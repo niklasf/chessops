@@ -23,7 +23,7 @@ export type Board = {
   [square in Square]?: Piece;
 }
 
-export type VariantKey = 'standard';
+export type Rules = 'chess';
 
 export interface Position {
   board: Board;
@@ -35,5 +35,5 @@ export interface Position {
   remainingChecks: any; // XXX
   fmvn: number;
   hmvc: number;
-  variant: VariantKey;
+  variant: Rules;
 }
