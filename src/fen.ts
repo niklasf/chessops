@@ -12,6 +12,12 @@ function emptyMaterial(): Material {
   };
 }
 
+function parseSquare(square: string): Square | undefined {
+  if ('a'.charCodeAt(0) > square.charCodeAt(0) || square.charCodeAt(0) > 'h'.charCodeAt(0)) return;
+  if ('1'.charCodeAt(0) > square.charCodeAt(1) || square.charCodeAt(1) > '8'.charCodeAt(0)) return;
+  return square as Square;
+}
+
 function parsePockets(pocketPart: string): ByColor<Material> | undefined {
   const pockets = { white: emptyMaterial(), black: emptyMaterial() };
   for (const c of pocketPart) {
@@ -112,10 +118,11 @@ export function parse(rules: Rules, fen: string): Position | undefined {
     // TODO
   }
 
-  let epSquare;
+  let epSquare: Square | undefined;
   const epPart = parts.shift();
   if (defined(epPart) && epPart != '-') {
-    // TODO
+    epSquare = parseSquare(epPart);
+    if (!epSquare) return; // invalid ep square
   }
 
   let halfmoves, remainingChecks;
