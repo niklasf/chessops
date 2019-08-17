@@ -82,20 +82,18 @@ export function parseCastlingRights(board: Board, castlingPart: string): Square[
   return castlingRights;
 }
 
-function parseUnsignedInt(str: string): number | undefined {
-  if (str.includes('+') || str.includes('-')) return;
-  const n = parseInt(str, 10);
-  return Number.isInteger(n) ? n : undefined;
+function parseUint(str: string): number | undefined {
+  return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
 }
 
 function parseRemainingChecks(part: string): Colored<number> | undefined {
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
-    const white = parseUnsignedInt(parts[1]), black = parseUnsignedInt(parts[2]);
+    const white = parseUint(parts[1]), black = parseUint(parts[2]);
     if (!defined(white) || white > 3 || !defined(black) || black > 3) return;
     return { white: 3 - white, black: 3 - black };
   } else if (parts.length == 2) {
-    const white = parseUnsignedInt(parts[0]), black = parseUnsignedInt(parts[1]);
+    const white = parseUint(parts[0]), black = parseUint(parts[1]);
     if (!defined(white) || white > 3 || !defined(black) || black > 3) return;
     return { white, black };
   } else return;
@@ -151,14 +149,14 @@ export function parse(fen: string): Setup | undefined {
     halfmovePart = parts.shift();
   }
   if (defined(halfmovePart)) {
-    halfmoves = parseUnsignedInt(halfmovePart);
+    halfmoves = parseUint(halfmovePart);
     if (!defined(halfmoves)) return; // invalid halfmoves
   }
 
   let fullmoves;
   const fullmovesPart = parts.shift();
   if (defined(fullmovesPart)) {
-    fullmoves = parseUnsignedInt(fullmovesPart);
+    fullmoves = parseUint(fullmovesPart);
     if (!defined(fullmoves)) return; // invalid fullmoves
   }
 
