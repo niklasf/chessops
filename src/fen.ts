@@ -1,8 +1,10 @@
 import { defined, nthIndexOf } from './util';
 import { Color, Board, Square, Piece, Position, Colored, Material, Setup } from './types';
 
-export const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
+export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
+export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
 function emptyMaterial(): Material {
   return {

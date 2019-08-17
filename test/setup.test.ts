@@ -1,9 +1,10 @@
-import { parseFen, INITIAL_FEN } from '../src/fen';
+import { parseFen, INITIAL_FEN, EMPTY_FEN } from '../src/fen';
 import { setup } from '../src/setup';
 
 test('setup initial position', () => {
-  const s = parseFen(INITIAL_FEN);
-  expect(s).toBeDefined();
-  const pos = setup(s!);
-  expect(pos).toBeDefined();
+  expect(setup(parseFen(INITIAL_FEN)!)).toBeDefined();
+});
+
+test('setup empty position', () => {
+  expect(setup(parseFen(EMPTY_FEN)!)).toBeUndefined();
 });
