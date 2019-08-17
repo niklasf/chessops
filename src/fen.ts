@@ -115,7 +115,10 @@ export function parse(rules: Rules, fen: string): Position | undefined {
   let castlingRights: Square[] = [];
   const castlingPart = parts.shift();
   if (defined(castlingPart) && castlingPart != '-') {
-    // TODO
+    for (const c of castlingPart) {
+      const rank = c == c.toLowerCase() ? '8' : '1';
+      // TODO
+    }
   }
 
   let epSquare: Square | undefined;
