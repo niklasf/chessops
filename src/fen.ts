@@ -1,7 +1,25 @@
 import { defined, nthIndexOf } from './util';
-import { Color, Board, Square, Rules, Piece, Position } from './types';
+import { Color, Board, Square, Rules, Piece, Position, ByColor, Material } from './types';
 
-function parsePockets(pocketPart: string): any | undefined {
+function emptyMaterial(): Material {
+  return {
+    pawn: 0,
+    knight: 0,
+    bishop: 0,
+    rook: 0,
+    queen: 0,
+    king: 0,
+  };
+}
+
+function parsePockets(pocketPart: string): ByColor<Material> | undefined {
+  const pockets = { white: emptyMaterial(), black: emptyMaterial() };
+  for (const c of pocketPart) {
+    const piece = parsePiece(c);
+    if (!piece) return;
+    pockets[piece.color][piece.role]++;
+  }
+  return pockets;
 }
 
 function parsePiece(c: string): Piece | undefined {
