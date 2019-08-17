@@ -39,7 +39,7 @@ export interface Material {
   king: number;
 }
 
-export interface Position {
+export interface Setup {
   board: Board;
   turn: Color;
   epSquare?: Square;
@@ -48,5 +48,8 @@ export interface Position {
   remainingChecks?: ByColor<number>;
   halfmoves: number;
   fullmoves: number;
+}
+
+export interface Position extends Setup {
   rules: Rules;
 }

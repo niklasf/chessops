@@ -1,5 +1,5 @@
 import { defined, nthIndexOf } from './util';
-import { Color, Board, Square, Rules, Piece, Position, ByColor, Material } from './types';
+import { Color, Board, Square, Piece, Position, ByColor, Material, Setup } from './types';
 
 function emptyMaterial(): Material {
   return {
@@ -85,7 +85,7 @@ function parseRemainingChecks(part: string): ByColor<number> | undefined {
   } else return;
 }
 
-export function parse(rules: Rules, fen: string): Position | undefined {
+export function parse(fen: string): Setup | undefined {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
@@ -174,7 +174,6 @@ export function parse(rules: Rules, fen: string): Position | undefined {
     castlingRights,
     remainingChecks,
     halfmoves: halfmoves || 0,
-    fullmoves: Math.max(1, fullmoves || 1),
-    rules
+    fullmoves: Math.max(1, fullmoves || 1)
   };
 }
