@@ -1,4 +1,4 @@
-import { Color, Board, Square, Rules, Position } from './types';
+import { Color, Board, Square, Rules, Piece, Position } from './types';
 
 function defined<A>(v: A | undefined): v is A {
   return typeof v !== 'undefined';
@@ -14,11 +14,40 @@ function nthIndexOf(haystack: string, needle: string, n: number): number {
 }
 
 function parsePockets(pocketPart: string): any | undefined {
+  // TODO
+}
+
+function parsePiece(c: string): Piece | undefined {
+  const color = c.toLowerCase() == c ? 'black' : 'white';
+  switch (c.toLowerCase()) {
+    case 'p': return { role: 'pawn', color };
+    case 'n': return { role: 'knight', color };
+    case 'b': return { role: 'bishop', color };
+    case 'r': return { role: 'rook', color };
+    case 'q': return { role: 'queen', color };
+    case 'k': return { role: 'king', color };
+    default: return;
+  }
 }
 
 function parseBoard(boardPart: string): Board | undefined {
-  let x = 0, y = 7;
-  return {};
+  let rank = 7, file = 0, board: Board = {};
+  for (const c of boardPart) {
+    if (c == '/' && file == 8) {
+      file = 0;
+      rank--;
+    } else {
+      const step = parseInt(c, 10);
+      if (step) file += step;
+      else {
+        const piece = parsePiece(c);
+        if (!piece) return;
+        const square = "abcdefgh"[file] + (rank + 1);
+        board[square as Square] = piece;
+      }
+    }
+  }
+  return (rank == 0 && file == 8) ? board : undefined;
 }
 
 function parseUnsignedInt(str: string): number | undefined {
@@ -28,6 +57,7 @@ function parseUnsignedInt(str: string): number | undefined {
 }
 
 function parseRemainingChecks(part: string): any | undefined {
+  // TODO
   return;
 }
 
