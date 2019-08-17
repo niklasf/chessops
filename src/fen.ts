@@ -65,9 +65,17 @@ function parseUnsignedInt(str: string): number | undefined {
   return typeof n == 'number' ? n : undefined;
 }
 
-function parseRemainingChecks(part: string): any | undefined {
-  // TODO
-  return;
+function parseRemainingChecks(part: string): ByColor<number> | undefined {
+  const parts = part.split('+');
+  if (parts.length == 3 && parts[0] === '') {
+    const white = parseUnsignedInt(parts[1]), black = parseUnsignedInt(parts[2]);
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return;
+    return { white: 3 - white, black: 3 - black };
+  } else if (parts.length == 2) {
+    const white = parseUnsignedInt(parts[0]), black = parseUnsignedInt(parts[1]);
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return;
+    return { white, black };
+  } else return;
 }
 
 export function parse(rules: Rules, fen: string): Position | undefined {

@@ -45,7 +45,7 @@ export interface Position {
   epSquare?: Square;
   castlingRights: Square[];
   pockets?: ByColor<Material>;
-  remainingChecks: ByColor<number>;
+  remainingChecks?: ByColor<number>;
   halfmoves: number;
   fullmoves: number;
   rules: Rules;
