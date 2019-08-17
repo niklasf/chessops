@@ -2,7 +2,6 @@ import { defined, nthIndexOf } from './util';
 import { Color, Board, Square, Rules, Piece, Position } from './types';
 
 function parsePockets(pocketPart: string): any | undefined {
-  // TODO
 }
 
 function parsePiece(c: string): Piece | undefined {
@@ -32,6 +31,7 @@ function parseBoard(boardPart: string): Board | undefined {
         if (!piece) return;
         const square = "abcdefgh"[file] + (rank + 1);
         board[square as Square] = piece;
+        file++;
       }
     }
   }
@@ -69,7 +69,6 @@ export function parse(rules: Rules, fen: string): Position | undefined {
       if (!pockets) return; // invalid pocket
     }
   }
-  console.log(board);
   if (!board) return; // invalid board
 
   let turn: Color;
