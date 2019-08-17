@@ -9,25 +9,25 @@ function nthIndexOf(haystack: string, needle: string, n: number): number {
   return index;
 }
 
-function readPockets(pocketPart: string): any | undefined {
+function parsePockets(pocketPart: string): any | undefined {
 }
 
-function readBoard(boardPart: string): Board | undefined {
+function parseBoard(boardPart: string): Board | undefined {
   let x = 0, y = 7;
   return {};
 }
 
-function readUnsignedInt(str: string): number | undefined {
+function parseUnsignedInt(str: string): number | undefined {
   if (str.includes('+') || str.includes('-')) return;
   const n = parseInt(str, 10);
   return typeof n == 'number' ? n : undefined;
 }
 
-function readRemainingChecks(part: string): any | undefined {
+function parseRemainingChecks(part: string): any | undefined {
   return;
 }
 
-export function read(rules: Rules, fen: string): Position | undefined {
+export function parse(rules: Rules, fen: string): Position | undefined {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
@@ -35,15 +35,15 @@ export function read(rules: Rules, fen: string): Position | undefined {
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
     if (pocketStart == -1) return; // no matching '[' for ']'
-    board = readBoard(boardPart.substr(0, pocketStart));
-    pockets = readPockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
+    board = parseBoard(boardPart.substr(0, pocketStart));
+    pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
     if (!pockets) return; // invalid pocket
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 8);
-    if (pocketStart == -1) board = readBoard(boardPart);
+    if (pocketStart == -1) board = parseBoard(boardPart);
     else {
-      board = readBoard(boardPart.substr(0, pocketStart));
-      pockets = readPockets(boardPart.substr(pocketStart + 1));
+      board = parseBoard(boardPart.substr(0, pocketStart));
+      pockets = parsePockets(boardPart.substr(pocketStart + 1));
       if (!pockets) return; // invalid pocket
     }
   }
@@ -70,26 +70,26 @@ export function read(rules: Rules, fen: string): Position | undefined {
   let halfmoves, remainingChecks;
   let halfmovePart = parts.shift();
   if (typeof halfmovePart != 'undefined' && halfmovePart.includes('+')) {
-    remainingChecks = readRemainingChecks(halfmovePart);
+    remainingChecks = parseRemainingChecks(halfmovePart);
     if (!remainingChecks) return; // invalid remaining checks
     halfmovePart = parts.shift();
   }
   if (typeof halfmovePart != 'undefined') {
-    halfmoves = readUnsignedInt(halfmovePart);
+    halfmoves = parseUnsignedInt(halfmovePart);
     if (typeof halfmoves == 'undefined') return; // invalid halfmoves
   }
 
   let fullmoves;
   const fullmovesPart = parts.shift();
   if (typeof fullmovesPart != 'undefined') {
-    fullmoves = readUnsignedInt(fullmovesPart);
+    fullmoves = parseUnsignedInt(fullmovesPart);
     if (typeof fullmoves == 'undefined') return; // invalid fullmoves
   }
 
   const remainingChecksPart = parts.shift();
   if (typeof remainingChecksPart != 'undefined') {
     if (remainingChecks) return; // already got this part
-    remainingChecks = readRemainingChecks(remainingChecksPart);
+    remainingChecks = parseRemainingChecks(remainingChecksPart);
     if (!remainingChecks) return; // invalid remaining checks
   }
 
