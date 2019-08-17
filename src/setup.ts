@@ -17,9 +17,17 @@ export function setup(setup: Setup): Position | undefined {
   }
   if (!kings.white || !kings.black) return; // missing king
 
+  // TODO: castling rights?
+
+  // TODO: ep square
+
+  // TODO: opposite check
+
   return {
-    board,
     rules: 'chess',
+    board,
+    pockets: undefined,
+    remainingChecks: undefined,
     ...setup
   };
 }
