@@ -88,7 +88,7 @@ export function parseCastlingRights(board: Board, castlingPart: string): Square[
 function parseUnsignedInt(str: string): number | undefined {
   if (str.includes('+') || str.includes('-')) return;
   const n = parseInt(str, 10);
-  return typeof n == 'number' ? n : undefined;
+  return Number.isInteger(n) ? n : undefined;
 }
 
 function parseRemainingChecks(part: string): ByColor<number> | undefined {
