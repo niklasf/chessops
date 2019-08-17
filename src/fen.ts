@@ -1,4 +1,4 @@
-import { Board, Rules, Position } from './types';
+import { Color, Board, Square, Rules, Position } from './types';
 
 function nthIndexOf(haystack: string, needle: string, n: number): number {
   let index = haystack.indexOf(needle);
@@ -15,6 +15,16 @@ function readPockets(pocketPart: string): any | undefined {
 function readBoard(boardPart: string): Board | undefined {
   let x = 0, y = 7;
   return {};
+}
+
+function readUnsignedInt(str: string): number | undefined {
+  if (str.includes('+') || str.includes('-')) return;
+  const n = parseInt(str, 10);
+  return typeof n == 'number' ? n : undefined;
+}
+
+function readRemainingChecks(part: string): any | undefined {
+  return;
 }
 
 export function read(rules: Rules, fen: string): Position | undefined {
@@ -39,13 +49,13 @@ export function read(rules: Rules, fen: string): Position | undefined {
   }
   if (!board) return; // invalid board
 
-  let turn;
+  let turn: Color;
   const turnPart = parts.shift();
   if (typeof turnPart == 'undefined' || turnPart == 'w') turn = 'white';
   else if (turnPart) turn = 'black';
   else return; // invalid turn
 
-  let castlingRights = [];
+  let castlingRights: Square[] = [];
   const castlingPart = parts.shift();
   if (typeof castlingPart != 'undefined' && castlingPart != '-') {
     // TODO
@@ -57,25 +67,33 @@ export function read(rules: Rules, fen: string): Position | undefined {
     // TODO
   }
 
-  let halfmoves = 0, fullmoves = 1, remainingChecks;
+  let halfmoves, remainingChecks;
   let halfmovePart = parts.shift();
-  if (typeof halfmovePart != 'undefined' && part.includes('+')) {
-    remainingChecks = readReaminingChecks(halfmovePart);
+  if (typeof halfmovePart != 'undefined' && halfmovePart.includes('+')) {
+    remainingChecks = readRemainingChecks(halfmovePart);
+    if (!remainingChecks) return; // invalid remaining checks
     halfmovePart = parts.shift();
   }
-  if (typeof halfmovePart != 'undefined') halfmoves = parseInt(halfmovePart, 10);
-  if (halfmoves < 0) return; // invalid halfmoves part
+  if (typeof halfmovePart != 'undefined') {
+    halfmoves = readUnsignedInt(halfmovePart);
+    if (typeof halfmoves == 'undefined') return; // invalid halfmoves
+  }
 
+  let fullmoves;
   const fullmovesPart = parts.shift();
-  if (typeof fullmovesPart != undefined) {
-    if (fullmovesPart.includes('+') || fullmovesPart.includes('-')) return; // invalid fullmoves part
+  if (typeof fullmovesPart != 'undefined') {
+    fullmoves = readUnsignedInt(fullmovesPart);
+    if (typeof fullmoves == 'undefined') return; // invalid fullmoves
   }
 
   const remainingChecksPart = parts.shift();
   if (typeof remainingChecksPart != 'undefined') {
+    if (remainingChecks) return; // already got this part
     remainingChecks = readRemainingChecks(remainingChecksPart);
     if (!remainingChecks) return; // invalid remaining checks
   }
+
+  if (parts.length) return;
 
   return {
     board,
@@ -84,7 +102,8 @@ export function read(rules: Rules, fen: string): Position | undefined {
     epSquare,
     castlingRights,
     remainingChecks,
-    halfmoves,
-    fullmoves
+    halfmoves: halfmoves || 0,
+    fullmoves: Math.max(1, fullmoves || 1),
+    rules
   };
 }

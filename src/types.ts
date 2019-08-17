@@ -34,5 +34,5 @@ export interface Position {
   remainingChecks: any; // XXX
   halfmoves: number;
   fullmoves: number;
-  variant: Rules;
+  rules: Rules;
 }
