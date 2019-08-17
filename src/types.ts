@@ -30,10 +30,9 @@ export interface Position {
   turn: Color;
   epSquare?: Square;
   castlingRights: any; // XXX
-  royalKings: any; // XXX
   pockets: any; // XXX
   remainingChecks: any; // XXX
-  fmvn: number;
-  hmvc: number;
+  halfmoves: number;
+  fullmoves: number;
   variant: Rules;
 }
