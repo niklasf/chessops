@@ -1,6 +1,9 @@
 import { defined, nthIndexOf } from './util';
 import { Color, Board, Square, Piece, Position, Colored, Material, Setup } from './types';
 
+export const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+
 function emptyMaterial(): Material {
   return {
     pawn: 0,
@@ -39,7 +42,7 @@ function parsePiece(c: string): Piece | undefined {
   }
 }
 
-export function parseBoard(boardPart: string): Board | undefined {
+export function parseBoardFen(boardPart: string): Board | undefined {
   let rank = 7, file = 0, board: Board = {};
   for (const c of boardPart) {
     if (c == '/' && file == 8) {
@@ -63,7 +66,7 @@ export function parseBoard(boardPart: string): Board | undefined {
   return (rank == 0 && file == 8) ? board : undefined;
 }
 
-export function parseCastlingRights(board: Board, castlingPart: string): Square[] | undefined {
+export function parseCastlingFen(board: Board, castlingPart: string): Square[] | undefined {
   const castlingRights: Square[] = [];
   if (castlingPart == '-') return castlingRights;
   for (const c of castlingPart) {
@@ -99,7 +102,7 @@ function parseRemainingChecks(part: string): Colored<number> | undefined {
   } else return;
 }
 
-export function parse(fen: string): Setup | undefined {
+export function parseFen(fen: string): Setup | undefined {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
@@ -107,14 +110,14 @@ export function parse(fen: string): Setup | undefined {
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
     if (pocketStart == -1) return; // no matching '[' for ']'
-    board = parseBoard(boardPart.substr(0, pocketStart));
+    board = parseBoardFen(boardPart.substr(0, pocketStart));
     pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
     if (!pockets) return; // invalid pocket
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 8);
-    if (pocketStart == -1) board = parseBoard(boardPart);
+    if (pocketStart == -1) board = parseBoardFen(boardPart);
     else {
-      board = parseBoard(boardPart.substr(0, pocketStart));
+      board = parseBoardFen(boardPart.substr(0, pocketStart));
       pockets = parsePockets(boardPart.substr(pocketStart + 1));
       if (!pockets) return; // invalid pocket
     }
@@ -130,7 +133,7 @@ export function parse(fen: string): Setup | undefined {
   let castlingRights: Square[] | undefined = [];
   const castlingPart = parts.shift();
   if (defined(castlingPart)) {
-    castlingRights = parseCastlingRights(board, castlingPart);
+    castlingRights = parseCastlingFen(board, castlingPart);
     if (!castlingRights) return; // invalid castling rights
   }
 
