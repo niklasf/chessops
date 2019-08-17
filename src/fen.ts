@@ -122,7 +122,8 @@ export function parse(rules: Rules, fen: string): Position | undefined {
         (c == 'q' || c == 'Q') ? 'abcdefgh' :
         (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
       for (const file of files) {
-        const square = (file + rank) as Square;
+        const square = parseSquare(file + rank);
+        if (!square) return; // invalid castling part
         const piece = board[square];
         if (piece && piece.role == 'rook' && piece.color == color) castlingRights.push(square);
       }

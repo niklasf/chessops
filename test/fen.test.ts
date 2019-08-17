@@ -9,3 +9,7 @@ test('read fen', () => {
   expect(pos.halfmoves).toBe(0);
   expect(pos.fullmoves).toBe(1);
 });
+
+test('invalid fen', () => {
+  expect(parse('chess', '8/8/8/8/8/8/8/8 w · - 0 1')).toBeUndefined();
+});
