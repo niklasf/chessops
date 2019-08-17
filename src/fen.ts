@@ -66,6 +66,25 @@ export function parseBoard(boardPart: string): Board | undefined {
   return (rank == 0 && file == 8) ? board : undefined;
 }
 
+export function parseCastlingRights(board: Board, castlingPart: string): Square[] | undefined {
+  const castlingRights: Square[] = [];
+  if (castlingPart == '-') return castlingRights;
+  for (const c of castlingPart) {
+    const color = c == c.toLowerCase() ? 'black' : 'white';
+    const rank = color == 'white' ? '1' : '8';
+    const files =
+      (c == 'q' || c == 'Q') ? 'abcdefgh' :
+      (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
+    for (const file of files) {
+      const square = parseSquare(file + rank);
+      if (!square) return; // invalid castling part
+      const piece = board[square];
+      if (piece && piece.role == 'rook' && piece.color == color) castlingRights.push(square);
+    }
+  }
+  return castlingRights;
+}
+
 function parseUnsignedInt(str: string): number | undefined {
   if (str.includes('+') || str.includes('-')) return;
   const n = parseInt(str, 10);
@@ -113,22 +132,11 @@ export function parse(fen: string): Setup | undefined {
   else if (turnPart) turn = 'black';
   else return; // invalid turn
 
-  let castlingRights: Square[] = [];
+  let castlingRights: Square[] | undefined = [];
   const castlingPart = parts.shift();
-  if (defined(castlingPart) && castlingPart != '-') {
-    for (const c of castlingPart) {
-      const color = c == c.toLowerCase() ? 'black' : 'white';
-      const rank = color == 'white' ? '1' : '8';
-      const files =
-        (c == 'q' || c == 'Q') ? 'abcdefgh' :
-        (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
-      for (const file of files) {
-        const square = parseSquare(file + rank);
-        if (!square) return; // invalid castling part
-        const piece = board[square];
-        if (piece && piece.role == 'rook' && piece.color == color) castlingRights.push(square);
-      }
-    }
+  if (defined(castlingPart)) {
+    castlingRights = parseCastlingRights(board, castlingPart);
+    if (!castlingRights) return; // invalid castling rights
   }
 
   let epSquare: Square | undefined;
