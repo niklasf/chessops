@@ -9,6 +9,26 @@ Goals
 * Fast enough for using it on the main thread of chess interfaces, even on
   mobile devices.
 
+Features
+--------
+
+<!-- Board editor: -->
+
+* [x] Parse FEN
+* [ ] Validate chess positions
+
+<!-- Ceval: -->
+
+* [ ] Make moves
+* [ ] Format principal variations
+
+<!-- Analysis board: -->
+
+* [ ] Write FEN
+* [ ] Validate variant chess positions
+* [ ] Generate legal moves
+* [ ] Write SAN
+
 License
 -------
 
