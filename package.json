@@ -1,5 +1,14 @@
 {
   "name": "chessrules",
   "version": "0.1.0",
-  "description": "Chess and chess variant rules"
+  "description": "Chess and chess variant rules",
+  "repository": "https://github.com/niklasf/chessrules",
+  "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "jest": "^24.9.0"
+  },
+  "scripts": {
+    "test": "jest"
+  }
 }

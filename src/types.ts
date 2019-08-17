@@ -11,6 +11,8 @@ export type Square = 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' |
                      'a7' | 'b7' | 'c7' | 'd7' | 'e7' | 'f7' | 'g7' | 'h7' |
                      'a8' | 'b8' | 'c8' | 'd8' | 'e8' | 'f8' | 'g8' | 'h8';
 
+export type Sq = number;
+
 export interface Piece {
   role: Role;
   color: Color;
@@ -19,4 +21,17 @@ export interface Piece {
 
 export interface Board {
   [square: Square]: Piece | undefined;
+}
+
+export interface Position {
+  board: Board;
+  turn: Color;
+  epSquare: Square?;
+  castlingRights: ...;
+  royalKings: ...;
+  pockets: ...;
+  remainingChecks: ...;
+  fmvn: number;
+  hmvc: number;
+  variant: VariantKey;
 }
