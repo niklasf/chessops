@@ -19,18 +19,20 @@ export interface Piece {
   promoted?: boolean;
 }
 
-export interface Board {
-  [square: Square]: Piece | undefined;
+export type Board = {
+  [square in Square]?: Piece;
 }
+
+export type VariantKey = 'standard';
 
 export interface Position {
   board: Board;
   turn: Color;
-  epSquare: Square?;
-  castlingRights: ...;
-  royalKings: ...;
-  pockets: ...;
-  remainingChecks: ...;
+  epSquare?: Square;
+  castlingRights: any; // XXX
+  royalKings: any; // XXX
+  pockets: any; // XXX
+  remainingChecks: any; // XXX
   fmvn: number;
   hmvc: number;
   variant: VariantKey;
