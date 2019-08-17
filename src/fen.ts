@@ -1,5 +1,9 @@
 import { Color, Board, Square, Rules, Position } from './types';
 
+function defined<A>(v: A | undefined): v is A {
+  return typeof v !== 'undefined';
+}
+
 function nthIndexOf(haystack: string, needle: string, n: number): number {
   let index = haystack.indexOf(needle);
   while (n-- > 0) {
@@ -51,43 +55,43 @@ export function parse(rules: Rules, fen: string): Position | undefined {
 
   let turn: Color;
   const turnPart = parts.shift();
-  if (typeof turnPart == 'undefined' || turnPart == 'w') turn = 'white';
+  if (!defined(turnPart) || turnPart == 'w') turn = 'white';
   else if (turnPart) turn = 'black';
   else return; // invalid turn
 
   let castlingRights: Square[] = [];
   const castlingPart = parts.shift();
-  if (typeof castlingPart != 'undefined' && castlingPart != '-') {
+  if (defined(castlingPart) && castlingPart != '-') {
     // TODO
   }
 
   let epSquare;
   const epPart = parts.shift();
-  if (typeof epPart != 'undefined' && epPart != '-') {
+  if (defined(epPart) && epPart != '-') {
     // TODO
   }
 
   let halfmoves, remainingChecks;
   let halfmovePart = parts.shift();
-  if (typeof halfmovePart != 'undefined' && halfmovePart.includes('+')) {
+  if (defined(halfmovePart) && halfmovePart.includes('+')) {
     remainingChecks = parseRemainingChecks(halfmovePart);
     if (!remainingChecks) return; // invalid remaining checks
     halfmovePart = parts.shift();
   }
-  if (typeof halfmovePart != 'undefined') {
+  if (defined(halfmovePart)) {
     halfmoves = parseUnsignedInt(halfmovePart);
-    if (typeof halfmoves == 'undefined') return; // invalid halfmoves
+    if (!defined(halfmoves)) return; // invalid halfmoves
   }
 
   let fullmoves;
   const fullmovesPart = parts.shift();
-  if (typeof fullmovesPart != 'undefined') {
+  if (defined(fullmovesPart)) {
     fullmoves = parseUnsignedInt(fullmovesPart);
-    if (typeof fullmoves == 'undefined') return; // invalid fullmoves
+    if (!defined(fullmoves)) return; // invalid fullmoves
   }
 
   const remainingChecksPart = parts.shift();
-  if (typeof remainingChecksPart != 'undefined') {
+  if (defined(remainingChecksPart)) {
     if (remainingChecks) return; // already got this part
     remainingChecks = parseRemainingChecks(remainingChecksPart);
     if (!remainingChecks) return; // invalid remaining checks
