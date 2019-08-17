@@ -25,13 +25,27 @@ export type Board = {
 
 export type Rules = 'chess';
 
+export interface ByColor<T> {
+  white: T,
+  black: T,
+}
+
+export interface Material {
+  pawn: number;
+  knight: number;
+  bishop: number;
+  rook: number;
+  queen: number;
+  king: number;
+}
+
 export interface Position {
   board: Board;
   turn: Color;
   epSquare?: Square;
-  castlingRights: any; // XXX
-  pockets: any; // XXX
-  remainingChecks: any; // XXX
+  castlingRights: Square[];
+  pockets?: ByColor<Material>;
+  remainingChecks: ByColor<number>;
   halfmoves: number;
   fullmoves: number;
   rules: Rules;

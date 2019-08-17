@@ -27,7 +27,7 @@ function parseBoard(boardPart: string): Board | undefined {
       const step = parseInt(c, 10);
       if (step) file += step;
       else {
-        const square = "abcdefgh"[file] + (rank + 1);
+        const square = 'abcdefgh'[file] + (rank + 1);
         if (c == '~' && board[square as Square]) board[square as Square]!.promoted = true;
         else {
           const piece = parsePiece(c);
