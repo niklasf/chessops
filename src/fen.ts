@@ -27,11 +27,14 @@ function parseBoard(boardPart: string): Board | undefined {
       const step = parseInt(c, 10);
       if (step) file += step;
       else {
-        const piece = parsePiece(c);
-        if (!piece) return;
         const square = "abcdefgh"[file] + (rank + 1);
-        board[square as Square] = piece;
-        file++;
+        if (c == '~' && board[square as Square]) board[square as Square]!.promoted = true;
+        else {
+          const piece = parsePiece(c);
+          if (!piece) return;
+          board[square as Square] = piece;
+          file++;
+        }
       }
     }
   }
