@@ -116,8 +116,16 @@ export function parse(rules: Rules, fen: string): Position | undefined {
   const castlingPart = parts.shift();
   if (defined(castlingPart) && castlingPart != '-') {
     for (const c of castlingPart) {
-      const rank = c == c.toLowerCase() ? '8' : '1';
-      // TODO
+      const color = c == c.toLowerCase() ? 'black' : 'white';
+      const rank = color == 'white' ? '1' : '8';
+      const files =
+        (c == 'q' || c == 'Q') ? 'abcdefgh' :
+        (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
+      for (const file of files) {
+        const square = (file + rank) as Square;
+        const piece = board[square];
+        if (piece && piece.role == 'rook' && piece.color == color) castlingRights.push(square);
+      }
     }
   }
 
