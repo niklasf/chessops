@@ -1,5 +1,5 @@
 import { defined, nthIndexOf } from './util';
-import { Color, Board, Square, Piece, Position, ByColor, Material, Setup } from './types';
+import { Color, Board, Square, Piece, Position, Colored, Material, Setup } from './types';
 
 function emptyMaterial(): Material {
   return {
@@ -19,7 +19,7 @@ function parseSquare(square: string): Square | undefined {
   return square as Square;
 }
 
-function parsePockets(pocketPart: string): ByColor<Material> | undefined {
+function parsePockets(pocketPart: string): Colored<Material> | undefined {
   const pockets = { white: emptyMaterial(), black: emptyMaterial() };
   for (const c of pocketPart) {
     const piece = parsePiece(c);
@@ -91,7 +91,7 @@ function parseUnsignedInt(str: string): number | undefined {
   return Number.isInteger(n) ? n : undefined;
 }
 
-function parseRemainingChecks(part: string): ByColor<number> | undefined {
+function parseRemainingChecks(part: string): Colored<number> | undefined {
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
     const white = parseUnsignedInt(parts[1]), black = parseUnsignedInt(parts[2]);
