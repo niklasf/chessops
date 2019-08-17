@@ -42,7 +42,7 @@ function parsePiece(c: string): Piece | undefined {
   }
 }
 
-function parseBoard(boardPart: string): Board | undefined {
+export function parseBoard(boardPart: string): Board | undefined {
   let rank = 7, file = 0, board: Board = {};
   for (const c of boardPart) {
     if (c == '/' && file == 8) {
