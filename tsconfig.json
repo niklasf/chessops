@@ -9,7 +9,10 @@
     "moduleResolution": "node",
     "target": "ES6",
     "lib": ["ES6"],
-    "module": "commonjs"
-  }
+    "module": "commonjs",
+    "outDir": "dist/lib",
+    "declarationDir": "dist/types",
+    "declaration": true
+  },
+  "include": ["src"]
 }
-
