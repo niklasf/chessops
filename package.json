@@ -6,9 +6,12 @@
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "jest": "^24.9.0"
+    "@types/jest": "^24.0.7",
+    "jest": "^24.9.0",
+    "typescript": "^3.5.3"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "compile": "tsc"
   }
 }
