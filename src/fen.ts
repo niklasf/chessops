@@ -1,17 +1,5 @@
+import { defined, nthIndexOf } from './util';
 import { Color, Board, Square, Rules, Piece, Position } from './types';
-
-function defined<A>(v: A | undefined): v is A {
-  return typeof v !== 'undefined';
-}
-
-function nthIndexOf(haystack: string, needle: string, n: number): number {
-  let index = haystack.indexOf(needle);
-  while (n-- > 0) {
-    if (index == -1) break;
-    index = haystack.indexOf(needle, index + 1);
-  }
-  return index;
-}
 
 function parsePockets(pocketPart: string): any | undefined {
   // TODO
@@ -81,6 +69,7 @@ export function parse(rules: Rules, fen: string): Position | undefined {
       if (!pockets) return; // invalid pocket
     }
   }
+  console.log(board);
   if (!board) return; // invalid board
 
   let turn: Color;
