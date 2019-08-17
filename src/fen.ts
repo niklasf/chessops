@@ -13,6 +13,7 @@ function emptyMaterial(): Material {
 }
 
 function parseSquare(square: string): Square | undefined {
+  if (square.length != 2) return;
   if ('a'.charCodeAt(0) > square.charCodeAt(0) || square.charCodeAt(0) > 'h'.charCodeAt(0)) return;
   if ('1'.charCodeAt(0) > square.charCodeAt(1) || square.charCodeAt(1) > '8'.charCodeAt(0)) return;
   return square as Square;
