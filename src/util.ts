@@ -1,4 +1,4 @@
-import { Square, Color } from './types';
+import { Square, Color, Role } from './types';
 
 export function opposite(color: Color): Color {
   return color == 'white' ? 'black' : 'white';
@@ -12,6 +12,7 @@ export function charToRole(c: string): Role | undefined {
     case 'r': case 'R': return 'rook';
     case 'q': case 'Q': return 'queen';
     case 'k': case 'K': return 'king';
+    default: return;
   }
 }
 
