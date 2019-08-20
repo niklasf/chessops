@@ -1,4 +1,4 @@
-import { defined, nthIndexOf } from './util';
+import { defined, nthIndexOf, charToRole } from './util';
 import { Color, Board, Square, Piece, Colored, Material, Setup, SQUARES } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -33,15 +33,8 @@ function parsePockets(pocketPart: string): Colored<Material> | undefined {
 
 export function parsePiece(c: string): Piece | undefined {
   const color = c.toLowerCase() == c ? 'black' : 'white';
-  switch (c.toLowerCase()) {
-    case 'p': return { role: 'pawn', color };
-    case 'n': return { role: 'knight', color };
-    case 'b': return { role: 'bishop', color };
-    case 'r': return { role: 'rook', color };
-    case 'q': return { role: 'queen', color };
-    case 'k': return { role: 'king', color };
-    default: return;
-  }
+  const role = charToRole(c);
+  return role && { role, color };
 }
 
 export function parseBoardFen(boardPart: string): Board | undefined {

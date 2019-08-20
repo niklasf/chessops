@@ -27,9 +27,9 @@ export type Role = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
 export const ROLES: Role[] = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
 
 export interface Piece {
-  role: Role;
-  color: Color;
-  promoted?: boolean;
+  readonly role: Role;
+  readonly color: Color;
+  readonly promoted?: boolean;
 }
 
 export interface Board {

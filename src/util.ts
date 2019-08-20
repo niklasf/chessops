@@ -4,6 +4,17 @@ export function opposite(color: Color): Color {
   return color == 'white' ? 'black' : 'white';
 }
 
+export function charToRole(c: string): Role | undefined {
+  switch (c) {
+    case 'p': case 'P': return 'pawn';
+    case 'n': case 'N': return 'knight';
+    case 'b': case 'B': return 'bishop';
+    case 'r': case 'R': return 'rook';
+    case 'q': case 'Q': return 'queen';
+    case 'k': case 'K': return 'king';
+  }
+}
+
 export function defined<A>(v: A | undefined): v is A {
   return typeof v !== 'undefined';
 }
