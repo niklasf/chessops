@@ -1,4 +1,4 @@
-import { defined, nthIndexOf, keyToSquare, KEYS } from './util';
+import { defined, nthIndexOf, SQUARES } from './util';
 import { Color, Board, Square, Piece, Colored, Material, Setup } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -54,7 +54,7 @@ export function parseBoardFen(boardPart: string): Board | undefined {
       const step = parseInt(c, 10);
       if (step) file += step;
       else {
-        const square = KEYS[file + rank * 8];
+        const square = SQUARES[file + rank * 8];
         if (c == '~' && board[square]) board[square]!.promoted = true;
         else {
           const piece = parsePiece(c);

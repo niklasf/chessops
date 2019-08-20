@@ -1,66 +1,80 @@
-import { Color, Role, Board, Sq } from './types';
-import { defined, pp } from './util';
+import { Color, Role, Board, Square } from './types';
+import { defined, pp, SQUARES } from './util';
 
-const ROOK_DELTAS = [1, -1, 8, -8];
-const BISHOP_DELTAS = [7, -7, 9, -9];
-
-function squareDist(a: Sq, b: Sq): number {
+function squareDist(a: number, b: number): number {
   const x1 = a & 7, x2 = b & 7;
   const y1 = a >> 3, y2 = b >> 3;
   return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
 }
 
-function slidingMovesTo(board: Board, square: Sq, deltas: number[]): Sq[] {
+// build some lookup tables
+type ShiftTable = { [sq in Square]: Square | undefined };
+const NORTH = {} as ShiftTable;
+const SOUTH = {} as ShiftTable;
+const WEST = {} as ShiftTable;
+const EAST = {} as ShiftTable;
+const NORTH_WEST = {} as ShiftTable;
+const NORTH_EAST = {} as ShiftTable;
+const SOUTH_WEST = {} as ShiftTable;
+const SOUTH_EAST = {} as ShiftTable;
+const KNIGHT_MOVES = {} as { [sq in Square]: Array<Square> };
+const KING_MOVES = {} as { [sq in Square]: Array<Square> };
+for (let s = 0; s < 64; s++) {
+  NORTH[SQUARES[s]] = SQUARES[s + 8];
+  SOUTH[SQUARES[s]] = SQUARES[s - 8];
+  WEST[SQUARES[s]] = (s & 7) > 0 ?  SQUARES[s - 1] : undefined;
+  EAST[SQUARES[s]] = (s & 7) < 7 ?  SQUARES[s + 1] : undefined;
+  NORTH_WEST[SQUARES[s]] = NORTH[WEST[SQUARES[s]]!];
+  NORTH_EAST[SQUARES[s]] = NORTH[EAST[SQUARES[s]]!];
+  SOUTH_WEST[SQUARES[s]] = SOUTH[WEST[SQUARES[s]]!];
+  SOUTH_EAST[SQUARES[s]] = SOUTH[EAST[SQUARES[s]]!];
+  KNIGHT_MOVES[SQUARES[s]] = [s + 17, s + 15, s + 10, s + 6, s - 6, s - 10, s - 15, s - 17].filter(
+    to => to >= 0 && to < 64 && squareDist(s, to) <= 2
+  ).map(to => SQUARES[to]);
+  KING_MOVES[SQUARES[s]] = [s - 1, s - 9, s - 8, s - 7, s + 1, s + 9, s + 8, s + 7].filter(
+    to => to >= 0 && to < 64 && squareDist(s, to) <= 2
+  ).map(to => SQUARES[to]);
+}
+
+function slidingMovesTo(board: Board, square: Square, deltas: ShiftTable[]): Square[] {
   let result = [];
   for (const delta of deltas) {
-    for (let s = square + delta; s >= 0 && s < 64 && squareDist(s, s - delta) == 1; s += delta) {
+    for (let s = delta[square]; s; s = delta[s]) {
       result.push(s);
       if (board[s]) break;
     }
   }
-  return result;
+  return result as Square[];
 }
 
-function kingMovesTo(s: Sq): Sq[] {
-  return [s - 1, s - 9, s - 8, s - 7, s + 1, s + 9, s + 8, s + 7].filter(
-    o => o >= 0 && o < 64 && squareDist(s, o) == 1);
+function pawnAttacksTo(color: Color, square: Square): Square[] {
+  const forward = (color == 'white' ? NORTH : SOUTH)[square];
+  return [WEST[forward!], EAST[forward!]].filter(s => s) as Square[];
 }
 
-function knightMovesTo(s: Sq): Sq[] {
-  return [s + 17, s + 15, s + 10, s + 6, s - 6, s - 10, s - 15, s - 17].filter(
-    o => o >= 0 && o < 64 && squareDist(s, o) <= 2);
-}
-
-function pawnAttacksTo(color: Color, s: Sq): Sq[] {
-  const left = color == 'white' ? 7 : -7;
-  const right = color == 'black' ? 9 : -9;
-  return [s + left, s + right].filter(
-    o => o >= 0 && o < 64 && squareDist(s, 0) == 1);
-}
-
-function isAt(board: Board, s: Sq, turn: Color, role: Role): boolean {
-  const piece = board[s];
+function isAt(board: Board, square: Square, turn: Color, role: Role): boolean {
+  const piece = board[square];
   return !!(piece && piece.role == role && piece.color == turn);
 }
 
-export function findKing(board: Board, color: Color): Sq | undefined {
-  let king: Sq | undefined;
+export function findKing(board: Board, color: Color): Square | undefined {
+  let king: Square | undefined;
   for (const sq in board) {
-    const piece = board[sq];
+    const piece = board[sq as Square];
     if (piece && piece.role == 'king' && piece.color == color && !piece.promoted) {
       if (defined(king)) return; // not unique
-      else king = sq;
+      else king = sq as Square;
     }
   }
   return king;
 }
 
-export function attacksTo(board: Board, by: Color, s: Sq): Sq[] {
+export function attacksTo(board: Board, by: Color, s: Square): Square[] {
   return pp([
-    ...kingMovesTo(s).filter(o => isAt(board, o, by, 'king')),
-    ...knightMovesTo(s).filter(o => isAt(board, o, by, 'knight')),
+    ...KING_MOVES[s].filter(o => isAt(board, o, by, 'king')),
+    ...KNIGHT_MOVES[s].filter(o => isAt(board, o, by, 'knight')),
     ...pawnAttacksTo(by, s).filter(o => isAt(board, o, by, 'pawn')),
-    ...slidingMovesTo(board, s, ROOK_DELTAS).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
-    ...slidingMovesTo(board, s, BISHOP_DELTAS).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
+    ...slidingMovesTo(board, s, [WEST, EAST, NORTH, SOUTH]).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
+    ...slidingMovesTo(board, s, [NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST]).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
   ], 'attacksTo');
 }

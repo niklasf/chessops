@@ -1,6 +1,6 @@
-import { Sq, Key, Color } from './types';
+import { Square, Color } from './types';
 
-export const KEYS: Key[] = [
+export const SQUARES: Square[] = [
     'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1',
     'a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2',
     'a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3',
@@ -8,17 +8,8 @@ export const KEYS: Key[] = [
     'a5', 'b5', 'c5', 'd5', 'e5', 'f5', 'g5', 'h5',
     'a6', 'b6', 'c6', 'd6', 'e6', 'f6', 'g6', 'h6',
     'a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7',
-    'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'];
-
-export function keyToSquare(key: Key): Sq {
-  const file = key.charCodeAt(0) - 'a'.charCodeAt(0);
-  const rank = key.charCodeAt(1) - '1'.charCodeAt(0);
-  return file + rank * 8;
-}
-
-export function squareToKey(square: Sq): Key {
-  return ('abcdefgh'[square & 7] + (1 + square >> 3)) as Key;
-}
+    'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'
+];
 
 export function otherColor(color: Color): Color {
   return color == 'white' ? 'black' : 'white';
