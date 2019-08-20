@@ -59,11 +59,11 @@ function isAt(board: Board, square: Square, turn: Color, role: Role): boolean {
 
 export function findKing(board: Board, color: Color): Square | undefined {
   let king: Square | undefined;
-  for (const sq in board) {
-    const piece = board[sq as Square];
+  for (const square in board) {
+    const piece = board[square];
     if (piece && piece.role == 'king' && piece.color == color && !piece.promoted) {
       if (defined(king)) return; // not unique
-      else king = sq as Square;
+      else king = square as Square;
     }
   }
   return king;

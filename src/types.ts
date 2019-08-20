@@ -17,8 +17,8 @@ export interface Piece {
   promoted?: boolean;
 }
 
-export type Board = {
-  [square in Key]?: Piece | undefined;
+export interface Board {
+  [square: string]: Piece | undefined;
 }
 
 export interface Colored<T> {
@@ -38,8 +38,8 @@ export interface Material {
 export interface Setup {
   board: Board;
   turn: Color;
-  epSquare?: Key;
-  castlingRights: Key[];
+  epSquare?: Square;
+  castlingRights: Square[];
   pockets?: Colored<Material>;
   remainingChecks?: Colored<number>;
   halfmoves: number;
