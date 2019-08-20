@@ -27,6 +27,8 @@ export function makeMove(pos: Position, uci: Uci) {
   if (capture || piece.role == 'pawn') pos.halfmoves = 0;
   else pos.halfmoves++;
 
+  // TODO: castling & update castling rights
+
   if (piece.role == 'pawn') {
     // en passant
     if (!capture && from[1] != to[1]) {
