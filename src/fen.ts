@@ -27,22 +27,21 @@ function parseSquare(square: string): Square | undefined {
 function parsePockets(pocketPart: string): Colored<Material> | undefined {
   const pockets = { white: emptyMaterial(), black: emptyMaterial() };
   for (const c of pocketPart) {
-    const piece = parsePiece(c);
-    if (!piece) return;
-    pockets[piece.color][piece.role]++;
+    const piece = charToPiece(c);
+    if (piece) pockets[piece.color][piece.role]++;
   }
   return pockets;
 }
 
-function parsePiece(c: string): Piece | undefined {
+function charToPiece(c: string): Piece | undefined {
   const color = c.toLowerCase() == c ? 'black' : 'white';
   const role = charToRole(c);
   return role && { role, color };
 }
 
 export function parseBoardFen(boardPart: string): Board | undefined {
-  console.log('board fen', boardPart);
-  let rank = 7, file = 0, board: Board = {};
+  const board: Board = {};
+  let rank = 7, file = 0;
   for (let i = 0; i < boardPart.length; i++) {
     const c = boardPart[i];
     if (c == '/' && file == 8) {
@@ -53,7 +52,7 @@ export function parseBoardFen(boardPart: string): Board | undefined {
       if (step) file += step;
       else {
         const square = SQUARES[file + rank * 8];
-        const piece = parsePiece(c);
+        const piece = charToPiece(c);
         if (!piece) return;
         if (boardPart[i + 1] == '~') {
           board[square] = { promoted: true, ...piece };
@@ -67,23 +66,22 @@ export function parseBoardFen(boardPart: string): Board | undefined {
 }
 
 export function parseCastlingFen(board: Board, castlingPart: string): Square[] | undefined {
-  const castlingRights: Square[] = [];
-  if (castlingPart == '-') return castlingRights;
+  if (castlingPart == '-') return [];
   if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return;
+  const castlingRights: Square[] = [];
   for (const c of castlingPart) {
     const color = c == c.toLowerCase() ? 'black' : 'white';
     const rank = color == 'white' ? '1' : '8';
-    const files =
-      (c == 'q' || c == 'Q') ? ABCDEFGH :
-      (c == 'k' || c == 'K') ? HGFEDCBA : c.toLowerCase();
+    const files = (c == 'q' || c == 'Q') ? ABCDEFGH :
+                  (c == 'k' || c == 'K') ? HGFEDCBA : c.toLowerCase();
     for (const file of files) {
       const square = (file + rank) as Square;
       const piece = board[square];
-      if (piece && piece.role == 'rook' && piece.color == color && castlingRights.indexOf(square) == -1)
-        castlingRights.push(square);
+      if (!piece || piece.color != color) continue;
+      if (piece.role == 'king') break;
+      if (piece.role == 'rook' && castlingRights.indexOf(square) == -1) castlingRights.push(square);
     }
   }
-  console.log('castlingRights', castlingRights);
   return castlingRights;
 }
 
@@ -105,7 +103,6 @@ function parseRemainingChecks(part: string): Colored<number> | undefined {
 }
 
 export function parseFen(fen: string): Setup | undefined {
-  console.log('====', fen);
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
@@ -118,7 +115,6 @@ export function parseFen(fen: string): Setup | undefined {
     if (!pockets) return; // invalid pocket
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 7);
-    console.log('pocketStart', pocketStart);
     if (pocketStart == -1) board = parseBoardFen(boardPart);
     else {
       board = parseBoardFen(boardPart.substr(0, pocketStart));
@@ -126,7 +122,6 @@ export function parseFen(fen: string): Setup | undefined {
       if (!pockets) return; // invalid pocket
     }
   }
-  console.log('board', board);
   if (!board) return; // invalid board
 
   let turn: Color;
@@ -189,10 +184,6 @@ export function parseFen(fen: string): Setup | undefined {
   };
 }
 
-interface FenOpts {
-  promoted?: boolean;
-}
-
 function roleToChar(role: Role): string {
   switch (role) {
     case 'pawn': return 'p';
@@ -209,6 +200,10 @@ function makePiece(piece: Piece, opts?: FenOpts): string {
   if (piece.color == 'white') r = r.toUpperCase();
   if (opts && opts.promoted && piece.promoted) r += '~';
   return r;
+}
+
+interface FenOpts {
+  promoted?: boolean;
 }
 
 export function makeBoardFen(board: Board, opts?: FenOpts): string {
