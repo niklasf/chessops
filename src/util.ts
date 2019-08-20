@@ -16,18 +16,6 @@ export function charToRole(c: string): Role | undefined {
   }
 }
 
-export function findKing(board: Board, color: Color): Square | undefined {
-  let king: Square | undefined;
-  for (const square in board) {
-    const piece = board[square];
-    if (piece && piece.role == 'king' && piece.color == color && !piece.promoted) {
-      if (defined(king)) return; // not unique
-      else king = square as Square;
-    }
-  }
-  return king;
-}
-
 export function defined<A>(v: A | undefined): v is A {
   return typeof v !== 'undefined';
 }

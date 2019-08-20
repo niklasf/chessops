@@ -1,5 +1,5 @@
 import { Color, Role, Board, Square, SQUARES } from './types';
-import { findKing, defined, pp } from './util';
+import { defined, pp } from './util';
 
 function squareDist(a: number, b: number): number {
   const x1 = a & 7, x2 = b & 7;
@@ -65,4 +65,16 @@ export function attacksTo(board: Board, by: Color, s: Square): Square[] {
     ...slidingMovesTo(board, s, [WEST, EAST, NORTH, SOUTH]).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
     ...slidingMovesTo(board, s, [NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST]).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
   ], 'attacksTo');
+}
+
+export function findKing(board: Board, color: Color): Square | undefined {
+  let king: Square | undefined;
+  for (const square in board) {
+    const piece = board[square];
+    if (piece && piece.role == 'king' && piece.color == color && !piece.promoted) {
+      if (defined(king)) return; // not unique
+      else king = square as Square;
+    }
+  }
+  return king;
 }

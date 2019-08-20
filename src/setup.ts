@@ -1,6 +1,6 @@
 import { Board, Setup, Position, Square, Colored } from './types';
-import { defined, findKing, opposite, fail } from './util';
-import { attacksTo } from './attacks';
+import { defined, opposite, fail } from './util';
+import { findKing, attacksTo } from './attacks';
 
 export function setup(setup: Setup): Position | undefined {
   console.log('----');

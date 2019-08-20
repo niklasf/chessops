@@ -1,4 +1,4 @@
-import { defined, nthIndexOf, charToRole, findKing, strRepeat } from './util';
+import { defined, nthIndexOf, charToRole, strRepeat } from './util';
 import { Color, COLORS, Board, Square, Role, Piece, Colored, Material, Setup, SQUARES } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
