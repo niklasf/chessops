@@ -48,7 +48,7 @@ export function parseBoardFen(boardPart: string): Board | undefined {
       if (step) file += step;
       else {
         const square = SQUARES[file + rank * 8];
-        if (c == '~' && board[square]) board[square]!.promoted = true;
+        if (c == '~' && board[square]) board[square] = { promoted: true, ...board[square]! };
         else {
           const piece = parsePiece(c);
           if (!piece) return;
