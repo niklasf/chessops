@@ -1,5 +1,5 @@
-import { defined, nthIndexOf, charToRole } from './util';
-import { Color, Board, Square, Role, Piece, Colored, Material, Setup, SQUARES } from './types';
+import { defined, nthIndexOf, charToRole, findKing } from './util';
+import { Color, COLORS, Board, Square, Role, Piece, Colored, Material, Setup, SQUARES } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -78,6 +78,7 @@ export function parseCastlingFen(board: Board, castlingPart: string): Square[] |
         castlingRights.push(square);
     }
   }
+  console.log('castlingRights', castlingRights);
   return castlingRights;
 }
 
@@ -182,6 +183,7 @@ export function parseFen(fen: string): Setup | undefined {
 
 interface FenOpts {
   promoted?: boolean;
+  shredder?: boolean;
 }
 
 function roleToChar(role: Role): string {
@@ -231,8 +233,20 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
   return fen;
 }
 
-function makeCastlingFen(setup: Setup): string {
-  return '-';
+function makeCastlingFen(setup: Setup, opts?: FenOpts): string {
+  const builder = [];
+  for (const color of COLORS) {
+    const king = findKing(setup.board, color);
+    if (!king) continue;
+    for (const rook of setup.castlingRights) {
+      if ((color == 'white') != (rook[1] == '1')) continue;
+      const aSide = rook < king;
+      console.log(rook, king, aSide);
+      const ch = aSide ? 'q' : 'k';
+      builder.push(color == 'white' ? ch.toUpperCase() : ch);
+    }
+  }
+  return builder.length ? builder.join('') : '-';
 }
 
 export function makeFen(setup: Setup, opts?: FenOpts): string {

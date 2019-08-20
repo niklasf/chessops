@@ -1,5 +1,5 @@
 import { Color, Role, Board, Square, SQUARES } from './types';
-import { defined, pp } from './util';
+import { findKing, defined, pp } from './util';
 
 function squareDist(a: number, b: number): number {
   const x1 = a & 7, x2 = b & 7;
@@ -55,18 +55,6 @@ function pawnAttacksTo(color: Color, square: Square): Square[] {
 function isAt(board: Board, square: Square, turn: Color, role: Role): boolean {
   const piece = board[square];
   return !!(piece && piece.role == role && piece.color == turn);
-}
-
-export function findKing(board: Board, color: Color): Square | undefined {
-  let king: Square | undefined;
-  for (const square in board) {
-    const piece = board[square];
-    if (piece && piece.role == 'king' && piece.color == color && !piece.promoted) {
-      if (defined(king)) return; // not unique
-      else king = square as Square;
-    }
-  }
-  return king;
 }
 
 export function attacksTo(board: Board, by: Color, s: Square): Square[] {
