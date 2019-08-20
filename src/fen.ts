@@ -234,19 +234,31 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
 }
 
 function makeCastlingFen(setup: Setup, opts?: FenOpts): string {
-  const builder = [];
+  let result = '';
   for (const color of COLORS) {
-    const king = findKing(setup.board, color);
-    if (!king) continue;
-    for (const rook of setup.castlingRights) {
-      if ((color == 'white') != (rook[1] == '1')) continue;
-      const aSide = rook < king;
-      console.log(rook, king, aSide);
-      const ch = aSide ? 'q' : 'k';
-      builder.push(color == 'white' ? ch.toUpperCase() : ch);
+    let side = '', foundKing = false;
+    for (const direction of 'kq') {
+      let outer = true;
+      for (const file of (direction == 'k' ? 'hgfedcba' : 'abcdefgh')) {
+        const cr = file + (color == 'white' ? '1' : '8') as Square;
+        const piece = setup.board[cr];
+        if (!piece || piece.color != color) continue;
+        if (piece.role == 'king') {
+          foundKing = true;
+          break;
+        }
+        if (piece.role == 'rook') {
+          if (setup.castlingRights.indexOf(cr) != -1) {
+            side += outer ? direction : file;
+          }
+          outer = false;
+        }
+      }
     }
+    if (!foundKing) side = '';
+    result += color == 'white' ? side.toUpperCase() : side;
   }
-  return builder.length ? builder.join('') : '-';
+  return result || '-';
 }
 
 export function makeFen(setup: Setup, opts?: FenOpts): string {
