@@ -28,7 +28,8 @@ function parsePockets(pocketPart: string): Colored<Material> | undefined {
   const pockets = { white: emptyMaterial(), black: emptyMaterial() };
   for (const c of pocketPart) {
     const piece = charToPiece(c);
-    if (piece) pockets[piece.color][piece.role]++;
+    if (!piece) return;
+    pockets[piece.color][piece.role]++;
   }
   return pockets;
 }

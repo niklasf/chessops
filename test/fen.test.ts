@@ -12,8 +12,10 @@ test('parse fen', () => {
 test('parse invalid fen', () => {
   expect(parseFen('')).toBeUndefined();
   expect(parseFen('x')).toBeUndefined();
-  expect(parseFen('8/8/8/8/8/8/8/8 w - - a82 1')).toBeUndefined();
-  expect(parseFen('8/8/8/8/8/8/8/8 w - - 0 -2')).toBeUndefined();
+  expect(parseFen('8/8/8/8/8/8/8/8[x] w - - 0 1')).toBeUndefined();
+  expect(parseFen('8/8/8/8/8/8/8/8 w - e3 a82 1')).toBeUndefined();
+  expect(parseFen('8/8/8/8/8/8/8/8 w - e6 0 -2')).toBeUndefined();
+  expect(parseFen('8/8/8/8/8/8/8/8 w - a99 0 1')).toBeUndefined();
   expect(parseFen('8/8/8/8/8/8/8/8 w · - 0 1')).toBeUndefined();
 });
 
