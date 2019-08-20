@@ -31,3 +31,10 @@ test('make fen', () => {
   const pos = parseFen(INITIAL_FEN)!;
   expect(makeFen(pos)).toBe(INITIAL_FEN);
 });
+
+test('read and write crazyhouse fen', () => {
+  const fen = 'rnbqk1nQ~/ppppp3/8/5p2/8/5N2/PPPPPPP1/RNBQKB1R/PPBRq b KQq - 0 6';
+  const pos = parseFen(fen);
+  expect(pos).toBeDefined();
+  expect(makeFen(pos!, {promoted: true})).toBe(fen);
+});

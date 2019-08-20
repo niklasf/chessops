@@ -41,8 +41,10 @@ function parsePiece(c: string): Piece | undefined {
 }
 
 export function parseBoardFen(boardPart: string): Board | undefined {
+  console.log('board fen', boardPart);
   let rank = 7, file = 0, board: Board = {};
-  for (const c of boardPart) {
+  for (let i = 0; i < boardPart.length; i++) {
+    const c = boardPart[i];
     if (c == '/' && file == 8) {
       file = 0;
       rank--;
@@ -51,13 +53,13 @@ export function parseBoardFen(boardPart: string): Board | undefined {
       if (step) file += step;
       else {
         const square = SQUARES[file + rank * 8];
-        if (c == '~' && board[square]) board[square] = { promoted: true, ...board[square]! };
-        else {
-          const piece = parsePiece(c);
-          if (!piece) return;
-          board[square] = piece;
-          file++;
-        }
+        const piece = parsePiece(c);
+        if (!piece) return;
+        if (boardPart[i + 1] == '~') {
+          board[square] = { promoted: true, ...piece };
+          i++;
+        } else board[square] = piece;
+        file++;
       }
     }
   }
@@ -103,6 +105,7 @@ function parseRemainingChecks(part: string): Colored<number> | undefined {
 }
 
 export function parseFen(fen: string): Setup | undefined {
+  console.log('====', fen);
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
@@ -114,7 +117,8 @@ export function parseFen(fen: string): Setup | undefined {
     pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
     if (!pockets) return; // invalid pocket
   } else {
-    const pocketStart = nthIndexOf(boardPart, '/', 8);
+    const pocketStart = nthIndexOf(boardPart, '/', 7);
+    console.log('pocketStart', pocketStart);
     if (pocketStart == -1) board = parseBoardFen(boardPart);
     else {
       board = parseBoardFen(boardPart.substr(0, pocketStart));
@@ -122,6 +126,7 @@ export function parseFen(fen: string): Setup | undefined {
       if (!pockets) return; // invalid pocket
     }
   }
+  console.log('board', board);
   if (!board) return; // invalid board
 
   let turn: Color;
@@ -237,12 +242,12 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
 
 function makePocket(material: Material): string {
   return (
-    strRepeat('k', material.king) +
-    strRepeat('q', material.queen) +
-    strRepeat('r', material.rook) +
-    strRepeat('b', material.bishop) +
+    strRepeat('p', material.pawn) +
     strRepeat('n', material.knight) +
-    strRepeat('p', material.pawn)
+    strRepeat('b', material.bishop) +
+    strRepeat('r', material.rook) +
+    strRepeat('q', material.queen) +
+    strRepeat('k', material.king)
   );
 }
 
