@@ -282,5 +282,6 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     setup.halfmoves,
     setup.fullmoves
   ];
+  if (setup.remainingChecks) parts.push(`+${3 - setup.remainingChecks.white}+${3 - setup.remainingChecks.black}`);
   return parts.join(' ');
 }
