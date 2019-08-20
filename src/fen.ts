@@ -6,6 +6,9 @@ export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
 export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
 export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
+const ABCDEFGH = 'abcdefgh';
+const HGFEDCBA = 'hgfedcba';
+
 function emptyMaterial(): Material {
   return {
     pawn: 0,
@@ -69,8 +72,8 @@ export function parseCastlingFen(board: Board, castlingPart: string): Square[] |
     const color = c == c.toLowerCase() ? 'black' : 'white';
     const rank = color == 'white' ? '1' : '8';
     const files =
-      (c == 'q' || c == 'Q') ? 'abcdefgh' :
-      (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
+      (c == 'q' || c == 'Q') ? ABCDEFGH :
+      (c == 'k' || c == 'K') ? HGFEDCBA : c.toLowerCase();
     for (const file of files) {
       const square = (file + rank) as Square;
       const piece = board[square];
@@ -253,7 +256,7 @@ function makeCastlingFen(setup: Setup, opts?: FenOpts): string {
     let side = '', foundKing = false;
     for (const direction of 'kq') {
       let outer = true;
-      for (const file of (direction == 'k' ? 'hgfedcba' : 'abcdefgh')) {
+      for (const file of (direction == 'k' ? HGFEDCBA : ABCDEFGH)) {
         const cr = file + (color == 'white' ? '1' : '8') as Square;
         const piece = setup.board[cr];
         if (!piece || piece.color != color) continue;
