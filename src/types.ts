@@ -36,9 +36,8 @@ export interface Board {
   [square: string]: Piece | undefined;
 }
 
-export interface Colored<T> {
-  white: T,
-  black: T,
+export type Colored<T> = {
+  [color in Color]: T;
 }
 
 export type Material = {
