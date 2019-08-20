@@ -1,4 +1,4 @@
-import { defined, nthIndexOf, charToRole, findKing } from './util';
+import { defined, nthIndexOf, charToRole, findKing, strRepeat } from './util';
 import { Color, COLORS, Board, Square, Role, Piece, Colored, Material, Setup, SQUARES } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -232,6 +232,21 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
   return fen;
 }
 
+function makePocket(material: Material): string {
+  return (
+    strRepeat('k', material.king) +
+    strRepeat('q', material.queen) +
+    strRepeat('r', material.rook) +
+    strRepeat('b', material.bishop) +
+    strRepeat('n', material.knight) +
+    strRepeat('p', material.pawn)
+  );
+}
+
+function makePockets(pocket: Colored<Material>): string {
+  return makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
+}
+
 function makeCastlingFen(setup: Setup, opts?: FenOpts): string {
   let result = '';
   for (const color of COLORS) {
@@ -260,7 +275,7 @@ function makeCastlingFen(setup: Setup, opts?: FenOpts): string {
 
 export function makeFen(setup: Setup, opts?: FenOpts): string {
   const parts = [
-    makeBoardFen(setup.board, opts),
+    makeBoardFen(setup.board, opts) + (setup.pockets ? ('/' + makePockets(setup.pockets)) : ''),
     setup.turn[0],
     makeCastlingFen(setup),
     setup.epSquare || '-',

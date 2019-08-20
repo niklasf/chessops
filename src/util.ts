@@ -41,6 +41,12 @@ export function nthIndexOf(haystack: string, needle: string, n: number): number 
   return index;
 }
 
+export function strRepeat(str: string, num: number): string {
+  let r = '';
+  for (let i = 0; i < num; i++) r += str;
+  return r;
+}
+
 // TODO: remove
 export function fail(str: string): undefined {
   console.log(str);
