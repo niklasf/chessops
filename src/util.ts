@@ -1,4 +1,4 @@
-import { Sq, Key } from './types';
+import { Sq, Key, Color } from './types';
 
 export function keyToSquare(key: Key): Sq {
   const file = key.charCodeAt(0) - 'a'.charCodeAt(0);
@@ -8,6 +8,10 @@ export function keyToSquare(key: Key): Sq {
 
 export function squareToKey(square: Sq): Key {
   return ('abcdefgh'[square & 7] + (1 + square >> 3)) as Key;
+}
+
+export function otherColor(color: Color): Color {
+  return color == 'white' ? 'black' : 'white';
 }
 
 export function defined<A>(v: A | undefined): v is A {

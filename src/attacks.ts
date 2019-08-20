@@ -54,6 +54,18 @@ function isAt(board: Board, s: Sq, turn: Color, role: Role): boolean {
   return !!(piece && piece.role == role && piece.color == turn);
 }
 
+export function findKing(board: Board, color: Color): Sq | undefined {
+  let king = undefined;
+  for (const sq of board) {
+    const piece = board[sq];
+    if (piece && piece.role == 'king' && piece.color == color && !piece.promoted) {
+      if (defined(king)) return;
+      else king = sq;
+    }
+  }
+  return king;
+}
+
 export function attacksTo(board: Board, by: Color, s: Sq): Sq[] {
   return [
     ...kingMovesTo(s).filter(o => isAt(board, o, by, 'king')),

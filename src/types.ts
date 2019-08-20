@@ -20,7 +20,7 @@ export interface Piece {
 }
 
 export type Board = {
-  [square in Sq]?: Piece;
+  [square: Sq]: Piece | undefined;
 }
 
 export interface Colored<T> {

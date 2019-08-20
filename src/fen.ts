@@ -69,9 +69,9 @@ export function parseBoardFen(boardPart: string): Board | undefined {
 }
 
 export function parseCastlingFen(board: Board, castlingPart: string): Sq[] | undefined {
-  if (castlingPart == '-') return [];
-  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return;
   const castlingRights: Sq[] = [];
+  if (castlingPart == '-') return castlingRights;
+  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return;
   for (const c of castlingPart) {
     const color = c == c.toLowerCase() ? 'black' : 'white';
     const rank = color == 'white' ? '1' : '8';
