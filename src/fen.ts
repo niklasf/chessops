@@ -69,8 +69,9 @@ export function parseBoardFen(boardPart: string): Board | undefined {
 }
 
 export function parseCastlingFen(board: Board, castlingPart: string): Sq[] | undefined {
+  if (castlingPart == '-') return [];
+  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return;
   const castlingRights: Sq[] = [];
-  if (castlingPart == '-') return castlingRights;
   for (const c of castlingPart) {
     const color = c == c.toLowerCase() ? 'black' : 'white';
     const rank = color == 'white' ? '1' : '8';
@@ -78,8 +79,7 @@ export function parseCastlingFen(board: Board, castlingPart: string): Sq[] | und
       (c == 'q' || c == 'Q') ? 'abcdefgh' :
       (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
     for (const file of files) {
-      const square = parseSquare(file + rank);
-      if (!defined(square)) return; // invalid castling part
+      const square = keyToSquare((file + rank) as Square);
       const piece = board[square];
       if (piece && piece.role == 'rook' && piece.color == color && castlingRights.indexOf(square) == -1)
         castlingRights.push(square);
