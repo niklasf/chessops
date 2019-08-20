@@ -248,9 +248,7 @@ function makeCastlingFen(setup: Setup, opts?: FenOpts): string {
           break;
         }
         if (piece.role == 'rook') {
-          if (setup.castlingRights.indexOf(cr) != -1) {
-            side += outer ? direction : file;
-          }
+          if (setup.castlingRights.indexOf(cr) != -1) side += outer ? direction : file;
           outer = false;
         }
       }
