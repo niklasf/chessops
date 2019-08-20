@@ -1,4 +1,9 @@
-import { nthIndexOf } from '../src/util';
+import { opposite, nthIndexOf } from '../src/util';
+
+test('opposite color', () => {
+  expect(opposite('white')).toBe('black');
+  expect(opposite('black')).toBe('white');
+});
 
 test('nth index', () => {
   expect(nthIndexOf('aa', 'b', 0)).toBe(-1);
