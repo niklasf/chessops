@@ -1,5 +1,5 @@
 import { Board, Setup, Position, Square, Colored } from './types';
-import { defined, otherColor, fail } from './util';
+import { defined, opposite, fail } from './util';
 import { findKing, attacksTo } from './attacks';
 
 export function setup(setup: Setup): Position | undefined {
@@ -28,7 +28,7 @@ export function setup(setup: Setup): Position | undefined {
   if (!defined(findKing(board, setup.turn))) return fail('side to move has no king');
 
   // other side in check
-  const otherKing = findKing(board, otherColor(setup.turn));
+  const otherKing = findKing(board, opposite(setup.turn));
   if (!defined(otherKing)) return fail('other side has no king');
   if (attacksTo(board, setup.turn, otherKing).length) return fail('opposite check'); // opposite check
 
