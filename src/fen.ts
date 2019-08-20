@@ -275,7 +275,7 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     makeBoardFen(setup.board, opts) + (setup.pockets ? ('/' + makePockets(setup.pockets)) : ''),
     setup.turn[0],
     makeCastlingFen(setup),
-    setup.epSquare || '-',
+    setup.epSquare || '-', // TODO: only legal ep squares
     setup.halfmoves,
     setup.fullmoves
   ];
