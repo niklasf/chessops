@@ -26,3 +26,8 @@ export function nthIndexOf(haystack: string, needle: string, n: number): number 
   }
   return index;
 }
+
+export function fail(str: string): undefined {
+  console.log(str);
+  return;
+}
