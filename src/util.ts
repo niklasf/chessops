@@ -31,3 +31,9 @@ export function fail(str: string): undefined {
   console.log(str);
   return;
 }
+
+export function pp<A>(v: A, name?: string): A {
+  if (name) console.log(name, v);
+  else console.log(v);
+  return v;
+}

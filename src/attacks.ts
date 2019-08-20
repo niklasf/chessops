@@ -1,5 +1,5 @@
 import { Color, Role, Board, Sq } from './types';
-import { defined } from './util';
+import { defined, pp } from './util';
 
 const ROOK_DELTAS = [1, -1, 8, -8];
 const BISHOP_DELTAS = [7, -7, 9, -9];
@@ -55,11 +55,11 @@ export function findKing(board: Board, color: Color): Sq | undefined {
 }
 
 export function attacksTo(board: Board, by: Color, s: Sq): Sq[] {
-  return [
+  return pp([
     ...kingMovesTo(s).filter(o => isAt(board, o, by, 'king')),
     ...knightMovesTo(s).filter(o => isAt(board, o, by, 'knight')),
     ...pawnAttacksTo(by, s).filter(o => isAt(board, o, by, 'pawn')),
     ...slidingMovesTo(board, s, ROOK_DELTAS).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
     ...slidingMovesTo(board, s, BISHOP_DELTAS).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
-  ];
+  ], 'attacksTo');
 }

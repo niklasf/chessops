@@ -21,7 +21,7 @@ export function setup(setup: Setup): Position | undefined {
 
   const otherKing = findKing(board, otherColor(setup.turn));
   if (!defined(otherKing)) return fail('other side has no king');
-  if (attacksTo(board, setup.turn, otherKing)) return fail('opposite check'); // opposite check
+  if (attacksTo(board, setup.turn, otherKing).length) return fail('opposite check'); // opposite check
 
   return {
     rules: 'chess',
