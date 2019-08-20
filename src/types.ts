@@ -18,6 +18,8 @@ export const SQUARES: Square[] = [
     'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'
 ];
 
+export type Uci = string; // g1f3, h2h1q, P@e3
+
 export type Color = 'white' | 'black';
 
 export const COLORS: Color[] = ['white', 'black'];
