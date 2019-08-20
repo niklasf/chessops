@@ -1,5 +1,5 @@
-import { defined, nthIndexOf } from './util';
-import { Color, Board, Square, Piece, Position, Colored, Material, Setup } from './types';
+import { defined, nthIndexOf, keyToSquare } from './util';
+import { Color, Board, Square, Key, Piece, Position, Colored, Material, Setup } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -18,7 +18,7 @@ function emptyMaterial(): Material {
 }
 
 function parseSquare(square: string): Square | undefined {
-  return /^[a-h][1-8]$/.test(square) ? square as Square : undefined;
+  return /^[a-h][1-8]$/.test(square) ? keyToSquare(square as Key) : undefined;
 }
 
 function parsePockets(pocketPart: string): Colored<Material> | undefined {
@@ -54,12 +54,12 @@ export function parseBoardFen(boardPart: string): Board | undefined {
       const step = parseInt(c, 10);
       if (step) file += step;
       else {
-        const square = 'abcdefgh'[file] + (rank + 1);
-        if (c == '~' && board[square as Square]) board[square as Square]!.promoted = true;
+        const square = file + rank * 8;
+        if (c == '~' && board[square]) board[square]!.promoted = true;
         else {
           const piece = parsePiece(c);
           if (!piece) return;
-          board[square as Square] = piece;
+          board[square] = piece;
           file++;
         }
       }
@@ -81,7 +81,7 @@ export function parseCastlingFen(board: Board, castlingPart: string): Square[] |
       const square = parseSquare(file + rank);
       if (!square) return; // invalid castling part
       const piece = board[square];
-      if (piece && piece.role == 'rook' && piece.color == color && !castlingRights.includes(square))
+      if (piece && piece.role == 'rook' && piece.color == color && castlingRights.indexOf(square) == -1)
         castlingRights.push(square);
     }
   }
