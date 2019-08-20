@@ -60,3 +60,7 @@ export type Rules = 'chess' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'at
 export interface Position extends Setup {
   rules: Rules;
 }
+
+export interface Dests {
+  [square: string]: Square[] | undefined;
+}
