@@ -1,12 +1,12 @@
-import { Square, Key } from './types';
+import { Sq, Key } from './types';
 
-export function keyToSquare(key: Key): Square {
+export function keyToSquare(key: Key): Sq {
   const file = key.charCodeAt(0) - 'a'.charCodeAt(0);
   const rank = key.charCodeAt(1) - '1'.charCodeAt(0);
   return file + rank * 8;
 }
 
-export function squareToKey(square: Square): Key {
+export function squareToKey(square: Sq): Key {
   return ('abcdefgh'[square & 7] + (1 + square >> 3)) as Key;
 }
 

@@ -1,5 +1,5 @@
 import { defined, nthIndexOf, keyToSquare } from './util';
-import { Color, Board, Square, Key, Piece, Position, Colored, Material, Setup } from './types';
+import { Color, Board, Sq, Key, Piece, Position, Colored, Material, Setup } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -17,7 +17,7 @@ function emptyMaterial(): Material {
   };
 }
 
-function parseSquare(square: string): Square | undefined {
+function parseSquare(square: string): Sq | undefined {
   return /^[a-h][1-8]$/.test(square) ? keyToSquare(square as Key) : undefined;
 }
 
@@ -68,8 +68,8 @@ export function parseBoardFen(boardPart: string): Board | undefined {
   return (rank == 0 && file == 8) ? board : undefined;
 }
 
-export function parseCastlingFen(board: Board, castlingPart: string): Square[] | undefined {
-  const castlingRights: Square[] = [];
+export function parseCastlingFen(board: Board, castlingPart: string): Sq[] | undefined {
+  const castlingRights: Sq[] = [];
   if (castlingPart == '-') return castlingRights;
   for (const c of castlingPart) {
     const color = c == c.toLowerCase() ? 'black' : 'white';
@@ -133,18 +133,18 @@ export function parseFen(fen: string): Setup | undefined {
   else if (turnPart) turn = 'black';
   else return; // invalid turn
 
-  let castlingRights: Square[] | undefined = [];
+  let castlingRights: Sq[] | undefined = [];
   const castlingPart = parts.shift();
   if (defined(castlingPart)) {
     castlingRights = parseCastlingFen(board, castlingPart);
     if (!castlingRights) return; // invalid castling rights
   }
 
-  let epSquare: Square | undefined;
+  let epSquare: Sq | undefined;
   const epPart = parts.shift();
   if (defined(epPart) && epPart != '-') {
     epSquare = parseSquare(epPart);
-    if (!epSquare) return; // invalid ep square
+    if (!defined(epSquare)) return; // invalid ep square
   }
 
   let halfmoves, remainingChecks;
