@@ -13,10 +13,7 @@ export function setup(setup: Setup): Position | undefined {
   // copy and discard promoted flag
   const board = setup.board.map(piece => piece && { role: piece.role, color: piece.color });
 
-  if (!defined(findKing(board, setup.turn))) return fail('side to move has no king');
-
-  // TODO: castling rights?
-
+  // ep square
   if (defined(setup.epSquare)) {
     const rank = setup.epSquare >> 3;
     if (rank != (setup.turn == 'white' ? 5 : 4)) return fail('ep square not on sixth rank');
@@ -25,6 +22,10 @@ export function setup(setup: Setup): Position | undefined {
     if (!pawn || pawn.role != 'pawn' || pawn.color == setup.turn) return fail('missing ep pawn');
   }
 
+  // missing king
+  if (!defined(findKing(board, setup.turn))) return fail('side to move has no king');
+
+  // other side in check
   const otherKing = findKing(board, otherColor(setup.turn));
   if (!defined(otherKing)) return fail('other side has no king');
   if (attacksTo(board, setup.turn, otherKing).length) return fail('opposite check'); // opposite check
