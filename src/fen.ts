@@ -1,5 +1,5 @@
 import { defined, nthIndexOf, charToRole, strRepeat } from './util';
-import { Color, COLORS, Board, Square, Role, Piece, Colored, Material, Setup, SQUARES } from './types';
+import { Color, COLORS, Board, Square, Role, ROLES, Piece, Colored, Material, Setup, SQUARES } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -241,14 +241,7 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
 }
 
 function makePocket(material: Material): string {
-  return (
-    strRepeat('p', material.pawn) +
-    strRepeat('n', material.knight) +
-    strRepeat('b', material.bishop) +
-    strRepeat('r', material.rook) +
-    strRepeat('q', material.queen) +
-    strRepeat('k', material.king)
-  );
+  return ROLES.map(role => strRepeat(roleToChar(role), material[role])).join('');
 }
 
 function makePockets(pocket: Colored<Material>): string {
