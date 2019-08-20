@@ -17,7 +17,13 @@ export function setup(setup: Setup): Position | undefined {
 
   // TODO: castling rights?
 
-  // TODO: ep square
+  if (defined(setup.epSquare)) {
+    const rank = setup.epSquare >> 3;
+    if (rank != (setup.turn == 'white' ? 5 : 4)) return fail('ep square not on sixth rank');
+    if (board[setup.epSquare + (setup.turn == 'white' ? -8 : 8)]) return fail('invalid ep square');
+    const pawn = board[setup.epSquare + (setup.turn == 'white' ? 8 : -8)];
+    if (!pawn || pawn.role != 'pawn' || pawn.color == setup.turn) return fail('missing ep pawn');
+  }
 
   const otherKing = findKing(board, otherColor(setup.turn));
   if (!defined(otherKing)) return fail('other side has no king');
