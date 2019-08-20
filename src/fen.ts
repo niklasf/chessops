@@ -81,7 +81,8 @@ export function parseCastlingFen(board: Board, castlingPart: string): Square[] |
       const square = parseSquare(file + rank);
       if (!square) return; // invalid castling part
       const piece = board[square];
-      if (piece && piece.role == 'rook' && piece.color == color) castlingRights.push(square);
+      if (piece && piece.role == 'rook' && piece.color == color && !castlingRights.includes(square))
+        castlingRights.push(square);
     }
   }
   return castlingRights;
