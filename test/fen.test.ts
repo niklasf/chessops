@@ -1,9 +1,8 @@
-import { keyToSquare } from '../src/util';
 import { parseFen, INITIAL_FEN } from '../src/fen';
 
 test('read fen', () => {
   const pos = parseFen(INITIAL_FEN)!;
-  expect(pos.board[keyToSquare('e2')]).toEqual({role: 'pawn', color: 'white'});
+  expect(pos.board['e2']).toEqual({role: 'pawn', color: 'white'});
   expect(pos.turn).toBe('white');
   expect(pos.epSquare).toBeUndefined();
   expect(pos.halfmoves).toBe(0);

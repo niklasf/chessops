@@ -1,4 +1,4 @@
-import { defined, nthIndexOf, keyToSquare } from './util';
+import { defined, nthIndexOf, keyToSquare, KEYS } from './util';
 import { Color, Board, Sq, Key, Piece, Position, Colored, Material, Setup } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -17,8 +17,8 @@ function emptyMaterial(): Material {
   };
 }
 
-function parseSquare(square: string): Sq | undefined {
-  return /^[a-h][1-8]$/.test(square) ? keyToSquare(square as Key) : undefined;
+function parseSquare(square: string): Key | undefined {
+  return /^[a-h][1-8]$/.test(square) ? square as Key : undefined;
 }
 
 function parsePockets(pocketPart: string): Colored<Material> | undefined {
@@ -45,7 +45,7 @@ function parsePiece(c: string): Piece | undefined {
 }
 
 export function parseBoardFen(boardPart: string): Board | undefined {
-  let rank = 7, file = 0, board: Board = [];
+  let rank = 7, file = 0, board: Board = {};
   for (const c of boardPart) {
     if (c == '/' && file == 8) {
       file = 0;
@@ -54,7 +54,7 @@ export function parseBoardFen(boardPart: string): Board | undefined {
       const step = parseInt(c, 10);
       if (step) file += step;
       else {
-        const square = file + rank * 8;
+        const square = KEYS[file + rank * 8];
         if (c == '~' && board[square]) board[square]!.promoted = true;
         else {
           const piece = parsePiece(c);
@@ -68,8 +68,8 @@ export function parseBoardFen(boardPart: string): Board | undefined {
   return (rank == 0 && file == 8) ? board : undefined;
 }
 
-export function parseCastlingFen(board: Board, castlingPart: string): Sq[] | undefined {
-  const castlingRights: Sq[] = [];
+export function parseCastlingFen(board: Board, castlingPart: string): Key[] | undefined {
+  const castlingRights: Key[] = [];
   if (castlingPart == '-') return castlingRights;
   if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return;
   for (const c of castlingPart) {
@@ -79,7 +79,7 @@ export function parseCastlingFen(board: Board, castlingPart: string): Sq[] | und
       (c == 'q' || c == 'Q') ? 'abcdefgh' :
       (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
     for (const file of files) {
-      const square = keyToSquare((file + rank) as Key);
+      const square = (file + rank) as Key;
       const piece = board[square];
       if (piece && piece.role == 'rook' && piece.color == color && castlingRights.indexOf(square) == -1)
         castlingRights.push(square);
@@ -133,14 +133,14 @@ export function parseFen(fen: string): Setup | undefined {
   else if (turnPart) turn = 'black';
   else return; // invalid turn
 
-  let castlingRights: Sq[] | undefined = [];
+  let castlingRights: Key[] | undefined = [];
   const castlingPart = parts.shift();
   if (defined(castlingPart)) {
     castlingRights = parseCastlingFen(board, castlingPart);
     if (!castlingRights) return; // invalid castling rights
   }
 
-  let epSquare: Sq | undefined;
+  let epSquare: Key | undefined;
   const epPart = parts.shift();
   if (defined(epPart) && epPart != '-') {
     epSquare = parseSquare(epPart);

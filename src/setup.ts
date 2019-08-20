@@ -1,24 +1,26 @@
-import { Board, Setup, Position, Sq, Colored } from './types';
+import { Board, Setup, Position, Sq, Key, Colored } from './types';
 import { defined, otherColor, fail } from './util';
 import { findKing, attacksTo } from './attacks';
 
 export function setup(setup: Setup): Position | undefined {
   console.log('----');
-  // pawn on backrank
-  if (setup.board.some((piece, square) => {
-    const rank = square >> 3;
-    return piece && piece.role == 'pawn' && (rank == 0 || rank == 7);
-  })) return fail('pawns on backrank');
+  const board: Board = {};
+  for (const square in setup.board) {
+    const piece = setup.board[square as Key];
+    if (!piece) continue;
 
-  // copy and discard promoted flag
-  const board = setup.board.map(piece => piece && { role: piece.role, color: piece.color });
+    // pawn on backrank
+    if (piece.role == 'pawn' && (square[1] == '1' || square[1] == '8')) return fail('pawns on backrank');
+
+    // copy and discard promoted flag
+    board[square as Key] = { role: piece.role, color: piece.color };
+  };
 
   // ep square
   if (defined(setup.epSquare)) {
-    const rank = setup.epSquare >> 3;
-    if (rank != (setup.turn == 'white' ? 5 : 4)) return fail('ep square not on sixth rank');
-    if (board[setup.epSquare + (setup.turn == 'white' ? -8 : 8)]) return fail('invalid ep square');
-    const pawn = board[setup.epSquare + (setup.turn == 'white' ? 8 : -8)];
+    if (setup.epSquare[1] != (setup.turn == 'white' ? '6' : '3')) return fail('ep square not on sixth rank');
+    if (board[setup.epSquare[0] + (setup.turn == 'white' ? '7' : '2') as Key]) return fail('invalid ep square');
+    const pawn = board[setup.epSquare[0] + (setup.turn == 'white' ? '5' : '4') as Key];
     if (!pawn || pawn.role != 'pawn' || pawn.color == setup.turn) return fail('missing ep pawn');
   }
 

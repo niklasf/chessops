@@ -1,5 +1,3 @@
-export type Sq = number;
-
 export type Key = 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' |
                   'a2' | 'b2' | 'c2' | 'd2' | 'e2' | 'f2' | 'g2' | 'h2' |
                   'a3' | 'b3' | 'c3' | 'd3' | 'e3' | 'f3' | 'g3' | 'h3' |
@@ -8,6 +6,8 @@ export type Key = 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' |
                   'a6' | 'b6' | 'c6' | 'd6' | 'e6' | 'f6' | 'g6' | 'h6' |
                   'a7' | 'b7' | 'c7' | 'd7' | 'e7' | 'f7' | 'g7' | 'h7' |
                   'a8' | 'b8' | 'c8' | 'd8' | 'e8' | 'f8' | 'g8' | 'h8';
+
+export type Sq = Key; // TODO: clean up type names
 
 export type Color = 'white' | 'black';
 
@@ -19,7 +19,9 @@ export interface Piece {
   promoted?: boolean;
 }
 
-export type Board = Array<Piece | undefined>;
+export type Board = {
+  [square in Key]?: Piece | undefined;
+}
 
 export interface Colored<T> {
   white: T,
@@ -38,8 +40,8 @@ export interface Material {
 export interface Setup {
   board: Board;
   turn: Color;
-  epSquare?: Square;
-  castlingRights: Square[];
+  epSquare?: Key;
+  castlingRights: Key[];
   pockets?: Colored<Material>;
   remainingChecks?: Colored<number>;
   halfmoves: number;
