@@ -183,7 +183,6 @@ export function parseFen(fen: string): Setup | undefined {
 
 interface FenOpts {
   promoted?: boolean;
-  shredder?: boolean;
 }
 
 function roleToChar(role: Role): string {
