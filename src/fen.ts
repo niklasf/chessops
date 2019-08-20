@@ -79,7 +79,7 @@ export function parseCastlingFen(board: Board, castlingPart: string): Sq[] | und
       (c == 'k' || c == 'K') ? 'hgfedcba' : c.toLowerCase();
     for (const file of files) {
       const square = parseSquare(file + rank);
-      if (!square) return; // invalid castling part
+      if (!defined(square)) return; // invalid castling part
       const piece = board[square];
       if (piece && piece.role == 'rook' && piece.color == color && castlingRights.indexOf(square) == -1)
         castlingRights.push(square);
