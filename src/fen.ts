@@ -1,5 +1,5 @@
-import { defined, nthIndexOf, SQUARES } from './util';
-import { Color, Board, Square, Piece, Colored, Material, Setup } from './types';
+import { defined, nthIndexOf } from './util';
+import { Color, Board, Square, Piece, Colored, Material, Setup, SQUARES } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';

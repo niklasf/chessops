@@ -1,5 +1,5 @@
-import { Color, Role, Board, Square } from './types';
-import { defined, pp, SQUARES } from './util';
+import { Color, Role, Board, Square, SQUARES } from './types';
+import { defined, pp } from './util';
 
 function squareDist(a: number, b: number): number {
   const x1 = a & 7, x2 = b & 7;
