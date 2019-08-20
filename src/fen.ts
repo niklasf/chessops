@@ -31,7 +31,7 @@ function parsePockets(pocketPart: string): Colored<Material> | undefined {
   return pockets;
 }
 
-function parsePiece(c: string): Piece | undefined {
+export function parsePiece(c: string): Piece | undefined {
   const color = c.toLowerCase() == c ? 'black' : 'white';
   switch (c.toLowerCase()) {
     case 'p': return { role: 'pawn', color };
