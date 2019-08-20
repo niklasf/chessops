@@ -20,7 +20,11 @@ export const SQUARES: Square[] = [
 
 export type Color = 'white' | 'black';
 
+export const COLORS: Color[] = ['white', 'black'];
+
 export type Role = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
+
+export const ROLES: Role[] = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
 
 export interface Piece {
   role: Role;
