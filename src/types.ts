@@ -41,13 +41,8 @@ export interface Colored<T> {
   black: T,
 }
 
-export interface Material {
-  pawn: number;
-  knight: number;
-  bishop: number;
-  rook: number;
-  queen: number;
-  king: number;
+export type Material = {
+  [role in Role]: number;
 }
 
 export interface Setup {
