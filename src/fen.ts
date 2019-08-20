@@ -45,7 +45,7 @@ function parsePiece(c: string): Piece | undefined {
 }
 
 export function parseBoardFen(boardPart: string): Board | undefined {
-  let rank = 7, file = 0, board: Board = {};
+  let rank = 7, file = 0, board: Board = [];
   for (const c of boardPart) {
     if (c == '/' && file == 8) {
       file = 0;

@@ -19,9 +19,7 @@ export interface Piece {
   promoted?: boolean;
 }
 
-export type Board = {
-  [square: Sq]: Piece | undefined;
-}
+export type Board = Array<Piece | undefined>;
 
 export interface Colored<T> {
   white: T,

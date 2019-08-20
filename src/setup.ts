@@ -3,16 +3,14 @@ import { defined, otherColor } from './util';
 import { findKing, attacksTo } from './attacks';
 
 export function setup(setup: Setup): Position | undefined {
-  const board: Board = {};
-  for (const square in setup.board) {
-    const piece = setup.board[square];
-    if (!piece) continue;
-    if (piece.role == 'pawn') {
-      const rank: number = square >> 3;
-      if (rank == 0 || rank == 7) return; // pawn on backrank
-    }
-    board[square] = { role: piece.role, color: piece.color }; // discard promoted
-  }
+  // pawn on backrank
+  if (setup.board.some((piece, square) => {
+    const rank = square >> 3;
+    return piece && piece.role == 'pawn' && (rank == 0 || rank == 7);
+  })) return;
+
+  // copy and discard promoted flag
+  const board = setup.board.map(piece => piece && { role: piece.role, color: piece.color });
 
   if (!defined(findKing(board, setup.turn))) return;
 

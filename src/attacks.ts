@@ -1,19 +1,8 @@
-import { Color, Role, Board, Square } from './types';
-
-type Sq = number;
+import { Color, Role, Board, Sq } from './types';
+import { defined } from './util';
 
 const ROOK_DELTAS = [1, -1, 8, -8];
 const BISHOP_DELTAS = [7, -7, 9, -9];
-
-function squareToSq(square: Square): Sq {
-  const file = square.charCodeAt(0) - 'a'.charCodeAt(0);
-  const rank = square.charCodeAt(1) - '1'.charCodeAt(0);
-  return file + 8 * rank;
-}
-
-function sqToSquare(sq: Sq): Square {
-  return ('abcdefgh'[sq & 7] + (1 + sq >> 3)) as Square;
-}
 
 function squareDist(a: Sq, b: Sq): number {
   const x1 = a & 7, x2 = b & 7;
@@ -26,7 +15,7 @@ function slidingMovesTo(board: Board, square: Sq, deltas: number[]): Sq[] {
   for (const delta of deltas) {
     for (let s = square + delta; s >= 0 && s < 64 && squareDist(s, s - delta) == 1; s += delta) {
       result.push(s);
-      if (board[sqToSquare(s)]) break;
+      if (board[s]) break;
     }
   }
   return result;
@@ -42,27 +31,26 @@ function knightMovesTo(s: Sq): Sq[] {
     o => o >= 0 && o < 64 && squareDist(s, o) <= 2);
 }
 
-function pawnAttacksTo(turn: Color, s: Sq): Sq[] {
-  const left = turn == 'white' ? 7 : -7;
-  const right = turn == 'black' ? 9 : -9;
+function pawnAttacksTo(color: Color, s: Sq): Sq[] {
+  const left = color == 'white' ? 7 : -7;
+  const right = color == 'black' ? 9 : -9;
   return [s + left, s + right].filter(
     o => o >= 0 && o < 64 && squareDist(s, 0) == 1);
 }
 
 function isAt(board: Board, s: Sq, turn: Color, role: Role): boolean {
-  const piece = board[sqToSquare(s)];
+  const piece = board[s];
   return !!(piece && piece.role == role && piece.color == turn);
 }
 
 export function findKing(board: Board, color: Color): Sq | undefined {
-  let king = undefined;
-  for (const sq of board) {
-    const piece = board[sq];
+  let king: Sq | undefined;
+  board.forEach((piece, sq) => {
     if (piece && piece.role == 'king' && piece.color == color && !piece.promoted) {
       if (defined(king)) return;
       else king = sq;
     }
-  }
+  });
   return king;
 }
 
@@ -70,8 +58,8 @@ export function attacksTo(board: Board, by: Color, s: Sq): Sq[] {
   return [
     ...kingMovesTo(s).filter(o => isAt(board, o, by, 'king')),
     ...knightMovesTo(s).filter(o => isAt(board, o, by, 'knight')),
-    ...pawnAttacksTo(s).filter(o => isAt(board, o, by, 'pawn')),
+    ...pawnAttacksTo(by, s).filter(o => isAt(board, o, by, 'pawn')),
     ...slidingMovesTo(board, s, ROOK_DELTAS).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
-    ...slidingMovesTo(board, s, BISHOP_DELTAS).filter(o => isAt(board, o, by 'bishop') || isAt(board, o, by, 'queen'))
+    ...slidingMovesTo(board, s, BISHOP_DELTAS).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
   ];
 }
