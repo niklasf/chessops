@@ -34,16 +34,3 @@ export function strRepeat(str: string, num: number): string {
   for (let i = 0; i < num; i++) r += str;
   return r;
 }
-
-// TODO: remove
-export function fail(str: string): undefined {
-  console.log(str);
-  return;
-}
-
-// TODO: remove
-export function pp<A>(v: A, name?: string): A {
-  if (name) console.log(name, v);
-  else console.log(v);
-  return v;
-}

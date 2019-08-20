@@ -1,5 +1,5 @@
 import { Color, Role, Board, Square, SQUARES } from './types';
-import { defined, pp } from './util';
+import { defined } from './util';
 
 function squareDist(a: number, b: number): number {
   const x1 = a & 7, x2 = b & 7;
@@ -58,13 +58,13 @@ function isAt(board: Board, square: Square, turn: Color, role: Role): boolean {
 }
 
 export function attacksTo(board: Board, by: Color, s: Square): Square[] {
-  return pp([
+  return [
     ...KING_MOVES[s].filter(o => isAt(board, o, by, 'king')),
     ...KNIGHT_MOVES[s].filter(o => isAt(board, o, by, 'knight')),
     ...pawnAttacksTo(by, s).filter(o => isAt(board, o, by, 'pawn')),
     ...slidingMovesTo(board, s, [WEST, EAST, NORTH, SOUTH]).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
     ...slidingMovesTo(board, s, [NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST]).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
-  ], 'attacksTo');
+  ];
 }
 
 export function findKing(board: Board, color: Color): Square | undefined {
