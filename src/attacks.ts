@@ -70,8 +70,8 @@ export function attacksTo(board: Board, by: Color, s: Square): Square[] {
     ...KING_MOVES[s].filter(o => isAt(board, o, by, 'king')),
     ...KNIGHT_MOVES[s].filter(o => isAt(board, o, by, 'knight')),
     ...pawnAttacks(s, opposite(by)).filter(o => isAt(board, o, by, 'pawn')),
-    ...rookAttacks(board, s).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
-    ...bishopAttacks(board, s).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
+    ...(rookAttacks(board, s).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen'))),
+    ...(bishopAttacks(board, s).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen')))
   ];
 }
 
