@@ -1,6 +1,6 @@
 import { Position, Role, Piece, Uci, Square } from './types';
 import { opposite, charToRole, arrayRemove } from './util';
-import { KING_MOVES } from './attacks';
+import { findKing, attacksTo, KING_MOVES } from './attacks';
 
 export function makeMove(pos: Position, uci: Uci) {
   pos.epSquare = undefined;
@@ -27,6 +27,7 @@ export function makeMove(pos: Position, uci: Uci) {
   if (capture || piece.role == 'pawn') pos.halfmoves = 0;
   else pos.halfmoves++;
 
+  let isCastling = false;
   if (piece.role == 'rook') arrayRemove(pos.castlingRights, from);
   else if (piece.role == 'king') {
     const backrank = piece.color == 'white' ? '1' : '8';
@@ -34,16 +35,8 @@ export function makeMove(pos: Position, uci: Uci) {
       if (from[0] == 'e' && to[0] == 'f') to = 'h' + to[1] as Square;
       else if (from[0] == 'e' && to[0] == 'c') to = 'a' + to[1] as Square;
     }
-    const isCastling = pos.castlingRights.indexOf(to) != -1;
+    isCastling = pos.castlingRights.indexOf(to) != -1;
     pos.castlingRights = pos.castlingRights.filter(rook => rook[1] != backrank);
-    if (isCastling) {
-      const rook = pos.board[to]!;
-      delete pos.board[to];
-      delete pos.board[from];
-      pos.board[(from < to ? 'c' : 'g') + to[1]] = piece;
-      pos.board[(from < to ? 'd' : 'f') + to[1]] = rook;
-      return;
-    }
   } else if (piece.role == 'pawn') {
     // en passant
     if (!capture && from[0] != to[0]) {
@@ -61,24 +54,38 @@ export function makeMove(pos: Position, uci: Uci) {
   if (uci[4]) piece = { role: charToRole(uci[4]).value!, color: turn, promoted: true };
 
   // update board
-  delete pos.board[from];
-  if (capture) arrayRemove(pos.castlingRights, to);
-  pos.board[to] = piece;
-
-  // update pockets
-  if (pos.pockets && capture) {
-    pos.pockets[opposite(turn)][capture.promoted ? 'pawn' : capture.role]++;
-  }
-
-  // atomic explosion
-  if (pos.rules == 'atomic' && capture) {
+  if (isCastling) {
+    const rook = pos.board[to]!;
     delete pos.board[to];
-    for (const ring of KING_MOVES[to as Square]) {
-      const exploded = pos.board[ring];
-      if (exploded && exploded.role != 'pawn') {
-        arrayRemove(pos.castlingRights, ring);
-        delete pos.board[ring];
+    delete pos.board[from];
+    pos.board[(from < to ? 'c' : 'g') + to[1]] = piece;
+    pos.board[(from < to ? 'd' : 'f') + to[1]] = rook;
+  } else {
+    delete pos.board[from];
+    if (capture) arrayRemove(pos.castlingRights, to);
+    pos.board[to] = piece;
+
+    // update pockets
+    if (pos.pockets && capture) {
+      pos.pockets[opposite(turn)][capture.promoted ? 'pawn' : capture.role]++;
+    }
+
+    // atomic explosion
+    if (pos.rules == 'atomic' && capture) {
+      delete pos.board[to];
+      for (const ring of KING_MOVES[to as Square]) {
+        const exploded = pos.board[ring];
+        if (exploded && exploded.role != 'pawn') {
+          arrayRemove(pos.castlingRights, ring);
+          delete pos.board[ring];
+        }
       }
     }
+  }
+
+  // update remaining checks in three check
+  if (pos.remainingChecks) {
+    const king = findKing(pos.board, pos.turn)!;
+    if (attacksTo(pos.board, turn, king).length) pos.remainingChecks[turn]--;
   }
 }
