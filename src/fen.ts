@@ -112,17 +112,16 @@ export function parseFen(fen: string): Option<Setup> {
     if (pocketStart == -1) return err(); // no matching '[' for ']'
     board = parseBoardFen(boardPart.substr(0, pocketStart));
     pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
-    if (!isOk(pockets)) return err(); // invalid pocket
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 7);
     if (pocketStart == -1) board = parseBoardFen(boardPart);
     else {
       board = parseBoardFen(boardPart.substr(0, pocketStart));
       pockets = parsePockets(boardPart.substr(pocketStart + 1));
-      if (!isOk(pockets)) return err(); // invalid pocket
     }
   }
   if (!isOk(board)) return err(); // invalid board
+  if (!isOk(pockets)) return err();
 
   let turn: Color;
   const turnPart = parts.shift();
@@ -135,24 +134,21 @@ export function parseFen(fen: string): Option<Setup> {
   if (defined(castlingPart)) castlingRights = parseCastlingFen(board.value, castlingPart);
   if (!isOk(castlingRights)) return err();
 
-  let epSquare: Option<Square | undefined> = ok(undefined);
   const epPart = parts.shift();
-  if (defined(epPart) && epPart != '-') epSquare = parseSquare(epPart);
+  const epSquare = (defined(epPart) && epPart != '-') ? parseSquare(epPart) : ok(undefined);
   if (!isOk(epSquare)) return err();
 
-  let halfmoves: Option<number> = ok(0), remainingChecks: Option<Colored<number> | undefined> = ok(undefined);
+  let remainingChecks: Option<Colored<number> | undefined> = ok(undefined);
   let halfmovePart = parts.shift();
   if (defined(halfmovePart) && halfmovePart.includes('+')) {
     remainingChecks = parseRemainingChecks(halfmovePart);
-    if (!isOk(remainingChecks)) return err();
     halfmovePart = parts.shift();
   }
-  if (defined(halfmovePart)) halfmoves = parseSmallUint(halfmovePart);
+  const halfmoves = defined(halfmovePart) ? parseSmallUint(halfmovePart) : ok(0);
   if (!isOk(halfmoves)) return err();
 
-  let fullmoves: Option<number> = ok(1);
   const fullmovesPart = parts.shift();
-  if (defined(fullmovesPart)) fullmoves = parseSmallUint(fullmovesPart);
+  const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart): ok(1);
   if (!isOk(fullmoves)) return err();
 
   const remainingChecksPart = parts.shift();
