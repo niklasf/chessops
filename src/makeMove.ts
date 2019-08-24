@@ -35,7 +35,7 @@ export function makeMove(pos: Position, uci: Uci) {
       else if (from[0] == 'e' && to[0] == 'c') to = 'a' + to[1] as Square;
     }
     const isCastling = pos.castlingRights.indexOf(to) != -1;
-    pos.castlingRights = pos.castlingRights.filter(rook => rook[1] == backrank);
+    pos.castlingRights = pos.castlingRights.filter(rook => rook[1] != backrank);
     if (isCastling) {
       const rook = pos.board[to]!;
       delete pos.board[to];
