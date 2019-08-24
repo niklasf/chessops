@@ -36,10 +36,7 @@ export function moveDests(pos: Position): Dests {
   const dests: Dests = {};
   for (const square in pos.board) {
     const piece = pos.board[square];
-    if (piece && piece.color == pos.turn) {
-      const to = destsFrom(pos, square as Square);
-      if (to.length) dests[square] = to;
-    }
+    if (piece && piece.color == pos.turn) dests[square] = destsFrom(pos, square as Square);
   }
   return dests;
 }
