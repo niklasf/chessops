@@ -1,5 +1,6 @@
-import { defined, nthIndexOf, charToRole, strRepeat, ok, err, isOk } from './util';
-import { Color, COLORS, Board, Square, Role, ROLES, Piece, Colored, Material, Setup, SQUARES, Result } from './types';
+import { Result, ok, err, isOk } from './fp';
+import { defined, nthIndexOf, charToRole, strRepeat } from './util';
+import { Color, COLORS, Board, Square, Role, ROLES, Piece, Colored, Material, Setup, SQUARES } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';

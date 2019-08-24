@@ -1,11 +1,5 @@
-import { Result } from '../src/types';
-import { isOk } from '../src/util';
+import { unwrap } from '../src/fp';
 import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
-
-function unwrap<V, E>(result: Result<V, E>): V {
-  if (isOk(result)) return result.value;
-  else throw result.error;
-}
 
 test('parse fen', () => {
   const pos = unwrap(parseFen(INITIAL_FEN));
