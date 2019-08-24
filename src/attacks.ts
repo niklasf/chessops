@@ -24,6 +24,8 @@ for (let s = 0; s < 64; s++) {
   SOUTH[SQUARES[s]] = SQUARES[s - 8];
   WEST[SQUARES[s]] = (s & 7) > 0 ?  SQUARES[s - 1] : undefined;
   EAST[SQUARES[s]] = (s & 7) < 7 ?  SQUARES[s + 1] : undefined;
+}
+for (let s = 0; s < 64; s++) {
   NORTH_WEST[SQUARES[s]] = NORTH[WEST[SQUARES[s]]!];
   NORTH_EAST[SQUARES[s]] = NORTH[EAST[SQUARES[s]]!];
   SOUTH_WEST[SQUARES[s]] = SOUTH[WEST[SQUARES[s]]!];

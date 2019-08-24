@@ -257,7 +257,7 @@ function makeCastlingFen(setup: Setup, opts?: FenOpts): string {
   return result || '-';
 }
 
-export function makeFen(setup: Setup, opts?: FenOpts): string {
+export function makeFen(setup: Setup & { [key: string]: any }, opts?: FenOpts): string {
   const parts = [
     makeBoardFen(setup.board, opts) + (setup.pockets ? ('/' + makePockets(setup.pockets)) : ''),
     setup.turn[0],
