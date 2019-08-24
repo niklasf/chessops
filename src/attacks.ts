@@ -1,5 +1,5 @@
 import { Color, Role, Board, Square, SQUARES } from './types';
-import { defined } from './util';
+import { defined, opposite } from './util';
 
 function squareDist(a: number, b: number): number {
   const x1 = a & 7, x2 = b & 7;
@@ -9,15 +9,15 @@ function squareDist(a: number, b: number): number {
 
 // build some lookup tables
 type ShiftTable = { [sq in Square]: Square | undefined };
-const NORTH = {} as ShiftTable;
-const SOUTH = {} as ShiftTable;
+export const NORTH = {} as ShiftTable;
+export const SOUTH = {} as ShiftTable;
 const WEST = {} as ShiftTable;
 const EAST = {} as ShiftTable;
 const NORTH_WEST = {} as ShiftTable;
 const NORTH_EAST = {} as ShiftTable;
 const SOUTH_WEST = {} as ShiftTable;
 const SOUTH_EAST = {} as ShiftTable;
-const KNIGHT_MOVES = {} as { [sq in Square]: Array<Square> };
+export const KNIGHT_MOVES = {} as { [sq in Square]: Array<Square> };
 export const KING_MOVES = {} as { [sq in Square]: Array<Square> };
 for (let s = 0; s < 64; s++) {
   NORTH[SQUARES[s]] = SQUARES[s + 8];
@@ -47,7 +47,7 @@ function slidingMovesTo(board: Board, square: Square, deltas: ShiftTable[]): Squ
   return result as Square[];
 }
 
-function pawnAttacksTo(color: Color, square: Square): Square[] {
+export function pawnAttacks(square: Square, color: Color): Square[] {
   const forward = (color == 'white' ? NORTH : SOUTH)[square];
   return [WEST[forward!], EAST[forward!]].filter(s => s) as Square[];
 }
@@ -57,13 +57,21 @@ function isAt(board: Board, square: Square, turn: Color, role: Role): boolean {
   return !!(piece && piece.role == role && piece.color == turn);
 }
 
+export function rookAttacks(board: Board, square: Square): Square[] {
+  return slidingMovesTo(board, square, [WEST, EAST, NORTH, SOUTH]);
+}
+
+export function bishopAttacks(board: Board, square: Square): Square[] {
+  return slidingMovesTo(board, square, [NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST]);
+}
+
 export function attacksTo(board: Board, by: Color, s: Square): Square[] {
   return [
     ...KING_MOVES[s].filter(o => isAt(board, o, by, 'king')),
     ...KNIGHT_MOVES[s].filter(o => isAt(board, o, by, 'knight')),
-    ...pawnAttacksTo(by, s).filter(o => isAt(board, o, by, 'pawn')),
-    ...slidingMovesTo(board, s, [WEST, EAST, NORTH, SOUTH]).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
-    ...slidingMovesTo(board, s, [NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST]).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
+    ...pawnAttacks(s, opposite(by)).filter(o => isAt(board, o, by, 'pawn')),
+    ...rookAttacks(board, s).filter(o => isAt(board, o, by, 'rook') || isAt(board, o, by, 'queen')),
+    ...bishopAttacks(board, s).filter(o => isAt(board, o, by, 'bishop') || isAt(board, o, by, 'queen'))
   ];
 }
 
