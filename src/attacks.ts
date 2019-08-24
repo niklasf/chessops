@@ -41,7 +41,7 @@ for (let s = 0; s < 64; s++) {
 console.log(KNIGHT_MOVES['b8']);
 
 function slidingMovesTo(board: Board, square: Square, deltas: ShiftTable[]): Square[] {
-  let result = [];
+  const result = [];
   for (const delta of deltas) {
     for (let s = delta[square]; s; s = delta[s]) {
       result.push(s);
@@ -49,6 +49,32 @@ function slidingMovesTo(board: Board, square: Square, deltas: ShiftTable[]): Squ
     }
   }
   return result as Square[];
+}
+
+function blockersAtRay(board: Board, square: Square, turn: Color, deltas: ShiftTable[], snipers: Role[]): Square[] {
+  const result = [];
+  for (const delta of deltas) {
+    let blocker;
+    for (let s = delta[square]; s; s = delta[s]) {
+      const piece = board[s];
+      if (!piece) continue;
+      if (piece.color == turn) {
+        if (!defined(blocker)) blocker = s;
+        else break;
+      } else if (snipers.indexOf(piece.role) != -1) {
+        if (defined(blocker)) result.push(blocker);
+        break;
+      } else break;
+    }
+  }
+  return result as Square[];
+}
+
+export function sliderBlockers(board: Board, square: Square, turn: Color): Square[] {
+  return [
+    ...blockersAtRay(board, square, turn, [EAST, WEST, NORTH, SOUTH], ['rook', 'queen']),
+    ...blockersAtRay(board, square, turn, [NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST], ['bishop', 'queen'])
+  ]
 }
 
 export function pawnAttacks(square: Square, color: Color): Square[] {
