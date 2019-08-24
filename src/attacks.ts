@@ -38,7 +38,36 @@ for (let s = 0; s < 64; s++) {
   ).map(to => SQUARES[to]);
 }
 
-console.log(KNIGHT_MOVES['b8']);
+function genBetween(a: Square, b: Square, delta: ShiftTable): Square[] | undefined {
+  const result = [];
+  for (let s = delta[a]; s; s = delta[s]) {
+    if (s == b) return result as Square[];
+    result.push(s);
+  }
+  return;
+}
+
+export const BETWEEN = {} as { [sq in Square]: { [sq in Square]: Square[] } };
+for (const a of SQUARES) {
+  BETWEEN[a] = {} as { [sq in Square]: Square[] };
+  for (const b of SQUARES) {
+    BETWEEN[a][b] = (
+      genBetween(a, b, NORTH) ||
+      genBetween(a, b, SOUTH) ||
+      genBetween(a, b, EAST) ||
+      genBetween(a, b, WEST) ||
+      genBetween(a, b, NORTH_EAST) ||
+      genBetween(a, b, NORTH_WEST) ||
+      genBetween(a, b, SOUTH_EAST) ||
+      genBetween(a, b, SOUTH_WEST) ||
+      []
+    );
+  }
+}
+
+export function aligned(a: Square, b: Square, c: Square): boolean {
+  return BETWEEN[a][b].indexOf(c) != -1;
+}
 
 function slidingMovesTo(board: Board, square: Square, deltas: ShiftTable[]): Square[] {
   const result = [];

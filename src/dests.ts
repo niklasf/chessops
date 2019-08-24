@@ -1,6 +1,6 @@
 import { Square, Position, Dests } from './types';
 import { opposite } from './util';
-import { findKing, pawnAttacks, bishopAttacks, rookAttacks, isAttacked, KING_MOVES, KNIGHT_MOVES, NORTH, SOUTH } from './attacks';
+import { findKing, pawnAttacks, bishopAttacks, rookAttacks, isAttacked, sliderBlockers, aligned, KING_MOVES, KNIGHT_MOVES, NORTH, SOUTH } from './attacks';
 
 export function destsFrom(pos: Position, square: Square): Square[] {
   const v = (to: Square) => {
@@ -34,12 +34,20 @@ export function destsFrom(pos: Position, square: Square): Square[] {
 }
 
 export function moveDests(pos: Position): Dests {
-  const king = findKing(pos.board, pos.turn);
+  const king = findKing(pos.board, pos.turn)!;
+  const blockers = sliderBlockers(pos.board, king, pos.turn);
 
   const dests: Dests = {};
-  for (const square in pos.board) {
-    const piece = pos.board[square];
-    if (piece && piece.color == pos.turn) dests[square] = destsFrom(pos, square as Square);
+  for (const s in pos.board) {
+    const from = s as Square;
+    const piece = pos.board[from];
+    if (piece && piece.color == pos.turn) {
+      let d = destsFrom(pos, from);
+      if (blockers.indexOf(from) != -1) d = d.filter(to => {
+        return aligned(from, to, king);
+      });
+      dests[from] = d;
+    }
   }
   return dests;
 }
