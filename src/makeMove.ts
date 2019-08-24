@@ -29,12 +29,13 @@ export function makeMove(pos: Position, uci: Uci) {
 
   if (piece.role == 'rook') arrayRemove(pos.castlingRights, from);
   else if (piece.role == 'king') {
-    if (from[0] == 'e' && to[0] == 'f') to = 'h' + to[1] as Square;
-    else if (from[0] == 'e' && to[0] == 'c') to = 'a' + to[1] as Square;
+    const backrank = piece.color == 'white' ? '1' : '8';
+    if (from[1] == backrank && to[1] == backrank) {
+      if (from[0] == 'e' && to[0] == 'f') to = 'h' + to[1] as Square;
+      else if (from[0] == 'e' && to[0] == 'c') to = 'a' + to[1] as Square;
+    }
     const isCastling = pos.castlingRights.indexOf(to) != -1;
-    pos.castlingRights = pos.castlingRights.filter(rook => {
-      return rook[1] == (piece!.color == 'white' ? '1' : '8')
-    });
+    pos.castlingRights = pos.castlingRights.filter(rook => rook[1] == backrank);
     if (isCastling) {
       const rook = pos.board[to]!;
       delete pos.board[to];
