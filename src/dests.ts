@@ -1,5 +1,6 @@
 import { Square, Position, Dests } from './types';
-import { findKing, pawnAttacks, bishopAttacks, rookAttacks, KING_MOVES, KNIGHT_MOVES, NORTH, SOUTH } from './attacks';
+import { opposite } from './util';
+import { findKing, pawnAttacks, bishopAttacks, rookAttacks, isAttacked, KING_MOVES, KNIGHT_MOVES, NORTH, SOUTH } from './attacks';
 
 export function destsFrom(pos: Position, square: Square): Square[] {
   const v = (to: Square) => {
@@ -8,7 +9,9 @@ export function destsFrom(pos: Position, square: Square): Square[] {
   };
   const piece = pos.board[square];
   if (!piece || piece.color != pos.turn) return [];
-  if (piece.role == 'king') return KING_MOVES[square].filter(v);
+  if (piece.role == 'king') return KING_MOVES[square].filter(v).filter(to => {
+    return !isAttacked(pos.board, opposite(pos.turn), to);
+  });
   else if (piece.role == 'knight') return KNIGHT_MOVES[square].filter(v);
   else if (piece.role == 'bishop') return bishopAttacks(pos.board, square).filter(v);
   else if (piece.role == 'rook') return rookAttacks(pos.board, square).filter(v);

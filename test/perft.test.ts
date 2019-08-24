@@ -35,11 +35,17 @@ function perft(pos: Position, depth: number): number {
         const uci = from + to;
         const child = copyPosition(pos);
         makeMove(child, uci);
-        nodes += perft(child, depth - 1);
+        if (depth == 2) nodes += d(from + to, perft(child, depth - 1));
+        else nodes += perft(child, depth - 1);
       }
     }
   }
   return nodes;
+}
+
+function d<T>(ctx: string, v: T): T {
+  //console.log(ctx, v);
+  return v;
 }
 
 test('initial perft', () => {
@@ -47,4 +53,11 @@ test('initial perft', () => {
   expect(perft(pos, 1)).toBe(20);
   expect(perft(pos, 2)).toBe(400);
   expect(perft(pos, 3)).toBe(8902);
+  expect(perft(pos, 4)).toBe(197281);
 });
+
+/* test('debug', () => {
+  const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
+  makeMove(pos, 'e2e4');
+  console.log(moveDests(pos));
+}); */

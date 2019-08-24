@@ -38,6 +38,8 @@ for (let s = 0; s < 64; s++) {
   ).map(to => SQUARES[to]);
 }
 
+console.log(KNIGHT_MOVES['b8']);
+
 function slidingMovesTo(board: Board, square: Square, deltas: ShiftTable[]): Square[] {
   let result = [];
   for (const delta of deltas) {
