@@ -7,11 +7,13 @@ import { moveDests } from '../src/dests';
 
 function copyPosition(pos: Position): Position {
   return {
+    rules: pos.rules,
     board: { ...pos.board },
     turn: pos.turn,
-    castlingRights: [...pos.castlingRights],
     epSquare: pos.epSquare,
-    rules: pos.rules,
+    castlingRights: [...pos.castlingRights],
+    pockets: pos.pockets && { white: { ...pos.pockets.white }, black: { ... pos.pockets.black } },
+    remainingChecks: pos.remainingChecks && { ...pos.remainingChecks },
     halfmoves: pos.halfmoves,
     fullmoves: pos.fullmoves
   };
