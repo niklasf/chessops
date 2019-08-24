@@ -1,10 +1,9 @@
 import { unwrap } from '../src/fp';
 import { Position } from '../src/types';
-import { parseFen, makeFen, INITIAL_FEN} from '../src/fen';
+import { parseFen, INITIAL_FEN} from '../src/fen';
 import { setup } from '../src/setup';
 import { makeMove } from '../src/makeMove';
 import { moveDests } from '../src/dests';
-import { bishopAttacks } from '../src/attacks';
 
 function copyPosition(pos: Position): Position {
   return {
@@ -31,13 +30,11 @@ function perft(pos: Position, depth: number): number {
       }
     }
   } else {
-    if (depth == 2) console.log(dests);
     for (const from in dests) {
       for (const to of (dests[from] || [])) {
         const uci = from + to;
         const child = copyPosition(pos);
         makeMove(child, uci);
-        if (depth == 2) console.log(depth, '!', uci, perft(child, depth - 1));
         nodes += perft(child, depth - 1);
       }
     }
@@ -45,40 +42,9 @@ function perft(pos: Position, depth: number): number {
   return nodes;
 }
 
-/* test('initial perft', () => {
-  const now = performance.now();
+test('initial perft', () => {
   const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
   expect(perft(pos, 1)).toBe(20);
   expect(perft(pos, 2)).toBe(400);
   expect(perft(pos, 3)).toBe(8902);
-  //console.log(performance.now() - now);
-}); */
-
-test('perft after a4', () => {
-  const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
-  makeMove(pos, 'd2d3');
-  makeMove(pos, 'b8c6');
-  console.log(bishopAttacks(pos.board, 'c1'));
-  console.log(makeFen(pos));
-  //makeMove(pos, 'a7a6');
-  console.log(moveDests(pos));
-  expect(perft(pos, 1)).toBe(27);
- // expect(perft(pos, 2)).toBe(539);
 });
-
-/* test('initial dests', () => {
-  const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
-  expect(pos.turn).toBe('white');
-  expect(moveDests(pos)).toBe({
-    b1: ['a3', 'c3'],
-    g1: ['f3', 'h3'],
-    a2: ['a3', 'a4'],
-    b2: ['b3', 'b4'],
-    c2: ['c3', 'c4'],
-    d2: ['d3', 'd4'],
-    e2: ['e3', 'e4'],
-    f2: ['f3', 'f4'],
-    g2: ['g3', 'g4'],
-    h2: ['h3', 'h4']
-  });
-}); */
