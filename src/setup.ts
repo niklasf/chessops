@@ -36,8 +36,12 @@ export function setup(setup: Setup): Result<Position, string> {
   return ok({
     rules: 'chess',
     board,
+    turn: setup.turn,
+    epSquare: setup.epSquare,
+    castlingRights: [...setup.castlingRights],
     pockets: undefined,
     remainingChecks: undefined,
-    ...setup
+    halfmoves: setup.halfmoves,
+    fullmoves: setup.fullmoves
   });
 }
