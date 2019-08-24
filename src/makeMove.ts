@@ -9,7 +9,7 @@ export function makeMove(pos: Position, uci: Uci) {
   pos.turn = opposite(turn);
   if (uci == '0000') return;
 
-  const to = uci.slice(2, 4);
+  let to = uci.slice(2, 4);
 
   // drop
   if (uci.includes('@')) {
@@ -27,13 +27,22 @@ export function makeMove(pos: Position, uci: Uci) {
   if (capture || piece.role == 'pawn') pos.halfmoves = 0;
   else pos.halfmoves++;
 
-  // TODO: castling
-
   if (piece.role == 'rook') arrayRemove(pos.castlingRights, from);
   else if (piece.role == 'king') {
+    if (from[0] == 'e' && to == 'f') to = 'h' + to[1];
+    else if (from[0] == 'e' && to == 'c') to = 'a' + to[1];
+    const isCastling = pos.castlingRights.indexOf(to) != -1;
     pos.castlingRights = pos.castlingRights.filter(rook => {
       rook[1] == (piece.color == 'white' ? '1' : '8')
     });
+    if (isCastling) {
+      const rook = pos.board[to]!;
+      delete pos.board[to];
+      delete pos.board[from];
+      pos.board[(from < to ? 'c' : 'g') + to[1]] = piece;
+      pos.board[(from < to ? 'd' : 'f') + to[1]] = rook;
+      return;
+    }
   } else if (piece.role == 'pawn') {
     // en passant
     if (!capture && from[1] != to[1]) {
