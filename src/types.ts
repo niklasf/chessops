@@ -1,16 +1,20 @@
-export interface ResultInterface<V, E> {
-  map(f: (value: V) => V): Result<V, E>;
-}
-
-export interface Ok<V, E = never> extends ResultInterface<V, E> {
+export interface Ok<V, E = never> {
   value: V;
+  map<U>(f: (value: V) => U): Ok<U, never>;
 }
 
-export interface Err<V, E> extends ResultInterface<V, E> {
+export interface Err<V, E> {
   error: E;
+  map<U>(f: (value: V) => U): Err<never, E>;
 }
 
-export type Result<V, E> = Ok<V, E> | Err<V, E>;
+export type Result<V, E> = {
+  value?: V,
+  error?: E,
+  map<U>(f: (value: V) => U): Result<U, E>;
+}
+
+export type Option<V> = Result<V, undefined>;
 
 export type Square = 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' |
                      'a2' | 'b2' | 'c2' | 'd2' | 'e2' | 'f2' | 'g2' | 'h2' |

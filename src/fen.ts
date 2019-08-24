@@ -1,5 +1,5 @@
-import { defined, nthIndexOf, charToRole, strRepeat } from './util';
-import { Color, COLORS, Board, Square, Role, ROLES, Piece, Colored, Material, Setup, SQUARES } from './types';
+import { defined, nthIndexOf, charToRole, strRepeat, ok, err, isOk } from './util';
+import { Color, COLORS, Board, Square, Role, ROLES, Piece, Colored, Material, Setup, SQUARES, Option } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -20,27 +20,26 @@ function emptyMaterial(): Material {
   };
 }
 
-function parseSquare(square: string): Square | undefined {
-  return /^[a-h][1-8]$/.test(square) ? square as Square : undefined;
+function parseSquare(square: string): Option<Square> {
+  return /^[a-h][1-8]$/.test(square) ? ok(square as Square) : err();
 }
 
-function parsePockets(pocketPart: string): Colored<Material> | undefined {
+function parsePockets(pocketPart: string): Option<Colored<Material>> {
   const pockets = { white: emptyMaterial(), black: emptyMaterial() };
   for (const c of pocketPart) {
     const piece = charToPiece(c);
-    if (!piece) return;
-    pockets[piece.color][piece.role]++;
+    if (!isOk(piece)) return err();
+    pockets[piece.value.color][piece.value.role]++;
   }
-  return pockets;
+  return ok(pockets);
 }
 
-function charToPiece(c: string): Piece | undefined {
+function charToPiece(c: string): Option<Piece> {
   const color = c.toLowerCase() == c ? 'black' : 'white';
-  const role = charToRole(c);
-  return role && { role, color };
+  return charToRole(c).map(role => ({role, color}));
 }
 
-export function parseBoardFen(boardPart: string): Board | undefined {
+export function parseBoardFen(boardPart: string): Option<Board> {
   const board: Board = {};
   let rank = 7, file = 0;
   for (let i = 0; i < boardPart.length; i++) {
@@ -54,21 +53,21 @@ export function parseBoardFen(boardPart: string): Board | undefined {
       else {
         const square = SQUARES[file + rank * 8];
         const piece = charToPiece(c);
-        if (!piece) return;
+        if (!isOk(piece)) return err();
         if (boardPart[i + 1] == '~') {
-          board[square] = { promoted: true, ...piece };
+          board[square] = { promoted: true, ...piece.value };
           i++;
-        } else board[square] = piece;
+        } else board[square] = piece.value;
         file++;
       }
     }
   }
-  return (rank == 0 && file == 8) ? board : undefined;
+  return (rank == 0 && file == 8) ? ok(board) : err();
 }
 
-export function parseCastlingFen(board: Board, castlingPart: string): Square[] | undefined {
-  if (castlingPart == '-') return [];
-  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return;
+export function parseCastlingFen(board: Board, castlingPart: string): Option<Square[]> {
+  if (castlingPart == '-') return ok([]);
+  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return err();
   const castlingRights: Square[] = [];
   for (const c of castlingPart) {
     const color = c == c.toLowerCase() ? 'black' : 'white';
@@ -83,106 +82,98 @@ export function parseCastlingFen(board: Board, castlingPart: string): Square[] |
       if (piece.role == 'rook' && castlingRights.indexOf(square) == -1) castlingRights.push(square);
     }
   }
-  return castlingRights;
+  return ok(castlingRights);
 }
 
-function parseSmallUint(str: string): number | undefined {
-  return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
+function parseSmallUint(str: string): Option<number> {
+  return /^\d{1,4}$/.test(str) ? ok(parseInt(str, 10)) : err();
 }
 
-function parseRemainingChecks(part: string): Colored<number> | undefined {
+function parseRemainingChecks(part: string): Option<Colored<number>> {
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return;
-    return { white: 3 - white, black: 3 - black };
+    if (!isOk(white) || white.value > 3 || !isOk(black) || black.value > 3) return err();
+    return ok({white: 3 - white.value, black: 3 - black.value});
   } else if (parts.length == 2) {
     const white = parseSmallUint(parts[0]), black = parseSmallUint(parts[1]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return;
-    return { white, black };
-  } else return;
+    if (!isOk(white) || white.value > 3 || !isOk(black) || black.value > 3) return err();
+    return ok({white: white.value, black: black.value});
+  } else return err();
 }
 
-export function parseFen(fen: string): Setup | undefined {
+export function parseFen(fen: string): Option<Setup> {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
-  let board, pockets;
+  let board, pockets: Option<Colored<Material> | undefined> = ok(undefined);
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
-    if (pocketStart == -1) return; // no matching '[' for ']'
+    if (pocketStart == -1) return err(); // no matching '[' for ']'
     board = parseBoardFen(boardPart.substr(0, pocketStart));
     pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
-    if (!pockets) return; // invalid pocket
+    if (!isOk(pockets)) return err(); // invalid pocket
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 7);
     if (pocketStart == -1) board = parseBoardFen(boardPart);
     else {
       board = parseBoardFen(boardPart.substr(0, pocketStart));
       pockets = parsePockets(boardPart.substr(pocketStart + 1));
-      if (!pockets) return; // invalid pocket
+      if (!isOk(pockets)) return err(); // invalid pocket
     }
   }
-  if (!board) return; // invalid board
+  if (!isOk(board)) return err(); // invalid board
 
   let turn: Color;
   const turnPart = parts.shift();
   if (!defined(turnPart) || turnPart == 'w') turn = 'white';
   else if (turnPart) turn = 'black';
-  else return; // invalid turn
+  else return err(); // invalid turn
 
-  let castlingRights: Square[] | undefined = [];
+  let castlingRights: Option<Square[]> = ok([]);
   const castlingPart = parts.shift();
-  if (defined(castlingPart)) {
-    castlingRights = parseCastlingFen(board, castlingPart);
-    if (!castlingRights) return; // invalid castling rights
-  }
+  if (defined(castlingPart)) castlingRights = parseCastlingFen(board.value, castlingPart);
+  if (!isOk(castlingRights)) return err();
 
-  let epSquare: Square | undefined;
+  let epSquare: Option<Square | undefined> = ok(undefined);
   const epPart = parts.shift();
-  if (defined(epPart) && epPart != '-') {
-    epSquare = parseSquare(epPart);
-    if (!defined(epSquare)) return; // invalid ep square
-  }
+  if (defined(epPart) && epPart != '-') epSquare = parseSquare(epPart);
+  if (!isOk(epSquare)) return err();
 
-  let halfmoves, remainingChecks;
+  let halfmoves: Option<number> = ok(0), remainingChecks: Option<Colored<number> | undefined> = ok(undefined);
   let halfmovePart = parts.shift();
   if (defined(halfmovePart) && halfmovePart.includes('+')) {
     remainingChecks = parseRemainingChecks(halfmovePart);
-    if (!remainingChecks) return; // invalid remaining checks
+    if (!isOk(remainingChecks)) return err();
     halfmovePart = parts.shift();
   }
-  if (defined(halfmovePart)) {
-    halfmoves = parseSmallUint(halfmovePart);
-    if (!defined(halfmoves)) return; // invalid halfmoves
-  }
+  if (defined(halfmovePart)) halfmoves = parseSmallUint(halfmovePart);
+  if (!isOk(halfmoves)) return err();
 
-  let fullmoves;
+  let fullmoves: Option<number> = ok(1);
   const fullmovesPart = parts.shift();
-  if (defined(fullmovesPart)) {
-    fullmoves = parseSmallUint(fullmovesPart);
-    if (!defined(fullmoves)) return; // invalid fullmoves
-  }
+  if (defined(fullmovesPart)) fullmoves = parseSmallUint(fullmovesPart);
+  if (!isOk(fullmoves)) return err();
 
   const remainingChecksPart = parts.shift();
   if (defined(remainingChecksPart)) {
-    if (remainingChecks) return; // already got this part
+    if (remainingChecks) return err(); // already got this part
     remainingChecks = parseRemainingChecks(remainingChecksPart);
-    if (!remainingChecks) return; // invalid remaining checks
   }
+  if (!isOk(remainingChecks)) return err();
 
-  if (parts.length) return;
+  if (parts.length) return err();
 
-  return {
-    board,
-    pockets,
+  return ok({
+    board: board.value,
+    pockets: pockets.value,
     turn,
-    epSquare,
-    castlingRights,
-    remainingChecks,
-    halfmoves: halfmoves || 0,
-    fullmoves: Math.max(1, fullmoves || 1)
-  };
+    epSquare: epSquare.value,
+    castlingRights: castlingRights.value,
+    remainingChecks: remainingChecks.value,
+    halfmoves: halfmoves.value,
+    fullmoves: Math.max(1, fullmoves.value)
+  });
 }
 
 function roleToChar(role: Role): string {
