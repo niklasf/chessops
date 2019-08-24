@@ -1,5 +1,5 @@
 import { defined, nthIndexOf, charToRole, strRepeat, ok, err, isOk } from './util';
-import { Color, COLORS, Board, Square, Role, ROLES, Piece, Colored, Material, Setup, SQUARES, Option } from './types';
+import { Color, COLORS, Board, Square, Role, ROLES, Piece, Colored, Material, Setup, SQUARES, Result } from './types';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -20,11 +20,11 @@ function emptyMaterial(): Material {
   };
 }
 
-function parseSquare(square: string): Option<Square> {
+function parseSquare(square: string): Result<Square> {
   return /^[a-h][1-8]$/.test(square) ? ok(square as Square) : err();
 }
 
-function parsePockets(pocketPart: string): Option<Colored<Material>> {
+function parsePockets(pocketPart: string): Result<Colored<Material>> {
   const pockets = { white: emptyMaterial(), black: emptyMaterial() };
   for (const c of pocketPart) {
     const piece = charToPiece(c);
@@ -34,12 +34,12 @@ function parsePockets(pocketPart: string): Option<Colored<Material>> {
   return ok(pockets);
 }
 
-function charToPiece(c: string): Option<Piece> {
+function charToPiece(c: string): Result<Piece> {
   const color = c.toLowerCase() == c ? 'black' : 'white';
   return charToRole(c).map(role => ({role, color}));
 }
 
-export function parseBoardFen(boardPart: string): Option<Board> {
+export function parseBoardFen(boardPart: string): Result<Board> {
   const board: Board = {};
   let rank = 7, file = 0;
   for (let i = 0; i < boardPart.length; i++) {
@@ -65,7 +65,7 @@ export function parseBoardFen(boardPart: string): Option<Board> {
   return (rank == 0 && file == 8) ? ok(board) : err();
 }
 
-export function parseCastlingFen(board: Board, castlingPart: string): Option<Square[]> {
+export function parseCastlingFen(board: Board, castlingPart: string): Result<Square[]> {
   if (castlingPart == '-') return ok([]);
   if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return err();
   const castlingRights: Square[] = [];
@@ -85,11 +85,11 @@ export function parseCastlingFen(board: Board, castlingPart: string): Option<Squ
   return ok(castlingRights);
 }
 
-function parseSmallUint(str: string): Option<number> {
+function parseSmallUint(str: string): Result<number> {
   return /^\d{1,4}$/.test(str) ? ok(parseInt(str, 10)) : err();
 }
 
-function parseRemainingChecks(part: string): Option<Colored<number>> {
+function parseRemainingChecks(part: string): Result<Colored<number>> {
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
@@ -102,11 +102,11 @@ function parseRemainingChecks(part: string): Option<Colored<number>> {
   } else return err();
 }
 
-export function parseFen(fen: string): Option<Setup> {
+export function parseFen(fen: string): Result<Setup> {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
-  let board, pockets: Option<Colored<Material> | undefined> = ok(undefined);
+  let board, pockets: Result<Colored<Material> | undefined> = ok(undefined);
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
     if (pocketStart == -1) return err(); // no matching '[' for ']'
@@ -129,7 +129,7 @@ export function parseFen(fen: string): Option<Setup> {
   else if (turnPart) turn = 'black';
   else return err(); // invalid turn
 
-  let castlingRights: Option<Square[]> = ok([]);
+  let castlingRights: Result<Square[]> = ok([]);
   const castlingPart = parts.shift();
   if (defined(castlingPart)) castlingRights = parseCastlingFen(board.value, castlingPart);
   if (!isOk(castlingRights)) return err();
@@ -138,7 +138,7 @@ export function parseFen(fen: string): Option<Setup> {
   const epSquare = (defined(epPart) && epPart != '-') ? parseSquare(epPart) : ok(undefined);
   if (!isOk(epSquare)) return err();
 
-  let remainingChecks: Option<Colored<number> | undefined> = ok(undefined);
+  let remainingChecks: Result<Colored<number> | undefined> = ok(undefined);
   let halfmovePart = parts.shift();
   if (defined(halfmovePart) && halfmovePart.includes('+')) {
     remainingChecks = parseRemainingChecks(halfmovePart);
