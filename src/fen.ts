@@ -102,7 +102,7 @@ function parseRemainingChecks(part: string): Result<Colored<number>> {
   } else return err();
 }
 
-export function parseFen(fen: string): Result<Setup> {
+export function parseFen(fen: string): Result<Setup, string> {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
@@ -120,23 +120,22 @@ export function parseFen(fen: string): Result<Setup> {
       pockets = parsePockets(boardPart.substr(pocketStart + 1));
     }
   }
-  if (!isOk(board)) return err(); // invalid board
-  if (!isOk(pockets)) return err();
+  if (!isOk(board)) return err('invalid board'); // invalid board
+  if (!isOk(pockets)) return err('invalid pockets');
 
   let turn: Color;
   const turnPart = parts.shift();
   if (!defined(turnPart) || turnPart == 'w') turn = 'white';
   else if (turnPart) turn = 'black';
-  else return err(); // invalid turn
+  else return err('invalid turn'); // invalid turn
 
-  let castlingRights: Result<Square[]> = ok([]);
   const castlingPart = parts.shift();
-  if (defined(castlingPart)) castlingRights = parseCastlingFen(board.value, castlingPart);
-  if (!isOk(castlingRights)) return err();
+  const castlingRights = defined(castlingPart) ? parseCastlingFen(board.value, castlingPart) : ok([]);
+  if (!isOk(castlingRights)) return err('invalid castling rights');
 
   const epPart = parts.shift();
   const epSquare = (defined(epPart) && epPart != '-') ? parseSquare(epPart) : ok(undefined);
-  if (!isOk(epSquare)) return err();
+  if (!isOk(epSquare)) return err('invalid ep square');
 
   let remainingChecks: Result<Colored<number> | undefined> = ok(undefined);
   let halfmovePart = parts.shift();
@@ -145,20 +144,20 @@ export function parseFen(fen: string): Result<Setup> {
     halfmovePart = parts.shift();
   }
   const halfmoves = defined(halfmovePart) ? parseSmallUint(halfmovePart) : ok(0);
-  if (!isOk(halfmoves)) return err();
+  if (!isOk(halfmoves)) return err('invalid halfmoves');
 
   const fullmovesPart = parts.shift();
   const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart): ok(1);
-  if (!isOk(fullmoves)) return err();
+  if (!isOk(fullmoves)) return err('invalid fullmoves');
 
   const remainingChecksPart = parts.shift();
   if (defined(remainingChecksPart)) {
-    if (remainingChecks) return err(); // already got this part
+    if (defined(remainingChecks.value)) return err('duplicate remaining checks');
     remainingChecks = parseRemainingChecks(remainingChecksPart);
   }
-  if (!isOk(remainingChecks)) return err();
+  if (!isOk(remainingChecks)) return err('invalid remaining checks');
 
-  if (parts.length) return err();
+  if (parts.length) return err('too many parts');
 
   return ok({
     board: board.value,
