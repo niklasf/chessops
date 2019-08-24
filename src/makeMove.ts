@@ -1,5 +1,5 @@
 import { Position, Role, Piece, Uci, Square } from './types';
-import { opposite, charToRole } from './util';
+import { opposite, charToRole, arrayRemove } from './util';
 import { KING_MOVES } from './attacks';
 
 export function makeMove(pos: Position, uci: Uci) {
@@ -27,9 +27,14 @@ export function makeMove(pos: Position, uci: Uci) {
   if (capture || piece.role == 'pawn') pos.halfmoves = 0;
   else pos.halfmoves++;
 
-  // TODO: castling & update castling rights
+  // TODO: castling
 
-  if (piece.role == 'pawn') {
+  if (piece.role == 'rook') arrayRemove(pos.castlingRights, from);
+  else if (piece.role == 'king') {
+    pos.castlingRights = pos.castlingRights.filter(rook => {
+      rook[1] == (piece.color == 'white' ? '1' : '8')
+    });
+  } else if (piece.role == 'pawn') {
     // en passant
     if (!capture && from[1] != to[1]) {
       const fifthRank = to[0] + (turn == 'white' ? '6' : '4');
@@ -46,8 +51,8 @@ export function makeMove(pos: Position, uci: Uci) {
   if (uci[4]) piece = { role: charToRole(uci[4])!, color: turn, promoted: true };
 
   // update board
+  if (capture) arrayRemove(pos.castlingRights, to);
   pos.board[to] = piece;
-  delete pos.board[from];
 
   // update pockets
   if (pos.pockets && capture) {
@@ -56,10 +61,13 @@ export function makeMove(pos: Position, uci: Uci) {
 
   // atomic explosion
   if (pos.rules == 'atomic' && capture) {
-    delete pos.board[to];
+    removePiece(pos.board[to]);
     for (const ring of KING_MOVES[to as Square]) {
       const exploded = pos.board[ring];
-      if (exploded && exploded.role != 'pawn') delete pos.board[ring];
+      if (exploded && exploded.role != 'pawn') {
+        arrayRemove(pos.castlingRights, ring);
+        delete pos.board[ring];
+      }
     }
   }
 }

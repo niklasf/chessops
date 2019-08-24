@@ -35,3 +35,11 @@ export function strRepeat(str: string, num: number): string {
   for (let i = 0; i < num; i++) r += str;
   return r;
 }
+
+export function arrayRemove<T>(arr: T[], element: T): void {
+  while (true) {
+    const index = arr.indexOf(element);
+    if (index != -1) arr.splice(index, 1);
+    else return;
+  }
+}
