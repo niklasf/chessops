@@ -1,6 +1,6 @@
 import { Position, Role, Piece, Uci, Square } from './types';
 import { opposite, charToRole, arrayRemove } from './util';
-import { findKing, attacksTo, KING_MOVES } from './attacks';
+import { findKing, isAttacked, KING_MOVES } from './attacks';
 
 export function makeMove(pos: Position, uci: Uci) {
   pos.epSquare = undefined;
@@ -86,6 +86,6 @@ export function makeMove(pos: Position, uci: Uci) {
   // update remaining checks in three check
   if (pos.remainingChecks) {
     const king = findKing(pos.board, pos.turn)!;
-    if (attacksTo(pos.board, turn, king).length) pos.remainingChecks[turn]--;
+    if (isAttacked(pos.board, turn, king)) pos.remainingChecks[turn]--;
   }
 }

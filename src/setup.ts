@@ -1,7 +1,7 @@
 import { Result, ok, err } from './fp';
 import { Board, Setup, Position, Square, Colored } from './types';
 import { defined, opposite } from './util';
-import { findKing, attacksTo } from './attacks';
+import { findKing, isAttacked } from './attacks';
 
 export function setup(setup: Setup): Result<Position, string> {
   const board: Board = {};
@@ -31,7 +31,7 @@ export function setup(setup: Setup): Result<Position, string> {
   // other side in check
   const otherKing = findKing(board, opposite(setup.turn));
   if (!defined(otherKing)) return err('missing king');
-  if (attacksTo(board, setup.turn, otherKing).length) return err('opposite king in check');
+  if (isAttacked(board, setup.turn, otherKing)) return err('opposite king in check');
 
   return ok({
     rules: 'chess',
