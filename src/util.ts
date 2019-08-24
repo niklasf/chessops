@@ -1,4 +1,4 @@
-import { Board, Square, Color, Role } from './types';
+import { Board, Square, Color, Role, Ok } from './types';
 
 export function opposite(color: Color): Color {
   return color == 'white' ? 'black' : 'white';
@@ -33,4 +33,13 @@ export function strRepeat(str: string, num: number): string {
   let r = '';
   for (let i = 0; i < num; i++) r += str;
   return r;
+}
+
+export function ok<V, E>(value: V): Ok<V, E> {
+  return {
+    value,
+    map(f: (value: V) => V) {
+      return ok(f(value));
+    }
+  };
 }

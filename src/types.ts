@@ -1,3 +1,17 @@
+export interface ResultInterface<V, E> {
+  map(f: (value: V) => V): Result<V, E>;
+}
+
+export interface Ok<V, E = never> extends ResultInterface<V, E> {
+  value: V;
+}
+
+export interface Err<V, E> extends ResultInterface<V, E> {
+  error: E;
+}
+
+export type Result<V, E> = Ok<V, E> | Err<V, E>;
+
 export type Square = 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' |
                      'a2' | 'b2' | 'c2' | 'd2' | 'e2' | 'f2' | 'g2' | 'h2' |
                      'a3' | 'b3' | 'c3' | 'd3' | 'e3' | 'f3' | 'g3' | 'h3' |
