@@ -9,11 +9,11 @@ export function makeMove(pos: Position, uci: Uci) {
   pos.turn = opposite(turn);
   if (uci == '0000') return;
 
-  let to = uci.slice(2, 4);
+  let to = uci.slice(2, 4) as Square;
 
   // drop
   if (uci.includes('@')) {
-    const dropped: Piece = { role: charToRole(uci[0])!, color: turn };
+    const dropped: Piece = { role: charToRole(uci[0]).value!, color: turn };
     pos.board[to] = dropped;
     if (pos.pockets) pos.pockets[dropped.color][dropped.role]--;
     return;
@@ -29,11 +29,11 @@ export function makeMove(pos: Position, uci: Uci) {
 
   if (piece.role == 'rook') arrayRemove(pos.castlingRights, from);
   else if (piece.role == 'king') {
-    if (from[0] == 'e' && to == 'f') to = 'h' + to[1];
-    else if (from[0] == 'e' && to == 'c') to = 'a' + to[1];
+    if (from[0] == 'e' && to[0] == 'f') to = 'h' + to[1] as Square;
+    else if (from[0] == 'e' && to[0] == 'c') to = 'a' + to[1] as Square;
     const isCastling = pos.castlingRights.indexOf(to) != -1;
     pos.castlingRights = pos.castlingRights.filter(rook => {
-      rook[1] == (piece.color == 'white' ? '1' : '8')
+      return rook[1] == (piece!.color == 'white' ? '1' : '8')
     });
     if (isCastling) {
       const rook = pos.board[to]!;
@@ -45,7 +45,7 @@ export function makeMove(pos: Position, uci: Uci) {
     }
   } else if (piece.role == 'pawn') {
     // en passant
-    if (!capture && from[1] != to[1]) {
+    if (!capture && from[0] != to[0]) {
       const fifthRank = to[0] + (turn == 'white' ? '6' : '4');
       capture = pos.board[fifthRank];
       delete pos.board[fifthRank];
@@ -57,9 +57,10 @@ export function makeMove(pos: Position, uci: Uci) {
   }
 
   // promotion
-  if (uci[4]) piece = { role: charToRole(uci[4])!, color: turn, promoted: true };
+  if (uci[4]) piece = { role: charToRole(uci[4]).value!, color: turn, promoted: true };
 
   // update board
+  delete pos.board[from];
   if (capture) arrayRemove(pos.castlingRights, to);
   pos.board[to] = piece;
 
@@ -70,7 +71,7 @@ export function makeMove(pos: Position, uci: Uci) {
 
   // atomic explosion
   if (pos.rules == 'atomic' && capture) {
-    removePiece(pos.board[to]);
+    delete pos.board[to];
     for (const ring of KING_MOVES[to as Square]) {
       const exploded = pos.board[ring];
       if (exploded && exploded.role != 'pawn') {
