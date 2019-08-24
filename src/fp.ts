@@ -38,7 +38,7 @@ export function err<V, E>(error?: E): Err<V, E | undefined> {
   }
 }
 
-export function unwrap<V, E>(result: Result<V, E>): V {
+export function unwrap<V>(result: Result<V, string>): V {
   if (isOk(result)) return result.value;
-  else throw result.error;
+  else throw new Error(result.error);
 }
