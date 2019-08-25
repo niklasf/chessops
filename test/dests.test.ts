@@ -38,6 +38,24 @@ function perft(pos: Position, depth: number): number {
   return nodes;
 }
 
+function testPerftFile(path: string, done: () => void): void {
+  let pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
+  eachLine('./perft/tricky.perft', (line, last) => {
+    if (line) {
+      const parts = line.split(' ');
+      const command = parts.shift();
+      //if (command == 'id') console.log(parts.join(' '));
+      if (command == 'epd') pos = unwrap(setup(unwrap(parseFen(parts.join(' ')))));
+      if (command == 'perft') {
+        const depth = parseInt(parts.shift()!, 10);
+        const nodes = parseInt(parts.shift()!, 10);
+        if (depth <= 1) expect(perft(pos, depth)).toBe(nodes);
+      }
+    }
+    if (last) done();
+  });
+}
+
 function d<T>(ctx: string, v: T): T {
   console.log(ctx, v);
   return v;
@@ -58,20 +76,5 @@ test('simple evasions', () => {
 });
 
 test('tricky perft', (done) => {
-  let pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
-  eachLine('./perft/tricky.perft', (line, last) => {
-    if (line) {
-      const parts = line.split(' ');
-      const command = parts.shift();
-      if (command == 'id') console.log(parts.join(' '));
-      if (command == 'epd') pos = unwrap(setup(unwrap(parseFen(parts.join(' ')))));
-      if (command == 'perft') {
-        const depth = parseInt(parts.shift()!, 10);
-        const nodes = parseInt(parts.shift()!, 10);
-        console.log(moveDests(pos));
-        if (depth <= 1) expect(perft(pos, depth)).toBe(nodes);
-      }
-    }
-    if (last) done();
-  });
+  testPerftFile('./perft/tricky.perft', done);
 });
