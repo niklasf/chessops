@@ -48,8 +48,12 @@ function testPerftFile(path: string, done: () => void): void {
       if (command == 'epd') pos = unwrap(setup(unwrap(parseFen(parts.join(' ')))));
       if (command == 'perft') {
         const depth = parseInt(parts.shift()!, 10);
-        const nodes = parseInt(parts.shift()!, 10);
-        if (depth <= 1) expect(perft(pos, depth)).toBe(nodes);
+        if (depth <= 1) {
+          const nodes = parseInt(parts.shift()!, 10);
+          const perftNodes = perft(pos, depth);
+          if (nodes != perftNodes) console.log(moveDests(pos));
+          expect(perftNodes).toBe(nodes);
+        }
       }
     }
     if (last) done();

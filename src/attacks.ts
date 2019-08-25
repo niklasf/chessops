@@ -48,6 +48,7 @@ function genBetween(a: Square, b: Square, delta: ShiftTable): Square[] | undefin
 }
 
 function genRay(a: Square, b: Square, shift: ShiftTable, unshift: ShiftTable): Square[] | undefined {
+  if (a == b) return undefined;
   const result: Square[] = [];
   for (let s = shift[a]; s; s = shift[s]) result.push(s);
   for (let s: Square | undefined = a; s; s = unshift[s]) result.push(s);
