@@ -32,7 +32,7 @@ export function makeMove(pos: Position, uci: Uci) {
   else if (piece.role == 'king') {
     const backrank = piece.color == 'white' ? '1' : '8';
     if (from[1] == backrank && to[1] == backrank) {
-      if (from[0] == 'e' && to[0] == 'f') to = 'h' + to[1] as Square;
+      if (from[0] == 'e' && to[0] == 'g') to = 'h' + to[1] as Square;
       else if (from[0] == 'e' && to[0] == 'c') to = 'a' + to[1] as Square;
     }
     isCastling = pos.castlingRights.indexOf(to) != -1;
