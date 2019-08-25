@@ -97,6 +97,8 @@ export function moveDests(pos: Position): Dests {
     const aSide = rook < king;
     const rookTo = (aSide ? 'd' : 'f') + backrank as Square;
     const kingTo = (aSide ? 'c' : 'g') + backrank as Square;
+    if (rookTo != rook && rookTo != king && pos.board[rookTo]) continue;
+    if (kingTo != king && kingTo != rook && pos.board[kingTo]) continue;
     if (BETWEEN[rook][rookTo].some(o => o != king && pos.board[o])) continue;
     if (BETWEEN[king][kingTo].some(o => o != rook && pos.board[o])) continue;
     if ([kingTo, ...BETWEEN[king][kingTo]].some(o => {
