@@ -1,7 +1,7 @@
 import { eachLine } from 'line-reader';
 import { unwrap } from '../src/fp';
 import { Position } from '../src/types';
-import { parseFen, INITIAL_FEN} from '../src/fen';
+import { parseFen, makeFen, INITIAL_FEN} from '../src/fen';
 import { setup } from '../src/setup';
 import { makeMove } from '../src/makeMove';
 import { moveDests } from '../src/dests';
@@ -30,7 +30,7 @@ function perft(pos: Position, depth: number): number {
         const uci = from + to + suffix;
         const child = copyPosition(pos);
         makeMove(child, uci);
-        if (depth == 5) nodes += d(from + to, perft(child, depth - 1));
+        if (depth == 2) nodes += d(from + to, perft(child, depth - 1));
         else nodes += perft(child, depth - 1);
       }
     }
@@ -65,7 +65,7 @@ function d<T>(ctx: string, v: T): T {
   return v;
 }
 
-test('initial perft', () => {
+/* test('initial perft', () => {
   const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
   expect(perft(pos, 1)).toBe(20);
   expect(perft(pos, 2)).toBe(400);
@@ -86,4 +86,15 @@ test('tricky perft', done => {
 test('random perft', done => {
   jest.setTimeout(60000);
   testPerftFile('./perft/random.perft', done);
+}); */
+
+test('gentest', () => {
+  const pos = unwrap(setup(unwrap(parseFen('rnbqkbr1/pppp1ppp/8/4p3/P2PPB2/3Q4/1PP2PPP/RN2KnNR w KQq - 0 1'))));
+  expect(perft(pos, 1)).toBe(44);
+  //expect(perft(pos, 2)).toBe(1421);
+
+  makeMove(pos, 'e1f1');
+  console.log(moveDests(pos));
+  console.log(makeFen(pos));
+  expect(perft(pos, 1)).toBe(29);
 });

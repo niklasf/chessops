@@ -19,3 +19,9 @@ test('setup initial position', () => {
   makeMove(pos, 'e8f7');
   expect(makeFen(pos)).toBe('r1bq1bnr/pppp1kpp/2n5/4p3/4P3/8/PPPP1PPP/RNBQK1NR w KQ - 0 4');
 });
+
+test('king capturing on backrank', () => {
+  const pos = unwrap(setup(unwrap(parseFen('rnbqkbr1/pppp1ppp/8/4p3/P2PPB2/3Q4/1PP2PPP/RN2KnNR w KQq - 0 1'))));
+  makeMove(pos, 'e1f1');
+  expect(makeFen(pos)).toBe('rnbqkbr1/pppp1ppp/8/4p3/P2PPB2/3Q4/1PP2PPP/RN3KNR b q - 0 1');
+});
