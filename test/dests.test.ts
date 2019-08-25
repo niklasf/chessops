@@ -84,5 +84,6 @@ test('tricky perft', done => {
 });
 
 test('random perft', done => {
+  jest.setTimeout(60000);
   testPerftFile('./perft/random.perft', done);
 });
