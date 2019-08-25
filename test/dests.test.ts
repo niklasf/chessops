@@ -89,12 +89,12 @@ test('random perft', done => {
 }); */
 
 test('gentest', () => {
-  const pos = unwrap(setup(unwrap(parseFen('rnbqkbr1/pppp1ppp/8/4p3/P2PPB2/3Q4/1PP2PPP/RN2KnNR w KQq - 0 1'))));
-  expect(perft(pos, 1)).toBe(44);
-  //expect(perft(pos, 2)).toBe(1421);
-
-  makeMove(pos, 'e1f1');
-  console.log(moveDests(pos));
-  console.log(makeFen(pos));
+  const pos = unwrap(setup(unwrap(parseFen('rnbqk1nr/p2p3p/1p5b/2pPppp1/8/P7/1PPQPPPP/RNB1KBNR w KQkq c6 0 1'))));
   expect(perft(pos, 1)).toBe(29);
+  expect(perft(pos, 2)).toBe(643);
+
+  //makeMove(pos, 'e1f1');
+  //console.log(moveDests(pos));
+  //console.log(makeFen(pos));
+  //expect(perft(pos, 1)).toBe(29);
 });

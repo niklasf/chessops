@@ -40,7 +40,7 @@ export function makeMove(pos: Position, uci: Uci) {
   } else if (piece.role == 'pawn') {
     // en passant
     if (!capture && from[0] != to[0]) {
-      const fifthRank = to[0] + (turn == 'white' ? '6' : '4');
+      const fifthRank = to[0] + from[1] as Square;
       capture = pos.board[fifthRank];
       delete pos.board[fifthRank];
     }

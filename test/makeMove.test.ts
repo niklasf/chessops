@@ -25,3 +25,9 @@ test('king capturing on backrank', () => {
   makeMove(pos, 'e1f1');
   expect(makeFen(pos)).toBe('rnbqkbr1/pppp1ppp/8/4p3/P2PPB2/3Q4/1PP2PPP/RN3KNR b q - 0 1');
 });
+
+test('en passant capture', () => {
+  const pos = unwrap(setup(unwrap(parseFen('rnbqk1nr/p2p3p/1p5b/2pPppp1/8/P7/1PPQPPPP/RNB1KBNR w KQkq c6 0 1'))));
+  makeMove(pos, 'd5c6');
+  expect(makeFen(pos)).toBe('rnbqk1nr/p2p3p/1pP4b/4ppp1/8/P7/1PPQPPPP/RNB1KBNR b KQkq - 0 1');
+});
