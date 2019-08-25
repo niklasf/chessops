@@ -116,9 +116,10 @@ function isAt(board: Board, square: Square, turn: Color, role: Role): boolean {
   return !!(piece && piece.role == role && piece.color == turn);
 }
 
-function isAtRay(board: Board, square: Square, turn: Color, roles: Role[], blacklist: Square[], delta: ShiftTable): boolean {
+function isAtRay(board: Board, square: Square, turn: Color, roles: Role[], blacklist: Square[], whitelist: Square[], delta: ShiftTable): boolean {
   for (let s = delta[square]; s; s = delta[s]) {
     if (blacklist.indexOf(s) != -1) continue;
+    if (whitelist.indexOf(s) != -1) break;
     const piece = board[s];
     if (piece && piece.color == turn && roles.indexOf(piece.role) != -1) return true;
     if (piece) break;
@@ -144,19 +145,19 @@ export function attacksTo(board: Board, by: Color, s: Square): Square[] {
   ];
 }
 
-export function isAttacked(board: Board, by: Color, s: Square, blacklist: Square[] = []): boolean {
+export function isAttacked(board: Board, by: Color, s: Square, blacklist: Square[] = [], whitelist: Square[] = []): boolean {
   return (
-    KING_MOVES[s].some(o => isAt(board, o, by, 'king')) ||
-    KNIGHT_MOVES[s].some(o => isAt(board, o, by, 'knight')) ||
-    pawnAttacks(s, opposite(by)).some(o => isAt(board, o, by, 'pawn')) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, SOUTH_EAST) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, SOUTH_WEST) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, NORTH_EAST) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, NORTH_WEST) ||
-    isAtRay(board, s, by, ['rook', 'queen'], blacklist, NORTH) ||
-    isAtRay(board, s, by, ['rook', 'queen'], blacklist, SOUTH) ||
-    isAtRay(board, s, by, ['rook', 'queen'], blacklist, EAST) ||
-    isAtRay(board, s, by, ['rook', 'queen'], blacklist, WEST)
+    KING_MOVES[s].some(o => blacklist.indexOf(o) != -1 && isAt(board, o, by, 'king')) ||
+    KNIGHT_MOVES[s].some(o => blacklist.indexOf(o) != -1 && isAt(board, o, by, 'knight')) ||
+    pawnAttacks(s, opposite(by)).some(o => blacklist.indexOf(o) != -1 && isAt(board, o, by, 'pawn')) ||
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, whitelist, SOUTH_EAST) ||
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, whitelist, SOUTH_WEST) ||
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, whitelist, NORTH_EAST) ||
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, whitelist, NORTH_WEST) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, whitelist, NORTH) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, whitelist, SOUTH) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, whitelist, EAST) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, whitelist, WEST)
   );
 }
 

@@ -19,7 +19,7 @@ export function destsFrom(pos: Position, square: Square): Square[] {
   else {
     const captures = pawnAttacks(square, pos.turn).filter(to => {
       const capture = pos.board[to];
-      return (capture && capture.color != pos.turn) || pos.epSquare == to;
+      return (capture && capture.color != pos.turn);
     });
     const forward = pos.turn == 'white' ? NORTH : SOUTH;
     const firstTwoRanks = pos.turn == 'white' ? ['1', '2'] : ['7', '8'];
@@ -33,8 +33,22 @@ export function destsFrom(pos: Position, square: Square): Square[] {
   }
 }
 
-function evasions(pos: Position, king: Square, checkers: Square[]): Dests {
+function enPassant(pos: Position, king: Square): Dests {
   const dests: Dests = {};
+  if (pos.epSquare) {
+    for (const from of pawnAttacks(pos.epSquare, opposite(pos.turn))) {
+      const piece = pos.board[from];
+      if (!piece || piece.role != 'pawn' || piece.color != pos.turn) continue;
+      const capturedPawn = pos.epSquare[0] + from[1] as Square;
+      if (isAttacked(pos.board, opposite(pos.turn), king, [from, capturedPawn], [pos.epSquare])) continue;
+      dests[from] = [pos.epSquare];
+    }
+  }
+  return dests;
+}
+
+function evasions(pos: Position, king: Square, checkers: Square[]): Dests {
+  const dests: Dests = enPassant(pos, king);
   dests[king] = KING_MOVES[king].filter(to => {
     const capture = pos.board[to];
     if (capture && capture.color == pos.turn) return false;
@@ -47,9 +61,10 @@ function evasions(pos: Position, king: Square, checkers: Square[]): Dests {
       if (s == king) continue;
       const piece = pos.board[from];
       if (!piece || piece.color != pos.turn) continue;
-      dests[from] = destsFrom(pos, from).filter(to => {
-        return to == checker || BETWEEN[checker][king].indexOf(to) != -1;
-      });
+      if (!dests[from]) dests[from] = [];
+      for (const to of destsFrom(pos, from)) {
+        if (to == checker || BETWEEN[checker][king].indexOf(to) != -1) dests[from]!.push(to);
+      }
     }
   }
   return dests;
@@ -61,7 +76,7 @@ export function moveDests(pos: Position): Dests {
   const checkers = attacksTo(pos.board, opposite(pos.turn), king);
   if (checkers.length > 0) return evasions(pos, king, checkers);
 
-  const dests: Dests = {};
+  const dests: Dests = enPassant(pos, king);
   for (const s in pos.board) {
     const from = s as Square;
     const piece = pos.board[from];
@@ -70,7 +85,8 @@ export function moveDests(pos: Position): Dests {
       if (blockers.indexOf(from) != -1) d = d.filter(to => {
         return aligned(from, to, king);
       });
-      dests[from] = d;
+      if (!dests[from]) dests[from] = [];
+      for (const to of d) dests[from]!.push(to);
     }
   }
   return dests;
