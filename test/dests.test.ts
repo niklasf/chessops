@@ -1,3 +1,4 @@
+import { eachLine } from 'line-reader';
 import { unwrap } from '../src/fp';
 import { Position } from '../src/types';
 import { parseFen, INITIAL_FEN} from '../src/fen';
@@ -62,8 +63,18 @@ test('simple evasions', () => {
   expect(dests['e8']).toEqual(['e7']);
 });
 
-/* test('debug', () => {
-  const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
-  makeMove(pos, 'e2e4');
-  console.log(moveDests(pos));
-}); */
+test('tricky perft', () => {
+  let pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
+  eachLine('../perft/tricky.perft', (line) => {
+    if (!line || line.startsWith('#')) return;
+    const parts = line.split(' ');
+    const command = parts.shift();
+    if (command == 'id') console.log(parts.join(' '));
+    if (command == 'epd') pos = unwrap(setup(unwrap(parseFen(parts.join(' ')))));
+    if (command == 'perft') {
+      const depth = parseInt(parts.shift()!, 10);
+      const nodes = parseInt(parts.shift()!, 10);
+      expect(perft(pos, depth)).toBe(nodes);
+    }
+  });
+});

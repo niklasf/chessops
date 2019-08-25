@@ -7,7 +7,9 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/jest": "^24.0.7",
+    "@types/line-reader": "0.0.28",
     "jest": "^24.9.0",
+    "line-reader": "^0.4.0",
     "ts-jest": "^24.0.2",
     "typedoc": "^0.15.0",
     "typescript": "^3.5.3"
