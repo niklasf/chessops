@@ -2,6 +2,20 @@ import { Position, Role, Piece, Uci, Square } from './types';
 import { opposite, charToRole, arrayRemove } from './util';
 import { findKing, isAttacked, KING_MOVES } from './attacks';
 
+export function copyPosition(pos: Position): Position {
+  return {
+    rules: pos.rules,
+    board: { ...pos.board },
+    turn: pos.turn,
+    epSquare: pos.epSquare,
+    castlingRights: [...pos.castlingRights],
+    pockets: pos.pockets && { white: { ...pos.pockets.white }, black: { ... pos.pockets.black } },
+    remainingChecks: pos.remainingChecks && { ...pos.remainingChecks },
+    halfmoves: pos.halfmoves,
+    fullmoves: pos.fullmoves
+  };
+}
+
 export function makeMove(pos: Position, uci: Uci) {
   pos.epSquare = undefined;
   if (pos.turn == 'black') pos.fullmoves++;

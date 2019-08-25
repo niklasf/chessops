@@ -3,22 +3,8 @@ import { unwrap } from '../src/fp';
 import { Position } from '../src/types';
 import { parseFen, makeFen, INITIAL_FEN} from '../src/fen';
 import { setup } from '../src/setup';
-import { makeMove } from '../src/makeMove';
+import { copyPosition, makeMove } from '../src/makeMove';
 import { moveDests } from '../src/dests';
-
-function copyPosition(pos: Position): Position {
-  return {
-    rules: pos.rules,
-    board: { ...pos.board },
-    turn: pos.turn,
-    epSquare: pos.epSquare,
-    castlingRights: [...pos.castlingRights],
-    pockets: pos.pockets && { white: { ...pos.pockets.white }, black: { ... pos.pockets.black } },
-    remainingChecks: pos.remainingChecks && { ...pos.remainingChecks },
-    halfmoves: pos.halfmoves,
-    fullmoves: pos.fullmoves
-  };
-}
 
 function perft(pos: Position, depth: number): number {
   if (depth == 0) return 1;
@@ -48,7 +34,7 @@ function testPerftFile(path: string, done: () => void): void {
       if (command == 'epd') pos = unwrap(setup(unwrap(parseFen(parts.join(' ')))));
       if (command == 'perft') {
         const depth = parseInt(parts.shift()!, 10);
-        if (depth <= 2) {
+        if (depth <= 1) {
           const nodes = parseInt(parts.shift()!, 10);
           const perftNodes = perft(pos, depth);
           if (nodes != perftNodes) console.log(moveDests(pos));
@@ -86,15 +72,4 @@ test('tricky perft', done => {
 test('random perft', done => {
   jest.setTimeout(300000);
   testPerftFile('./perft/random.perft', done);
-});
-
-test('gentest', () => {
-  const pos = unwrap(setup(unwrap(parseFen('rnbq1br1/p2p4/1pp2pkp/1P1Np1p1/3Pn3/P2N3P/2PB4/R3KBQR w KQ -'))));
-  expect(perft(pos, 1)).toBe(45);
-  expect(perft(pos, 2)).toBe(1420);
-
-  //makeMove(pos, 'e1f1');
-  //console.log(moveDests(pos));
-  //console.log(makeFen(pos));
-  //expect(perft(pos, 1)).toBe(29);
 });
