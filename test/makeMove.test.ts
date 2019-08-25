@@ -31,3 +31,9 @@ test('en passant capture', () => {
   makeMove(pos, 'd5c6');
   expect(makeFen(pos)).toBe('rnbqk1nr/p2p3p/1pP4b/4ppp1/8/P7/1PPQPPPP/RNB1KBNR b KQkq - 0 1');
 });
+
+test('long castle', () => {
+  const pos = unwrap(setup(unwrap(parseFen('rnbq1br1/p2p4/1pp2pkp/1P1Np1p1/3Pn3/P2N3P/2PB4/R3KBQR w KQ - 0 1'))));
+  makeMove(pos, 'e1c1');
+  expect(makeFen(pos)).toBe('rnbq1br1/p2p4/1pp2pkp/1P1Np1p1/3Pn3/P2N3P/2PB4/2KR1BQR b - - 1 1');
+});

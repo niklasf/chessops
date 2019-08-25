@@ -58,8 +58,8 @@ export function makeMove(pos: Position, uci: Uci) {
     const rook = pos.board[to]!;
     delete pos.board[to];
     delete pos.board[from];
-    pos.board[(from < to ? 'c' : 'g') + to[1]] = piece;
-    pos.board[(from < to ? 'd' : 'f') + to[1]] = rook;
+    pos.board[(to < from ? 'c' : 'g') + to[1]] = piece;
+    pos.board[(to < from ? 'd' : 'f') + to[1]] = rook;
   } else {
     delete pos.board[from];
     if (capture) arrayRemove(pos.castlingRights, to);

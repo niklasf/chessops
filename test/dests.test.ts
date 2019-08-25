@@ -89,9 +89,9 @@ test('random perft', done => {
 }); */
 
 test('gentest', () => {
-  const pos = unwrap(setup(unwrap(parseFen('rnbqk1nr/p2p3p/1p5b/2pPppp1/8/P7/1PPQPPPP/RNB1KBNR w KQkq c6 0 1'))));
-  expect(perft(pos, 1)).toBe(29);
-  expect(perft(pos, 2)).toBe(643);
+  const pos = unwrap(setup(unwrap(parseFen('rnbq1br1/p2p4/1pp2pkp/1P1Np1p1/3Pn3/P2N3P/2PB4/R3KBQR w KQ -'))));
+  expect(perft(pos, 1)).toBe(45);
+  expect(perft(pos, 2)).toBe(1420);
 
   //makeMove(pos, 'e1f1');
   //console.log(moveDests(pos));
