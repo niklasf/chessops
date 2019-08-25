@@ -116,8 +116,9 @@ function isAt(board: Board, square: Square, turn: Color, role: Role): boolean {
   return !!(piece && piece.role == role && piece.color == turn);
 }
 
-function isAtRay(board: Board, square: Square, turn: Color, roles: Role[], delta: ShiftTable): boolean {
+function isAtRay(board: Board, square: Square, turn: Color, roles: Role[], blacklist: Square[], delta: ShiftTable): boolean {
   for (let s = delta[square]; s; s = delta[s]) {
+    if (blacklist.indexOf(s) != -1) continue;
     const piece = board[s];
     if (piece && piece.color == turn && roles.indexOf(piece.role) != -1) return true;
     if (piece) break;
@@ -143,19 +144,19 @@ export function attacksTo(board: Board, by: Color, s: Square): Square[] {
   ];
 }
 
-export function isAttacked(board: Board, by: Color, s: Square): boolean {
+export function isAttacked(board: Board, by: Color, s: Square, blacklist: Square[] = []): boolean {
   return (
     KING_MOVES[s].some(o => isAt(board, o, by, 'king')) ||
     KNIGHT_MOVES[s].some(o => isAt(board, o, by, 'knight')) ||
     pawnAttacks(s, opposite(by)).some(o => isAt(board, o, by, 'pawn')) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], SOUTH_EAST) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], SOUTH_WEST) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], NORTH_EAST) ||
-    isAtRay(board, s, by, ['bishop', 'queen'], NORTH_WEST) ||
-    isAtRay(board, s, by, ['rook', 'queen'], NORTH) ||
-    isAtRay(board, s, by, ['rook', 'queen'], SOUTH) ||
-    isAtRay(board, s, by, ['rook', 'queen'], EAST) ||
-    isAtRay(board, s, by, ['rook', 'queen'], WEST)
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, SOUTH_EAST) ||
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, SOUTH_WEST) ||
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, NORTH_EAST) ||
+    isAtRay(board, s, by, ['bishop', 'queen'], blacklist, NORTH_WEST) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, NORTH) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, SOUTH) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, EAST) ||
+    isAtRay(board, s, by, ['rook', 'queen'], blacklist, WEST)
   );
 }
 
