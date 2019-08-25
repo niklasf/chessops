@@ -51,7 +51,7 @@ function genRay(a: Square, b: Square, shift: ShiftTable, unshift: ShiftTable): S
   const result: Square[] = [];
   for (let s = shift[a]; s; s = shift[s]) result.push(s);
   for (let s: Square | undefined = a; s; s = unshift[s]) result.push(s);
-  return result.indexOf(b) == -1 ? result : undefined;
+  return result.indexOf(b) != -1 ? result : undefined;
 }
 
 export const BETWEEN = {} as { [sq in Square]: { [sq in Square]: Square[] } };
