@@ -48,7 +48,7 @@ function evasions(pos: Position, king: Square, checkers: Square[]): Dests {
       const piece = pos.board[from];
       if (!piece || piece.color != pos.turn) continue;
       dests[from] = destsFrom(pos, from).filter(to => {
-        return to == checker || BETWEEN[checker][to].indexOf(to) != -1;
+        return to == checker || BETWEEN[checker][king].indexOf(to) != -1;
       });
     }
   }

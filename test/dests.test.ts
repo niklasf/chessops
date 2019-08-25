@@ -56,6 +56,12 @@ test('initial perft', () => {
   expect(perft(pos, 4)).toBe(197281);
 });
 
+test('simple evasions', () => {
+  const pos = unwrap(setup(unwrap(parseFen('r1bqkb1r/ppp2ppp/5n2/nB1Pp1N1/8/8/PPPP1PPP/RNBQK2R b KQkq - 2 6'))));
+  const dests = moveDests(pos);
+  expect(dests['e8']).toEqual(['e7']);
+});
+
 /* test('debug', () => {
   const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
   makeMove(pos, 'e2e4');
