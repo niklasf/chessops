@@ -30,7 +30,7 @@ function perft(pos: Position, depth: number): number {
         const uci = from + to + suffix;
         const child = copyPosition(pos);
         makeMove(child, uci);
-        if (depth == 2) nodes += d(from + to, perft(child, depth - 1));
+        if (depth == 5) nodes += d(from + to, perft(child, depth - 1));
         else nodes += perft(child, depth - 1);
       }
     }
@@ -65,7 +65,7 @@ function d<T>(ctx: string, v: T): T {
   return v;
 }
 
-/* test('initial perft', () => {
+test('initial perft', () => {
   const pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
   expect(perft(pos, 1)).toBe(20);
   expect(perft(pos, 2)).toBe(400);
@@ -84,9 +84,9 @@ test('tricky perft', done => {
 });
 
 test('random perft', done => {
-  jest.setTimeout(60000);
+  jest.setTimeout(300000);
   testPerftFile('./perft/random.perft', done);
-}); */
+});
 
 test('gentest', () => {
   const pos = unwrap(setup(unwrap(parseFen('rnbq1br1/p2p4/1pp2pkp/1P1Np1p1/3Pn3/P2N3P/2PB4/R3KBQR w KQ -'))));
