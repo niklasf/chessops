@@ -89,5 +89,20 @@ export function moveDests(pos: Position): Dests {
       for (const to of d) dests[from]!.push(to);
     }
   }
+
+  for (const rook of pos.castlingRights) {
+    const backrank = pos.turn == 'white' ? '1' : '8';
+    if (rook[1] != backrank) continue;
+    const aSide = rook < king;
+    const rookTo = (aSide ? 'd' : 'f') + backrank as Square;
+    const kingTo = (aSide ? 'c' : 'g') + backrank as Square;
+    if (BETWEEN[rook][rookTo].some(o => o != king && pos.board[o])) continue;
+    if (BETWEEN[king][kingTo].some(o => o != rook && pos.board[o])) continue;
+    if ([kingTo, ...BETWEEN[king][kingTo]].some(o => {
+      return isAttacked(pos.board, opposite(pos.turn), o, [rook, king]);
+    })) continue;
+    dests[king]!.push(rook);
+  }
+
   return dests;
 }
