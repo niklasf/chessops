@@ -35,7 +35,7 @@ function perft(pos: Position, depth: number): number {
         const uci = from + to;
         const child = copyPosition(pos);
         makeMove(child, uci);
-        if (depth == 2) nodes += d(from + to, perft(child, depth - 1));
+        if (depth == 5) nodes += d(from + to, perft(child, depth - 1));
         else nodes += perft(child, depth - 1);
       }
     }
@@ -44,7 +44,7 @@ function perft(pos: Position, depth: number): number {
 }
 
 function d<T>(ctx: string, v: T): T {
-  //console.log(ctx, v);
+  console.log(ctx, v);
   return v;
 }
 

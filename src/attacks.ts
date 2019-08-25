@@ -147,9 +147,9 @@ export function attacksTo(board: Board, by: Color, s: Square): Square[] {
 
 export function isAttacked(board: Board, by: Color, s: Square, blacklist: Square[] = [], whitelist: Square[] = []): boolean {
   return (
-    KING_MOVES[s].some(o => blacklist.indexOf(o) != -1 && isAt(board, o, by, 'king')) ||
-    KNIGHT_MOVES[s].some(o => blacklist.indexOf(o) != -1 && isAt(board, o, by, 'knight')) ||
-    pawnAttacks(s, opposite(by)).some(o => blacklist.indexOf(o) != -1 && isAt(board, o, by, 'pawn')) ||
+    KING_MOVES[s].some(o => blacklist.indexOf(o) == -1 && isAt(board, o, by, 'king')) ||
+    KNIGHT_MOVES[s].some(o => blacklist.indexOf(o) == -1 && isAt(board, o, by, 'knight')) ||
+    pawnAttacks(s, opposite(by)).some(o => blacklist.indexOf(o) == -1 && isAt(board, o, by, 'pawn')) ||
     isAtRay(board, s, by, ['bishop', 'queen'], blacklist, whitelist, SOUTH_EAST) ||
     isAtRay(board, s, by, ['bishop', 'queen'], blacklist, whitelist, SOUTH_WEST) ||
     isAtRay(board, s, by, ['bishop', 'queen'], blacklist, whitelist, NORTH_EAST) ||
