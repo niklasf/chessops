@@ -40,11 +40,11 @@ function perft(pos: Position, depth: number): number {
 
 function testPerftFile(path: string, done: () => void): void {
   let pos = unwrap(setup(unwrap(parseFen(INITIAL_FEN))));
-  eachLine('./perft/tricky.perft', (line, last) => {
+  eachLine(path, (line, last) => {
     if (line) {
       const parts = line.split(' ');
       const command = parts.shift();
-      //if (command == 'id') console.log(parts.join(' '));
+      if (command == 'id') console.log(parts.join(' '));
       if (command == 'epd') pos = unwrap(setup(unwrap(parseFen(parts.join(' ')))));
       if (command == 'perft') {
         const depth = parseInt(parts.shift()!, 10);
@@ -75,6 +75,10 @@ test('simple evasions', () => {
   expect(dests['e8']).toEqual(['e7']);
 });
 
-test('tricky perft', (done) => {
+test('tricky perft', done => {
   testPerftFile('./perft/tricky.perft', done);
+});
+
+test('random perft', done => {
+  testPerftFile('./perft/random.perft', done);
 });
