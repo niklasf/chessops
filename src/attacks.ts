@@ -39,17 +39,26 @@ for (let s = 0; s < 64; s++) {
 }
 
 function genBetween(a: Square, b: Square, delta: ShiftTable): Square[] | undefined {
-  const result = [];
+  const result: Square[] = [];
   for (let s = delta[a]; s; s = delta[s]) {
-    if (s == b) return result as Square[];
+    if (s == b) return result;
     result.push(s);
   }
   return;
 }
 
+function genRay(a: Square, b: Square, shift: ShiftTable, unshift: ShiftTable): Square[] | undefined {
+  const result: Square[] = [];
+  for (let s = shift[a]; s; s = shift[s]) result.push(s);
+  for (let s: Square | undefined = a; s; s = unshift[s]) result.push(s);
+  return result.indexOf(b) == -1 ? result : undefined;
+}
+
 export const BETWEEN = {} as { [sq in Square]: { [sq in Square]: Square[] } };
+export const RAY = {} as { [sq in Square]: { [sq in Square]: Square[] } };
 for (const a of SQUARES) {
   BETWEEN[a] = {} as { [sq in Square]: Square[] };
+  RAY[a] = {} as { [sq in Square]: Square[] };
   for (const b of SQUARES) {
     BETWEEN[a][b] = (
       genBetween(a, b, NORTH) ||
@@ -62,11 +71,19 @@ for (const a of SQUARES) {
       genBetween(a, b, SOUTH_WEST) ||
       []
     );
+    RAY[a][b] = (
+      genRay(a, b, NORTH, SOUTH) ||
+      genRay(a, b, EAST, WEST) ||
+      genRay(a, b, NORTH_EAST, SOUTH_WEST) ||
+      genRay(a, b, SOUTH_EAST, NORTH_WEST) ||
+      []
+    );
   }
 }
 
+
 export function aligned(a: Square, b: Square, c: Square): boolean {
-  return BETWEEN[a][b].indexOf(c) != -1;
+  return RAY[a][b].indexOf(c) != -1;
 }
 
 function slidingMovesTo(board: Board, square: Square, deltas: ShiftTable[]): Square[] {
