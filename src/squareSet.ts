@@ -11,7 +11,19 @@ export class SquareSet {
   readonly hi: number;
 
   static fromSquare(square: Square): SquareSet {
-    return square >= 32 ? new SquareSet(0, 1 << (square - 32)) : new SquareSet(1 << square, 0);
+    return square >= 32 ?
+      new SquareSet(0, 1 << (square - 32)) :
+      new SquareSet(1 << square, 0);
+  }
+
+  static fromRank(rank: number): SquareSet {
+    return rank >= 4 ?
+      new SquareSet(0, 0xff << (8 * (rank - 4))) :
+      new SquareSet(0xff << (8 * rank), 0);
+  }
+
+  static fromFile(file: number): SquareSet {
+    return new SquareSet(0x01010101 << file, 0x01010101 << file);
   }
 
   static empty(): SquareSet {
