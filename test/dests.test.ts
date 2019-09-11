@@ -1,4 +1,4 @@
-import { eachLine } from 'line-reader';
+/* import { eachLine } from 'line-reader';
 import { unwrap } from '../src/fp';
 import { Position } from '../src/types';
 import { parseFen, makeFen, INITIAL_FEN} from '../src/fen';
@@ -72,4 +72,4 @@ test('tricky perft', done => {
 test('random perft', done => {
   jest.setTimeout(300000);
   testPerftFile('./perft/random.perft', done);
-});
+}); */
