@@ -139,4 +139,27 @@ export class SquareSet {
       }
     };
   }
+
+  reversed(): Iterable<Square> {
+    let lo = this.lo, hi = this.hi;
+    return {
+      [Symbol.iterator]() {
+        return {
+          next(): IteratorResult<Square> {
+            if (hi) {
+              const idx = 31 - Math.clz32(hi);
+              hi ^= 1 << idx;
+              return { value: 32 + idx, done: false };
+            }
+            if (lo) {
+              const idx = 31 - Math.clz32(lo);
+              lo ^= 1 << idx;
+              return { value: idx, done: false };
+            }
+            return { done: true } as IteratorResult<Square>;
+          }
+        };
+      }
+    };
+  }
 }
