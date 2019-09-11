@@ -162,4 +162,32 @@ export class SquareSet {
       }
     };
   }
+
+  private plusOne(): SquareSet {
+    if (this.lo < 0xffffffff) return new SquareSet(this.lo + 1, this.hi);
+    else if (this.hi < 0xffffffff) return new SquareSet(0, this.hi + 1);
+    else return new SquareSet(0, 0);
+  }
+
+  subsets(): Iterable<SquareSet> {
+    const mask = this;
+    const complement = this.complement();
+    let subset = SquareSet.empty();
+    let first = true;
+    return {
+      [Symbol.iterator]() {
+        return {
+          next(): IteratorResult<SquareSet> {
+            if (first || !subset.isEmpty()) {
+              first = false;
+              const value = subset;
+              subset = subset.union(complement).plusOne().intersection(mask);
+              return { value, done: false };
+            }
+            return { done: true } as IteratorResult<SquareSet>;
+          }
+        }
+      }
+    };
+  }
 }
