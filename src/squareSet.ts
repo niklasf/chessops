@@ -1,6 +1,6 @@
 type Square = number;
 
-function popcount(n: number): number {
+function popcnt32(n: number): number {
   n = n - ((n >>> 1) & 0x55555555);
   n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
   return ((n + (n >>> 4) & 0xf0f0f0f) * 0x1010101) >> 24;
@@ -68,7 +68,7 @@ export class SquareSet {
   }
 
   size(): number {
-    return popcount(this.lo) + popcount(this.hi);
+    return popcnt32(this.lo) + popcnt32(this.hi);
   }
 
   isEmpty(): boolean {
@@ -77,6 +77,10 @@ export class SquareSet {
 
   has(square: Square): boolean {
     return !!(square >= 32 ? this.hi & (1 << (square - 32)) : this.lo & (1 << square));
+  }
+
+  set(square: Square, on: boolean): SquareSet {
+    return on ? this.with(square) : this.without(square);
   }
 
   with(square: Square): SquareSet {
@@ -91,14 +95,10 @@ export class SquareSet {
       new SquareSet(this.lo & ~(1 << square), this.hi);
   }
 
-  flip(square: Square): SquareSet {
+  toggle(square: Square): SquareSet {
     return square >= 32 ?
       new SquareSet(this.lo, this.hi ^ (1 << (square - 32))) :
       new SquareSet(this.lo ^ (1 << square), this.hi);
-  }
-
-  toggle(square: Square, on: boolean): SquareSet {
-    return on ? this.with(square) : this.without(square);
   }
 
   last(): Square | undefined {
