@@ -98,3 +98,7 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
 }
 
 export const [RAYS, BETWEEN] = rayTables();
+
+export function aligned(a: Square, b: Square, c: Square): boolean {
+  return RAYS[a][b].has(c);
+}
