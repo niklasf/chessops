@@ -16,6 +16,20 @@ export class Board {
   private queen: SquareSet;
   private king: SquareSet;
 
+  static default(): Board {
+    const board = new Board();
+    board.occupied = new SquareSet(0xffff, 0xffff0000);
+    board.white = new SquareSet(0xffff, 0);
+    board.black = new SquareSet(0, 0xffff0000);
+    board.pawn = new SquareSet(0xff00, 0xff0000);
+    board.knight = new SquareSet(0x42, 0x42000000);
+    board.bishop = new SquareSet(0x24, 0x24000000);
+    board.rook = new SquareSet(0x81, 0x81000000);
+    board.queen = new SquareSet(0x8, 0x8000000);
+    board.king = new SquareSet(0x10, 0x10000000);
+    return board;
+  }
+
   clear() {
     this.occupied = SquareSet.empty();
 
@@ -78,5 +92,25 @@ export class Board {
 
   has(square: Square): boolean {
     return this.occupied.has(square);
+  }
+
+  keys(): Iterator<Square> {
+    return this.occupied[Symbol.iterator]();
+  }
+
+  entries(): Iterator<[Square, Piece]> {
+    const self = this;
+    const keys = this.keys();
+    return {
+      next(): IteratorResult<[Square, Piece]> {
+        const entry = keys.next();
+        if (entry.done) return { done: true } as IteratorResult<[Square, Piece]>;
+        else return { value: [entry.value, self.get(entry.value)!], done: false };
+      }
+    };
+  }
+
+  [Symbol.iterator](): Iterator<[Square, Piece]> {
+    return this.entries();
   }
 }
