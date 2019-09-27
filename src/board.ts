@@ -1,4 +1,4 @@
-import { Square, Color, Role, Piece, ROLES } from './types';
+import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 
 export class Board {
@@ -32,18 +32,9 @@ export class Board {
 
   clear() {
     this.occupied = SquareSet.empty();
-
     this.promoted = SquareSet.empty();
-
-    this.white = SquareSet.empty();
-    this.black = SquareSet.empty();
-
-    this.pawn = SquareSet.empty();
-    this.knight = SquareSet.empty();
-    this.bishop = SquareSet.empty();
-    this.rook = SquareSet.empty();
-    this.queen = SquareSet.empty();
-    this.king = SquareSet.empty();
+    for (const color of COLORS) this[color] = SquareSet.empty();
+    for (const role of ROLES) this[role] = SquareSet.empty();
   }
 
   constructor() {
