@@ -35,8 +35,8 @@ export class SquareSet {
   }
 
   constructor(lo: number, hi: number) {
-    this.lo = lo;
-    this.hi = hi;
+    this.lo = lo | 0;
+    this.hi = hi | 0;
   }
 
   complement(): SquareSet {
@@ -176,8 +176,8 @@ export class SquareSet {
   }
 
   private plusOne(): SquareSet {
-    if (this.lo < 0xffffffff) return new SquareSet(this.lo + 1, this.hi);
-    else if (this.hi < 0xffffffff) return new SquareSet(0, this.hi + 1);
+    if (this.lo != -1) return new SquareSet(this.lo + 1, this.hi);
+    else if (this.hi != -1) return new SquareSet(0, this.hi + 1);
     else return new SquareSet(0, 0);
   }
 
