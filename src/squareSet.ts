@@ -38,7 +38,7 @@ export class SquareSet {
   }
 
   complement(): SquareSet {
-    return new SquareSet(this.lo ^ 0xffffffff, this.hi ^ 0xffffffff);
+    return new SquareSet(~this.lo, ~this.hi);
   }
 
   xor(other: SquareSet): SquareSet {
@@ -49,28 +49,28 @@ export class SquareSet {
     return new SquareSet(this.lo | other.lo, this.hi | other.hi);
   }
 
-  intersection(other: SquareSet): SquareSet {
+  intersect(other: SquareSet): SquareSet {
     return new SquareSet(this.lo & other.lo, this.hi & other.hi);
   }
 
-  difference(other: SquareSet): SquareSet {
+  diff(other: SquareSet): SquareSet {
     return new SquareSet(this.lo & ~other.lo, this.hi & ~other.hi);
   }
 
   intersects(other: SquareSet): boolean {
-    return !this.intersection(other).isEmpty();
+    return this.intersect(other).nonEmpty();
   }
 
   isDisjoint(other: SquareSet): boolean {
-    return this.intersection(other).isEmpty();
+    return this.intersect(other).isEmpty();
   }
 
-  isSubset(other: SquareSet): boolean {
-    return other.difference(this).isEmpty();
+  supersetOf(other: SquareSet): boolean {
+    return other.diff(this).isEmpty();
   }
 
-  isSuperset(other: SquareSet): boolean {
-    return this.difference(other).isEmpty();
+  subsetOf(other: SquareSet): boolean {
+    return this.diff(other).isEmpty();
   }
 
   shr(shift: number): SquareSet {
@@ -97,6 +97,10 @@ export class SquareSet {
 
   isEmpty(): boolean {
     return this.lo == 0 && this.hi == 0;
+  }
+
+  nonEmpty(): boolean {
+    return this.lo != 0 || this.hi != 0;
   }
 
   has(square: Square): boolean {
@@ -205,7 +209,7 @@ export class SquareSet {
             if (first || !subset.isEmpty()) {
               first = false;
               const value = subset;
-              subset = subset.union(complement).plusOne().intersection(mask);
+              subset = subset.union(complement).plusOne().intersect(mask);
               return { value, done: false };
             }
             return { done: true } as IteratorResult<SquareSet>;

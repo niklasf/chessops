@@ -19,8 +19,8 @@ function slidingAttacks(square: Square, occupied: SquareSet, deltas: number[]): 
 }
 
 function edges(square: Square): SquareSet {
-  const h = SquareSet.fromRank(0).union(SquareSet.fromRank(7)).difference(SquareSet.fromRank(square >> 3));
-  const v = SquareSet.fromFile(0).union(SquareSet.fromFile(7)).difference(SquareSet.fromFile(square & 7));
+  const h = SquareSet.fromRank(0).union(SquareSet.fromRank(7)).diff(SquareSet.fromRank(square >> 3));
+  const v = SquareSet.fromFile(0).union(SquareSet.fromFile(7)).diff(SquareSet.fromFile(square & 7));
   return h.union(v);
 }
 
@@ -31,7 +31,7 @@ function slidingAttackTable(deltas: number[]): [BySquare<SquareSet>, BySquare<At
   const masks = [];
   const table = [];
   for (let square = 0; square < 64; square++) {
-    const mask = slidingAttacks(square, SquareSet.empty(), deltas).difference(edges(square));
+    const mask = slidingAttacks(square, SquareSet.empty(), deltas).diff(edges(square));
     const attacks: Attacks = {};
     for (const subset of mask.subsets()) {
       attacks[subset.lo] = attacks[subset.lo] || {};
@@ -63,17 +63,17 @@ const [RANK_MASKS, RANK_ATTACKS] = slidingAttackTable([-1, 1]);
 const [FILE_MASKS, FILE_ATTACKS] = slidingAttackTable([-8, 8]);
 
 export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const occ = DIAG_MASKS[square].intersection(occupied);
+  const occ = DIAG_MASKS[square].intersect(occupied);
   return DIAG_ATTACKS[square][occ.lo][occ.hi];
 }
 
 function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const occ = RANK_MASKS[square].intersection(occupied);
+  const occ = RANK_MASKS[square].intersect(occupied);
   return RANK_ATTACKS[square][occ.lo][occ.hi];
 }
 
 function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const occ = FILE_MASKS[square].intersection(occupied);
+  const occ = FILE_MASKS[square].intersect(occupied);
   return FILE_ATTACKS[square][occ.lo][occ.hi];
 }
 
@@ -103,14 +103,14 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
     between[a] = [];
     for (let b = 0; b < 64; b++) {
       if (DIAG_ATTACKS[a][0][0].has(b)) {
-        rays[a][b] = DIAG_ATTACKS[a][0][0].intersection(DIAG_ATTACKS[b][0][0]).with(a).with(b);
-        between[a][b] = bishopAttacks(a, SquareSet.fromSquare(b)).intersection(bishopAttacks(b, SquareSet.fromSquare(a)));
+        rays[a][b] = DIAG_ATTACKS[a][0][0].intersect(DIAG_ATTACKS[b][0][0]).with(a).with(b);
+        between[a][b] = bishopAttacks(a, SquareSet.fromSquare(b)).intersect(bishopAttacks(b, SquareSet.fromSquare(a)));
       } else if (RANK_ATTACKS[a][0][0].has(b)) {
         rays[a][b] = RANK_ATTACKS[a][0][0].with(a);
-        between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersection(rankAttacks(b, SquareSet.fromSquare(a)));
+        between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersect(rankAttacks(b, SquareSet.fromSquare(a)));
       } else if (FILE_ATTACKS[a][0][0].has(b)) {
         rays[a][b] = FILE_ATTACKS[a][0][0].with(b);
-        between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersection(fileAttacks(b, SquareSet.fromSquare(a)));
+        between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersect(fileAttacks(b, SquareSet.fromSquare(a)));
       } else {
         rays[a][b] = SquareSet.empty();
         between[a][b] = SquareSet.empty();
