@@ -1,5 +1,10 @@
+import { Piece } from '../src/types';
 import { Board } from '../src/board';
 
-test('empty board', () => {
-  expect(new Board().get(0)).toBeUndefined();
+test('set and get', () => {
+  const board = new Board();
+  expect(board.get(0)).toBeUndefined();
+  const piece: Piece = { role: 'knight', color: 'black', promoted: false };
+  expect(board.set(0, piece)).toBeUndefined();
+  expect(board.get(0)).toEqual(piece);
 });

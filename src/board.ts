@@ -28,4 +28,24 @@ export class Board {
     }
     return;
   }
+
+  take(square: Square): Piece | undefined {
+    const piece = this.get(square);
+    if (piece) {
+      this.occupied = this.occupied.without(square);
+      this[piece.color] = this[piece.color].without(square);
+      this[piece.role] = this[piece.role].without(square);
+      if (piece.promoted) this.promoted = this.promoted.without(square);
+    }
+    return piece;
+  }
+
+  set(square: Square, piece: Piece): Piece | undefined {
+    const old = this.take(square);
+    this.occupied = this.occupied.with(square);
+    this[piece.color] = this[piece.color].with(square);
+    this[piece.role] = this[piece.role].with(square);
+    if (piece.promoted) this.promoted = this.promoted.with(square);
+    return old;
+  }
 }
