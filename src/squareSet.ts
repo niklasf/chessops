@@ -17,9 +17,7 @@ export class SquareSet {
   }
 
   static fromRank(rank: number): SquareSet {
-    return rank >= 4 ?
-      new SquareSet(0, 0xff << (8 * (rank - 4))) :
-      new SquareSet(0xff << (8 * rank), 0);
+    return new SquareSet(0xff, 0).shl(8 * rank);
   }
 
   static fromFile(file: number): SquareSet {
