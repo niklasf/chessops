@@ -32,6 +32,10 @@ export class Board {
     this.king = SquareSet.empty();
   }
 
+  constructor() {
+    this.clear();
+  }
+
   private getColor(square: Square): Color | undefined {
     if (this.white.has(square)) return 'white';
     else if (this.black.has(square)) return 'black';
