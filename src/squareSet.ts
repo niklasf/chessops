@@ -75,6 +75,20 @@ export class SquareSet {
     return this.difference(other).isEmpty();
   }
 
+  shr(shift: number): SquareSet {
+    if (shift >= 64) return SquareSet.empty();
+    else if (shift >= 32) return new SquareSet(this.hi >>> (shift - 32), 0);
+    else if (shift > 0) return new SquareSet((this.lo >>> shift) ^ (this.hi << (32 - shift)), this.hi >>> shift);
+    else return this;
+  }
+
+  shl(shift: number): SquareSet {
+    if (shift >= 64) return SquareSet.empty();
+    else if (shift >= 32) return new SquareSet(0, this.lo << (shift - 32));
+    else if (shift > 0) return new SquareSet(this.lo << shift, (this.hi << shift) ^ (this.lo >>> (32 - shift)));
+    else return this;
+  }
+
   equals(other: SquareSet): boolean {
     return this.lo == other.lo && this.hi == other.hi;
   }
