@@ -2,16 +2,35 @@ import { Square, Color, Role, Piece, ROLES } from './types';
 import { SquareSet } from './squareSet';
 
 export class Board {
-  private occupied: SquareSet = SquareSet.empty();
-  private promoted: SquareSet = SquareSet.empty();
-  private white: SquareSet = SquareSet.empty();
-  private black: SquareSet = SquareSet.empty();
-  private pawn: SquareSet = SquareSet.empty();
-  private knight: SquareSet = SquareSet.empty();
-  private bishop: SquareSet = SquareSet.empty();
-  private rook: SquareSet = SquareSet.empty();
-  private queen: SquareSet = SquareSet.empty();
-  private king: SquareSet = SquareSet.empty();
+  private occupied: SquareSet;
+
+  private promoted: SquareSet;
+
+  private white: SquareSet;
+  private black: SquareSet;
+
+  private pawn: SquareSet;
+  private knight: SquareSet;
+  private bishop: SquareSet;
+  private rook: SquareSet;
+  private queen: SquareSet;
+  private king: SquareSet;
+
+  clear() {
+    this.occupied = SquareSet.empty();
+
+    this.promoted = SquareSet.empty();
+
+    this.white = SquareSet.empty();
+    this.black = SquareSet.empty();
+
+    this.pawn = SquareSet.empty();
+    this.knight = SquareSet.empty();
+    this.bishop = SquareSet.empty();
+    this.rook = SquareSet.empty();
+    this.queen = SquareSet.empty();
+    this.king = SquareSet.empty();
+  }
 
   private getColor(square: Square): Color | undefined {
     if (this.white.has(square)) return 'white';
@@ -40,6 +59,10 @@ export class Board {
     return piece;
   }
 
+  delete(square: Square): boolean {
+    return !!this.take(square);
+  }
+
   set(square: Square, piece: Piece): Piece | undefined {
     const old = this.take(square);
     this.occupied = this.occupied.with(square);
@@ -47,5 +70,9 @@ export class Board {
     this[piece.role] = this[piece.role].with(square);
     if (piece.promoted) this.promoted = this.promoted.with(square);
     return old;
+  }
+
+  has(square: Square): boolean {
+    return this.occupied.has(square);
   }
 }
