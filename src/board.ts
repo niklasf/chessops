@@ -16,17 +16,30 @@ export class Board {
   private queen: SquareSet;
   private king: SquareSet;
 
+  private constructor() { }
+
   static default(): Board {
     const board = new Board();
-    board.occupied = new SquareSet(0xffff, 0xffff0000);
-    board.white = new SquareSet(0xffff, 0);
-    board.black = new SquareSet(0, 0xffff0000);
-    board.pawn = new SquareSet(0xff00, 0xff0000);
-    board.knight = new SquareSet(0x42, 0x42000000);
-    board.bishop = new SquareSet(0x24, 0x24000000);
-    board.rook = new SquareSet(0x81, 0x81000000);
-    board.queen = new SquareSet(0x8, 0x8000000);
-    board.king = new SquareSet(0x10, 0x10000000);
+    board.reset();
+    return board;
+  }
+
+  reset(): void {
+    this.occupied = new SquareSet(0xffff, 0xffff0000);
+    this.promoted = SquareSet.empty();
+    this.white = new SquareSet(0xffff, 0);
+    this.black = new SquareSet(0, 0xffff0000);
+    this.pawn = new SquareSet(0xff00, 0xff0000);
+    this.knight = new SquareSet(0x42, 0x42000000);
+    this.bishop = new SquareSet(0x24, 0x24000000);
+    this.rook = new SquareSet(0x81, 0x81000000);
+    this.queen = new SquareSet(0x8, 0x8000000);
+    this.king = new SquareSet(0x10, 0x10000000);
+  }
+
+  static empty(): Board {
+    const board = new Board();
+    board.clear();
     return board;
   }
 
@@ -37,8 +50,14 @@ export class Board {
     for (const role of ROLES) this[role] = SquareSet.empty();
   }
 
-  constructor() {
-    this.clear();
+
+  clone(): Board {
+    const board = new Board();
+    board.occupied = this.occupied;
+    board.promoted = this.promoted;
+    for (const color of COLORS) board[color] = this[color];
+    for (const role of ROLES) board[role] = this[role];
+    return board;
   }
 
   private getColor(square: Square): Color | undefined {
