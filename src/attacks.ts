@@ -1,4 +1,4 @@
-import { Square } from './types';
+import { Square, Piece } from './types';
 import { SquareSet } from './squareSet';
 
 function squareDist(a: Square, b: Square): number {
@@ -83,6 +83,17 @@ export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
 
 export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
   return bishopAttacks(square, occupied).xor(rookAttacks(square, occupied));
+}
+
+export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {
+  switch (piece.role) {
+    case 'pawn': return PAWN_ATTACKS[piece.color][square];
+    case 'knight': return KNIGHT_ATTACKS[square];
+    case 'bishop': return bishopAttacks(square, occupied);
+    case 'rook': return rookAttacks(square, occupied);
+    case 'queen': return queenAttacks(square, occupied);
+    case 'king': return KING_ATTACKS[square];
+  }
 }
 
 function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSet>>] {
