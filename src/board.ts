@@ -30,7 +30,7 @@ export class Board {
     return board;
   }
 
-  clear() {
+  clear(): void {
     this.occupied = SquareSet.empty();
     this.promoted = SquareSet.empty();
     for (const color of COLORS) this[color] = SquareSet.empty();
