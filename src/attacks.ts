@@ -1,8 +1,6 @@
 import { Square } from './types';
 import { SquareSet } from './squareSet';
 
-type Square = number;
-
 function squareDist(a: Square, b: Square): number {
   const x1 = a & 7, x2 = b & 7;
   const y1 = a >> 3, y2 = b >> 3;
