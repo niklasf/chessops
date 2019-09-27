@@ -77,7 +77,7 @@ export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSet>>] {
-  const rays = {}, between = {};
+  const rays: BySquare<BySquare<SquareSet>> = [], between: BySquare<BySquare<SquareSet>> = [];
   for (let a = 0; a < 64; a++) {
     rays[a] = [];
     between[a] = [];
