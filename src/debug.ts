@@ -14,7 +14,7 @@ export function squareSet(v: SquareSet): string {
   return r;
 }
 
-function piece(piece: Piece): string {
+export function piece(piece: Piece): string {
   const ch = {
     pawn: 'p',
     knight: 'n',
@@ -23,7 +23,7 @@ function piece(piece: Piece): string {
     queen: 'q',
     king: 'k',
   }[piece.role];
-  return piece.color == 'white' ? ch.toUpperCase() : ch;
+  return (piece.color == 'white' ? ch.toUpperCase() : ch) + (piece.promoted ? '~' : '');
 }
 
 export function board(v: Board): string {
@@ -33,7 +33,7 @@ export function board(v: Board): string {
       const square = x + y * 8;
       const p = v.get(square);
       r += p ? piece(p) : '.';
-      r += x < 7 ? ' ' : '\n';
+      r += x < 7 ? (p && p.promoted ? '': ' ') : '\n';
     }
   }
   return r;
