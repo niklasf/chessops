@@ -1,3 +1,4 @@
+import { Square } from './types';
 import { SquareSet } from './squareSet';
 
 type Square = number;
