@@ -123,4 +123,24 @@ export class Board {
   [Symbol.iterator](): Iterator<[Square, Piece]> {
     return this.entries();
   }
+
+  occ(): SquareSet {
+    return this.occupied;
+  }
+
+  kings(): SquareSet {
+    return this.king;
+  }
+
+  byColor(color: Color): SquareSet {
+    return this[color];
+  }
+
+  rooksAndQueens(): SquareSet {
+    return this.rook.union(this.queen);
+  }
+
+  bishopsAndQueens(): SquareSet {
+    return this.bishop.union(this.queen);
+  }
 }
