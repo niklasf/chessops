@@ -132,6 +132,14 @@ export class Board {
     return this.king;
   }
 
+  knights(): SquareSet {
+    return this.knight;
+  }
+
+  pawns(): SquareSet {
+    return this.pawn;
+  }
+
   byColor(color: Color): SquareSet {
     return this[color];
   }
