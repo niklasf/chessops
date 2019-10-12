@@ -77,17 +77,28 @@ export class Chess {
     if (!piece || piece.color != this.turn) return SquareSet.empty();
     let pseudo;
     if (piece.role == 'pawn') {
-      // TODO single step, double step, en passant
-      pseudo = SquareSet.empty();
+      pseudo = PAWN_ATTACKS[this.turn][square].intersect(this.board.byColor(opposite(this.turn)));
+      const delta = this.turn == 'white' ? 8 : -8;
+      const step = square + delta;
+      if (0 <= step && step < 64 && !this.board.occ().has(step)) {
+        pseudo = pseudo.with(step);
+        const doubleStep = step + delta; // TODO: only on second rank
+        if (!this.board.occ().has(doubleStep)) {
+          pseudo = pseudo.with(doubleStep);
+        }
+      }
+      // TODO: en passant
     }
     else if (piece.role == 'bishop') pseudo = bishopAttacks(square, this.board.occ());
     else if (piece.role == 'knight') pseudo = KNIGHT_ATTACKS[square];
     else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occ());
     else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occ());
-    else pseudo = KING_ATTACKS[square];
-    // TODO: castling, safe steps
+    else {
+      pseudo = KING_ATTACKS[square];
+      // TODO: castling, safe steps
+    }
 
-    if (ctx.checkers.isEmpty()) {
+    if (ctx.checkers.nonEmpty()) {
     } else {
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(RAYS[square][ctx.king]);
     }
