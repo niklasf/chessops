@@ -85,6 +85,7 @@ export class Chess {
   dests(square: Square, ctx: Context): SquareSet {
     const piece = this.board.get(square);
     if (!piece || piece.color != this.turn) return SquareSet.empty();
+
     let pseudo;
     if (piece.role == 'pawn') {
       pseudo = PAWN_ATTACKS[this.turn][square].intersect(this.board.byColor(opposite(this.turn)));
@@ -105,11 +106,20 @@ export class Chess {
     else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occ());
     else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occ());
     else {
-      pseudo = KING_ATTACKS[square];
-      // TODO: castling, safe steps
+      // TODO: castling
+      pseudo = KING_ATTACKS[square].diff(this.board.byColor(this.turn));
+      for (const square of pseudo) {
+        if (this.kingAttackers(square, opposite(this.turn), this.board.occ().without(ctx.king)).nonEmpty()) {
+          pseudo = pseudo.without(square);
+        }
+      }
+      return pseudo;
     }
 
     if (ctx.checkers.nonEmpty()) {
+      const checker = ctx.checkers.singleSquare();
+      if (!checker) return SquareSet.empty();
+      pseudo = pseudo.intersect(BETWEEN[checker][ctx.king].with(checker));
     } else {
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(RAYS[square][ctx.king]);
     }
