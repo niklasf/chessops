@@ -156,6 +156,10 @@ export class Board {
     return this[color];
   }
 
+  byRole(role: Role): SquareSet {
+    return this[role];
+  }
+
   rooksAndQueens(): SquareSet {
     return this.rook.union(this.queen);
   }
