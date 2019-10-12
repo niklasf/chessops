@@ -50,6 +50,16 @@ export class Chess {
     return pos;
   }
 
+  clone(): Chess {
+    const pos = new Chess();
+    pos.board = this.board.clone();
+    pos.turn = this.turn;
+    pos.epSquare = this.epSquare;
+    pos.halfmoves = this.halfmoves;
+    pos.fullmoves = this.fullmoves;
+    return pos;
+  }
+
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
@@ -114,5 +124,8 @@ export class Chess {
       d[square] = this.dests(square, ctx);
     }
     return d;
+  }
+
+  playMove(uci: string) {
   }
 }

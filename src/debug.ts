@@ -52,7 +52,9 @@ export function perft(pos: Chess, depth: number, outer: boolean = true): number 
     const d = pos.allDests();
     for (const from in d) {
       for (const to of d[from]) {
-        const children = perft(pos, depth - 1, false);
+        const child = pos.clone();
+        child.playMove(square(parseInt(from)) + square(to));
+        const children = perft(child, depth - 1, false);
         if (outer) console.log(square(parseInt(from)), square(to), children);
         nodes += children;
       }
