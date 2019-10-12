@@ -1,6 +1,7 @@
-import { Piece, ByRole } from './types';
+import { Square, Piece, ByRole } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
+import { Chess } from './chess';
 
 export function squareSet(squares: SquareSet): string {
   let r = '';
@@ -38,4 +39,24 @@ export function board(board: Board): string {
     }
   }
   return r;
+}
+
+export function square(sq: Square): string {
+  return 'abcdefgh'[sq & 0x7] + '12345678'[sq >> 3];
+}
+
+export function perft(pos: Chess, depth: number, outer: boolean = true): number {
+  if (depth < 1) return 1;
+  else {
+    let nodes = 0;
+    const d = pos.allDests();
+    for (const from in d) {
+      for (const to of d[from]) {
+        const children = perft(pos, depth - 1, false);
+        if (outer) console.log(square(parseInt(from)), square(to), children);
+        nodes += children;
+      }
+    }
+    return nodes;
+  }
 }
