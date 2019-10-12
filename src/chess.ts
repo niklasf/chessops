@@ -82,8 +82,9 @@ export class Chess {
       const step = square + delta;
       if (0 <= step && step < 64 && !this.board.occ().has(step)) {
         pseudo = pseudo.with(step);
+        const canDoubleStep = this.turn == 'white' ? (square < 16) : (square >= 64 - 16);
         const doubleStep = step + delta; // TODO: only on second rank
-        if (!this.board.occ().has(doubleStep)) {
+        if (canDoubleStep && !this.board.occ().has(doubleStep)) {
           pseudo = pseudo.with(doubleStep);
         }
       }
