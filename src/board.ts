@@ -128,16 +128,28 @@ export class Board {
     return this.occupied;
   }
 
-  kings(): SquareSet {
-    return this.king;
+  pawns(): SquareSet {
+    return this.pawn;
   }
 
   knights(): SquareSet {
     return this.knight;
   }
 
-  pawns(): SquareSet {
-    return this.pawn;
+  bishops(): SquareSet {
+    return this.bishop;
+  }
+
+  rooks(): SquareSet {
+    return this.rook;
+  }
+
+  queens(): SquareSet {
+    return this.queen;
+  }
+
+  kings(): SquareSet {
+    return this.king;
   }
 
   byColor(color: Color): SquareSet {

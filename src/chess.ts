@@ -1,7 +1,7 @@
 import { Color, Square } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
-import { bishopAttacks, rookAttacks, KNIGHT_ATTACKS, KING_ATTACKS, PAWN_ATTACKS, BETWEEN } from './attacks';
+import { bishopAttacks, rookAttacks, queenAttacks, KNIGHT_ATTACKS, KING_ATTACKS, PAWN_ATTACKS, BETWEEN, RAYS } from './attacks';
 import { opposite } from './util';
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
@@ -13,6 +13,8 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
       .union(PAWN_ATTACKS[opposite(attacker)][square].intersect(board.pawns())));
 }
 
+type BySquare<T> = { [square: number]: T };
+
 /* export interface Setup {
   board: Board,
   turn: Color,
@@ -23,7 +25,7 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
 } */
 
 interface Context {
-  king: Square | undefined,
+  king: Square,
   blockers: SquareSet,
   checkers: SquareSet,
 }
@@ -68,5 +70,37 @@ export class Chess {
       blockers,
       checkers
     };
+  }
+
+  dests(square: Square, ctx: Context): SquareSet {
+    const piece = this.board.get(square);
+    if (!piece || piece.color != this.turn) return SquareSet.empty();
+    let pseudo;
+    if (piece.role == 'pawn') {
+      // TODO single step, double step, en passant
+      pseudo = SquareSet.empty();
+    }
+    else if (piece.role == 'bishop') pseudo = bishopAttacks(square, this.board.occ());
+    else if (piece.role == 'knight') pseudo = KNIGHT_ATTACKS[square];
+    else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occ());
+    else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occ());
+    else pseudo = KING_ATTACKS[square];
+    // TODO: castling, safe steps
+
+    if (ctx.checkers.isEmpty()) {
+    } else {
+      if (ctx.blockers.has(square)) pseudo = pseudo.intersect(RAYS[square][ctx.king]);
+    }
+
+    return pseudo.diff(this.board.byColor(this.turn));
+  }
+
+  allDests(): BySquare<SquareSet> {
+    const ctx = this.ctx();
+    const d: BySquare<SquareSet> = {};
+    for (const square of this.board.byColor(this.turn)) {
+      d[square] = this.dests(square, ctx);
+    }
+    return d;
   }
 }
