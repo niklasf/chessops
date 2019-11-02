@@ -2,9 +2,9 @@ import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 
 export class Board {
-  private occupied: SquareSet;
+  private _occupied: SquareSet;
 
-  private promoted: SquareSet;
+  private _promoted: SquareSet;
 
   private white: SquareSet;
   private black: SquareSet;
@@ -25,8 +25,8 @@ export class Board {
   }
 
   reset(): void {
-    this.occupied = new SquareSet(0xffff, 0xffff0000);
-    this.promoted = SquareSet.empty();
+    this._occupied = new SquareSet(0xffff, 0xffff0000);
+    this._promoted = SquareSet.empty();
     this.white = new SquareSet(0xffff, 0);
     this.black = new SquareSet(0, 0xffff0000);
     this.pawn = new SquareSet(0xff00, 0xff0000);
@@ -44,8 +44,8 @@ export class Board {
   }
 
   clear(): void {
-    this.occupied = SquareSet.empty();
-    this.promoted = SquareSet.empty();
+    this._occupied = SquareSet.empty();
+    this._promoted = SquareSet.empty();
     for (const color of COLORS) this[color] = SquareSet.empty();
     for (const role of ROLES) this[role] = SquareSet.empty();
   }
@@ -53,8 +53,8 @@ export class Board {
 
   clone(): Board {
     const board = new Board();
-    board.occupied = this.occupied;
-    board.promoted = this.promoted;
+    board._occupied = this._occupied;
+    board._promoted = this._promoted;
     for (const color of COLORS) board[color] = this[color];
     for (const role of ROLES) board[role] = this[role];
     return board;
@@ -69,7 +69,7 @@ export class Board {
   get(square: Square): Piece | undefined {
     const color = this.getColor(square);
     if (!color) return;
-    const promoted = this.promoted.has(square);
+    const promoted = this._promoted.has(square);
     for (const role of ROLES) {
       if (this[role].has(square)) return { color, promoted, role };
     }
@@ -79,10 +79,10 @@ export class Board {
   take(square: Square): Piece | undefined {
     const piece = this.get(square);
     if (piece) {
-      this.occupied = this.occupied.without(square);
+      this._occupied = this._occupied.without(square);
       this[piece.color] = this[piece.color].without(square);
       this[piece.role] = this[piece.role].without(square);
-      if (piece.promoted) this.promoted = this.promoted.without(square);
+      if (piece.promoted) this._promoted = this._promoted.without(square);
     }
     return piece;
   }
@@ -93,19 +93,19 @@ export class Board {
 
   set(square: Square, piece: Piece): Piece | undefined {
     const old = this.take(square);
-    this.occupied = this.occupied.with(square);
+    this._occupied = this._occupied.with(square);
     this[piece.color] = this[piece.color].with(square);
     this[piece.role] = this[piece.role].with(square);
-    if (piece.promoted) this.promoted = this.promoted.with(square);
+    if (piece.promoted) this._promoted = this._promoted.with(square);
     return old;
   }
 
   has(square: Square): boolean {
-    return this.occupied.has(square);
+    return this._occupied.has(square);
   }
 
   keys(): Iterator<Square> {
-    return this.occupied[Symbol.iterator]();
+    return this._occupied[Symbol.iterator]();
   }
 
   entries(): Iterator<[Square, Piece]> {
@@ -124,8 +124,12 @@ export class Board {
     return this.entries();
   }
 
-  occ(): SquareSet {
-    return this.occupied;
+  occupied(): SquareSet {
+    return this._occupied;
+  }
+
+  promoted(): SquareSet {
+    return this._promoted;
   }
 
   pawns(): SquareSet {
@@ -167,4 +171,27 @@ export class Board {
   bishopsAndQueens(): SquareSet {
     return this.bishop.union(this.queen);
   }
+}
+
+export interface ReadonlyBoard {
+  clone(): Board;
+
+  get(square: Square): Piece | undefined;
+  has(square: Square): boolean;
+  keys(): Iterator<Square>;
+  entries(): Iterator<[Square, Piece]>;
+  [Symbol.iterator](): Iterator<[Square, Piece]>;
+
+  occupied(): SquareSet;
+  promoted(): SquareSet;
+  pawns(): SquareSet;
+  knights(): SquareSet;
+  bishops(): SquareSet;
+  rooks(): SquareSet;
+  queens(): SquareSet;
+  kings(): SquareSet;
+  byColor(color: Color): SquareSet;
+  byRole(role: Role): SquareSet;
+  rooksAndQueens(): SquareSet;
+  bishopsAndQueens(): SquareSet;
 }
