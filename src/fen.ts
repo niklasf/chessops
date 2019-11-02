@@ -3,6 +3,8 @@ import { Board } from './board';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
+export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
+export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
 interface FenOpts {
   promoted?: boolean;

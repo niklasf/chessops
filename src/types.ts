@@ -16,6 +16,8 @@ export type ByRole<T> = {
   [role in Role]: T;
 };
 
+export type Material = ByRole<number>;
+
 export interface Piece {
   role: Role;
   color: Color;
