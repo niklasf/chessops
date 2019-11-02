@@ -104,13 +104,9 @@ export class Board {
     return this._occupied.has(square);
   }
 
-  keys(): Iterator<Square> {
-    return this._occupied[Symbol.iterator]();
-  }
-
-  entries(): Iterator<[Square, Piece]> {
+  [Symbol.iterator](): Iterator<[Square, Piece]> {
     const self = this;
-    const keys = this.keys();
+    const keys = this._occupied[Symbol.iterator]();
     return {
       next(): IteratorResult<[Square, Piece]> {
         const entry = keys.next();
@@ -118,10 +114,6 @@ export class Board {
         else return { value: [entry.value, self.get(entry.value)!], done: false };
       }
     };
-  }
-
-  [Symbol.iterator](): Iterator<[Square, Piece]> {
-    return this.entries();
   }
 
   occupied(): SquareSet {
@@ -178,8 +170,6 @@ export interface ReadonlyBoard {
 
   get(square: Square): Piece | undefined;
   has(square: Square): boolean;
-  keys(): Iterator<Square>;
-  entries(): Iterator<[Square, Piece]>;
   [Symbol.iterator](): Iterator<[Square, Piece]>;
 
   occupied(): SquareSet;
