@@ -16,7 +16,15 @@ export type ByRole<T> = {
   [role in Role]: T;
 };
 
-export type Material = ByRole<number>;
+export type MaterialSide = ByRole<number>;
+
+export type Material = ByColor<MaterialSide>;
+
+export type CastlingSide = 'a' | 'h';
+
+export type ByCastlingSide<T> = {
+  [side in CastlingSide]: T;
+};
 
 export interface Piece {
   role: Role;

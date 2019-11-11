@@ -24,6 +24,32 @@ type BySquare<T> = { [square: number]: T };
   fullmoves: number,
 } */
 
+export class Castles {
+  private mask: SquareSet,
+  private rook: ByColor<ByCastlingSide<Square | undefined>>,
+  private path: ByColor<ByCastlingSide<SquareSet>>,
+
+  private constructor() { }
+
+  static default(): Castles {
+    const castles = new Castles();
+    castles.mask = SquareSet.corners();
+    castles.rook = {
+      white: { a: 0, h: 7 },
+      black: { a: 56 , h: 63 },
+    };
+    castles.path = { };
+  }
+
+  static empty(): Castles {
+    const castles = new Castles();
+    castles.mask = SquareSet.empty();
+    castles.rook = {};
+    castles.path = {};
+    return castles;
+  }
+}
+
 interface Context {
   king: Square,
   blockers: SquareSet,
@@ -42,7 +68,7 @@ export class Chess {
 
   static default(): Chess {
     const pos = new Chess();
-    pos.board = Board.default();
+    pos._board = Board.default();
     pos.turn = 'white';
     pos.epSquare = undefined;
     pos.halfmoves = 0;
