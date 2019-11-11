@@ -29,6 +29,7 @@ Roadmap
 * [ ] Complete FEN parsing
 * [ ] SAN writing
 * [ ] Move making
+* [ ] Perft test
 * [ ] Game end
 * [ ] Insufficient material
 * [ ] Chess variants
