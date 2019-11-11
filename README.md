@@ -19,6 +19,20 @@ Features
 * [ ] Write SAN
 -->
 
+Roadmap
+-------
+
+* [ ] Castling
+* [ ] En passant
+* [ ] Complete FEN writing
+* [ ] Setup
+* [ ] Complete FEN parsing
+* [ ] SAN writing
+* [ ] Move making
+* [ ] Game end
+* [ ] Insufficient material
+* [ ] Chess variants
+
 License
 -------
 
