@@ -2,16 +2,16 @@ import { CastlingSide, Color, Square, ByColor, ByCastlingSide, Material, Remaini
 import { SquareSet } from './squareSet';
 import { Board, ReadonlyBoard } from './board';
 import { Castles, ReadonlyCastles, Setup } from './setup';
-import { bishopAttacks, rookAttacks, queenAttacks, KNIGHT_ATTACKS, KING_ATTACKS, PAWN_ATTACKS, between, ray } from './attacks';
+import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board.byColor(attacker).intersect(
     rookAttacks(square, occupied).intersect(board.rooksAndQueens())
       .union(bishopAttacks(square, occupied).intersect(board.bishopsAndQueens()))
-      .union(KNIGHT_ATTACKS[square].intersect(board.knights()))
-      .union(KING_ATTACKS[square].intersect(board.kings()))
-      .union(PAWN_ATTACKS[opposite(attacker)][square].intersect(board.pawns())));
+      .union(knightAttacks(square).intersect(board.knights()))
+      .union(kingAttacks(square).intersect(board.kings()))
+      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawns())));
 }
 
 type BySquare<T> = { [square: number]: T };
@@ -150,7 +150,7 @@ export class Chess {
 
     let pseudo;
     if (piece.role == 'pawn') {
-      pseudo = PAWN_ATTACKS[this._turn][square].intersect(this._board.byColor(opposite(this._turn)));
+      pseudo = pawnAttacks(this._turn, square).intersect(this._board.byColor(opposite(this._turn)));
       const delta = this._turn == 'white' ? 8 : -8;
       const step = square + delta;
       if (0 <= step && step < 64 && !this._board.occupied().has(step)) {
@@ -164,11 +164,11 @@ export class Chess {
       // TODO: en passant
     }
     else if (piece.role == 'bishop') pseudo = bishopAttacks(square, this._board.occupied());
-    else if (piece.role == 'knight') pseudo = KNIGHT_ATTACKS[square];
+    else if (piece.role == 'knight') pseudo = knightAttacks(square);
     else if (piece.role == 'rook') pseudo = rookAttacks(square, this._board.occupied());
     else if (piece.role == 'queen') pseudo = queenAttacks(square, this._board.occupied());
     else {
-      pseudo = KING_ATTACKS[square].diff(this._board.byColor(this._turn));
+      pseudo = kingAttacks(square).diff(this._board.byColor(this._turn));
       for (const square of pseudo) {
         if (this.kingAttackers(square, opposite(this._turn), this._board.occupied().without(ctx.king)).nonEmpty()) {
           pseudo = pseudo.without(square);

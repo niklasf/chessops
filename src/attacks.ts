@@ -1,4 +1,4 @@
-import { Square, Piece } from './types';
+import { Square, Piece, Color } from './types';
 import { SquareSet } from './squareSet';
 
 function squareDist(a: Square, b: Square): number {
@@ -51,12 +51,24 @@ function stepAttackTable(deltas: number[]): BySquare<SquareSet> {
   return table;
 }
 
-export const KING_ATTACKS = stepAttackTable([-9, -8, -7, -1, 1, 7, 8, 9]);
-export const KNIGHT_ATTACKS = stepAttackTable([-17, -15, -10, -6, 6, 10, 15, 17]);
-export const PAWN_ATTACKS = {
+const KING_ATTACKS = stepAttackTable([-9, -8, -7, -1, 1, 7, 8, 9]);
+const KNIGHT_ATTACKS = stepAttackTable([-17, -15, -10, -6, 6, 10, 15, 17]);
+const PAWN_ATTACKS = {
   white: stepAttackTable([7, 9]),
   black: stepAttackTable([-7, -9])
 };
+
+export function kingAttacks(square: Square): SquareSet {
+  return KING_ATTACKS[square];
+}
+
+export function knightAttacks(square: Square): SquareSet {
+  return KNIGHT_ATTACKS[square];
+}
+
+export function pawnAttacks(color: Color, square: Square): SquareSet {
+  return PAWN_ATTACKS[color][square];
+}
 
 const [DIAG_MASKS, DIAG_ATTACKS] = slidingAttackTable([-9, -7, 7, 9]);
 const [RANK_MASKS, RANK_ATTACKS] = slidingAttackTable([-1, 1]);
