@@ -8,7 +8,7 @@ Roadmap
 
 * [x] Castling
 * [ ] En passant
-* [ ] Complete FEN writing
+* [x] Complete FEN writing
 * [ ] Setup
 * [ ] Complete FEN parsing
 * [ ] SAN writing
