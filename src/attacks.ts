@@ -120,8 +120,16 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
   return [rays, between];
 }
 
-export const [RAYS, BETWEEN] = rayTables();
+const [RAY, BETWEEN] = rayTables();
+
+export function ray(a: Square, b: Square): SquareSet {
+  return RAY[a][b];
+}
+
+export function between(a: Square, b: Square): SquareSet {
+  return BETWEEN[a][b];
+}
 
 export function aligned(a: Square, b: Square, c: Square): boolean {
-  return RAYS[a][b].has(c);
+  return RAY[a][b].has(c);
 }

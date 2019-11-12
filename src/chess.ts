@@ -2,7 +2,7 @@ import { CastlingSide, Color, Square, ByColor, ByCastlingSide, Material, Remaini
 import { SquareSet } from './squareSet';
 import { Board, ReadonlyBoard } from './board';
 import { Castles, ReadonlyCastles, Setup } from './setup';
-import { bishopAttacks, rookAttacks, queenAttacks, KNIGHT_ATTACKS, KING_ATTACKS, PAWN_ATTACKS, BETWEEN, RAYS } from './attacks';
+import { bishopAttacks, rookAttacks, queenAttacks, KNIGHT_ATTACKS, KING_ATTACKS, PAWN_ATTACKS, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
@@ -117,7 +117,7 @@ export class Chess {
       .intersect(this._board.byColor(opposite(this._turn)));
     let blockers = SquareSet.empty();
     for (const sniper of snipers) {
-      const b = BETWEEN[king][sniper].intersect(this._board.occupied());
+      const b = between(king, sniper).intersect(this._board.occupied());
       if (!b.moreThanOne()) blockers = blockers.union(b);
     }
     const checkers = this.kingAttackers(king, opposite(this._turn), this._board.occupied());
@@ -134,7 +134,7 @@ export class Chess {
     if (!defined(rook)) return SquareSet.empty();
     if (this._castles.path(this._turn, side).intersects(this._board.occupied())) return SquareSet.empty();
 
-    const kingPath = BETWEEN[ctx.king][kingCastlesTo(this._turn, side)];
+    const kingPath = between(ctx.king, kingCastlesTo(this._turn, side));
     for (const sq of kingPath) {
       if (this.kingAttackers(sq, opposite(this._turn), this._board.occupied().without(ctx.king)).nonEmpty()) {
         return SquareSet.empty();
@@ -181,9 +181,9 @@ export class Chess {
     if (ctx.checkers.nonEmpty()) {
       const checker = ctx.checkers.singleSquare();
       if (!checker) return SquareSet.empty();
-      pseudo = pseudo.intersect(BETWEEN[checker][ctx.king].with(checker));
+      pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
     } else {
-      if (ctx.blockers.has(square)) pseudo = pseudo.intersect(RAYS[square][ctx.king]);
+      if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
 
     return pseudo.diff(this._board.byColor(this._turn));
