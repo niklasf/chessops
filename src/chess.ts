@@ -15,14 +15,16 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
 
 type BySquare<T> = { [square: number]: T };
 
-/* export interface Setup {
-  board: Board,
-  turn: Color,
-  castles: Castles,
-  epSquare: Square | undefined,
-  halfmoves: number,
-  fullmoves: number,
-} */
+export interface Setup {
+  board: Board;
+  pockets: Material | undefined;
+  turn: Color;
+  unmovedRooks: SquareSet;
+  epSquare: Square | number;
+  remainingChecks: RemainingChecks | undefined;
+  halfmoves: number;
+  fullmoves: number;
+}
 
 function kingCastlesTo(color: Color, side: CastlingSide) {
   return color == 'white' ? (side == 'a' ? 2 : 6) : (side == 'a' ? 58 : 62);
@@ -67,6 +69,24 @@ export class Castles {
     return castles;
   }
 
+  clone(): Castles {
+    const castles = new Castles();
+    castles._unmovedRooks = this._unmovedRooks;
+    castles._rook = {
+      white: { a: this._rook.white.a, h: this._rook.white.h },
+      black: { a: this._rook.black.a, h: this._rook.black.h },
+    };
+    castles._path = {
+      white: { a: this._path.white.a, h: this._path.white.h },
+      black: { a: this._path.black.a, h: this._path.black.h },
+    };
+    return castles;
+  }
+
+  static fromSetup(setup: Setup): Castles {
+    return Castles.empty(); // TODO
+  }
+
   unmovedRooks(): SquareSet {
     return this._unmovedRooks;
   }
@@ -81,6 +101,7 @@ export class Castles {
 }
 
 export interface ReadonlyCastles {
+  clone(): Castles;
   unmovedRooks(): SquareSet;
   rook(color: Color, side: CastlingSide): Square | undefined;
   path(color: Color, side: CastlingSide): SquareSet;
@@ -116,10 +137,23 @@ export class Chess {
   clone(): Chess {
     const pos = new Chess();
     pos._board = this._board.clone();
+    pos._castles = this._castles.clone();
     pos._turn = this._turn;
     pos._epSquare = this._epSquare;
     pos._halfmoves = this._halfmoves;
     pos._fullmoves = this._fullmoves;
+    return pos;
+  }
+
+  static fromSetup(setup: Setup): Chess {
+    // TODO: Validate
+    const pos = new Chess();
+    pos._board = setup.board.clone();
+    pos._turn = setup.turn;
+    pos._castles = Castles.fromSetup(setup);
+    pos._epSquare = setup.epSquare;
+    pos._halfmoves = setup.halfmoves;
+    pos._fullmoves = setup.fullmoves;
     return pos;
   }
 
@@ -252,6 +286,7 @@ export class Chess {
 }
 
 export interface ReadonlyChess {
+  clone(): Chess;
   board(): ReadonlyBoard;
   pockets(): Material | undefined;
   turn(): Color;
