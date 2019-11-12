@@ -1,8 +1,8 @@
-import { Role, Piece, Square, COLORS } from './types';
+import { Role, Piece, Square, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
-import { ReadonlyChess } from './chess';
-import { defined } from './util';
+import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
+import { defined, strRepeat } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -64,7 +64,15 @@ export function makeBoardFen(board: Board, opts?: FenOpts) {
   return fen;
 }
 
-function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: FenOpts): string {
+function makePocket(material: MaterialSide): string {
+  return ROLES.map(role => strRepeat(roleToChar(role), material[role])).join('');
+}
+
+export function makePockets(pocket: Material): string {
+  return makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
+}
+
+export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: FenOpts): string {
   const shredder = opts && opts.shredder;
   let fen = '';
   for (const color of COLORS) {
@@ -84,13 +92,18 @@ function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: FenOpts):
   return fen || '-';
 }
 
-export function makeFen(pos: ReadonlyChess, opts?: FenOpts): string {
+export function makeRemainingChecks(checks: RemainingChecks): string {
+  return `${checks.white}+${checks.black}`;
+}
+
+export function makeFen(setup: Setup, opts?: FenOpts): string {
   return [
-    makeBoardFen(pos.board(), opts),
-    pos.turn()[0],
-    makeCastlingFen(pos.board(), pos.castles().unmovedRooks, opts),
-    makeSquare(pos.epSquare()),
-    pos.halfmoves(),
-    pos.fullmoves(),
+    makeBoardFen(setup.board, opts) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
+    setup.turn[0],
+    makeCastlingFen(setup.board, setup.unmovedRooks, opts),
+    makeSquare(setup.epSquare),
+    ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
+    setup.halfmoves,
+    setup.fullmoves,
   ].join(' ');
 }

@@ -18,7 +18,7 @@ Roadmap
 
 * [x] board to fen
 * [x] castling to fen
-* [ ] setup to fen
+* [x] setup to fen
 * [ ] fen to board
 * [ ] fen to castling
 * [ ] fen to setup
