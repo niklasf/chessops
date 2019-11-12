@@ -1,4 +1,4 @@
-import { Color, Square } from './types';
+import { Color, Square, ByColor, ByCastlingSide } from './types';
 import { SquareSet } from './squareSet';
 import { Board, ReadonlyBoard } from './board';
 import { bishopAttacks, rookAttacks, queenAttacks, KNIGHT_ATTACKS, KING_ATTACKS, PAWN_ATTACKS, BETWEEN, RAYS } from './attacks';
@@ -25,9 +25,9 @@ type BySquare<T> = { [square: number]: T };
 } */
 
 export class Castles {
-  private mask: SquareSet,
-  private rook: ByColor<ByCastlingSide<Square | undefined>>,
-  private path: ByColor<ByCastlingSide<SquareSet>>,
+  private mask: SquareSet;
+  private rook: ByColor<ByCastlingSide<Square | undefined>>;
+  private path: ByColor<ByCastlingSide<SquareSet>>;
 
   private constructor() { }
 
@@ -38,14 +38,24 @@ export class Castles {
       white: { a: 0, h: 7 },
       black: { a: 56 , h: 63 },
     };
-    castles.path = { };
+    castles.path = {
+      white: { a: new SquareSet(0x60, 0), h: new SquareSet(0, 0xe) },
+      black: { a: new SquareSet(0, 0x60000000), h: new SquareSet(0, 0x0e000000) },
+    };
+    return castles;
   }
 
   static empty(): Castles {
     const castles = new Castles();
     castles.mask = SquareSet.empty();
-    castles.rook = {};
-    castles.path = {};
+    castles.rook = {
+      white: { a: undefined, h: undefined },
+      black: { a: undefined, h: undefined },
+    };
+    castles.path = {
+      white: { a: SquareSet.empty(), h: SquareSet.empty() },
+      black: { a: SquareSet.empty(), h: SquareSet.empty() },
+    };
     return castles;
   }
 }
