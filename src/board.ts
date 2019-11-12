@@ -1,4 +1,5 @@
 import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
+import { opposite } from './util';
 import { SquareSet } from './squareSet';
 
 export class Board {
@@ -50,14 +51,17 @@ export class Board {
     for (const role of ROLES) this[role] = SquareSet.empty();
   }
 
+  transform(f: (s: SquareSet) => SquareSet, swapColor: boolean = false): Board {
+    const board = new Board();
+    board._occupied = f(this._occupied);
+    board._promoted = f(this._promoted);
+    for (const color of COLORS) board[swapColor ? opposite(color): color] = f(this[color]);
+    for (const role of ROLES) board[role] = f(this[role]);
+    return board;
+  }
 
   clone(): Board {
-    const board = new Board();
-    board._occupied = this._occupied;
-    board._promoted = this._promoted;
-    for (const color of COLORS) board[color] = this[color];
-    for (const role of ROLES) board[role] = this[role];
-    return board;
+    return this.transform((s) => s);
   }
 
   private getColor(square: Square): Color | undefined {
