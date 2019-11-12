@@ -24,7 +24,7 @@ export type RemainingChecks = ByColor<number>;
 
 export type CastlingSide = 'a' | 'h';
 
-export const CASTLING_SIDE: CastlingSide[] = ['a', 'h'];
+export const CASTLING_SIDES: CastlingSide[] = ['a', 'h'];
 
 export type ByCastlingSide<T> = {
   [side in CastlingSide]: T;
