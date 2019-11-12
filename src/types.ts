@@ -41,7 +41,7 @@ export interface UciDrop {
   to: Square;
 }
 
-export Uci = UciMove | UciDrop;
+export type Uci = UciMove | UciDrop;
 
 export function isDrop(v: Uci): v is UciDrop {
   return 'role' in v;

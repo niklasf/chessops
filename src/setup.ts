@@ -142,7 +142,7 @@ export interface Setup {
   pockets: Material | undefined;
   turn: Color;
   unmovedRooks: SquareSet;
-  epSquare: Square | number;
+  epSquare: Square | undefined;
   remainingChecks: RemainingChecks | undefined;
   halfmoves: number;
   fullmoves: number;

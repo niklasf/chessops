@@ -1,6 +1,8 @@
 import { ROLES, COLORS } from './types';
+import { defined } from './util';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
+import { Setup } from './setup';
 
 export function flipVertical(s: SquareSet): SquareSet {
   const k1 = new SquareSet(0x00ff00ff, 0x00ff00ff);
@@ -37,4 +39,18 @@ export function board(board: Board, f: (s: SquareSet) => SquareSet): Board {
   for (const color of COLORS) b[color] = f(board[color]);
   for (const role of ROLES) b[role] = f(board[role]);
   return b;
+}
+
+export function setup(setup: Setup, f: (s: SquareSet) => SquareSet): Setup {
+  return {
+    board: board(setup.board, f),
+    pockets: setup.pockets && setup.pockets.clone(),
+    turn: setup.turn,
+    unmovedRooks: f(setup.unmovedRooks),
+    epSquare: defined(setup.epSquare) ? f(SquareSet.fromSquare(setup.epSquare)).first() : undefined,
+    remainingChecks: setup.remainingChecks && setup.remainingChecks.clone(),
+    halfmoves: setup.halfmoves,
+    fullmoves: setup.fullmoves,
+    rules: setup.rules,
+  };
 }
