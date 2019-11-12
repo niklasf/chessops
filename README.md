@@ -31,6 +31,7 @@ Roadmap
 * [x] castling dests
 * [x] normal dests
 * [ ] perft test
+* [x] transformations
 
 ## 0.1.0-alpha.3: Continue from here in Lichess board editor
 
