@@ -194,7 +194,7 @@ export class Chess {
   }
 
   ctx(): Context {
-    const king = this._board.kings().intersect(this._board.byColor(this._turn)).last()!;
+    const king = this._board.kingOf(this._turn)!;
     const snipers = rookAttacks(king, SquareSet.empty()).intersect(this._board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this._board.bishopsAndQueens()))
       .intersect(this._board.byColor(opposite(this._turn)));
