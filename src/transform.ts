@@ -17,3 +17,13 @@ export function flipHorizontal(s: SquareSet): SquareSet {
   s = s.shr(4).intersect(k4).union(s.intersect(k4).shl(4));
   return s;
 }
+
+export function flipDiagonal(s: SquareSet): SquareSet {
+  let t = s.xor(s.shl(28)).intersect(new SquareSet(0, 0x0f0f0f0f));
+  s = s.xor(t.xor(t.shr(28)));
+  t = s.xor(s.shl(14)).intersect(new SquareSet(0x33330000, 0x33330000));
+  s = s.xor(t.xor(t.shr(14)));
+  t = s.xor(s.shl(7)).intersect(new SquareSet(0x55005500, 0x55005500));
+  s = s.xor(t.xor(t.shr(7)));
+  return s;
+}
