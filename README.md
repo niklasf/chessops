@@ -3,26 +3,10 @@ chessrules
 
 :warning: Do not use this just yet :warning:
 
-<!--
-Features
---------
-
-* [x] Parse FEN
-* [ ] Validate chess positions
-
-* [ ] Make moves
-* [ ] Format principal variations
-
-* [ ] Write FEN
-* [ ] Validate variant chess positions
-* [ ] Generate legal moves
-* [ ] Write SAN
--->
-
 Roadmap
 -------
 
-* [ ] Castling
+* [x] Castling
 * [ ] En passant
 * [ ] Complete FEN writing
 * [ ] Setup
