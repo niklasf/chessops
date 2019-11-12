@@ -3,19 +3,18 @@ import { opposite } from './util';
 import { SquareSet } from './squareSet';
 
 export class Board {
-  private _occupied: SquareSet;
+  public occupied: SquareSet;
+  public promoted: SquareSet;
 
-  private _promoted: SquareSet;
+  public white: SquareSet;
+  public black: SquareSet;
 
-  private white: SquareSet;
-  private black: SquareSet;
-
-  private pawn: SquareSet;
-  private knight: SquareSet;
-  private bishop: SquareSet;
-  private rook: SquareSet;
-  private queen: SquareSet;
-  private king: SquareSet;
+  public pawn: SquareSet;
+  public knight: SquareSet;
+  public bishop: SquareSet;
+  public rook: SquareSet;
+  public queen: SquareSet;
+  public king: SquareSet;
 
   private constructor() { }
 
@@ -26,8 +25,8 @@ export class Board {
   }
 
   reset(): void {
-    this._occupied = new SquareSet(0xffff, 0xffff0000);
-    this._promoted = SquareSet.empty();
+    this.occupied = new SquareSet(0xffff, 0xffff0000);
+    this.promoted = SquareSet.empty();
     this.white = new SquareSet(0xffff, 0);
     this.black = new SquareSet(0, 0xffff0000);
     this.pawn = new SquareSet(0xff00, 0xff0000);
@@ -45,23 +44,19 @@ export class Board {
   }
 
   clear(): void {
-    this._occupied = SquareSet.empty();
-    this._promoted = SquareSet.empty();
+    this.occupied = SquareSet.empty();
+    this.promoted = SquareSet.empty();
     for (const color of COLORS) this[color] = SquareSet.empty();
     for (const role of ROLES) this[role] = SquareSet.empty();
   }
 
-  transform(f: (s: SquareSet) => SquareSet, swapColor?: boolean): Board {
-    const board = new Board();
-    board._occupied = f(this._occupied);
-    board._promoted = f(this._promoted);
-    for (const color of COLORS) board[swapColor ? opposite(color): color] = f(this[color]);
-    for (const role of ROLES) board[role] = f(this[role]);
-    return board;
-  }
-
   clone(): Board {
-    return this.transform((s) => s);
+    const board = new Board();
+    board.occupied = this.occupied;
+    board.promoted = this.promoted;
+    for (const color of COLORS) board[color] = this[color];
+    for (const role of ROLES) board[role] = this[role];
+    return board;
   }
 
   private getColor(square: Square): Color | undefined {
@@ -73,7 +68,7 @@ export class Board {
   get(square: Square): Piece | undefined {
     const color = this.getColor(square);
     if (!color) return;
-    const promoted = this._promoted.has(square);
+    const promoted = this.promoted.has(square);
     for (const role of ROLES) {
       if (this[role].has(square)) return { color, promoted, role };
     }
@@ -83,10 +78,10 @@ export class Board {
   take(square: Square): Piece | undefined {
     const piece = this.get(square);
     if (piece) {
-      this._occupied = this._occupied.without(square);
+      this.occupied = this.occupied.without(square);
       this[piece.color] = this[piece.color].without(square);
       this[piece.role] = this[piece.role].without(square);
-      if (piece.promoted) this._promoted = this._promoted.without(square);
+      if (piece.promoted) this.promoted = this.promoted.without(square);
     }
     return piece;
   }
@@ -97,20 +92,20 @@ export class Board {
 
   set(square: Square, piece: Piece): Piece | undefined {
     const old = this.take(square);
-    this._occupied = this._occupied.with(square);
+    this.occupied = this.occupied.with(square);
     this[piece.color] = this[piece.color].with(square);
     this[piece.role] = this[piece.role].with(square);
-    if (piece.promoted) this._promoted = this._promoted.with(square);
+    if (piece.promoted) this.promoted = this.promoted.with(square);
     return old;
   }
 
   has(square: Square): boolean {
-    return this._occupied.has(square);
+    return this.occupied.has(square);
   }
 
   [Symbol.iterator](): Iterator<[Square, Piece]> {
     const self = this;
-    const keys = this._occupied[Symbol.iterator]();
+    const keys = this.occupied[Symbol.iterator]();
     return {
       next(): IteratorResult<[Square, Piece]> {
         const entry = keys.next();
@@ -120,44 +115,8 @@ export class Board {
     };
   }
 
-  occupied(): SquareSet {
-    return this._occupied;
-  }
-
-  promoted(): SquareSet {
-    return this._promoted;
-  }
-
-  pawns(): SquareSet {
-    return this.pawn;
-  }
-
-  knights(): SquareSet {
-    return this.knight;
-  }
-
-  bishops(): SquareSet {
-    return this.bishop;
-  }
-
-  rooks(): SquareSet {
-    return this.rook;
-  }
-
-  queens(): SquareSet {
-    return this.queen;
-  }
-
-  kings(): SquareSet {
-    return this.king;
-  }
-
-  byColor(color: Color): SquareSet {
-    return this[color];
-  }
-
-  byRole(role: Role): SquareSet {
-    return this[role];
+  pieces(color: Color, role: Role): SquareSet {
+    return this[color].intersect(this[role]);
   }
 
   rooksAndQueens(): SquareSet {
@@ -169,29 +128,6 @@ export class Board {
   }
 
   kingOf(color: Color): Square | undefined {
-    return this[color].intersect(this.king).diff(this._promoted).singleSquare();
+    return this.king.intersect(this[color]).diff(this.promoted).singleSquare();
   }
-}
-
-export interface ReadonlyBoard {
-  transform(f: (s: SquareSet) => SquareSet, swapColor?: boolean): Board;
-  clone(): Board;
-
-  get(square: Square): Piece | undefined;
-  has(square: Square): boolean;
-  [Symbol.iterator](): Iterator<[Square, Piece]>;
-
-  occupied(): SquareSet;
-  promoted(): SquareSet;
-  pawns(): SquareSet;
-  knights(): SquareSet;
-  bishops(): SquareSet;
-  rooks(): SquareSet;
-  queens(): SquareSet;
-  kings(): SquareSet;
-  byColor(color: Color): SquareSet;
-  byRole(role: Role): SquareSet;
-  rooksAndQueens(): SquareSet;
-  bishopsAndQueens(): SquareSet;
-  kingOf(color: Color): Square | undefined;
 }

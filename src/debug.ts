@@ -1,6 +1,6 @@
 import { Square, Piece, ByRole } from './types';
 import { SquareSet } from './squareSet';
-import { ReadonlyBoard } from './board';
+import { Board } from './board';
 import { Chess } from './chess';
 
 export function squareSet(squares: SquareSet): string {
@@ -27,7 +27,7 @@ export function piece(piece: Piece): string {
   return (piece.color == 'white' ? ch.toUpperCase() : ch) + (piece.promoted ? '~' : '');
 }
 
-export function board(board: ReadonlyBoard): string {
+export function board(board: Board): string {
   let r = '';
   for (let y = 7; y >= 0; y--) {
     for (let x = 0; x < 8; x++) {
