@@ -46,3 +46,5 @@ export type Uci = UciMove | UciDrop;
 export function isDrop(v: Uci): v is UciDrop {
   return 'role' in v;
 }
+
+export type Rules = 'chess';

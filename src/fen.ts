@@ -88,7 +88,7 @@ export function makeFen(pos: ReadonlyChess, opts?: FenOpts): string {
   return [
     makeBoardFen(pos.board(), opts),
     pos.turn()[0],
-    makeCastlingFen(pos.board(), pos.castles().unmovedRooks(), opts),
+    makeCastlingFen(pos.board(), pos.castles().unmovedRooks, opts),
     makeSquare(pos.epSquare()),
     pos.halfmoves(),
     pos.fullmoves(),

@@ -1,4 +1,4 @@
-import { CastlingSide, Color, COLORS, ROLES, Square, ByCastlingSide, ByColor } from './types';
+import { CastlingSide, Color, COLORS, ROLES, Square, ByCastlingSide, ByColor, Rules } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 
@@ -48,6 +48,8 @@ export class RemainingChecks {
   public white: number;
   public black: number;
 
+  private constructor() { }
+
   static default(): RemainingChecks {
     const r = new RemainingChecks();
     r.white = 3;
@@ -63,20 +65,20 @@ export class RemainingChecks {
 }
 
 export class Castles {
-  private _unmovedRooks: SquareSet;
-  private _rook: ByColor<ByCastlingSide<Square | undefined>>;
-  private _path: ByColor<ByCastlingSide<SquareSet>>;
+  public unmovedRooks: SquareSet;
+  public rook: ByColor<ByCastlingSide<Square | undefined>>;
+  public path: ByColor<ByCastlingSide<SquareSet>>;
 
   private constructor() { }
 
   static default(): Castles {
     const castles = new Castles();
-    castles._unmovedRooks = SquareSet.corners();
-    castles._rook = {
+    castles.unmovedRooks = SquareSet.corners();
+    castles.rook = {
       white: { a: 0, h: 7 },
       black: { a: 56 , h: 63 },
     };
-    castles._path = {
+    castles.path = {
       white: { a: new SquareSet(0x60, 0), h: new SquareSet(0, 0xe) },
       black: { a: new SquareSet(0, 0x60000000), h: new SquareSet(0, 0x0e000000) },
     };
@@ -85,12 +87,12 @@ export class Castles {
 
   static empty(): Castles {
     const castles = new Castles();
-    castles._unmovedRooks = SquareSet.empty();
-    castles._rook = {
+    castles.unmovedRooks = SquareSet.empty();
+    castles.rook = {
       white: { a: undefined, h: undefined },
       black: { a: undefined, h: undefined },
     };
-    castles._path = {
+    castles.path = {
       white: { a: SquareSet.empty(), h: SquareSet.empty() },
       black: { a: SquareSet.empty(), h: SquareSet.empty() },
     };
@@ -99,14 +101,14 @@ export class Castles {
 
   clone(): Castles {
     const castles = new Castles();
-    castles._unmovedRooks = this._unmovedRooks;
-    castles._rook = {
-      white: { a: this._rook.white.a, h: this._rook.white.h },
-      black: { a: this._rook.black.a, h: this._rook.black.h },
+    castles.unmovedRooks = this.unmovedRooks;
+    castles.rook = {
+      white: { a: this.rook.white.a, h: this.rook.white.h },
+      black: { a: this.rook.black.a, h: this.rook.black.h },
     };
-    castles._path = {
-      white: { a: this._path.white.a, h: this._path.white.h },
-      black: { a: this._path.black.a, h: this._path.black.h },
+    castles.path = {
+      white: { a: this.path.white.a, h: this.path.white.h },
+      black: { a: this.path.black.a, h: this.path.black.h },
     };
     return castles;
   }
@@ -114,28 +116,7 @@ export class Castles {
   static fromSetup(setup: Setup): Castles {
     return Castles.empty(); // TODO
   }
-
-  unmovedRooks(): SquareSet {
-    return this._unmovedRooks;
-  }
-
-  rook(color: Color, side: CastlingSide): Square | undefined {
-    return this._rook[color][side];
-  }
-
-  path(color: Color, side: CastlingSide): SquareSet {
-    return this._path[color][side];
-  }
 }
-
-export interface ReadonlyCastles {
-  clone(): Castles;
-  unmovedRooks(): SquareSet;
-  rook(color: Color, side: CastlingSide): Square | undefined;
-  path(color: Color, side: CastlingSide): SquareSet;
-}
-
-export type Rules = 'chess';
 
 export interface Setup {
   board: Board;

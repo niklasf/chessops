@@ -1,7 +1,7 @@
 import { CastlingSide, Color, Square, ByColor, ByCastlingSide } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
-import { Castles, ReadonlyCastles, Setup, Material, RemainingChecks } from './setup';
+import { Castles, Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
@@ -130,9 +130,9 @@ export class Chess {
 
   private castlingDest(side: CastlingSide, ctx: Context): SquareSet {
     if (ctx.checkers) return SquareSet.empty();
-    const rook = this._castles.rook(this._turn, side);
+    const rook = this._castles.rook[this._turn][side];
     if (!defined(rook)) return SquareSet.empty();
-    if (this._castles.path(this._turn, side).intersects(this._board.occupied)) return SquareSet.empty();
+    if (this._castles.path[this._turn][side].intersects(this._board.occupied)) return SquareSet.empty();
 
     const kingPath = between(ctx.king, kingCastlesTo(this._turn, side));
     for (const sq of kingPath) {
@@ -207,7 +207,7 @@ export interface ReadonlyChess {
   board(): Board;
   pockets(): Material | undefined;
   turn(): Color;
-  castles(): ReadonlyCastles;
+  castles(): Castles;
   epSquare(): Square | undefined;
   remainingChecks(): RemainingChecks | undefined;
   halfmoves(): number;
