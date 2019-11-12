@@ -16,12 +16,6 @@ export type ByRole<T> = {
   [role in Role]: T;
 };
 
-export type MaterialSide = ByRole<number>;
-
-export type Material = ByColor<MaterialSide>;
-
-export type RemainingChecks = ByColor<number>;
-
 export type CastlingSide = 'a' | 'h';
 
 export const CASTLING_SIDES: CastlingSide[] = ['a', 'h'];

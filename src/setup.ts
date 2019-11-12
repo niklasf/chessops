@@ -1,6 +1,66 @@
-import { CastlingSide, Color, Square, ByCastlingSide, ByColor, Material, RemainingChecks } from './types';
+import { CastlingSide, Color, COLORS, ROLES, Square, ByCastlingSide, ByColor } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
+
+export class MaterialSide {
+  public pawn: number;
+  public knight: number
+  public bishop: number;
+  public rook: number
+  public queen: number;
+  public king: number;
+
+  private constructor() { }
+
+  static empty(): MaterialSide {
+    const m = new MaterialSide();
+    for (const role of ROLES) m[role] = 0;
+    return m;
+  }
+
+  clone(): MaterialSide {
+    const m = new MaterialSide();
+    for (const role of ROLES) m[role] = this[role];
+    return m;
+  }
+}
+
+export class Material {
+  public white: MaterialSide;
+  public black: MaterialSide;
+
+  private constructor() { }
+
+  static empty(): Material {
+    const m = new Material();
+    for (const color of COLORS) m[color] = MaterialSide.empty();
+    return m;
+  }
+
+  clone(): Material {
+    const m = new Material();
+    for (const color of COLORS) m[color] = this[color].clone();
+    return m;
+  }
+}
+
+export class RemainingChecks {
+  public white: number;
+  public black: number;
+
+  static default(): RemainingChecks {
+    const r = new RemainingChecks();
+    r.white = 3;
+    r.black = 3;
+    return r;
+  }
+
+  clone(): RemainingChecks {
+    const r = new RemainingChecks();
+    for (const color of COLORS) r[color] = this[color];
+    return r;
+  }
+}
 
 export class Castles {
   private _unmovedRooks: SquareSet;
@@ -75,6 +135,8 @@ export interface ReadonlyCastles {
   path(color: Color, side: CastlingSide): SquareSet;
 }
 
+export type Rules = 'chess';
+
 export interface Setup {
   board: Board;
   pockets: Material | undefined;
@@ -84,5 +146,5 @@ export interface Setup {
   remainingChecks: RemainingChecks | undefined;
   halfmoves: number;
   fullmoves: number;
+  rules: Rules;
 }
-

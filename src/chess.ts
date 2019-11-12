@@ -1,7 +1,7 @@
-import { CastlingSide, Color, Square, ByColor, ByCastlingSide, Material, RemainingChecks } from './types';
+import { CastlingSide, Color, Square, ByColor, ByCastlingSide } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
-import { Castles, ReadonlyCastles, Setup } from './setup';
+import { Castles, ReadonlyCastles, Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
