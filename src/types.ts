@@ -29,3 +29,20 @@ export interface Piece {
   color: Color;
   promoted?: boolean;
 }
+
+export interface UciMove {
+  from: Square;
+  to: Square;
+  promotion?: Role;
+}
+
+export interface UciDrop {
+  role: Role;
+  to: Square;
+}
+
+export Uci = UciMove | UciDrop;
+
+export function isDrop(v: Uci): v is UciDrop {
+  return 'role' in v;
+}
