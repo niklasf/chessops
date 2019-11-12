@@ -1,4 +1,6 @@
+import { ROLES, COLORS } from './types';
 import { SquareSet } from './squareSet';
+import { Board } from './board';
 
 export function flipVertical(s: SquareSet): SquareSet {
   const k1 = new SquareSet(0x00ff00ff, 0x00ff00ff);
@@ -26,4 +28,13 @@ export function flipDiagonal(s: SquareSet): SquareSet {
   t = s.xor(s.shl(7)).intersect(new SquareSet(0x55005500, 0x55005500));
   s = s.xor(t.xor(t.shr(7)));
   return s;
+}
+
+export function board(board: Board, f: (s: SquareSet) => SquareSet): Board {
+  const b = Board.empty();
+  b.occupied = f(board.occupied);
+  b.promoted = f(board.promoted);
+  for (const color of COLORS) b[color] = f(board[color]);
+  for (const role of ROLES) b[role] = f(board[role]);
+  return b;
 }
