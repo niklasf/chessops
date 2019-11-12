@@ -163,6 +163,10 @@ export class Board {
   bishopsAndQueens(): SquareSet {
     return this.bishop.union(this.queen);
   }
+
+  kingOf(color: Color): Square | undefined {
+    return this[color].intersect(this.king).diff(this._promoted).singleSquare();
+  }
 }
 
 export interface ReadonlyBoard {
@@ -184,4 +188,5 @@ export interface ReadonlyBoard {
   byRole(role: Role): SquareSet;
   rooksAndQueens(): SquareSet;
   bishopsAndQueens(): SquareSet;
+  kingOf(color: Color): Square | undefined;
 }

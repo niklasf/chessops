@@ -1,4 +1,4 @@
-import { Role, Piece, Square } from './types';
+import { Role, Piece, Square, COLORS } from './types';
 import { SquareSet } from './squareSet';
 import { ReadonlyBoard } from './board';
 import { ReadonlyChess } from './chess';
@@ -11,6 +11,7 @@ export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
 interface FenOpts {
   promoted?: boolean;
+  shredder?: boolean;
 }
 
 function roleToChar(role: Role): string {
@@ -63,15 +64,31 @@ export function makeBoardFen(board: ReadonlyBoard, opts?: FenOpts) {
   return fen;
 }
 
-function makeCastlingFen(board: ReadonlyBoard, unmovedRooks: SquareSet): string {
-  return '-'; // TODO
+function makeCastlingFen(board: ReadonlyBoard, unmovedRooks: SquareSet, opts?: FenOpts): string {
+  const shredder = opts && opts.shredder;
+  let fen = '';
+  for (const color of COLORS) {
+    const king = board.kingOf(color);
+    const backrank = SquareSet.fromRank(color == 'white' ? 0 : 7);
+    const candidates = board.rooks().intersect(board.byColor(color)).intersect(backrank);
+    for (const rook of unmovedRooks.intersect(candidates).reversed()) {
+      if (!shredder && rook === candidates.first() && king && rook < king) {
+        fen += color == 'white' ? 'Q' : 'q';
+      } else if (!shredder && rook === candidates.last() && king && king < rook) {
+        fen += color == 'white' ? 'K' : 'k';
+      } else {
+        fen += (color == 'white' ? 'ABCDEFGH' : 'abcdefgh')[rook & 0x7];
+      }
+    }
+  }
+  return fen || '-';
 }
 
 export function makeFen(pos: ReadonlyChess, opts?: FenOpts): string {
   return [
     makeBoardFen(pos.board(), opts),
     pos.turn()[0],
-    makeCastlingFen(pos.board(), pos.castles().unmovedRooks()),
+    makeCastlingFen(pos.board(), pos.castles().unmovedRooks(), opts),
     makeSquare(pos.epSquare()),
     pos.halfmoves(),
     pos.fullmoves(),
