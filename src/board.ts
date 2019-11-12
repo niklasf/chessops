@@ -3,18 +3,18 @@ import { opposite } from './util';
 import { SquareSet } from './squareSet';
 
 export class Board {
-  public occupied: SquareSet;
-  public promoted: SquareSet;
+  occupied: SquareSet;
+  promoted: SquareSet;
 
-  public white: SquareSet;
-  public black: SquareSet;
+  white: SquareSet;
+  black: SquareSet;
 
-  public pawn: SquareSet;
-  public knight: SquareSet;
-  public bishop: SquareSet;
-  public rook: SquareSet;
-  public queen: SquareSet;
-  public king: SquareSet;
+  pawn: SquareSet;
+  knight: SquareSet;
+  bishop: SquareSet;
+  rook: SquareSet;
+  queen: SquareSet;
+  king: SquareSet;
 
   private constructor() { }
 

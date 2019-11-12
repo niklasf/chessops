@@ -3,12 +3,12 @@ import { SquareSet } from './squareSet';
 import { Board } from './board';
 
 export class MaterialSide {
-  public pawn: number;
-  public knight: number
-  public bishop: number;
-  public rook: number
-  public queen: number;
-  public king: number;
+  pawn: number;
+  knight: number
+  bishop: number;
+  rook: number
+  queen: number;
+  king: number;
 
   private constructor() { }
 
@@ -26,8 +26,8 @@ export class MaterialSide {
 }
 
 export class Material {
-  public white: MaterialSide;
-  public black: MaterialSide;
+  white: MaterialSide;
+  black: MaterialSide;
 
   private constructor() { }
 
@@ -45,8 +45,8 @@ export class Material {
 }
 
 export class RemainingChecks {
-  public white: number;
-  public black: number;
+  white: number;
+  black: number;
 
   private constructor() { }
 
@@ -65,9 +65,9 @@ export class RemainingChecks {
 }
 
 export class Castles {
-  public unmovedRooks: SquareSet;
-  public rook: ByColor<ByCastlingSide<Square | undefined>>;
-  public path: ByColor<ByCastlingSide<SquareSet>>;
+  unmovedRooks: SquareSet;
+  rook: ByColor<ByCastlingSide<Square | undefined>>;
+  path: ByColor<ByCastlingSide<SquareSet>>;
 
   private constructor() { }
 
