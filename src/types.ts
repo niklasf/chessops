@@ -20,6 +20,8 @@ export type MaterialSide = ByRole<number>;
 
 export type Material = ByColor<MaterialSide>;
 
+export type RemainingChecks = ByColor<number>;
+
 export type CastlingSide = 'a' | 'h';
 
 export type ByCastlingSide<T> = {

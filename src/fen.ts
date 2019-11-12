@@ -1,5 +1,8 @@
-import { Role, Piece } from './types';
-import { Board } from './board';
+import { Role, Piece, Square } from './types';
+import { SquareSet } from './squareSet';
+import { ReadonlyBoard } from './board';
+import { ReadonlyChess } from './chess';
+import { defined } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -21,6 +24,11 @@ function roleToChar(role: Role): string {
   }
 }
 
+function makeSquare(square: Square | undefined): string {
+  if (defined(square)) return 'abcdefgh'[square & 0x7] + '12345678'[square >> 3];
+  else return '-';
+}
+
 function makePiece(piece: Piece, opts?: FenOpts): string {
   let r = roleToChar(piece.role);
   if (piece.color == 'white') r = r.toUpperCase();
@@ -28,7 +36,7 @@ function makePiece(piece: Piece, opts?: FenOpts): string {
   return r;
 }
 
-export function makeBoardFen(board: Board, opts?: FenOpts) {
+export function makeBoardFen(board: ReadonlyBoard, opts?: FenOpts) {
   let fen = '', empty = 0;
   for (let rank = 7; rank >= 0; rank--) {
     for (let file = 0; file < 8; file++) {
@@ -53,4 +61,19 @@ export function makeBoardFen(board: Board, opts?: FenOpts) {
     }
   }
   return fen;
+}
+
+function makeCastlingFen(board: ReadonlyBoard, unmovedRooks: SquareSet): string {
+  return '-'; // TODO
+}
+
+export function makeFen(pos: ReadonlyChess, opts?: FenOpts): string {
+  return [
+    makeBoardFen(pos.board(), opts),
+    pos.turn()[0],
+    makeCastlingFen(pos.board(), pos.castles().unmovedRooks()),
+    makeSquare(pos.epSquare()),
+    pos.halfmoves(),
+    pos.fullmoves(),
+  ].join(' ');
 }

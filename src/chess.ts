@@ -1,4 +1,4 @@
-import { CastlingSide, Color, Square, ByColor, ByCastlingSide } from './types';
+import { CastlingSide, Color, Square, ByColor, ByCastlingSide, Material, RemainingChecks } from './types';
 import { SquareSet } from './squareSet';
 import { Board, ReadonlyBoard } from './board';
 import { bishopAttacks, rookAttacks, queenAttacks, KNIGHT_ATTACKS, KING_ATTACKS, PAWN_ATTACKS, BETWEEN, RAYS } from './attacks';
@@ -33,7 +33,7 @@ function rookCastlesTo(color: Color, side: CastlingSide) {
 }
 
 export class Castles {
-  private mask: SquareSet;
+  private _unmovedRooks: SquareSet;
   private _rook: ByColor<ByCastlingSide<Square | undefined>>;
   private _path: ByColor<ByCastlingSide<SquareSet>>;
 
@@ -41,7 +41,7 @@ export class Castles {
 
   static default(): Castles {
     const castles = new Castles();
-    castles.mask = SquareSet.corners();
+    castles._unmovedRooks = SquareSet.corners();
     castles._rook = {
       white: { a: 0, h: 7 },
       black: { a: 56 , h: 63 },
@@ -55,7 +55,7 @@ export class Castles {
 
   static empty(): Castles {
     const castles = new Castles();
-    castles.mask = SquareSet.empty();
+    castles._unmovedRooks = SquareSet.empty();
     castles._rook = {
       white: { a: undefined, h: undefined },
       black: { a: undefined, h: undefined },
@@ -67,6 +67,10 @@ export class Castles {
     return castles;
   }
 
+  unmovedRooks(): SquareSet {
+    return this._unmovedRooks;
+  }
+
   rook(color: Color, side: CastlingSide): Square | undefined {
     return this._rook[color][side];
   }
@@ -74,6 +78,12 @@ export class Castles {
   path(color: Color, side: CastlingSide): SquareSet {
     return this._path[color][side];
   }
+}
+
+export interface ReadonlyCastles {
+  unmovedRooks(): SquareSet;
+  rook(color: Color, side: CastlingSide): Square | undefined;
+  path(color: Color, side: CastlingSide): SquareSet;
 }
 
 interface Context {
@@ -84,23 +94,32 @@ interface Context {
 
 export class Chess {
   private _board: Board;
-  private castles: Castles;
-  private turn: Color;
-//  private castles: Castles;
-  private epSquare: Square | undefined;
-  private halfmoves: number;
-  private fullmoves: number;
+  private _castles: Castles;
+  private _turn: Color;
+  private _epSquare: Square | undefined;
+  private _halfmoves: number;
+  private _fullmoves: number;
 
   private constructor() { }
 
   static default(): Chess {
     const pos = new Chess();
     pos._board = Board.default();
-    pos.turn = 'white';
-    pos.castles = Castles.default();
-    pos.epSquare = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
+    pos._turn = 'white';
+    pos._castles = Castles.default();
+    pos._epSquare = undefined;
+    pos._halfmoves = 0;
+    pos._fullmoves = 1;
+    return pos;
+  }
+
+  clone(): Chess {
+    const pos = new Chess();
+    pos._board = this._board.clone();
+    pos._turn = this._turn;
+    pos._epSquare = this._epSquare;
+    pos._halfmoves = this._halfmoves;
+    pos._fullmoves = this._fullmoves;
     return pos;
   }
 
@@ -108,14 +127,32 @@ export class Chess {
     return this._board;
   }
 
-  clone(): Chess {
-    const pos = new Chess();
-    pos._board = this._board.clone();
-    pos.turn = this.turn;
-    pos.epSquare = this.epSquare;
-    pos.halfmoves = this.halfmoves;
-    pos.fullmoves = this.fullmoves;
-    return pos;
+  pockets(): Material | undefined {
+    return undefined;
+  }
+
+  turn(): Color {
+    return this._turn;
+  }
+
+  castles(): Castles {
+    return this._castles;
+  }
+
+  epSquare(): Square | undefined {
+    return this._epSquare;
+  }
+
+  remainingChecks(): RemainingChecks | undefined {
+    return undefined;
+  }
+
+  halfmoves(): number {
+    return this._halfmoves;
+  }
+
+  fullmoves(): number {
+    return this._fullmoves;
   }
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -123,16 +160,16 @@ export class Chess {
   }
 
   ctx(): Context {
-    const king = this._board.kings().intersect(this._board.byColor(this.turn)).last()!;
+    const king = this._board.kings().intersect(this._board.byColor(this._turn)).last()!;
     const snipers = rookAttacks(king, SquareSet.empty()).intersect(this._board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this._board.bishopsAndQueens()))
-      .intersect(this._board.byColor(opposite(this.turn)));
+      .intersect(this._board.byColor(opposite(this._turn)));
     let blockers = SquareSet.empty();
     for (const sniper of snipers) {
       const b = BETWEEN[king][sniper].intersect(this._board.occupied());
       if (!b.moreThanOne()) blockers = blockers.union(b);
     }
-    const checkers = this.kingAttackers(king, opposite(this.turn), this._board.occupied());
+    const checkers = this.kingAttackers(king, opposite(this._turn), this._board.occupied());
     return {
       king,
       blockers,
@@ -142,13 +179,13 @@ export class Chess {
 
   private castlingDest(side: CastlingSide, ctx: Context): SquareSet {
     if (ctx.checkers) return SquareSet.empty();
-    const rook = this.castles.rook(this.turn, side);
+    const rook = this._castles.rook(this._turn, side);
     if (!defined(rook)) return SquareSet.empty();
-    if (this.castles.path(this.turn, side).intersects(this._board.occupied())) return SquareSet.empty();
+    if (this._castles.path(this._turn, side).intersects(this._board.occupied())) return SquareSet.empty();
 
-    const kingPath = BETWEEN[ctx.king][kingCastlesTo(this.turn, side)];
+    const kingPath = BETWEEN[ctx.king][kingCastlesTo(this._turn, side)];
     for (const sq of kingPath) {
-      if (this.kingAttackers(sq, opposite(this.turn), this._board.occupied().without(ctx.king)).nonEmpty()) {
+      if (this.kingAttackers(sq, opposite(this._turn), this._board.occupied().without(ctx.king)).nonEmpty()) {
         return SquareSet.empty();
       }
     }
@@ -158,16 +195,16 @@ export class Chess {
 
   dests(square: Square, ctx: Context): SquareSet {
     const piece = this._board.get(square);
-    if (!piece || piece.color != this.turn) return SquareSet.empty();
+    if (!piece || piece.color != this._turn) return SquareSet.empty();
 
     let pseudo;
     if (piece.role == 'pawn') {
-      pseudo = PAWN_ATTACKS[this.turn][square].intersect(this._board.byColor(opposite(this.turn)));
-      const delta = this.turn == 'white' ? 8 : -8;
+      pseudo = PAWN_ATTACKS[this._turn][square].intersect(this._board.byColor(opposite(this._turn)));
+      const delta = this._turn == 'white' ? 8 : -8;
       const step = square + delta;
       if (0 <= step && step < 64 && !this._board.occupied().has(step)) {
         pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn == 'white' ? (square < 16) : (square >= 64 - 16);
+        const canDoubleStep = this._turn == 'white' ? (square < 16) : (square >= 64 - 16);
         const doubleStep = step + delta;
         if (canDoubleStep && !this._board.occupied().has(doubleStep)) {
           pseudo = pseudo.with(doubleStep);
@@ -180,9 +217,9 @@ export class Chess {
     else if (piece.role == 'rook') pseudo = rookAttacks(square, this._board.occupied());
     else if (piece.role == 'queen') pseudo = queenAttacks(square, this._board.occupied());
     else {
-      pseudo = KING_ATTACKS[square].diff(this._board.byColor(this.turn));
+      pseudo = KING_ATTACKS[square].diff(this._board.byColor(this._turn));
       for (const square of pseudo) {
-        if (this.kingAttackers(square, opposite(this.turn), this._board.occupied().without(ctx.king)).nonEmpty()) {
+        if (this.kingAttackers(square, opposite(this._turn), this._board.occupied().without(ctx.king)).nonEmpty()) {
           pseudo = pseudo.without(square);
         }
       }
@@ -198,13 +235,13 @@ export class Chess {
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(RAYS[square][ctx.king]);
     }
 
-    return pseudo.diff(this._board.byColor(this.turn));
+    return pseudo.diff(this._board.byColor(this._turn));
   }
 
   allDests(): BySquare<SquareSet> {
     const ctx = this.ctx();
     const d: BySquare<SquareSet> = {};
-    for (const square of this._board.byColor(this.turn)) {
+    for (const square of this._board.byColor(this._turn)) {
       d[square] = this.dests(square, ctx);
     }
     return d;
@@ -212,4 +249,15 @@ export class Chess {
 
   playMove(uci: string) {
   }
+}
+
+export interface ReadonlyChess {
+  board(): ReadonlyBoard;
+  pockets(): Material | undefined;
+  turn(): Color;
+  castles(): ReadonlyCastles;
+  epSquare(): Square | undefined;
+  remainingChecks(): RemainingChecks | undefined;
+  halfmoves(): number;
+  fullmoves(): number;
 }
