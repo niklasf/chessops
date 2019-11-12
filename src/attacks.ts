@@ -109,27 +109,27 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
 }
 
 function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSet>>] {
-  const rays: BySquare<BySquare<SquareSet>> = [], between: BySquare<BySquare<SquareSet>> = [];
+  const ray: BySquare<BySquare<SquareSet>> = [], between: BySquare<BySquare<SquareSet>> = [];
   for (let a = 0; a < 64; a++) {
-    rays[a] = [];
+    ray[a] = [];
     between[a] = [];
     for (let b = 0; b < 64; b++) {
       if (DIAG_ATTACKS[a][0][0].has(b)) {
-        rays[a][b] = DIAG_ATTACKS[a][0][0].intersect(DIAG_ATTACKS[b][0][0]).with(a).with(b);
+        ray[a][b] = DIAG_ATTACKS[a][0][0].intersect(DIAG_ATTACKS[b][0][0]).with(a).with(b);
         between[a][b] = bishopAttacks(a, SquareSet.fromSquare(b)).intersect(bishopAttacks(b, SquareSet.fromSquare(a)));
       } else if (RANK_ATTACKS[a][0][0].has(b)) {
-        rays[a][b] = RANK_ATTACKS[a][0][0].with(a);
+        ray[a][b] = RANK_ATTACKS[a][0][0].with(a);
         between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersect(rankAttacks(b, SquareSet.fromSquare(a)));
       } else if (FILE_ATTACKS[a][0][0].has(b)) {
-        rays[a][b] = FILE_ATTACKS[a][0][0].with(b);
+        ray[a][b] = FILE_ATTACKS[a][0][0].with(b);
         between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersect(fileAttacks(b, SquareSet.fromSquare(a)));
       } else {
-        rays[a][b] = SquareSet.empty();
+        ray[a][b] = SquareSet.empty();
         between[a][b] = SquareSet.empty();
       }
     }
   }
-  return [rays, between];
+  return [ray, between];
 }
 
 const [RAY, BETWEEN] = rayTables();
