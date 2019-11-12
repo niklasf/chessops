@@ -48,3 +48,5 @@ export function isDrop(v: Uci): v is UciDrop {
 }
 
 export type Rules = 'chess';
+
+export const RULES = ['chess'];
