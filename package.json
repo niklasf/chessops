@@ -2,6 +2,7 @@
   "name": "chessops",
   "version": "0.1.0-alpha.0",
   "description": "Chess and chess variant rules and operations",
+  "keywords": ["chess", "fen", "pgn", "uci"],
   "repository": "https://github.com/niklasf/chessops",
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>",
   "license": "GPL-3.0-or-later",
