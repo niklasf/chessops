@@ -51,7 +51,7 @@ export class Board {
     for (const role of ROLES) this[role] = SquareSet.empty();
   }
 
-  transform(f: (s: SquareSet) => SquareSet, swapColor: boolean = false): Board {
+  transform(f: (s: SquareSet) => SquareSet, swapColor?: boolean): Board {
     const board = new Board();
     board._occupied = f(this._occupied);
     board._promoted = f(this._promoted);
@@ -174,6 +174,7 @@ export class Board {
 }
 
 export interface ReadonlyBoard {
+  transform(f: (s: SquareSet) => SquareSet, swapColor?: boolean): Board;
   clone(): Board;
 
   get(square: Square): Piece | undefined;
