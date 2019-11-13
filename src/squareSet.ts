@@ -208,10 +208,9 @@ export class SquareSet {
     };
   }
 
-  private plusOne(): SquareSet {
-    if (this.lo != -1) return new SquareSet(this.lo + 1, this.hi);
-    else if (this.hi != -1) return new SquareSet(0, this.hi + 1);
-    else return new SquareSet(0, 0);
+  plusOne(): SquareSet {
+    const t = this.lo + 1;
+    return new SquareSet(t, t ? this.hi : (this.hi + 1));
   }
 
   subsets(): Iterable<SquareSet> {

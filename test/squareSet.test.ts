@@ -36,3 +36,9 @@ test('shl', () => {
   expect(r.shl(62)).toEqual(new SquareSet(0x0, 0x80000000));
   expect(r.shl(63)).toEqual(new SquareSet(0x0, 0x0));
 });
+
+test('plus one', () => {
+  expect(SquareSet.empty().plusOne()).toEqual(new SquareSet(1, 0));
+  expect(SquareSet.full().plusOne()).toEqual(SquareSet.empty());
+  expect(new SquareSet(0xffffffff, 0).plusOne()).toEqual(new SquareSet(0, 1));
+});
