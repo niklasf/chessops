@@ -141,10 +141,10 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
     between[a] = [];
     for (let b = 0; b < a; b++) {
       if (DIAG_RANGE[a].has(b)) {
-        ray[a][b] = DIAG_RANGE[a].with(b);
+        ray[a][b] = DIAG_RANGE[a].with(a);
         between[a][b] = diagAttacks(a, SquareSet.fromSquare(b)).intersect(diagAttacks(b, SquareSet.fromSquare(a)));
       } else if (ANTI_DIAG_RANGE[a].has(b)) {
-        ray[a][b] = ANTI_DIAG_RANGE[a].with(b);
+        ray[a][b] = ANTI_DIAG_RANGE[a].with(a);
         between[a][b] = antiDiagAttacks(a, SquareSet.fromSquare(b)).intersect(diagAttacks(b, SquareSet.fromSquare(a)));
       } else if (RANK_ATTACKS[a][0][0].has(b)) {
         ray[a][b] = RANK_ATTACKS[a][0][0].with(a);
