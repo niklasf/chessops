@@ -84,9 +84,19 @@ function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
   return RANK_ATTACKS[square][occ.lo][occ.hi];
 }
 
-function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
+/*function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
   const occ = FILE_MASKS[square].intersect(occupied);
   return FILE_ATTACKS[square][occ.lo][occ.hi];
+} */
+
+function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
+  const bit = SquareSet.fromSquare(square);
+  let forward = occupied.intersect(FILE_MASKS[square]);
+  let reverse = forward.bswap();
+  forward = forward.minus(bit);
+  reverse = reverse.minus(bit.bswap());
+  forward = forward.xor(reverse.bswap());
+  return forward.intersect(FILE_MASKS[square]);
 }
 
 export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {

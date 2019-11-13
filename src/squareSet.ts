@@ -209,8 +209,14 @@ export class SquareSet {
   }
 
   plusOne(): SquareSet {
-    const t = this.lo + 1;
-    return new SquareSet(t, t ? this.hi : (this.hi + 1));
+    const lo = this.lo + 1;
+    return new SquareSet(lo, lo ? this.hi : (this.hi + 1));
+  }
+
+  minus(other: SquareSet) {
+    const lo = this.lo - other.lo;
+    const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
+    return new SquareSet(lo, this.hi - (other.hi + c));
   }
 
   subsets(): Iterable<SquareSet> {
