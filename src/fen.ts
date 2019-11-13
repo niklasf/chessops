@@ -9,6 +9,8 @@ export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
 export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
 export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
+export class FenError extends Error { }
+
 interface FenOpts {
   promoted?: boolean;
   shredder?: boolean;

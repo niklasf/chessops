@@ -75,3 +75,17 @@ export interface Setup {
   fullmoves: number;
   rules: Rules;
 }
+
+export function defaultSetup(): Setup {
+  return {
+    board: Board.default(),
+    pockets: undefined,
+    turn: 'white',
+    unmovedRooks: SquareSet.corners(),
+    epSquare: undefined,
+    remainingChecks: undefined,
+    halfmoves: 0,
+    fullmoves: 1,
+    rules: 'chess',
+  };
+}
