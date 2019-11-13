@@ -139,7 +139,7 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
   for (let a = 0; a < 64; a++) {
     ray[a] = [];
     between[a] = [];
-    for (let b = 0; b < 64; b++) {
+    for (let b = 0; b < a; b++) {
       if (DIAG_RANGE[a].has(b)) {
         ray[a][b] = DIAG_RANGE[a].intersect(DIAG_RANGE[b]).with(a).with(b);
         between[a][b] = diagAttacks(a, SquareSet.fromSquare(b)).intersect(diagAttacks(b, SquareSet.fromSquare(a)));
@@ -156,6 +156,12 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
         ray[a][b] = SquareSet.empty();
         between[a][b] = SquareSet.empty();
       }
+    }
+  }
+  for (let a = 0; a < 64; a++) {
+    for (let b = 0; b < a; b++) {
+      ray[b][a] = ray[a][b];
+      between[b][a] = between[a][b];
     }
   }
   return [ray, between];
