@@ -1,6 +1,4 @@
 import { CastlingSide, Color, COLORS, ROLES, Square, ByCastlingSide, ByColor, Rules } from './types';
-import { defined } from './util';
-import { between } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 
