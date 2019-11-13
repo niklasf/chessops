@@ -150,7 +150,7 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
         ray[a][b] = RANK_ATTACKS[a][0][0].with(a);
         between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersect(rankAttacks(b, SquareSet.fromSquare(a)));
       } else if (FILE_RANGE[a].has(b)) {
-        ray[a][b] = FILE_RANGE[a].with(b);
+        ray[a][b] = FILE_RANGE[a].with(a);
         between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersect(fileAttacks(b, SquareSet.fromSquare(a)));
       } else {
         ray[a][b] = SquareSet.empty();
