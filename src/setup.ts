@@ -1,4 +1,6 @@
 import { CastlingSide, Color, COLORS, ROLES, Square, ByCastlingSide, ByColor, Rules } from './types';
+import { defined } from './util';
+import { between } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 
@@ -64,6 +66,14 @@ export class RemainingChecks {
   }
 }
 
+export function kingCastlesTo(color: Color, side: CastlingSide) {
+  return color == 'white' ? (side == 'a' ? 2 : 6) : (side == 'a' ? 58 : 62);
+}
+
+export function rookCastlesTo(color: Color, side: CastlingSide) {
+  return color == 'white' ? (side == 'a' ? 3 : 5) : (side == 'a' ? 59 : 61);
+}
+
 export class Castles {
   unmovedRooks: SquareSet;
   rook: ByColor<ByCastlingSide<Square | undefined>>;
@@ -113,8 +123,30 @@ export class Castles {
     return castles;
   }
 
+  private add(color: Color, side: CastlingSide, king: Square, rook: Square) {
+    const kingTo = kingCastlesTo(color, side);
+    const rookTo = rookCastlesTo(color, side);
+    this.unmovedRooks = this.unmovedRooks.with(rook);
+    this.rook[color][side] = rook;
+    this.path[color][side] = between(rook, rookTo).with(rookTo)
+      .union(between(king, kingTo).with(kingTo))
+      .without(king).without(rook);
+  }
+
   static fromSetup(setup: Setup): Castles {
-    return Castles.empty(); // TODO
+    const castles = Castles.empty();
+    const rooks = setup.unmovedRooks.intersect(setup.board.rook);
+    for (const color of COLORS) {
+      const backrank = color == 'white' ? 0 : 7;
+      const king = setup.board.kingOf(color);
+      if (!defined(king) || king >> 3 != backrank) continue;
+      const side = rooks.intersect(setup.board[color]).intersect(SquareSet.fromRank(backrank));
+      const aSide = side.first();
+      if (aSide && (aSide & 0x7) < (king & 0x7)) castles.add(color, 'a', king, aSide);
+      const hSide = side.last();
+      if (hSide && (king & 0x7) < (hSide & 0x7)) castles.add(color, 'h', king, hSide);
+    }
+    return castles;
   }
 }
 

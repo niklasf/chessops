@@ -1,7 +1,7 @@
 import { CastlingSide, Color, Square, ByColor, ByCastlingSide } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
-import { Castles, Setup, Material, RemainingChecks } from './setup';
+import { Castles, Setup, Material, RemainingChecks, kingCastlesTo, rookCastlesTo } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
@@ -15,14 +15,6 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
 }
 
 type BySquare<T> = { [square: number]: T };
-
-function kingCastlesTo(color: Color, side: CastlingSide) {
-  return color == 'white' ? (side == 'a' ? 2 : 6) : (side == 'a' ? 58 : 62);
-}
-
-function rookCastlesTo(color: Color, side: CastlingSide) {
-  return color == 'white' ? (side == 'a' ? 3 : 5) : (side == 'a' ? 59 : 61);
-}
 
 interface Context {
   king: Square,

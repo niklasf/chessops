@@ -37,6 +37,7 @@ Roadmap
 
 * [ ] insufficient material
 * [ ] game end
+* [ ] chess variants
 
 ### 0.1.0-alpha.4: Ceval
 
@@ -46,7 +47,6 @@ Roadmap
 
 * [ ] san parsing
 * [ ] pgn parsing
-* [ ] chess variants
 
 License
 -------
