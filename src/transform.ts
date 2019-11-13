@@ -5,11 +5,7 @@ import { Board } from './board';
 import { Setup } from './setup';
 
 export function flipVertical(s: SquareSet): SquareSet {
-  const k1 = new SquareSet(0x00ff00ff, 0x00ff00ff);
-  const k2 = new SquareSet(0x0000ffff, 0x0000ffff);
-  s = s.shr(8).intersect(k1).union(s.intersect(k1).shl(8));
-  s = s.shr(16).intersect(k2).union(s.intersect(k2).shl(16));
-  return new SquareSet(s.hi, s.lo);
+  return s.bswap();
 }
 
 export function flipHorizontal(s: SquareSet): SquareSet {

@@ -6,6 +6,11 @@ function popcnt32(n: number): number {
   return ((n + (n >>> 4) & 0xf0f0f0f) * 0x1010101) >> 24;
 }
 
+function bswap32(n: number): number {
+  n = (n >>> 8) & 0x00ff00ff | ((n & 0x00ff00ff) << 8);
+  return (n >>> 16) & 0xffff | ((n & 0xffff) << 16);
+}
+
 export class SquareSet {
   readonly lo: number;
   readonly hi: number;
@@ -93,6 +98,10 @@ export class SquareSet {
     else if (shift >= 32) return new SquareSet(0, this.lo << (shift - 32));
     else if (shift > 0) return new SquareSet(this.lo << shift, (this.hi << shift) ^ (this.lo >>> (32 - shift)));
     else return this;
+  }
+
+  bswap(): SquareSet {
+    return new SquareSet(bswap32(this.hi), bswap32(this.lo));
   }
 
   equals(other: SquareSet): boolean {
