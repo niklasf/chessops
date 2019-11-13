@@ -78,30 +78,34 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
   return PAWN_ATTACKS[color][square];
 }
 
-const [DIAG_MASKS, DIAG_ATTACKS] = slidingAttackTable([-9, -7, 7, 9]);
 const [RANK_MASKS, RANK_ATTACKS] = slidingAttackTable([-1, 1]);
 
 const FILE_RANGE = slidingRangeTable([-8, 8]);
-
-export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const occ = DIAG_MASKS[square].intersect(occupied);
-  return DIAG_ATTACKS[square][occ.lo][occ.hi];
-}
+const DIAG_RANGE = slidingRangeTable([-9, 9]);
+const ANTI_DIAG_RANGE = slidingRangeTable([-7, 7]);
 
 function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
   const occ = RANK_MASKS[square].intersect(occupied);
   return RANK_ATTACKS[square][occ.lo][occ.hi];
 }
 
-function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const range = FILE_RANGE[square];
-  const bit = SquareSet.fromSquare(square);
+function hyperbolaAttacks(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
   let forward = occupied.intersect(range);
   let reverse = forward.bswap();
   forward = forward.minus(bit);
   reverse = reverse.minus(bit.bswap());
   forward = forward.xor(reverse.bswap());
   return forward.intersect(range);
+}
+
+function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return hyperbolaAttacks(SquareSet.fromSquare(square), FILE_RANGE[square], occupied);
+}
+
+export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
+  const bit = SquareSet.fromSquare(square);
+  return hyperbolaAttacks(bit, DIAG_RANGE[square], occupied).union(
+    hyperbolaAttacks(bit, ANTI_DIAG_RANGE[square], occupied));
 }
 
 export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -129,8 +133,8 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
     ray[a] = [];
     between[a] = [];
     for (let b = 0; b < 64; b++) {
-      if (DIAG_ATTACKS[a][0][0].has(b)) {
-        ray[a][b] = DIAG_ATTACKS[a][0][0].intersect(DIAG_ATTACKS[b][0][0]).with(a).with(b);
+      if (DIAG_RANGE[a].union(ANTI_DIAG_RANGE[a]).has(b)) {
+        ray[a][b] = DIAG_RANGE[a].union(ANTI_DIAG_RANGE[a]).intersect(DIAG_RANGE[b].union(ANTI_DIAG_RANGE[b])).with(a).with(b);
         between[a][b] = bishopAttacks(a, SquareSet.fromSquare(b)).intersect(bishopAttacks(b, SquareSet.fromSquare(a)));
       } else if (RANK_ATTACKS[a][0][0].has(b)) {
         ray[a][b] = RANK_ATTACKS[a][0][0].with(a);
