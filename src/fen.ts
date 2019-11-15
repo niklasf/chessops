@@ -11,9 +11,57 @@ export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
 export class FenError extends Error { }
 
+function parseBoardFen(boardPart: string): Board {
+  const board = Board.empty();
+  let rank = 7, file = 0;
+  for (let i = 0; i < boardPart.length; i++) {
+    const c = boardPart[i];
+    if (c == '/' && file == 8) {
+      file = 0;
+      rank--;
+    } else {
+      const step = parseInt(c, 10);
+      if (step) file += step;
+      else {
+        if (file >= 8 || rank < 0) throw new FenError('invalid board part in fen');
+        const square = file + rank * 8;
+        const piece = charToPiece(c);
+        if (!piece) throw new FenError('invalid board part in fen');
+        if (boardPart[i + 1] == '~') {
+          piece.promoted = true;
+          i++;
+        }
+        board.set(square, piece);
+        file++;
+      }
+    }
+  }
+  if (rank != 0 || file != 8) throw new FenError('invalid board part in fen');
+  return board;
+}
+
 interface FenOpts {
   promoted?: boolean;
   shredder?: boolean;
+}
+
+function charToRole(ch: string): Role | undefined {
+  switch (ch) {
+    case 'p': return 'pawn';
+    case 'n': return 'knight';
+    case 'b': return 'bishop';
+    case 'r': return 'rook';
+    case 'q': return 'queen';
+    case 'k': return 'king';
+    default: return;
+  }
+}
+
+function charToPiece(ch: string): Piece | undefined {
+  const lower = ch.toLowerCase();
+  const role = charToRole(lower);
+  if (!role) return;
+  return { role, color: lower == ch ? 'black' : 'white' };
 }
 
 function roleToChar(role: Role): string {
