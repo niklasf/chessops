@@ -97,7 +97,7 @@ function parseRemainingChecks(part: string): RemainingChecks {
   } else throw new FenError('invalid remaining checks in fen');
 }
 
-function parseFen(fen: string): Setup {
+export function parseFen(fen: string): Setup {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
