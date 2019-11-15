@@ -73,7 +73,6 @@ export interface Setup {
   remainingChecks: RemainingChecks | undefined;
   halfmoves: number;
   fullmoves: number;
-  rules: Rules;
 }
 
 export function defaultSetup(): Setup {
@@ -86,6 +85,5 @@ export function defaultSetup(): Setup {
     remainingChecks: undefined,
     halfmoves: 0,
     fullmoves: 1,
-    rules: 'chess',
   };
 }

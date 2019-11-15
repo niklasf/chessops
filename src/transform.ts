@@ -47,6 +47,5 @@ export function setup(setup: Setup, f: (s: SquareSet) => SquareSet): Setup {
     remainingChecks: setup.remainingChecks && setup.remainingChecks.clone(),
     halfmoves: setup.halfmoves,
     fullmoves: setup.fullmoves,
-    rules: setup.rules,
   };
 }

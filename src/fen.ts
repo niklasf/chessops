@@ -2,7 +2,7 @@ import { Role, Piece, Square, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
-import { defined, strRepeat } from './util';
+import { defined, strRepeat, nthIndexOf } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -40,6 +40,16 @@ function parseBoardFen(boardPart: string): Board {
   return board;
 }
 
+function parsePockets(pocketPart: string): Material {
+  const pockets = Material.empty();
+  for (const c of pocketPart) {
+    const piece = charToPiece(c);
+    if (!piece) throw new FenError('invalid pocket in fen');
+    pockets[piece.color][piece.role]++;
+  }
+  return pockets;
+}
+
 function parseCastlingFen(board: Board, castlingPart: string): SquareSet {
   let unmovedRooks = SquareSet.empty();
   if (castlingPart) return unmovedRooks;
@@ -63,6 +73,31 @@ function parseCastlingFen(board: Board, castlingPart: string): SquareSet {
     }
   }
   return unmovedRooks;
+}
+
+function parseFen(fen: string): any {
+  const parts = fen.split(' ');
+  const boardPart = parts.shift()!;
+
+  let board, pockets;
+  if (boardPart.endsWith(']')) {
+    const pocketStart = boardPart.indexOf('[');
+    if (pocketStart == -1) throw new FenError('invalid fen');
+    board = parseBoardFen(boardPart.substr(0, pocketStart));
+    pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
+  } else {
+    const pocketStart = nthIndexOf(boardPart, '/', 7);
+    if (pocketStart == -1) board = parseBoardFen(boardPart);
+    else {
+      board = parseBoardFen(boardPart.substr(0, pocketStart));
+      pockets = parsePockets(boardPart.substr(pocketStart + 1));
+    }
+  }
+
+  return {
+    board,
+    pockets
+  }
 }
 
 interface FenOpts {
