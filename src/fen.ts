@@ -61,14 +61,14 @@ function parsePockets(pocketPart: string): Material {
 
 function parseCastlingFen(board: Board, castlingPart: string): SquareSet {
   let unmovedRooks = SquareSet.empty();
-  if (castlingPart) return unmovedRooks;
+  if (castlingPart == '-') return unmovedRooks;
   if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) throw new FenError('invalid castling part in fen');
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
     const color = c == lower ? 'black' : 'white';
     const rank = color == 'white' ? 0 : 7;
-    const files = (lower == 'q') ? [0, 1, 2, 3, 4, 5, 7, 8] :
-                  (lower == 'k') ? [8, 7, 6, 5, 4, 3, 2, 1] :
+    const files = (lower == 'q') ? [0, 1, 2, 3, 4, 5, 6, 7] :
+                  (lower == 'k') ? [7, 6, 5, 4, 3, 2, 1, 0] :
                                    [lower.charCodeAt(0) - 'a'.charCodeAt(0)];
     for (const file of files) {
       const square = file + 8 * rank;
