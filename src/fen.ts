@@ -1,4 +1,4 @@
-import { Role, Piece, Square, COLORS, ROLES } from './types';
+import { Role, Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
@@ -97,7 +97,7 @@ function parseRemainingChecks(part: string): RemainingChecks {
   } else throw new FenError('invalid remaining checks in fen');
 }
 
-function parseFen(fen: string): any {
+function parseFen(fen: string): Setup {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
@@ -116,7 +116,7 @@ function parseFen(fen: string): any {
     }
   }
 
-  let turn;
+  let turn: Color;
   const turnPart = parts.shift();
   if (!defined(turnPart) || turnPart == 'w') turn = 'white';
   else if (turnPart == 'b') turn = 'black';
@@ -126,14 +126,42 @@ function parseFen(fen: string): any {
   const unmovedRooks = defined(castlingPart) ? parseCastlingFen(board, castlingPart) : SquareSet.empty();
 
   const epPart = parts.shift();
+  let epSquare;
+  if (defined(epPart) && epPart != '-') {
+    epSquare = parseSquare(epPart);
+    if (!defined(epSquare)) throw new FenError('invalid ep square in fen');
+  }
 
+  let halfmovePart = parts.shift();
+  let remainingChecks;
+  if (defined(halfmovePart) && halfmovePart.includes('+')) {
+    remainingChecks = parseRemainingChecks(halfmovePart);
+    halfmovePart = parts.shift();
+  }
+  const halfmoves = defined(halfmovePart) ? parseSmallUint(halfmovePart) : 0;
+  if (!defined(halfmoves)) throw new FenError('invalid halfmoves in fen');
+
+  const fullmovesPart = parts.shift();
+  const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart) : 1;
+  if (!defined(fullmoves)) throw new FenError('invalid fullmoves in fen');
+
+  const remainingChecksPart = parts.shift();
+  if (defined(remainingChecksPart)) {
+    if (defined(remainingChecks)) throw new FenError('duplicate remaining checks in fen');
+    remainingChecks = parseRemainingChecks(remainingChecksPart);
+  }
+
+  if (parts.length) throw new FenError('too many parts in fen');
 
   return {
     board,
     pockets,
     turn,
     unmovedRooks,
-    enPassant: undefined,
+    remainingChecks,
+    epSquare,
+    halfmoves,
+    fullmoves: Math.max(1, fullmoves)
   };
 }
 
