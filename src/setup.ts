@@ -48,19 +48,17 @@ export class RemainingChecks {
   white: number;
   black: number;
 
-  private constructor() { }
+  constructor(white: number, black: number) {
+    this.white = white;
+    this.black = black;
+  }
 
   static default(): RemainingChecks {
-    const r = new RemainingChecks();
-    r.white = 3;
-    r.black = 3;
-    return r;
+    return new RemainingChecks(3, 3);
   }
 
   clone(): RemainingChecks {
-    const r = new RemainingChecks();
-    for (const color of COLORS) r[color] = this[color];
-    return r;
+    return new RemainingChecks(this.white, this.black);
   }
 }
 

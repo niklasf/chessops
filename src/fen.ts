@@ -11,6 +11,15 @@ export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
 export class FenError extends Error { }
 
+function parseSmallUint(str: string): number | undefined {
+  return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
+}
+
+function parseSquare(str: string): number | undefined {
+  if (!/^[a-h][1-8]$/.test(str)) return;
+  return str.charCodeAt(0) - 'a'.charCodeAt(0) + 8 * (str.charCodeAt(1) - '1'.charCodeAt(0));
+}
+
 function parseBoardFen(boardPart: string): Board {
   const board = Board.empty();
   let rank = 7, file = 0;
@@ -75,6 +84,19 @@ function parseCastlingFen(board: Board, castlingPart: string): SquareSet {
   return unmovedRooks;
 }
 
+function parseRemainingChecks(part: string): RemainingChecks {
+  const parts = part.split('+');
+  if (parts.length == 3 && parts[0] === '') {
+    const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) throw new FenError('invalid remaining checks in fen');
+    return new RemainingChecks(3 - white, 3 - black);
+  } else if (parts.length == 2) {
+    const white = parseSmallUint(parts[0]), black = parseSmallUint(parts[1]);
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) throw new FenError('invalid remaining checks in fen');
+    return new RemainingChecks(white, black);
+  } else throw new FenError('invalid remaining checks in fen');
+}
+
 function parseFen(fen: string): any {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
@@ -94,10 +116,25 @@ function parseFen(fen: string): any {
     }
   }
 
+  let turn;
+  const turnPart = parts.shift();
+  if (!defined(turnPart) || turnPart == 'w') turn = 'white';
+  else if (turnPart == 'b') turn = 'black';
+  else throw new FenError('invalid turn in fen');
+
+  const castlingPart = parts.shift();
+  const unmovedRooks = defined(castlingPart) ? parseCastlingFen(board, castlingPart) : SquareSet.empty();
+
+  const epPart = parts.shift();
+
+
   return {
     board,
-    pockets
-  }
+    pockets,
+    turn,
+    unmovedRooks,
+    enPassant: undefined,
+  };
 }
 
 interface FenOpts {
