@@ -36,6 +36,9 @@ const random: [string, string, number, number, number, number, number][] = [
   ['gentest-8', 'rnkq1bnr/p3ppp1/1ppp3p/5b2/8/2PQ3P/PP1PPPB1/RNB1K1NR b KQ -', 29, 927, 25822, 832461, 23480361],
   ['gentest-9', 'rn1q1bnr/p2kppp1/2pp3p/1p3b2/1P6/2PQ3P/P2PPPB1/RNB1K1NR w KQ -', 31, 834, 25926, 715605, 22575950],
   ['gentest-10', 'rn1q1bnr/3kppp1/p1pp3p/1p3b2/1P6/2P2N1P/P1QPPPB1/RNB1K2R b KQ -', 29, 900, 25008, 781431, 22075119],
+  ['gentest-94', '2b1kbnB/rppqp3/3p3p/3P1pp1/pnP3P1/PP2P2P/4QP2/RN2KBNR b KQ -', 27, 729, 20665, 613681, 18161673],
+  ['gentest-95', '2b1kbnB/r1pqp3/n2p3p/1p1P1pp1/p1P3P1/PP2P2P/Q4P2/RN2KBNR w KQ -', 30, 689, 21830, 556204, 18152100],
+  ['gentest-96', '2b1kbn1/r1pqp3/n2p3p/3P1pp1/ppP3P1/PPB1P2P/Q4P2/RN2KBNR b KQ -', 23, 685, 17480, 532817, 14672791],
 ];
 
 test('castles from setup', () => {
