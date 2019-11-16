@@ -330,6 +330,7 @@ export class Chess {
 
   protected playCaptureAt(square: Square, captured: Piece) {
     this.halfmoves = 0;
+    if (captured && captured.role == 'rook') this.castles.discardRook(square);
     if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
   }
 

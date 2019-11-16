@@ -64,7 +64,7 @@ test('play castling move', () => {
   expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
 });
 
-test.skip.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
+test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
   const setup = parseFen(fen);
   const pos = Chess.fromSetup(setup);
   expect(perft(pos, 1, false)).toBe(d1);
