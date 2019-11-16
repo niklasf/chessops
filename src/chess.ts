@@ -152,6 +152,10 @@ export class Chess {
     if (!defined(otherKing)) throw new PositionError('other side has no king');
     if (this.kingAttackers(otherKing, this.turn, this.board.occupied)) throw new PositionError('other side in check');
     if (SquareSet.backranks().intersects(this.board.pawn)) throw new PositionError('pawns on backrank');
+    for (const color of COLORS) {
+      if (this.board.pieces(color, 'pawn').size() > 8) throw new PositionError('more than 8 pawns');
+      if (this.board[color].size() > 16) throw new PositionError('more than 16 pieces');
+    }
   }
 
   private validEpSquare(square: Square | undefined): Square | undefined {
