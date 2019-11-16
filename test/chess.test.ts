@@ -1,7 +1,8 @@
+import { SquareSet } from '../src/squareSet';
 import { parseFen, INITIAL_FEN } from '../src/fen';
 import { Castles, Chess } from '../src/chess';
 
-const tricky: [string, string, number, number, number][] = [
+const tricky: [string, string, number, number?, number?][] = [
   ['pos-2', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -', 48, 2039, 97862]
 ];
 
@@ -15,10 +16,18 @@ function perft1(pos: Chess) {
 test('castles from setup', () => {
   const setup = parseFen(INITIAL_FEN);
   const castles = Castles.fromSetup(setup);
+
+  expect(castles.unmovedRooks).toEqual(SquareSet.corners());
+
   expect(castles.rook.white.a).toBe(0);
   expect(castles.rook.white.h).toBe(7);
   expect(castles.rook.black.a).toBe(56);
   expect(castles.rook.black.h).toBe(63);
+
+  expect(castles.path.white.a.toArray()).toEqual([1, 2, 3]);
+  expect(castles.path.white.h.toArray()).toEqual([5, 6]);
+  expect(castles.path.black.a.toArray()).toEqual([57, 58, 59]);
+  expect(castles.path.black.h.toArray()).toEqual([61, 62]);
 });
 
 test.each(tricky)('tricky perft: %s: %s', (_, fen, d1) => {
