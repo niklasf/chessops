@@ -1,4 +1,6 @@
 import { Square, Piece, ByRole } from './types';
+import { makeSquare } from './util';
+import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Chess } from './chess';
@@ -16,15 +18,7 @@ export function squareSet(squares: SquareSet): string {
 }
 
 export function piece(piece: Piece): string {
-  const ch = {
-    pawn: 'p',
-    knight: 'n',
-    bishop: 'b',
-    rook: 'r',
-    queen: 'q',
-    king: 'k',
-  }[piece.role];
-  return (piece.color == 'white' ? ch.toUpperCase() : ch) + (piece.promoted ? '~' : '');
+  return makePiece(piece);
 }
 
 export function board(board: Board): string {
@@ -42,7 +36,7 @@ export function board(board: Board): string {
 }
 
 export function square(sq: Square): string {
-  return 'abcdefgh'[sq & 0x7] + '12345678'[sq >> 3];
+  return makeSquare(sq);
 }
 
 /* export function perft(pos: Chess, depth: number, outer: boolean = true): number {

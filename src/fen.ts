@@ -195,7 +195,7 @@ function roleToChar(role: Role): string {
   }
 }
 
-function makePiece(piece: Piece, opts?: FenOpts): string {
+export function makePiece(piece: Piece, opts?: FenOpts): string {
   let r = roleToChar(piece.role);
   if (piece.color == 'white') r = r.toUpperCase();
   if (opts && opts.promoted && piece.promoted) r += '~';
