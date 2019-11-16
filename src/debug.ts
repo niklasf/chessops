@@ -69,8 +69,8 @@ export function perft(pos: Chess, depth: number, outer: boolean = true): number 
       for (const to of dests) {
         for (const promotion of promotions) {
           const child = pos.clone();
-          const children = perft(child, depth - 1, false);
           child.playMove({ from, to, promotion });
+          const children = perft(child, depth - 1, false);
           if (outer) console.log(square(from), square(to), promotion, children);
           nodes += children;
         }
