@@ -89,12 +89,12 @@ export class Castles {
     for (const color of COLORS) {
       const backrank = color == 'white' ? 0 : 7;
       const king = setup.board.kingOf(color);
-      if (!defined(king) || king >> 3 != backrank) continue;
+      if (!defined(king) || (king >> 3) != backrank) continue;
       const side = rooks.intersect(setup.board[color]).intersect(SquareSet.fromRank(backrank));
       const aSide = side.first();
-      if (aSide && (aSide & 0x7) < (king & 0x7)) castles.add(color, 'a', king, aSide);
+      if (defined(aSide) && (aSide & 0x7) < (king & 0x7)) castles.add(color, 'a', king, aSide);
       const hSide = side.last();
-      if (hSide && (king & 0x7) < (hSide & 0x7)) castles.add(color, 'h', king, hSide);
+      if (defined(hSide) && (king & 0x7) < (hSide & 0x7)) castles.add(color, 'h', king, hSide);
     }
     return castles;
   }
@@ -150,7 +150,7 @@ export class Chess {
     if (!defined(this.board.kingOf(this.turn))) throw new PositionError('stm has no king');
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (!defined(otherKing)) throw new PositionError('other side has no king');
-    if (this.kingAttackers(otherKing, this.turn, this.board.occupied)) throw new PositionError('other side in check');
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) throw new PositionError('other side in check');
     if (SquareSet.backranks().intersects(this.board.pawn)) throw new PositionError('pawns on backrank');
     for (const color of COLORS) {
       if (this.board.pieces(color, 'pawn').size() > 8) throw new PositionError('more than 8 pawns');

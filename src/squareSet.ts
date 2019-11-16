@@ -170,6 +170,12 @@ export class SquareSet {
     return this.moreThanOne() ? undefined : this.last();
   }
 
+  toArray(): Square[] {
+    const r = []
+    for (const sq of this) r.push(sq);
+    return r;
+  }
+
   [Symbol.iterator](): Iterator<Square> {
     let lo = this.lo, hi = this.hi;
     return {

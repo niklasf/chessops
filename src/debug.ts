@@ -1,4 +1,4 @@
-import { Square, Piece, ByRole } from './types';
+import { Square, Piece, ByRole, BySquare } from './types';
 import { makeSquare } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
@@ -37,6 +37,13 @@ export function board(board: Board): string {
 
 export function square(sq: Square): string {
   return makeSquare(sq);
+}
+
+export function dests(dests: BySquare<SquareSet>) {
+  return Object.keys(dests).map((key) => {
+    const from = parseInt(key, 10);
+    return `${makeSquare(from!)}: ${dests[from].toArray().map(square).join(' ')}`;
+  }).join('\n');
 }
 
 /* export function perft(pos: Chess, depth: number, outer: boolean = true): number {
