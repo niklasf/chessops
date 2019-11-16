@@ -307,10 +307,9 @@ export class Chess {
       const checker = ctx.checkers.singleSquare();
       if (!checker) return SquareSet.empty();
       pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
-    } else {
-      if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
 
+    if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     if (legal) pseudo = pseudo.union(legal);
     return pseudo.diff(this.board[this.turn]);
   }
