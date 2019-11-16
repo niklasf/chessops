@@ -3,7 +3,7 @@ import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
 import { Castles, Chess } from '../src/chess';
 import { perft } from '../src/debug';
 
-const tricky: [string, string, number, number?, number?, number?, number?][] = [
+const tricky: [string, string, number, number, number, number?, number?][] = [
   ['pos-2', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -', 48, 2039, 97862], // Kiwipete by Peter McKenzie
   ['pos-3', '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -', 14, 191, 2812, 43238],
   ['pos-4', 'r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ -', 6, 264, 9467],
@@ -23,6 +23,19 @@ const tricky: [string, string, number, number?, number?, number?, number?][] = [
 
   // https://github.com/ornicar/lila/issues/4625
   ['hside-rook-blocks-aside-castling', '4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff -', 42, 1743, 71908],
+];
+
+const random: [string, string, number, number, number, number, number][] = [
+  ['gentest-1', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -', 20, 400, 8902, 197281, 4865609],
+  ['gentest-2', 'rnbqkbnr/pp1ppppp/2p5/8/6P1/2P5/PP1PPP1P/RNBQKBNR b KQkq -', 21, 463, 11138, 274234, 7290026],
+  ['gentest-3', 'rnb1kbnr/ppq1pppp/2pp4/8/6P1/2P5/PP1PPPBP/RNBQK1NR w KQkq -', 27, 734, 20553, 579004, 16988496],
+  ['gentest-4', 'rnb1kbnr/p1q1pppp/1ppp4/8/4B1P1/2P5/PPQPPP1P/RNB1K1NR b KQkq -', 28, 837, 22536, 699777, 19118920],
+  ['gentest-5', 'rn2kbnr/p1q1ppp1/1ppp3p/8/4B1b1/2P4P/PPQPPP2/RNB1K1NR w KQkq -', 29, 827, 24815, 701084, 21819626],
+  ['gentest-6', 'rn1qkbnr/p3ppp1/1ppp2Qp/3B4/6b1/2P4P/PP1PPP2/RNB1K1NR b KQkq -', 25, 976, 23465, 872551, 21984216],
+  ['gentest-7', 'rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -', 36, 957, 33542, 891412, 31155934],
+  ['gentest-8', 'rnkq1bnr/p3ppp1/1ppp3p/5b2/8/2PQ3P/PP1PPPB1/RNB1K1NR b KQ -', 29, 927, 25822, 832461, 23480361],
+  ['gentest-9', 'rn1q1bnr/p2kppp1/2pp3p/1p3b2/1P6/2PQ3P/P2PPPB1/RNB1K1NR w KQ -', 31, 834, 25926, 715605, 22575950],
+  ['gentest-10', 'rn1q1bnr/3kppp1/p1pp3p/1p3b2/1P6/2P2N1P/P1QPPPB1/RNB1K2R b KQ -', 29, 900, 25008, 781431, 22075119],
 ];
 
 test('castles from setup', () => {
@@ -68,6 +81,16 @@ test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
   const setup = parseFen(fen);
   const pos = Chess.fromSetup(setup);
   expect(perft(pos, 1, false)).toBe(d1);
-  if (d2) expect(perft(pos, 2, false)).toBe(d2);
-  if (d3) expect(perft(pos, 3, false)).toBe(d3);
+  expect(perft(pos, 2, false)).toBe(d2);
+  expect(perft(pos, 3, false)).toBe(d3);
+});
+
+test.each(random)('random perft: %s: %s', (_, fen, d1, d2, d3, d4, d5) => {
+  const setup = parseFen(fen);
+  const pos = Chess.fromSetup(setup);
+  expect(perft(pos, 1, false)).toBe(d1);
+  expect(perft(pos, 2, false)).toBe(d2);
+  expect(perft(pos, 3, false)).toBe(d3);
+  expect(perft(pos, 4, false)).toBe(d4);
+  if (d5 < 100000) expect(perft(pos, 5, false)).toBe(d5);
 });
