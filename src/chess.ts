@@ -219,7 +219,7 @@ export class Chess {
   }
 
   private castlingDest(side: CastlingSide, ctx: Context): SquareSet {
-    if (ctx.checkers) return SquareSet.empty();
+    if (ctx.checkers.nonEmpty()) return SquareSet.empty();
     const rook = this.castles.rook[this.turn][side];
     if (!defined(rook)) return SquareSet.empty();
     if (this.castles.path[this.turn][side].intersects(this.board.occupied)) return SquareSet.empty();
