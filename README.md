@@ -22,7 +22,7 @@ Roadmap
 * [x] fen to board
 * [x] fen to castling
 * [x] fen to setup
-* [ ] validate setup
+* [x] validate setup
 
 ### 0.1.0-alpha.2: Replace chess.js on syzygy-tables.info
 

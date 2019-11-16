@@ -45,7 +45,7 @@ export function square(sq: Square): string {
   return 'abcdefgh'[sq & 0x7] + '12345678'[sq >> 3];
 }
 
-export function perft(pos: Chess, depth: number, outer: boolean = true): number {
+/* export function perft(pos: Chess, depth: number, outer: boolean = true): number {
   if (depth < 1) return 1;
   else {
     let nodes = 0;
@@ -62,4 +62,4 @@ export function perft(pos: Chess, depth: number, outer: boolean = true): number 
     }
     return nodes;
   }
-}
+} */

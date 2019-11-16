@@ -45,6 +45,10 @@ export class SquareSet {
     return new SquareSet(0x18000000, 0x18);
   }
 
+  static backranks(): SquareSet {
+    return new SquareSet(0xff, 0xff000000);
+  }
+
   constructor(lo: number, hi: number) {
     this.lo = lo | 0;
     this.hi = hi | 0;

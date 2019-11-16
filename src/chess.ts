@@ -1,9 +1,11 @@
-import { CastlingSide, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare } from './types';
+import { CastlingSide, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
+
+export class PositionError extends Error { }
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
@@ -98,7 +100,7 @@ export class Castles {
   }
 }
 
-interface Context {
+export interface Context {
   king: Square,
   blockers: SquareSet,
   checkers: SquareSet,
@@ -142,17 +144,38 @@ export class Chess {
     return pos;
   }
 
+  protected validate(): void {
+    if (this.board.occupied.isEmpty()) throw new PositionError('empty board');
+    if (this.board.king.size() != 2) throw new PositionError('need exactly two kings');
+    if (!defined(this.board.kingOf(this.turn))) throw new PositionError('stm has no king');
+    const otherKing = this.board.kingOf(opposite(this.turn));
+    if (!defined(otherKing)) throw new PositionError('other side has no king');
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied)) throw new PositionError('other side in check');
+    if (SquareSet.backranks().intersects(this.board.pawn)) throw new PositionError('pawns on backrank');
+  }
+
+  private validEpSquare(square: Square | undefined): Square | undefined {
+    if (!square) return;
+    const epRank = this.turn == 'white' ? 5 : 2;
+    const forward = this.turn == 'white' ? 8 : -8;
+    if ((square >> 3) != epRank) return;
+    if (this.board.occupied.has(square + forward)) return;
+    const pawn = square - forward;
+    if (!this.board.pawn.has(pawn) || !this.board[opposite(this.turn)].has(pawn)) return;
+    return square;
+  }
+
   static fromSetup(setup: Setup): Chess {
-    // TODO: Validate
     const pos = new Chess();
     pos.board = setup.board.clone();
-    pos.pockets = setup.pockets && setup.pockets.clone();
+    pos.pockets = undefined;
     pos.turn = setup.turn;
     pos.castles = Castles.fromSetup(setup);
-    pos.epSquare = setup.epSquare;
-    pos.remainingChecks = setup.remainingChecks && setup.remainingChecks.clone();
+    pos.epSquare = pos.validEpSquare(setup.epSquare);
+    pos.remainingChecks = undefined;
     pos.halfmoves = setup.halfmoves;
     pos.fullmoves = setup.fullmoves;
+    pos.validate();
     return pos;
   }
 
@@ -248,6 +271,22 @@ export class Chess {
     return d;
   }
 
-  playMove(uci: string) {
+  protected playCaptureAt(square: Square) { }
+
+  playMove(uci: Uci) {
+    const turn = this.turn, epSquare = this.epSquare;
+    this.halfmoves += 1;
+
+    if (isDrop(uci)) {
+      this.board.set(uci.to, { role: uci.role, color: this.turn });
+    } else {
+      const capture = this.board.take(uci.to);
+
+      if (this.pockets && capture) this.pockets[this.turn][capture.role]++;
+      if (capture) this.playCaptureAt(uci.to);
+    }
+
+    if (turn == 'black') this.fullmoves += 1;
+    this.turn = opposite(this.turn);
   }
 }
