@@ -224,12 +224,16 @@ export class Chess {
     if (!defined(rook)) return SquareSet.empty();
     if (this.castles.path[this.turn][side].intersects(this.board.occupied)) return SquareSet.empty();
 
-    const kingPath = between(ctx.king, kingCastlesTo(this.turn, side));
+    const kingTo = kingCastlesTo(this.turn, side);
+    const kingPath = between(ctx.king, kingTo);
+    const occ = this.board.occupied.without(ctx.king);
     for (const sq of kingPath) {
-      if (this.kingAttackers(sq, opposite(this.turn), this.board.occupied.without(ctx.king)).nonEmpty()) {
-        return SquareSet.empty();
-      }
+      if (this.kingAttackers(sq, opposite(this.turn), occ).nonEmpty()) return SquareSet.empty();
     }
+
+    const rookTo = rookCastlesTo(this.turn, side);
+    const after = this.board.occupied.toggle(ctx.king).toggle(rook).toggle(rookTo);
+    if (this.kingAttackers(kingTo, opposite(this.turn), after).nonEmpty()) return SquareSet.empty();
 
     return SquareSet.fromSquare(rook);
   }
