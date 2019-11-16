@@ -48,6 +48,7 @@ export function dests(dests: Map<Square, SquareSet>) {
 }
 
 export function perft(pos: Chess, depth: number, outer: boolean = true): number {
+  const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
   if (depth < 1) return 1;
   else if (!outer && depth == 1) {
     let nodes = 0;
@@ -55,21 +56,22 @@ export function perft(pos: Chess, depth: number, outer: boolean = true): number 
       nodes += to.size();
       if (pos.board.pawn.has(from)) {
         const backrank = SquareSet.fromRank(pos.turn == 'white' ? 7 : 0);
-        nodes += to.intersect(backrank).size() * 3;
+        nodes += to.intersect(backrank).size() * (promotionRoles.length - 1);
       }
     }
     return nodes;
   } else {
-    const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
     let nodes = 0;
     for (const [from, dests] of pos.allDests()) {
-      const promotions: Array<Role | undefined> = ((from >> 3) == (pos.turn == 'white' ? 6 : 1) && pos.board.pawn.has(from)) ? promotionRoles : [undefined];
+      const promotions: Array<Role | undefined> =
+        ((from >> 3) == (pos.turn == 'white' ? 6 : 1) && pos.board.pawn.has(from)) ?
+          promotionRoles : [undefined];
       for (const to of dests) {
         for (const promotion of promotions) {
           const child = pos.clone();
           const children = perft(child, depth - 1, false);
           child.playMove({ from, to, promotion });
-          console.log(square(from), square(to), promotion, children);
+          if (outer) console.log(square(from), square(to), promotion, children);
           nodes += children;
         }
       }

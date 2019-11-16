@@ -1,5 +1,5 @@
 import { SquareSet } from '../src/squareSet';
-import { parseFen, INITIAL_FEN } from '../src/fen';
+import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
 import { Castles, Chess } from '../src/chess';
 import { perft } from '../src/debug';
 
@@ -42,8 +42,21 @@ test('castles from setup', () => {
   expect(castles.path.black.h.toArray()).toEqual([61, 62]);
 });
 
-test.each(tricky)('tricky perft: %s: %s', (_, fen, d1) => {
+test('make move', () => {
+  const pos = Chess.fromSetup(parseFen('8/8/8/5k2/3p4/8/4P3/4K3 w - -'));
+
+  const kd1 = pos.clone();
+  kd1.playMove({ from: 4, to: 3 });
+  expect(makeFen(kd1.toSetup())).toBe('8/8/8/5k2/3p4/8/4P3/3K4 b - - 1 1');
+
+  const e4 = pos.clone();
+  e4.playMove({ from: 12, to: 28 });
+  expect(makeFen(e4.toSetup())).toBe('8/8/8/5k2/3pP3/8/8/4K3 b - e3 0 1');
+});
+
+test.skip.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2) => {
   const setup = parseFen(fen);
   const pos = Chess.fromSetup(setup);
   expect(perft(pos, 1, false)).toBe(d1);
+  expect(perft(pos, 2, false)).toBe(d2);
 });
