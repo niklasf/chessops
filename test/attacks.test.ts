@@ -14,4 +14,7 @@ test('ray', () => {
 test('between', () => {
   expect(between(42, 42)).toEqual(SquareSet.empty());
   expect(between(0, 3).toArray()).toEqual([1, 2]);
+
+  expect(between(61, 47).toArray()).toEqual([54]);
+  expect(between(47, 61).toArray()).toEqual([54]);
 });
