@@ -183,6 +183,19 @@ export class Chess {
     return pos;
   }
 
+  toSetup(): Setup {
+    return {
+      board: this.board.clone(),
+      pockets: this.pockets && this.pockets.clone(),
+      turn: this.turn,
+      unmovedRooks: this.castles.unmovedRooks,
+      epSquare: this.epSquare, // TODO: x-fen
+      remainingChecks: this.remainingChecks && this.remainingChecks.clone(),
+      halfmoves: this.halfmoves,
+      fullmoves: this.fullmoves,
+    };
+  }
+
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
