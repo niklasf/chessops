@@ -27,7 +27,15 @@ const tricky: [string, string, number, number?, number?, number?, number?][] = [
 function perft1(pos: Chess) {
   const dests = pos.allDests();
   let nodes = 0;
-  for (const sq in dests) nodes += dests[sq].size();
+  for (const [from, to] of dests) {
+    nodes += to.size();
+
+    // promotion
+    if (pos.board.pawn.has(from)) {
+      const backrank = SquareSet.fromRank(pos.turn == 'white' ? 7 : 0);
+      nodes += to.intersect(backrank).size() * 3;
+    }
+  }
   return nodes;
 }
 

@@ -287,11 +287,11 @@ export class Chess {
     return pseudo.diff(this.board[this.turn]);
   }
 
-  allDests(): BySquare<SquareSet> {
+  allDests(): Map<Square, SquareSet> {
     const ctx = this.ctx();
-    const d: BySquare<SquareSet> = {};
+    const d = new Map();
     for (const square of this.board[this.turn]) {
-      d[square] = this.dests(square, ctx);
+      d.set(square, this.dests(square, ctx));
     }
     return d;
   }
