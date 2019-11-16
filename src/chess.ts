@@ -133,6 +133,7 @@ export class Chess {
   remainingChecks: RemainingChecks | undefined;
   halfmoves: number;
   fullmoves: number;
+  trace: Uci[];
 
   private constructor() { }
 
@@ -146,6 +147,7 @@ export class Chess {
     pos.remainingChecks = undefined;
     pos.halfmoves = 0;
     pos.fullmoves = 1;
+    pos.trace = [];
     return pos;
   }
 
@@ -159,6 +161,7 @@ export class Chess {
     pos.remainingChecks = this.remainingChecks && this.remainingChecks.clone();
     pos.halfmoves = this.halfmoves;
     pos.fullmoves = this.fullmoves;
+    pos.trace = this.trace.slice();
     return pos;
   }
 
@@ -197,6 +200,7 @@ export class Chess {
     pos.remainingChecks = undefined;
     pos.halfmoves = setup.halfmoves;
     pos.fullmoves = setup.fullmoves;
+    pos.trace = [];
     pos.validate();
     return pos;
   }
@@ -219,6 +223,7 @@ export class Chess {
   }
 
   ctx(): Context {
+    // TODO: robustness
     const king = this.board.kingOf(this.turn)!;
     const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
@@ -329,6 +334,7 @@ export class Chess {
   }
 
   playMove(uci: Uci) {
+    this.trace.push(uci);
     const turn = this.turn, epSquare = this.epSquare;
     this.epSquare = undefined;
     this.halfmoves += 1;
@@ -362,7 +368,7 @@ export class Chess {
         if (isCastling) {
           const side = delta > 0 ? 'h' : 'a';
           const rookFrom = this.castles.rook[turn][side];
-          if (rookFrom) {
+          if (defined(rookFrom)) {
             const rook = this.board.take(rookFrom);
             this.board.set(kingCastlesTo(turn, side), piece);
             if (rook) this.board.set(rookCastlesTo(turn, side), rook);

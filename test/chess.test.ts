@@ -55,14 +55,19 @@ test('play move', () => {
 });
 
 test('play castling move', () => {
-  const pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -'));
+  let pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -'));
   pos.playMove({ from: 3, to: 4 });
   expect(makeFen(pos.toSetup())).toBe('2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
+
+  pos = Chess.fromSetup(parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'));
+  pos.playMove({ from: 4, to: 0 });
+  expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
 });
 
-test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2) => {
+test.skip.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
   const setup = parseFen(fen);
   const pos = Chess.fromSetup(setup);
   expect(perft(pos, 1, false)).toBe(d1);
-  expect(perft(pos, 2, false)).toBe(d2);
+  if (d2) expect(perft(pos, 2, false)).toBe(d2);
+  if (d3) expect(perft(pos, 3, false)).toBe(d3);
 });
