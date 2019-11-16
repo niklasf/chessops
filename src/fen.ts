@@ -2,7 +2,7 @@ import { Role, Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
-import { defined, strRepeat, nthIndexOf } from './util';
+import { defined, strRepeat, nthIndexOf, parseSquare, makeSquare } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -13,11 +13,6 @@ export class FenError extends Error { }
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
-}
-
-function parseSquare(str: string): number | undefined {
-  if (!/^[a-h][1-8]$/.test(str)) return;
-  return str.charCodeAt(0) - 'a'.charCodeAt(0) + 8 * (str.charCodeAt(1) - '1'.charCodeAt(0));
 }
 
 function parseBoardFen(boardPart: string): Board {
@@ -200,11 +195,6 @@ function roleToChar(role: Role): string {
   }
 }
 
-function makeSquare(square: Square | undefined): string {
-  if (defined(square)) return 'abcdefgh'[square & 0x7] + '12345678'[square >> 3];
-  else return '-';
-}
-
 function makePiece(piece: Piece, opts?: FenOpts): string {
   let r = roleToChar(piece.role);
   if (piece.color == 'white') r = r.toUpperCase();
@@ -276,7 +266,7 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     makeBoardFen(setup.board, opts) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
     setup.turn[0],
     makeCastlingFen(setup.board, setup.unmovedRooks, opts),
-    makeSquare(setup.epSquare),
+    defined(setup.epSquare) ? makeSquare(setup.epSquare) : '-',
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
     setup.halfmoves,
     setup.fullmoves,
