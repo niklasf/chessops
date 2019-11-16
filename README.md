@@ -23,7 +23,7 @@ Roadmap
 * [x] fen to castling
 * [x] fen to setup
 * [x] validate setup
-* [ ] move making
+* [x] move making
 * [x] en passant dests
 * [x] castling dests
 * [x] normal dests

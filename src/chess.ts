@@ -1,4 +1,4 @@
-import { CastlingSide, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop } from './types';
+import { CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
@@ -97,6 +97,24 @@ export class Castles {
       if (defined(hSide) && (king & 0x7) < (hSide & 0x7)) castles.add(color, 'h', king, hSide);
     }
     return castles;
+  }
+
+  discardRook(square: Square) {
+    if (this.unmovedRooks.has(square)) {
+      this.unmovedRooks = this.unmovedRooks.without(square);
+      for (const color of COLORS) {
+        for (const side of CASTLING_SIDES) {
+          if (this.rook[color][side] == square) this.rook[color][side] = undefined;
+        }
+      }
+    }
+  }
+
+  discardSide(color: Color) {
+    const otherBackrank = SquareSet.fromRank(color == 'white' ? 7 : 0);
+    this.unmovedRooks = this.unmovedRooks.intersect(otherBackrank);
+    this.rook[color].a = undefined;
+    this.rook[color].h = undefined;
   }
 }
 
@@ -300,22 +318,57 @@ export class Chess {
     return d;
   }
 
-  protected playCaptureAt(square: Square) { }
+  protected playCaptureAt(square: Square, captured: Piece) {
+    this.halfmoves = 0;
+    if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
+  }
 
   playMove(uci: Uci) {
     const turn = this.turn, epSquare = this.epSquare;
+    this.epSquare = undefined;
     this.halfmoves += 1;
+    if (turn == 'black') this.fullmoves += 1;
+    this.turn = opposite(turn);
 
     if (isDrop(uci)) {
-      this.board.set(uci.to, { role: uci.role, color: this.turn });
+      this.board.set(uci.to, { role: uci.role, color: turn });
+      if (this.pockets) this.pockets[turn][uci.role]--;
     } else {
-      const capture = this.board.take(uci.to);
+      const piece = this.board.take(uci.from);
+      if (!piece) return;
 
-      if (this.pockets && capture) this.pockets[this.turn][capture.role]++;
-      if (capture) this.playCaptureAt(uci.to);
+      if (piece.role == 'pawn') {
+        this.halfmoves = 0;
+        if (uci.to == epSquare) {
+          const pawn = this.board.take(uci.to + (turn == 'white' ? -8 : 8));
+          if (pawn) this.playCaptureAt(epSquare, pawn);
+        }
+        const delta = uci.from - uci.to;
+        if (Math.abs(delta) == 16) this.epSquare = (uci.from + uci.to) >> 1;
+        if (uci.promotion) {
+          piece.role = uci.promotion;
+          piece.promoted = true;
+        }
+      } else if (piece.role == 'rook') {
+         this.castles.discardRook(uci.from)
+      } else if (piece.role == 'king') {
+        const delta = uci.to - uci.from;
+        const isCastling = Math.abs(delta) == 2 && this.board[turn].has(uci.to);
+        if (isCastling) {
+          const side = delta > 0 ? 'h' : 'a';
+          const rookFrom = this.castles.rook[turn][side];
+          if (rookFrom) {
+            const rook = this.board.take(rookFrom);
+            this.board.set(kingCastlesTo(turn, side), piece);
+            if (rook) this.board.set(rookCastlesTo(turn, side), rook);
+          }
+        }
+        this.castles.discardSide(turn);
+        if (isCastling) return;
+      }
+
+      const capture = this.board.set(uci.to, piece);
+      if (capture) this.playCaptureAt(uci.to, capture);
     }
-
-    if (turn == 'black') this.fullmoves += 1;
-    this.turn = opposite(this.turn);
   }
 }
