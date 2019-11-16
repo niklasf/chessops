@@ -1,5 +1,7 @@
 export type Square = number;
 
+export type BySquare<T> = { [square: number]: T };
+
 export type Color = 'white' | 'black';
 
 export const COLORS: Color[] = ['white', 'black'];

@@ -1,4 +1,4 @@
-import { CastlingSide, Color, COLORS, Square, ByColor, ByCastlingSide } from './types';
+import { CastlingSide, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
@@ -97,9 +97,6 @@ export class Castles {
     return castles;
   }
 }
-
-
-type BySquare<T> = { [square: number]: T };
 
 interface Context {
   king: Square,
