@@ -54,7 +54,7 @@ test('make move', () => {
   expect(makeFen(e4.toSetup())).toBe('8/8/8/5k2/3pP3/8/8/4K3 b - e3 0 1');
 });
 
-test.skip.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2) => {
+test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2) => {
   const setup = parseFen(fen);
   const pos = Chess.fromSetup(setup);
   expect(perft(pos, 1, false)).toBe(d1);
