@@ -42,7 +42,7 @@ test('castles from setup', () => {
   expect(castles.path.black.h.toArray()).toEqual([61, 62]);
 });
 
-test('make move', () => {
+test('play move', () => {
   const pos = Chess.fromSetup(parseFen('8/8/8/5k2/3p4/8/4P3/4K3 w - -'));
 
   const kd1 = pos.clone();
@@ -52,6 +52,12 @@ test('make move', () => {
   const e4 = pos.clone();
   e4.playMove({ from: 12, to: 28 });
   expect(makeFen(e4.toSetup())).toBe('8/8/8/5k2/3pP3/8/8/4K3 b - e3 0 1');
+});
+
+test('play castling move', () => {
+  const pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -'));
+  pos.playMove({ from: 3, to: 4 });
+  expect(makeFen(pos.toSetup())).toBe('2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
 });
 
 test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2) => {

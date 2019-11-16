@@ -358,7 +358,7 @@ export class Chess {
          this.castles.discardRook(uci.from)
       } else if (piece.role == 'king') {
         const delta = uci.to - uci.from;
-        const isCastling = Math.abs(delta) == 2 && this.board[turn].has(uci.to);
+        const isCastling = Math.abs(delta) == 2 || this.board[turn].has(uci.to);
         if (isCastling) {
           const side = delta > 0 ? 'h' : 'a';
           const rookFrom = this.castles.rook[turn][side];
