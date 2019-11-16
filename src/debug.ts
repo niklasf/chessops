@@ -1,4 +1,4 @@
-import { Square, Piece, ByRole, BySquare } from './types';
+import { Square, Piece, Role, ByRole, BySquare } from './types';
 import { makeSquare } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
@@ -47,21 +47,33 @@ export function dests(dests: Map<Square, SquareSet>) {
   return lines.join('\n');
 }
 
-/* export function perft(pos: Chess, depth: number, outer: boolean = true): number {
+export function perft(pos: Chess, depth: number, outer: boolean = true): number {
   if (depth < 1) return 1;
-  else {
+  else if (!outer && depth == 1) {
     let nodes = 0;
-    const d = pos.allDests();
-    for (const from in d) {
-      for (const to of d[from]) {
-        // TODO: Promotion
-        const child = pos.clone();
-        child.playMove(square(parseInt(from)) + square(to));
-        const children = perft(child, depth - 1, false);
-        if (outer) console.log(square(parseInt(from)), square(to), children);
-        nodes += children;
+    for (const [from, to] of pos.allDests()) {
+      nodes += to.size();
+      if (pos.board.pawn.has(from)) {
+        const backrank = SquareSet.fromRank(pos.turn == 'white' ? 7 : 0);
+        nodes += to.intersect(backrank).size() * 3;
+      }
+    }
+    return nodes;
+  } else {
+    const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
+    let nodes = 0;
+    for (const [from, dests] of pos.allDests()) {
+      const promotions: Array<Role | undefined> = ((from >> 3) == (pos.turn == 'white' ? 6 : 1) && pos.board.pawn.has(from)) ? promotionRoles : [undefined];
+      for (const to of dests) {
+        for (const promotion of promotions) {
+          const child = pos.clone();
+          const children = perft(child, depth - 1, false);
+          child.playMove({ from, to, promotion });
+          console.log(square(from), square(to), promotion, children);
+          nodes += children;
+        }
       }
     }
     return nodes;
   }
-} */
+}

@@ -1,6 +1,7 @@
 import { SquareSet } from '../src/squareSet';
 import { parseFen, INITIAL_FEN } from '../src/fen';
 import { Castles, Chess } from '../src/chess';
+import { perft } from '../src/debug';
 
 const tricky: [string, string, number, number?, number?, number?, number?][] = [
   ['pos-2', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -', 48, 2039, 97862], // Kiwipete by Peter McKenzie
@@ -24,21 +25,6 @@ const tricky: [string, string, number, number?, number?, number?, number?][] = [
   ['hside-rook-blocks-aside-castling', '4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff -', 42, 1743, 71908],
 ];
 
-function perft1(pos: Chess) {
-  const dests = pos.allDests();
-  let nodes = 0;
-  for (const [from, to] of dests) {
-    nodes += to.size();
-
-    // promotion
-    if (pos.board.pawn.has(from)) {
-      const backrank = SquareSet.fromRank(pos.turn == 'white' ? 7 : 0);
-      nodes += to.intersect(backrank).size() * 3;
-    }
-  }
-  return nodes;
-}
-
 test('castles from setup', () => {
   const setup = parseFen(INITIAL_FEN);
   const castles = Castles.fromSetup(setup);
@@ -59,5 +45,5 @@ test('castles from setup', () => {
 test.each(tricky)('tricky perft: %s: %s', (_, fen, d1) => {
   const setup = parseFen(fen);
   const pos = Chess.fromSetup(setup);
-  expect(perft1(pos)).toBe(d1);
+  expect(perft(pos, 1, false)).toBe(d1);
 });
