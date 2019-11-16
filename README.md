@@ -27,7 +27,7 @@ Roadmap
 ### 0.1.0-alpha.2: Replace chess.js on syzygy-tables.info
 
 * [ ] move making
-* [ ] en passant dests
+* [x] en passant dests
 * [x] castling dests
 * [x] normal dests
 * [ ] perft test

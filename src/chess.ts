@@ -234,6 +234,14 @@ export class Chess {
     return SquareSet.fromSquare(rook);
   }
 
+  private canCaptureEp(pawn: Square, ctx: Context): boolean {
+    if (!defined(this.epSquare)) return false;
+    if (!pawnAttacks(this.turn, pawn).has(this.epSquare)) return false;
+    const captured = this.epSquare + ((this.turn == 'white') ? -8 : 8);
+    const occupied = this.board.occupied.toggle(pawn).toggle(this.epSquare).toggle(captured);
+    return this.kingAttackers(ctx.king, opposite(this.turn), occupied).isEmpty();
+  }
+
   dests(square: Square, ctx: Context): SquareSet {
     const piece = this.board.get(square);
     if (!piece || piece.color != this.turn) return SquareSet.empty();
@@ -251,7 +259,7 @@ export class Chess {
           pseudo = pseudo.with(doubleStep);
         }
       }
-      // TODO: en passant
+      if (defined(this.epSquare) && this.canCaptureEp(square, ctx)) pseudo = pseudo.with(this.epSquare);
     }
     else if (piece.role == 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
     else if (piece.role == 'knight') pseudo = knightAttacks(square);
