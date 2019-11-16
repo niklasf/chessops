@@ -1,4 +1,4 @@
-import { rookAttacks, ray } from '../src/attacks';
+import { rookAttacks, ray, between } from '../src/attacks';
 import { SquareSet } from '../src/squareSet';
 
 test('rook attacks', () => {
@@ -9,4 +9,9 @@ test('rook attacks', () => {
 
 test('ray', () => {
   expect(ray(0, 8)).toEqual(SquareSet.fromFile(0));
+});
+
+test('between', () => {
+  expect(between(42, 42)).toEqual(SquareSet.empty());
+  expect(between(0, 3).toArray()).toEqual([1, 2]);
 });
