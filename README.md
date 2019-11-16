@@ -23,9 +23,6 @@ Roadmap
 * [x] fen to castling
 * [x] fen to setup
 * [x] validate setup
-
-### 0.1.0-alpha.2: Replace chess.js on syzygy-tables.info
-
 * [ ] move making
 * [x] en passant dests
 * [x] castling dests
@@ -33,17 +30,17 @@ Roadmap
 * [ ] perft test
 * [x] transformations
 
-### 0.1.0-alpha.3: Continue from here in Lichess board editor
+### 0.1.0-alpha.2: Continue from here in Lichess board editor
 
 * [ ] insufficient material
 * [ ] game end
 * [ ] chess variants
 
-### 0.1.0-alpha.4: Ceval
+### 0.1.0-alpha.3: Ceval
 
 * [ ] san writing
 
-### 0.1.0-alpha.5: Analysis board
+### 0.1.0-alpha.4: Analysis board
 
 * [ ] san parsing
 * [ ] pgn parsing
