@@ -39,11 +39,12 @@ export function square(sq: Square): string {
   return makeSquare(sq);
 }
 
-export function dests(dests: BySquare<SquareSet>) {
-  return Object.keys(dests).map((key) => {
-    const from = parseInt(key, 10);
-    return `${makeSquare(from!)}: ${dests[from].toArray().map(square).join(' ')}`;
-  }).join('\n');
+export function dests(dests: Map<Square, SquareSet>) {
+  const lines = [];
+  for (const [from, to] of dests) {
+    lines.push(`${makeSquare(from)}: ${to.toArray().map(square).join(' ')}`);
+  }
+  return lines.join('\n');
 }
 
 /* export function perft(pos: Chess, depth: number, outer: boolean = true): number {
