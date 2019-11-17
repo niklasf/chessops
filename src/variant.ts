@@ -26,12 +26,12 @@ export class KingOfTheHill extends Chess {
 }
 
 export class ThreeCheck extends Chess {
-  hasInsufficientMaterial(color: Color: boolean {
+  hasInsufficientMaterial(color: Color): boolean {
     return this.board.pieces(color, 'king').equals(this.board[color]);
   }
 
   isVariantEnd(): boolean {
-    return this.remainingChecks && (this.remainingChecks.white <= 0 || this.remainingChecks.black <= 0);
+    return !!this.remainingChecks && (this.remainingChecks.white <= 0 || this.remainingChecks.black <= 0);
   }
 
   variantOutcome(): Outcome | undefined {

@@ -267,7 +267,7 @@ export class Chess extends Position {
   }
 
   clone(): Chess {
-    const pos = new Chess();
+    const pos = new (<any>this.constructor());
     pos.board = this.board.clone();
     pos.pockets = this.pockets && this.pockets.clone();
     pos.turn = this.turn;
