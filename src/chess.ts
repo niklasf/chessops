@@ -174,16 +174,18 @@ export abstract class Position {
   }
 
   isCheckmate(): boolean {
+    if (this.isVariantEnd()) return false;
     const ctx = this.ctx();
     return ctx.checkers.nonEmpty() && !this.hasDests(ctx);
   }
 
   isStalemate(): boolean {
+    if (this.isVariantEnd()) return false;
     const ctx = this.ctx();
     return ctx.checkers.isEmpty() && !this.hasDests(ctx);
   }
 
-  outcome() {
+  outcome(): Outcome | undefined {
     const variantOutcome = this.variantOutcome();
     if (variantOutcome) return variantOutcome;
     else if (this.isCheckmate()) return { winner: opposite(this.turn) };
@@ -205,13 +207,13 @@ export abstract class Position {
     return SquareSet.empty();
   }
 
-  protected playCaptureAt(square: Square, captured: Piece) {
+  protected playCaptureAt(square: Square, captured: Piece): void {
     this.halfmoves = 0;
     if (captured && captured.role == 'rook') this.castles.discardRook(square);
     if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
   }
 
-  playMove(uci: Uci) {
+  playMove(uci: Uci): void {
     const turn = this.turn, epSquare = this.epSquare;
     this.epSquare = undefined;
     this.halfmoves += 1;
@@ -260,9 +262,15 @@ export abstract class Position {
     }
   }
 
-  protected hasLegalEp() {
-    // TODO
-    return !!this.epSquare;
+  protected hasLegalEp(): boolean {
+    if (!this.epSquare) return false;
+    const ctx = this.ctx();
+    const ourPawns = this.board.pieces(this.turn, 'pawn');
+    const candidates = ourPawns.intersect(pawnAttacks(opposite(this.turn), this.epSquare));
+    for (const candidate of candidates) {
+      if (this.dests(candidate, ctx).has(this.epSquare)) return true;
+    }
+    return false;
   }
 
   clone(): Position {
