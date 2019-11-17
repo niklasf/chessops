@@ -59,7 +59,7 @@ test('castles from setup', () => {
 });
 
 test('play move', () => {
-  const pos = Chess.fromSetup(parseFen('8/8/8/5k2/3p4/8/4P3/4K3 w - -'));
+  const pos = new Chess(parseFen('8/8/8/5k2/3p4/8/4P3/4K3 w - -'));
 
   const kd1 = pos.clone();
   kd1.playMove({ from: 4, to: 3 });
@@ -71,26 +71,24 @@ test('play move', () => {
 });
 
 test('play castling move', () => {
-  let pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -'));
+  let pos = new Chess(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -'));
   pos.playMove({ from: 3, to: 4 });
   expect(makeFen(pos.toSetup())).toBe('2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
 
-  pos = Chess.fromSetup(parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'));
+  pos = new Chess(parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'));
   pos.playMove({ from: 4, to: 0 });
   expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
 });
 
 test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
-  const setup = parseFen(fen);
-  const pos = Chess.fromSetup(setup);
+  const pos = new Chess(parseFen(fen));
   expect(perft(pos, 1, false)).toBe(d1);
   expect(perft(pos, 2, false)).toBe(d2);
   expect(perft(pos, 3, false)).toBe(d3);
 });
 
 test.each(random)('random perft: %s: %s', (_, fen, d1, d2, d3, d4, d5) => {
-  const setup = parseFen(fen);
-  const pos = Chess.fromSetup(setup);
+  const pos = new Chess(parseFen(fen));
   expect(perft(pos, 1, false)).toBe(d1);
   expect(perft(pos, 2, false)).toBe(d2);
   expect(perft(pos, 3, false)).toBe(d3);
@@ -108,7 +106,7 @@ const insufficientMaterial: [string, boolean, boolean][] = [
 ];
 
 test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black) => {
-  const pos = Chess.fromSetup(parseFen(fen));
+  const pos = new Chess(parseFen(fen));
   expect(pos.hasInsufficientMaterial('white')).toBe(white);
   expect(pos.hasInsufficientMaterial('black')).toBe(black);
 });
