@@ -124,7 +124,7 @@ export interface Context {
   checkers: SquareSet,
 }
 
-abstract class Position {
+export abstract class Position {
   board: Board;
   pockets: Material | undefined;
   turn: Color;
