@@ -124,7 +124,7 @@ export interface Context {
   checkers: SquareSet,
 }
 
-export class Chess {
+abstract class Position {
   board: Board;
   pockets: Material | undefined;
   turn: Color;
@@ -133,22 +133,63 @@ export class Chess {
   remainingChecks: RemainingChecks | undefined;
   halfmoves: number;
   fullmoves: number;
-  trace: Uci[];
 
-  private constructor() { }
+  abstract clone(): Position;
+  abstract ctx(): Context;
+  abstract dests(square: Square, ctx: Context): SquareSet;
+  abstract playMove(move: Uci): void;
+  abstract variantOutcome(): Outcome | undefined;
+  abstract isCheckmate(): boolean;
+  abstract isStalemate(): boolean;
+  abstract hasInsufficientMaterial(color: Color): boolean;
 
-  static default(): Chess {
-    const pos = new Chess();
-    pos.board = Board.default();
-    pos.pockets = undefined;
-    pos.turn = 'white';
-    pos.castles = Castles.default();
-    pos.epSquare = undefined;
-    pos.remainingChecks = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
-    pos.trace = [];
-    return pos;
+  toSetup(): Setup {
+    return {
+      board: this.board.clone(),
+      pockets: this.pockets && this.pockets.clone(),
+      turn: this.turn,
+      unmovedRooks: this.castles.unmovedRooks,
+      epSquare: this.hasLegalEp() ? this.epSquare : undefined,
+      remainingChecks: this.remainingChecks && this.remainingChecks.clone(),
+      halfmoves: this.halfmoves,
+      fullmoves: this.fullmoves,
+    };
+  }
+
+  private hasLegalEp() {
+    // TODO
+    return !!this.epSquare;
+  }
+
+  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
+    return attacksTo(square, attacker, this.board, occupied);
+  }
+
+  isInsufficientMaterial() {
+    return COLORS.every(color => this.hasInsufficientMaterial(color));
+  }
+
+  outcome() {
+    const variantOutcome = this.variantOutcome();
+    if (variantOutcome) return variantOutcome;
+    else if (this.isCheckmate()) return { winner: opposite(this.turn) };
+    else if (this.isInsufficientMaterial() || this.isStalemate()) return { winner: undefined };
+    else return;
+  }
+
+  allDests(): Map<Square, SquareSet> {
+    const ctx = this.ctx();
+    const d = new Map();
+    for (const square of this.board[this.turn]) {
+      d.set(square, this.dests(square, ctx));
+    }
+    return d;
+  }
+}
+
+export class Chess extends Position {
+  private constructor() {
+    super();
   }
 
   clone(): Chess {
@@ -161,7 +202,19 @@ export class Chess {
     pos.remainingChecks = this.remainingChecks && this.remainingChecks.clone();
     pos.halfmoves = this.halfmoves;
     pos.fullmoves = this.fullmoves;
-    pos.trace = this.trace.slice();
+    return pos;
+  }
+
+  static default(): Chess {
+    const pos = new Chess();
+    pos.board = Board.default();
+    pos.pockets = undefined;
+    pos.turn = 'white';
+    pos.castles = Castles.default();
+    pos.epSquare = undefined;
+    pos.remainingChecks = undefined;
+    pos.halfmoves = 0;
+    pos.fullmoves = 1;
     return pos;
   }
 
@@ -200,26 +253,8 @@ export class Chess {
     pos.remainingChecks = undefined;
     pos.halfmoves = setup.halfmoves;
     pos.fullmoves = setup.fullmoves;
-    pos.trace = [];
     pos.validate();
     return pos;
-  }
-
-  toSetup(): Setup {
-    return {
-      board: this.board.clone(),
-      pockets: this.pockets && this.pockets.clone(),
-      turn: this.turn,
-      unmovedRooks: this.castles.unmovedRooks,
-      epSquare: this.hasLegalEp() ? this.epSquare : undefined,
-      remainingChecks: this.remainingChecks && this.remainingChecks.clone(),
-      halfmoves: this.halfmoves,
-      fullmoves: this.fullmoves,
-    };
-  }
-
-  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    return attacksTo(square, attacker, this.board, occupied);
   }
 
   ctx(): Context {
@@ -324,15 +359,6 @@ export class Chess {
     return pseudo;
   }
 
-  allDests(): Map<Square, SquareSet> {
-    const ctx = this.ctx();
-    const d = new Map();
-    for (const square of this.board[this.turn]) {
-      d.set(square, this.dests(square, ctx));
-    }
-    return d;
-  }
-
   protected playCaptureAt(square: Square, captured: Piece) {
     this.halfmoves = 0;
     if (captured && captured.role == 'rook') this.castles.discardRook(square);
@@ -340,7 +366,6 @@ export class Chess {
   }
 
   playMove(uci: Uci) {
-    this.trace.push(uci);
     const turn = this.turn, epSquare = this.epSquare;
     this.epSquare = undefined;
     this.halfmoves += 1;
@@ -389,11 +414,6 @@ export class Chess {
     }
   }
 
-  private hasLegalEp() {
-    // TODO
-    return !!this.epSquare;
-  }
-
   isCheckmate(): boolean {
     const ctx = this.ctx();
     if (ctx.checkers.isEmpty()) return false;
@@ -416,19 +436,7 @@ export class Chess {
     return false; // TODO
   }
 
-  isInsufficientMaterial() {
-    return COLORS.every(color => this.hasInsufficientMaterial(color));
-  }
-
   variantOutcome(): Outcome | undefined {
     return;
-  }
-
-  outcome() {
-    const variantOutcome = this.variantOutcome();
-    if (variantOutcome) return variantOutcome;
-    else if (this.isCheckmate()) return { winner: opposite(this.turn) };
-    else if (this.isInsufficientMaterial() || this.isStalemate()) return { winner: undefined };
-    else return;
   }
 }
