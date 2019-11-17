@@ -211,7 +211,7 @@ export class Chess {
       pockets: this.pockets && this.pockets.clone(),
       turn: this.turn,
       unmovedRooks: this.castles.unmovedRooks,
-      epSquare: this.epSquare, // TODO: x-fen
+      epSquare: this.hasLegalEp() ? this.epSquare : undefined,
       remainingChecks: this.remainingChecks && this.remainingChecks.clone(),
       halfmoves: this.halfmoves,
       fullmoves: this.fullmoves,
@@ -382,6 +382,11 @@ export class Chess {
       const capture = this.board.set(uci.to, piece);
       if (capture) this.playCaptureAt(uci.to, capture);
     }
+  }
+
+  private hasLegalEp() {
+    // TODO
+    return !!this.epSquare;
   }
 
   isCheckmate(): boolean {
