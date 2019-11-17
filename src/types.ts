@@ -49,9 +49,9 @@ export function isDrop(v: Uci): v is UciDrop {
   return 'role' in v;
 }
 
-export type Rules = 'chess';
+export type Rules = 'chess' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse';
 
-export const RULES = ['chess'];
+export const RULES: Rules[] = ['chess', 'antichess', 'kingOfTheHill', 'threeCheck', 'atomic', 'horde', 'racingKings', 'crazyhouse'];
 
 export interface Outcome {
   winner: Color | undefined;

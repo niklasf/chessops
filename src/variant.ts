@@ -1,4 +1,4 @@
-import { Square, Outcome, Color, COLORS } from './types';
+import { Square, Outcome, Color, COLORS, Rules } from './types';
 import { defined } from './util';
 import { between } from './attacks';
 import { SquareSet } from './squareSet';
@@ -12,17 +12,29 @@ export class Atomic extends Chess {
   clone(): Atomic {
     return super.clone() as Atomic;
   }
+
+  rules(): Rules {
+    return 'atomic';
+  }
 }
 
 export class Antichess extends Chess {
   clone(): Antichess {
     return super.clone() as Antichess;
   }
+
+  rules(): Rules {
+    return 'antichess';
+  }
 }
 
 export class KingOfTheHill extends Chess {
   clone(): KingOfTheHill {
     return super.clone() as KingOfTheHill;
+  }
+
+  rules(): Rules {
+    return 'KingOfTheHill';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -49,6 +61,10 @@ export class ThreeCheck extends Chess {
 
   clone(): ThreeCheck {
     return super.clone() as ThreeCheck;
+  }
+
+  rules(): Rules {
+    return 'threeCheck';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -79,6 +95,10 @@ export class Crazyhouse extends Chess {
     return super.clone() as Crazyhouse;
   }
 
+  rules(): Rules {
+    return 'crazyhouse';
+  }
+
   hasInsufficientMaterial(color: Color): boolean {
     return false; // TODO: maybe check anyway
   }
@@ -107,6 +127,10 @@ export class RacingKings extends Chess {
 
   clone(): RacingKings {
     return super.clone() as RacingKings;
+  }
+
+  rules(): Rules {
+    return 'racingKings';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -141,6 +165,10 @@ export class Horde extends Chess {
 
   clone(): Horde {
     return super.clone() as Horde;
+  }
+
+  rules(): Rules {
+    return 'horde';
   }
 
   hasInsufficientMaterial(color: Color): boolean {

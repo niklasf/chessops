@@ -135,6 +135,7 @@ export abstract class Position {
   halfmoves: number;
   fullmoves: number;
 
+  abstract rules(): Rules;
   abstract ctx(): Context;
   abstract dests(square: Square, ctx: Context): SquareSet;
   abstract isVariantEnd(): boolean;
@@ -312,6 +313,10 @@ export class Chess extends Position {
 
   clone(): Chess {
     return super.clone() as Chess;
+  }
+
+  rules(): Rules {
+    return 'chess';
   }
 
   protected validate(): void {
