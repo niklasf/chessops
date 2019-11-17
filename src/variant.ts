@@ -89,4 +89,30 @@ export class Crazyhouse extends Chess {
 
 // RacingKings
 
-// Horde
+export class Horde extends Chess {
+  constructor(setup?: Setup) {
+    super(setup);
+    if (!setup) {
+      this.board = Board.horde();
+    }
+  }
+
+  clone(): Horde {
+    return super.clone() as Horde;
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    return false; // TODO: detect when the horde cannot mate
+  }
+
+  isVariantEnd(): boolean {
+    return this.board.white.isEmpty() || this.board.black.isEmpty();
+  }
+
+  variantOutcome(): Outcome | undefined {
+    if (this.board.occupied.isEmpty()) return { winner: undefined };
+    else if (this.board.white.isEmpty()) return { winner: 'black' };
+    else if (this.board.black.isEmpty()) return { winner: 'white' };
+    return;
+  }
+}
