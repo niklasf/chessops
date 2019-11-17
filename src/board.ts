@@ -24,6 +24,36 @@ export class Board {
     return board;
   }
 
+  static racingKings(): Board {
+    const board = new Board();
+    board.occupied = new SquareSet(0xffff, 0);
+    board.promoted = SquareSet.empty();
+    board.white = new SquareSet(0xf0f0, 0);
+    board.black = new SquareSet(0x0f0f, 0);
+    board.pawn = SquareSet.empty();
+    board.knight = new SquareSet(0x1818, 0);
+    board.bishop = new SquareSet(0x2424, 0);
+    board.rook = new SquareSet(0x4242, 0);
+    board.queen = new SquareSet(0x0081, 0);
+    board.king = new SquareSet(0x8100, 0);
+    return board;
+  }
+
+  static horde(): Board {
+    const board = new Board();
+    board.occupied = new SquareSet(0xffffffff, 0xffff0066);
+    board.promoted = SquareSet.empty();
+    board.white = new SquareSet(0xffffffff, 0x00000066);
+    board.black = new SquareSet(0, 0xffff0000);
+    board.pawn = new SquareSet(0xffffffff, 0x00ff0066);
+    board.knight = new SquareSet(0, 0x42000000);
+    board.bishop = new SquareSet(0, 0x24000000);
+    board.rook = new SquareSet(0, 0x81000000);
+    board.queen = new SquareSet(0, 0x08000000);
+    board.king = new SquareSet(0, 0x10000000);
+    return board;
+  }
+
   reset(): void {
     this.occupied = new SquareSet(0xffff, 0xffff0000);
     this.promoted = SquareSet.empty();
