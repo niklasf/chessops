@@ -1,5 +1,5 @@
 import { SquareSet } from '../src/squareSet';
-import { flipVertical, flipHorizontal, flipDiagonal } from '../src/transform';
+import { flipVertical, flipHorizontal, flipDiagonal, rotate180 } from '../src/transform';
 
 const r = new SquareSet(0x0e0a1222, 0x1e222212);
 
@@ -16,4 +16,9 @@ test('flip horizontal', () => {
 test('flip diagonal', () => {
   expect(flipDiagonal(SquareSet.full())).toEqual(SquareSet.full());
   expect(flipDiagonal(r)).toEqual(new SquareSet(0x8c88ff00, 0x00006192));
+});
+
+test('rotate 180', () => {
+  expect(rotate180(SquareSet.full())).toEqual(SquareSet.full());
+  expect(rotate180(r)).toEqual(new SquareSet(0x48444478, 0x44485070));
 });

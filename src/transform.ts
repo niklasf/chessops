@@ -28,6 +28,10 @@ export function flipDiagonal(s: SquareSet): SquareSet {
   return s;
 }
 
+export function rotate180(s: SquareSet): SquareSet {
+  return s.rbit();
+}
+
 export function board(board: Board, f: (s: SquareSet) => SquareSet): Board {
   const b = Board.empty();
   b.occupied = f(board.occupied);
