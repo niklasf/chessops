@@ -1,4 +1,4 @@
-import { Square, Piece, Color } from './types';
+import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
 
 function squareDist(a: Square, b: Square): number {
@@ -18,37 +18,12 @@ function slidingAttacks(square: Square, occupied: SquareSet, deltas: number[]): 
   return attacks;
 }
 
-function edges(square: Square): SquareSet {
-  const h = SquareSet.fromRank(0).union(SquareSet.fromRank(7)).diff(SquareSet.fromRank(square >> 3));
-  const v = SquareSet.fromFile(0).union(SquareSet.fromFile(7)).diff(SquareSet.fromFile(square & 7));
-  return h.union(v);
-}
-
-type BySquare<T> = { [square: number]: T };
-type Attacks = { [lo: number]: { [hi : number]: SquareSet } };
-
 function slidingRangeTable(deltas: number[]): BySquare<SquareSet> {
   const table = [];
   for (let square = 0; square < 64; square++) {
     table[square] = slidingAttacks(square, SquareSet.empty(), deltas);
   }
   return table;
-}
-
-function slidingAttackTable(deltas: number[]): [BySquare<SquareSet>, BySquare<Attacks>] {
-  const masks = [];
-  const table = [];
-  for (let square = 0; square < 64; square++) {
-    const mask = slidingAttacks(square, SquareSet.empty(), deltas).diff(edges(square));
-    const attacks: Attacks = {};
-    for (const subset of mask.subsets()) {
-      attacks[subset.lo] = attacks[subset.lo] || {};
-      attacks[subset.lo][subset.hi] = slidingAttacks(square, subset, deltas);
-    }
-    masks[square] = mask;
-    table[square] = attacks;
-  }
-  return [masks, table];
 }
 
 function stepAttackTable(deltas: number[]): BySquare<SquareSet> {
@@ -78,28 +53,35 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
   return PAWN_ATTACKS[color][square];
 }
 
-const [RANK_MASKS, RANK_ATTACKS] = slidingAttackTable([-1, 1]);
-
+const RANK_RANGE = slidingRangeTable([-1, 1]);
 const FILE_RANGE = slidingRangeTable([-8, 8]);
 const DIAG_RANGE = slidingRangeTable([-9, 9]);
 const ANTI_DIAG_RANGE = slidingRangeTable([-7, 7]);
 
-function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const occ = RANK_MASKS[square].intersect(occupied);
-  return RANK_ATTACKS[square][occ.lo][occ.hi];
-}
-
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
   let forward = occupied.intersect(range);
-  let reverse = forward.bswap();
+  let reverse = forward.bswap(); // Assumes no more than 1 bit per rank
   forward = forward.minus(bit);
   reverse = reverse.minus(bit.bswap());
   forward = forward.xor(reverse.bswap());
   return forward.intersect(range);
 }
 
+function properHyberbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
+  let forward = occupied.intersect(range);
+  let reverse = forward.rbit();
+  forward = forward.minus(bit);
+  reverse = reverse.minus(bit.bswap());
+  forward = forward.xor(reverse.rbit());
+  return forward.intersect(range);
+}
+
 function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
   return hyperbola(SquareSet.fromSquare(square), FILE_RANGE[square], occupied);
+}
+
+function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return properHyberbola(SquareSet.fromSquare(square), RANK_RANGE[square], occupied);
 }
 
 function diagAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -116,7 +98,8 @@ export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
-  return fileAttacks(square, occupied).xor(rankAttacks(square, occupied));
+  const bit = SquareSet.fromSquare(square);
+  return hyperbola(bit, FILE_RANGE[square], occupied).xor(properHyberbola(bit, RANK_RANGE[square], occupied));
 }
 
 export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -156,8 +139,8 @@ function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSe
       ray[a][b] = FILE_RANGE[a].with(a);
       between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersect(fileAttacks(b, SquareSet.fromSquare(a)));
     }
-    for (const b of RANK_ATTACKS[a][0][0]) {
-      ray[a][b] = RANK_ATTACKS[a][0][0].with(a);
+    for (const b of RANK_RANGE[a]) {
+      ray[a][b] = RANK_RANGE[a].with(a);
       between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersect(rankAttacks(b, SquareSet.fromSquare(a)));
     }
   }
