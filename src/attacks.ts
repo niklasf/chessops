@@ -136,32 +136,29 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
 
 function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSet>>] {
   const ray: BySquare<BySquare<SquareSet>> = [], between: BySquare<BySquare<SquareSet>> = [];
+  const zero = SquareSet.empty();
   for (let a = 0; a < 64; a++) {
     ray[a] = [];
     between[a] = [];
-    for (let b = 0; b <= a; b++) {
-      if (DIAG_RANGE[a].has(b)) {
-        ray[a][b] = DIAG_RANGE[a].with(a);
-        between[a][b] = diagAttacks(a, SquareSet.fromSquare(b)).intersect(diagAttacks(b, SquareSet.fromSquare(a)));
-      } else if (ANTI_DIAG_RANGE[a].has(b)) {
-        ray[a][b] = ANTI_DIAG_RANGE[a].with(a);
-        between[a][b] = antiDiagAttacks(a, SquareSet.fromSquare(b)).intersect(antiDiagAttacks(b, SquareSet.fromSquare(a)));
-      } else if (RANK_ATTACKS[a][0][0].has(b)) {
-        ray[a][b] = RANK_ATTACKS[a][0][0].with(a);
-        between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersect(rankAttacks(b, SquareSet.fromSquare(a)));
-      } else if (FILE_RANGE[a].has(b)) {
-        ray[a][b] = FILE_RANGE[a].with(a);
-        between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersect(fileAttacks(b, SquareSet.fromSquare(a)));
-      } else {
-        ray[a][b] = SquareSet.empty();
-        between[a][b] = SquareSet.empty();
-      }
+    for (let b = 0; b < 64; b++) {
+      ray[a][b] = zero;
+      between[a][b] = zero;
     }
-  }
-  for (let a = 0; a < 64; a++) {
-    for (let b = 0; b < a; b++) {
-      ray[b][a] = ray[a][b];
-      between[b][a] = between[a][b];
+    for (const b of DIAG_RANGE[a]) {
+      ray[a][b] = DIAG_RANGE[a].with(a);
+      between[a][b] = diagAttacks(a, SquareSet.fromSquare(b)).intersect(diagAttacks(b, SquareSet.fromSquare(a)));
+    }
+    for (const b of ANTI_DIAG_RANGE[a]) {
+      ray[a][b] = ANTI_DIAG_RANGE[a].with(a);
+      between[a][b] = antiDiagAttacks(a, SquareSet.fromSquare(b)).intersect(antiDiagAttacks(b, SquareSet.fromSquare(a)));
+    }
+    for (const b of FILE_RANGE[a]) {
+      ray[a][b] = FILE_RANGE[a].with(a);
+      between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersect(fileAttacks(b, SquareSet.fromSquare(a)));
+    }
+    for (const b of RANK_ATTACKS[a][0][0]) {
+      ray[a][b] = RANK_ATTACKS[a][0][0].with(a);
+      between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersect(rankAttacks(b, SquareSet.fromSquare(a)));
     }
   }
   return [ray, between];
