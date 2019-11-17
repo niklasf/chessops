@@ -274,25 +274,30 @@ export abstract class Position {
 }
 
 export class Chess extends Position {
-  protected constructor() {
+  constructor(setup?: Setup) {
     super();
+    if (setup) {
+      this.board = setup.board.clone();
+      this.turn = setup.turn;
+      this.castles = Castles.fromSetup(setup);
+      this.epSquare = this.validEpSquare(setup.epSquare);
+      this.halfmoves = setup.halfmoves;
+      this.fullmoves = setup.fullmoves;
+      this.validate();
+    } else {
+      this.board = Board.default();
+      this.turn = 'white';
+      this.castles = Castles.default();
+      this.epSquare = undefined;
+      this.halfmoves = 0;
+      this.fullmoves = 0;
+    }
+    this.pockets = undefined;
+    this.remainingChecks = undefined;
   }
 
   clone(): Chess {
     return super.clone() as Chess;
-  }
-
-  static default(): Chess {
-    const pos = new Chess();
-    pos.board = Board.default();
-    pos.pockets = undefined;
-    pos.turn = 'white';
-    pos.castles = Castles.default();
-    pos.epSquare = undefined;
-    pos.remainingChecks = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
-    return pos;
   }
 
   protected validate(): void {
@@ -318,20 +323,6 @@ export class Chess extends Position {
     const pawn = square - forward;
     if (!this.board.pawn.has(pawn) || !this.board[opposite(this.turn)].has(pawn)) return;
     return square;
-  }
-
-  static fromSetup(setup: Setup): Chess {
-    const pos = new Chess();
-    pos.board = setup.board.clone();
-    pos.pockets = undefined;
-    pos.turn = setup.turn;
-    pos.castles = Castles.fromSetup(setup);
-    pos.epSquare = pos.validEpSquare(setup.epSquare);
-    pos.remainingChecks = undefined;
-    pos.halfmoves = setup.halfmoves;
-    pos.fullmoves = setup.fullmoves;
-    pos.validate();
-    return pos;
   }
 
   ctx(): Context {
