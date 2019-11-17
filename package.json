@@ -24,7 +24,7 @@
   "scripts": {
     "test": "jest",
     "compile": "tsc",
-    "doc": "typedoc --excludeNotExported"
+    "doc": "typedoc --excludeNotExported --theme minimal"
   },
   "jest": {
     "transform": {
