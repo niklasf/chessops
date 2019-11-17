@@ -2,14 +2,23 @@ import { Square, Outcome, Color, COLORS } from './types';
 import { defined } from './util';
 import { between } from './attacks';
 import { SquareSet } from './squareSet';
+import { Board } from './board';
 import { Setup, RemainingChecks, Material } from './setup';
-import { Position, Context, Chess } from './chess';
+import { Position, Context, Castles, Chess } from './chess';
 
 export { Position, Chess };
 
-// Atomic
+export class Atomic extends Chess {
+  clone(): Atomic {
+    return super.clone() as Atomic;
+  }
+}
 
-// Giveaway
+export class Antichess extends Chess {
+  clone(): Antichess {
+    return super.clone() as Antichess;
+  }
+}
 
 export class KingOfTheHill extends Chess {
   clone(): KingOfTheHill {
@@ -87,13 +96,46 @@ export class Crazyhouse extends Chess {
   }
 }
 
-// RacingKings
+export class RacingKings extends Chess {
+  constructor(setup?: Setup) {
+    super(setup);
+    if (!setup) {
+      this.board = Board.racingKings();
+      this.castles = Castles.empty();
+    }
+  }
+
+  clone(): RacingKings {
+    return super.clone() as RacingKings;
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    return false;
+  }
+
+  isVariantEnd(): boolean {
+    const inGoal = this.board.king.intersect(SquareSet.fromRank(7));
+    if (inGoal.isEmpty()) return false;
+    if (this.turn == 'white' || inGoal.intersects(this.board.black)) return true;
+
+    // TODO: White has reached the backrank, check if black can catch up
+
+    return true;
+  }
+
+  variantOutcome(): Outcome | undefined {
+    if (!this.isVariantEnd()) return;
+    // TODO
+    return;
+  }
+}
 
 export class Horde extends Chess {
   constructor(setup?: Setup) {
     super(setup);
     if (!setup) {
       this.board = Board.horde();
+      this.castles.discardSide('white');
     }
   }
 
