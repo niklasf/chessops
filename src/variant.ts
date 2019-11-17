@@ -9,6 +9,10 @@ export { Position, Chess };
 // Giveaway
 
 export class KingOfTheHill extends Chess {
+  clone(): KingOfTheHill {
+    return super.clone() as KingOfTheHill;
+  }
+
   hasInsufficientMaterial(color: Color): boolean {
     return false;
   }
@@ -26,6 +30,10 @@ export class KingOfTheHill extends Chess {
 }
 
 export class ThreeCheck extends Chess {
+  clone(): ThreeCheck {
+    return super.clone() as ThreeCheck;
+  }
+
   hasInsufficientMaterial(color: Color): boolean {
     return this.board.pieces(color, 'king').equals(this.board[color]);
   }

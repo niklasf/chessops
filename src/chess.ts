@@ -135,7 +135,6 @@ export abstract class Position {
   halfmoves: number;
   fullmoves: number;
 
-  abstract clone(): Position;
   abstract ctx(): Context;
   abstract dests(square: Square, ctx: Context): SquareSet;
   abstract isVariantEnd(): boolean;
@@ -259,15 +258,9 @@ export abstract class Position {
     // TODO
     return !!this.epSquare;
   }
-}
 
-export class Chess extends Position {
-  protected constructor() {
-    super();
-  }
-
-  clone(): Chess {
-    const pos = new (<any>this.constructor());
+  clone(): Position {
+    const pos = new (<any>this).constructor();
     pos.board = this.board.clone();
     pos.pockets = this.pockets && this.pockets.clone();
     pos.turn = this.turn;
@@ -277,6 +270,16 @@ export class Chess extends Position {
     pos.halfmoves = this.halfmoves;
     pos.fullmoves = this.fullmoves;
     return pos;
+  }
+}
+
+export class Chess extends Position {
+  protected constructor() {
+    super();
+  }
+
+  clone(): Chess {
+    return super.clone() as Chess;
   }
 
   static default(): Chess {
