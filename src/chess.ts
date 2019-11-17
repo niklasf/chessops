@@ -271,6 +271,10 @@ export abstract class Position {
     pos.fullmoves = this.fullmoves;
     return pos;
   }
+
+  dropDests(ctx: Context): SquareSet {
+    return SquareSet.empty();
+  }
 }
 
 export class Chess extends Position {

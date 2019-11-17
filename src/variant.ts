@@ -1,6 +1,8 @@
 import { Square, Outcome, Color, COLORS } from './types';
+import { defined } from './util';
+import { between } from './attacks';
 import { SquareSet } from './squareSet';
-import { Setup, RemainingChecks } from './setup';
+import { Setup, RemainingChecks, Material } from './setup';
 import { Position, Context, Chess } from './chess';
 
 export { Position, Chess };
@@ -60,7 +62,28 @@ export class ThreeCheck extends Chess {
 
 // ThreeCheck
 
-// Crazyhouse
+export class Crazyhouse extends Chess {
+  constructor(setup?: Setup) {
+    super(setup);
+    this.pockets = setup ? setup.pockets : Material.empty();
+  }
+
+  clone(): Crazyhouse {
+    return super.clone() as Crazyhouse;
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    return false; // TODO: maybe check anyway
+  }
+
+  dropDests(ctx: Context): SquareSet {
+    if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
+      const checker = ctx.checkers.singleSquare();
+      if (!defined(checker)) return SquareSet.empty();
+      return between(checker, ctx.king);
+    } else return this.board.occupied.complement();
+  }
+}
 
 // RacingKings
 
