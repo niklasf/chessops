@@ -60,6 +60,14 @@ export class SquareSet {
     return new SquareSet(0xff, 0xff000000);
   }
 
+  static lightSquares(): SquareSet {
+    return new SquareSet(0x55aa55aa, 0x55aa55aa);
+  }
+
+  static darkSquares(): SquareSet {
+    return new SquareSet(0xaa55aa55, 0xaa55aa55);
+  }
+
   complement(): SquareSet {
     return new SquareSet(~this.lo, ~this.hi);
   }

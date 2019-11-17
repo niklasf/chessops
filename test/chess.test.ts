@@ -97,3 +97,18 @@ test.each(random)('random perft: %s: %s', (_, fen, d1, d2, d3, d4, d5) => {
   expect(perft(pos, 4, false)).toBe(d4);
   if (d5 < 100000) expect(perft(pos, 5, false)).toBe(d5);
 });
+
+const insufficientMaterial: [string, boolean, boolean][] = [
+  ['8/5k2/8/8/8/8/3K4/8 w - - 0 1', true, true],
+  ['8/3k4/8/8/2N5/8/3K4/8 b - - 0 1', true, true],
+  ['8/4rk2/8/8/8/8/3K4/8 w - - 0 1', true, false],
+  ['8/4qk2/8/8/8/8/3K4/8 w - - 0 1', true, false],
+  ['8/4bk2/8/8/8/8/3KB3/8 w - - 0 1', false, false],
+  ['8/8/3Q4/2bK4/B7/8/1k6/8 w - - 1 68', false, false],
+];
+
+test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black) => {
+  const pos = Chess.fromSetup(parseFen(fen));
+  expect(pos.hasInsufficientMaterial('white')).toBe(white);
+  expect(pos.hasInsufficientMaterial('black')).toBe(black);
+});

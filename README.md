@@ -14,7 +14,7 @@ Roadmap
 * [x] attacks
 * [x] board representation
 
-### 0.1.0-alpha.1: Lichess board editor
+### 0.1.0-alpha.1: Continue from here in Lichess board editor
 
 * [x] board to fen
 * [x] castling to fen
@@ -30,17 +30,16 @@ Roadmap
 * [x] perft test
 * [x] transformations
 
-### 0.1.0-alpha.2: Continue from here in Lichess board editor
 
-* [ ] insufficient material
-* [ ] game end
+* [x] insufficient material
+* [x] game end
 * [ ] chess variants
 
-### 0.1.0-alpha.3: Ceval
+### 0.1.0-alpha.2: Ceval
 
 * [ ] san writing
 
-### 0.1.0-alpha.4: Analysis board
+### 0.1.0-alpha.3: Analysis board
 
 * [ ] san parsing
 * [ ] pgn parsing

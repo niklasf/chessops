@@ -435,6 +435,17 @@ export class Chess extends Position {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return false; // TODO
+    if (this.board[color].intersect(this.board.pawn.union(this.board.rooksAndQueens())).nonEmpty()) return false;
+    if (this.board[color].intersects(this.board.knight)) {
+      return this.board[color].size() <= 2 &&
+        this.board[opposite(color)].diff(this.board.king).diff(this.board.queen).isEmpty();
+    }
+    if (this.board[color].intersects(this.board.bishop)) {
+      const sameColor =
+        !this.board.bishop.intersects(SquareSet.darkSquares()) ||
+        !this.board.bishop.intersects(SquareSet.lightSquares());
+      return sameColor && !this.board[opposite(color)].diff(this.board.king).diff(this.board.rook).diff(this.board.queen).isEmpty();
+    }
+    return true;
   }
 }
