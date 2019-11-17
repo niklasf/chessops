@@ -1,5 +1,6 @@
 import { Square, Outcome, Color, COLORS } from './types';
 import { SquareSet } from './squareSet';
+import { Setup, RemainingChecks } from './setup';
 import { Position, Context, Chess } from './chess';
 
 export { Position, Chess };
@@ -30,6 +31,11 @@ export class KingOfTheHill extends Chess {
 }
 
 export class ThreeCheck extends Chess {
+  constructor(setup?: Setup) {
+    super(setup);
+    this.remainingChecks = setup ? setup.remainingChecks : RemainingChecks.default();
+  }
+
   clone(): ThreeCheck {
     return super.clone() as ThreeCheck;
   }
