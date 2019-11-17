@@ -15,7 +15,7 @@ function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
 }
 
-function parseBoardFen(boardPart: string): Board {
+export function parseBoardFen(boardPart: string): Board {
   const board = Board.empty();
   let rank = 7, file = 0;
   for (let i = 0; i < boardPart.length; i++) {
@@ -44,7 +44,7 @@ function parseBoardFen(boardPart: string): Board {
   return board;
 }
 
-function parsePockets(pocketPart: string): Material {
+export function parsePockets(pocketPart: string): Material {
   const pockets = Material.empty();
   for (const c of pocketPart) {
     const piece = charToPiece(c);
@@ -54,7 +54,7 @@ function parsePockets(pocketPart: string): Material {
   return pockets;
 }
 
-function parseCastlingFen(board: Board, castlingPart: string): SquareSet {
+export function parseCastlingFen(board: Board, castlingPart: string): SquareSet {
   let unmovedRooks = SquareSet.empty();
   if (castlingPart == '-') return unmovedRooks;
   if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) throw new FenError('invalid castling part in fen');
@@ -79,7 +79,7 @@ function parseCastlingFen(board: Board, castlingPart: string): SquareSet {
   return unmovedRooks;
 }
 
-function parseRemainingChecks(part: string): RemainingChecks {
+export function parseRemainingChecks(part: string): RemainingChecks {
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
