@@ -119,7 +119,7 @@ export class Castles {
 }
 
 export interface Context {
-  king: Square,
+  king: Square | undefined,
   blockers: SquareSet,
   checkers: SquareSet,
 }
@@ -223,8 +223,8 @@ export class Chess {
   }
 
   ctx(): Context {
-    // TODO: robustness
     const king = this.board.kingOf(this.turn)!;
+    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty() };
     const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
       .intersect(this.board[opposite(this.turn)]);
@@ -242,7 +242,7 @@ export class Chess {
   }
 
   private castlingDest(side: CastlingSide, ctx: Context): SquareSet {
-    if (ctx.checkers.nonEmpty()) return SquareSet.empty();
+    if (!defined(ctx.king) || ctx.checkers.nonEmpty()) return SquareSet.empty();
     const rook = this.castles.rook[this.turn][side];
     if (!defined(rook)) return SquareSet.empty();
     if (this.castles.path[this.turn][side].intersects(this.board.occupied)) return SquareSet.empty();
@@ -264,6 +264,7 @@ export class Chess {
   private canCaptureEp(pawn: Square, ctx: Context): boolean {
     if (!defined(this.epSquare)) return false;
     if (!pawnAttacks(this.turn, pawn).has(this.epSquare)) return false;
+    if (!defined(ctx.king)) return true;
     const captured = this.epSquare + ((this.turn == 'white') ? -8 : 8);
     const occupied = this.board.occupied.toggle(pawn).toggle(this.epSquare).toggle(captured);
     return !this.kingAttackers(ctx.king, opposite(this.turn), occupied).intersects(occupied);
@@ -299,24 +300,27 @@ export class Chess {
     else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occupied);
     else {
       pseudo = kingAttacks(square).diff(this.board[this.turn]);
-      for (const square of pseudo) {
-        if (this.kingAttackers(square, opposite(this.turn), this.board.occupied.without(ctx.king)).nonEmpty()) {
-          pseudo = pseudo.without(square);
-        }
+      const occ = this.board.occupied.without(square);
+      for (const to of pseudo) {
+        if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
       }
-
       return pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
     }
 
-    if (ctx.checkers.nonEmpty()) {
-      const checker = ctx.checkers.singleSquare();
-      if (!checker) return SquareSet.empty();
-      pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
+    pseudo = pseudo.diff(this.board[this.turn]);
+
+    if (defined(ctx.king)) {
+      if (ctx.checkers.nonEmpty()) {
+        const checker = ctx.checkers.singleSquare();
+        if (!checker) return SquareSet.empty();
+        pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
+      }
+
+      if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
 
-    if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     if (legal) pseudo = pseudo.union(legal);
-    return pseudo.diff(this.board[this.turn]);
+    return pseudo;
   }
 
   allDests(): Map<Square, SquareSet> {
