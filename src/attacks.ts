@@ -53,8 +53,8 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
   return PAWN_ATTACKS[color][square];
 }
 
-const RANK_RANGE = slidingRangeTable([-1, 1]);
 const FILE_RANGE = slidingRangeTable([-8, 8]);
+const RANK_RANGE = slidingRangeTable([-1, 1]);
 const DIAG_RANGE = slidingRangeTable([-9, 9]);
 const ANTI_DIAG_RANGE = slidingRangeTable([-7, 7]);
 
@@ -108,12 +108,12 @@ export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
 
 export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {
   switch (piece.role) {
-    case 'pawn': return PAWN_ATTACKS[piece.color][square];
-    case 'knight': return KNIGHT_ATTACKS[square];
+    case 'pawn': return pawnAttacks(piece.color, square);
+    case 'knight': return knightAttacks(square);
     case 'bishop': return bishopAttacks(square, occupied);
     case 'rook': return rookAttacks(square, occupied);
     case 'queen': return queenAttacks(square, occupied);
-    case 'king': return KING_ATTACKS[square];
+    case 'king': return kingAttacks(square);
   }
 }
 
