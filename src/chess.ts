@@ -162,24 +162,26 @@ export abstract class Position {
     return COLORS.every(color => this.hasInsufficientMaterial(color));
   }
 
+  hasDests(ctx: Context): boolean {
+    for (const square of this.board[this.turn]) {
+      if (this.dests(square, ctx).nonEmpty()) return true;
+    }
+    return this.dropDests(ctx).nonEmpty();
+  }
+
+  isEnd(): boolean {
+    return this.isVariantEnd() || this.isInsufficientMaterial() || !this.hasDests(this.ctx());
+  }
+
   isCheckmate(): boolean {
     const ctx = this.ctx();
-    if (ctx.checkers.isEmpty()) return false;
-    for (const square of this.board[this.turn]) {
-      if (this.dests(square, ctx).nonEmpty()) return false;
-    }
-    return true;
+    return ctx.checkers.nonEmpty() && !this.hasDests(ctx);
   }
 
   isStalemate(): boolean {
     const ctx = this.ctx();
-    if (ctx.checkers.nonEmpty()) return false;
-    for (const square of this.board[this.turn]) {
-      if (this.dests(square, ctx).nonEmpty()) return false;
-    }
-    return true;
+    return ctx.checkers.isEmpty() && !this.hasDests(ctx);
   }
-
 
   outcome() {
     const variantOutcome = this.variantOutcome();
@@ -197,6 +199,10 @@ export abstract class Position {
       d.set(square, this.dests(square, ctx));
     }
     return d;
+  }
+
+  dropDests(ctx: Context): SquareSet {
+    return SquareSet.empty();
   }
 
   protected playCaptureAt(square: Square, captured: Piece) {
@@ -270,10 +276,6 @@ export abstract class Position {
     pos.halfmoves = this.halfmoves;
     pos.fullmoves = this.fullmoves;
     return pos;
-  }
-
-  dropDests(ctx: Context): SquareSet {
-    return SquareSet.empty();
   }
 }
 

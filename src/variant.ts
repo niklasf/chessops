@@ -60,8 +60,6 @@ export class ThreeCheck extends Chess {
   }
 }
 
-// ThreeCheck
-
 export class Crazyhouse extends Chess {
   constructor(setup?: Setup) {
     super(setup);
@@ -77,11 +75,15 @@ export class Crazyhouse extends Chess {
   }
 
   dropDests(ctx: Context): SquareSet {
+    const mask = this.board.occupied.complement().intersect(
+      (this.pockets && this.pockets[this.turn].hasNonPawn()) ? SquareSet.full() :
+      (this.pockets && this.pockets[this.turn].pawn) ? SquareSet.backranks().complement() : SquareSet.empty());
+
     if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
       const checker = ctx.checkers.singleSquare();
       if (!defined(checker)) return SquareSet.empty();
-      return between(checker, ctx.king);
-    } else return this.board.occupied.complement();
+      return mask.intersect(between(checker, ctx.king));
+    } else return mask;
   }
 }
 

@@ -23,6 +23,18 @@ export class MaterialSide {
     for (const role of ROLES) m[role] = this[role];
     return m;
   }
+
+  nonEmpty(): boolean {
+    return ROLES.some(role => this[role] > 0);
+  }
+
+  isEmpty(): boolean {
+    return !this.nonEmpty();
+  }
+
+  hasNonPawn(): boolean {
+    return this.knight > 0 || this.bishop > 0 || this.rook > 0 || this.queen > 0 || this.king > 0;
+  }
 }
 
 export class Material {
