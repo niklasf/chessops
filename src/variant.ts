@@ -34,7 +34,7 @@ export class KingOfTheHill extends Chess {
   }
 
   rules(): Rules {
-    return 'KingOfTheHill';
+    return 'kingOfTheHill';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -184,5 +184,18 @@ export class Horde extends Chess {
     else if (this.board.white.isEmpty()) return { winner: 'black' };
     else if (this.board.black.isEmpty()) return { winner: 'white' };
     return;
+  }
+}
+
+export function setup(rules: Rules, setup?: Setup): Position {
+  switch (rules) {
+    case 'chess': return new Chess(setup);
+    case 'antichess': return new Antichess(setup);
+    case 'atomic': return new Atomic(setup);
+    case 'horde': return new Horde(setup);
+    case 'racingKings': return new RacingKings(setup);
+    case 'kingOfTheHill': return new KingOfTheHill(setup);
+    case 'threeCheck': return new ThreeCheck(setup);
+    case 'crazyhouse': return new Crazyhouse(setup);
   }
 }

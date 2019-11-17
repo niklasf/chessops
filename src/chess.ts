@@ -1,4 +1,4 @@
-import { CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
+import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
