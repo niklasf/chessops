@@ -6,7 +6,8 @@
     "chess",
     "fen",
     "pgn",
-    "uci"
+    "uci",
+    "typescript"
   ],
   "repository": "https://github.com/niklasf/chessops",
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>",
@@ -24,8 +25,13 @@
   "scripts": {
     "test": "jest",
     "compile": "tsc",
+    "prepare": "tsc",
     "doc": "typedoc --excludeNotExported --theme minimal"
   },
+  "files": [
+    "*.js",
+    "*.d.ts"
+  ],
   "jest": {
     "transform": {
       "\\.ts$": "ts-jest"

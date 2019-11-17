@@ -10,8 +10,8 @@
     "target": "ES6",
     "lib": ["ES6", "DOM"],
     "module": "commonjs",
-    "outDir": "dist/lib",
-    "declarationDir": "dist/types",
+    "outDir": "",
+    "declarationDir": "",
     "declaration": true
   },
   "include": ["src"]
