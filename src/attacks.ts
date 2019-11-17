@@ -67,21 +67,18 @@ function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): Squar
   return forward.intersect(range);
 }
 
-function properHyberbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
-  let forward = occupied.intersect(range);
-  let reverse = forward.rbit();
-  forward = forward.minus(bit);
-  reverse = reverse.minus(bit.bswap());
-  forward = forward.xor(reverse.rbit());
-  return forward.intersect(range);
-}
-
 function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
   return hyperbola(SquareSet.fromSquare(square), FILE_RANGE[square], occupied);
 }
 
 function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
-  return properHyberbola(SquareSet.fromSquare(square), RANK_RANGE[square], occupied);
+  const range = RANK_RANGE[square];
+  let forward = occupied.intersect(range);
+  let reverse = forward.rbit();
+  forward = forward.minus(SquareSet.fromSquare(square));
+  reverse = reverse.minus(SquareSet.fromSquare(63 - square));
+  forward = forward.xor(reverse.rbit());
+  return forward.intersect(range);
 }
 
 function diagAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -98,8 +95,7 @@ export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const bit = SquareSet.fromSquare(square);
-  return hyperbola(bit, FILE_RANGE[square], occupied).xor(properHyberbola(bit, RANK_RANGE[square], occupied));
+  return fileAttacks(square, occupied).xor(rankAttacks(square, occupied));
 }
 
 export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
