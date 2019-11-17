@@ -119,9 +119,10 @@ export class Castles {
 }
 
 export interface Context {
-  king: Square | undefined,
-  blockers: SquareSet,
-  checkers: SquareSet,
+  king: Square | undefined;
+  blockers: SquareSet;
+  checkers: SquareSet;
+  variantEnd: boolean;
 }
 
 export abstract class Position {
@@ -137,6 +138,7 @@ export abstract class Position {
   abstract clone(): Position;
   abstract ctx(): Context;
   abstract dests(square: Square, ctx: Context): SquareSet;
+  abstract isVariantEnd(): boolean;
   abstract variantOutcome(): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
 
@@ -191,6 +193,7 @@ export abstract class Position {
   allDests(): Map<Square, SquareSet> {
     const ctx = this.ctx();
     const d = new Map();
+    if (ctx.variantEnd) return d;
     for (const square of this.board[this.turn]) {
       d.set(square, this.dests(square, ctx));
     }
@@ -329,8 +332,9 @@ export class Chess extends Position {
   }
 
   ctx(): Context {
+    const variantEnd = this.isVariantEnd();
     const king = this.board.kingOf(this.turn)!;
-    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty() };
+    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd };
     const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
       .intersect(this.board[opposite(this.turn)]);
@@ -343,7 +347,8 @@ export class Chess extends Position {
     return {
       king,
       blockers,
-      checkers
+      checkers,
+      variantEnd,
     };
   }
 
@@ -377,6 +382,7 @@ export class Chess extends Position {
   }
 
   dests(square: Square, ctx: Context): SquareSet {
+    if (ctx.variantEnd) return SquareSet.empty();
     const piece = this.board.get(square);
     if (!piece || piece.color != this.turn) return SquareSet.empty();
 
@@ -428,6 +434,10 @@ export class Chess extends Position {
 
     if (legal) pseudo = pseudo.union(legal);
     return pseudo;
+  }
+
+  isVariantEnd(): boolean {
+    return false;
   }
 
   variantOutcome(): Outcome | undefined {
