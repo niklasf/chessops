@@ -1,4 +1,4 @@
-import { CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece } from './types';
+import { CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
@@ -382,5 +382,43 @@ export class Chess {
       const capture = this.board.set(uci.to, piece);
       if (capture) this.playCaptureAt(uci.to, capture);
     }
+  }
+
+  isCheckmate(): boolean {
+    const ctx = this.ctx();
+    if (ctx.checkers.isEmpty()) return false;
+    for (const square of this.board[this.turn]) {
+      if (this.dests(square, ctx).nonEmpty()) return false;
+    }
+    return true;
+  }
+
+  isStalemate(): boolean {
+    const ctx = this.ctx();
+    if (ctx.checkers.nonEmpty()) return false;
+    for (const square of this.board[this.turn]) {
+      if (this.dests(square, ctx).nonEmpty()) return false;
+    }
+    return true;
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    return false; // TODO
+  }
+
+  isInsufficientMaterial() {
+    return COLORS.every(color => this.hasInsufficientMaterial(color));
+  }
+
+  variantOutcome(): Outcome | undefined {
+    return;
+  }
+
+  outcome() {
+    const variantOutcome = this.variantOutcome();
+    if (variantOutcome) return variantOutcome;
+    else if (this.isCheckmate()) return { winner: opposite(this.turn) };
+    else if (this.isInsufficientMaterial() || this.isStalemate()) return { winner: undefined };
+    else return;
   }
 }

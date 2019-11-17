@@ -27,7 +27,7 @@ Roadmap
 * [x] en passant dests
 * [x] castling dests
 * [x] normal dests
-* [ ] perft test
+* [x] perft test
 * [x] transformations
 
 ### 0.1.0-alpha.2: Continue from here in Lichess board editor
