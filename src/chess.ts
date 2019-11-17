@@ -153,11 +153,6 @@ export abstract class Position {
     };
   }
 
-  private hasLegalEp() {
-    // TODO
-    return !!this.epSquare;
-  }
-
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
@@ -255,6 +250,11 @@ export abstract class Position {
       const capture = this.board.set(uci.to, piece);
       if (capture) this.playCaptureAt(uci.to, capture);
     }
+  }
+
+  protected hasLegalEp() {
+    // TODO
+    return !!this.epSquare;
   }
 }
 
