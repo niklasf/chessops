@@ -47,7 +47,7 @@ export function dests(dests: Map<Square, SquareSet>) {
   return lines.join('\n');
 }
 
-export function perft(pos: Chess, depth: number, outer: boolean = true): number {
+export function perft(pos: Chess, depth: number, outer: boolean = false): number {
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
   if (depth < 1) return 1;
   else if (!outer && depth == 1) {
