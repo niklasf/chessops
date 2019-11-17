@@ -137,10 +137,7 @@ abstract class Position {
   abstract clone(): Position;
   abstract ctx(): Context;
   abstract dests(square: Square, ctx: Context): SquareSet;
-  abstract playMove(move: Uci): void;
   abstract variantOutcome(): Outcome | undefined;
-  abstract isCheckmate(): boolean;
-  abstract isStalemate(): boolean;
   abstract hasInsufficientMaterial(color: Color): boolean;
 
   toSetup(): Setup {
@@ -169,6 +166,25 @@ abstract class Position {
     return COLORS.every(color => this.hasInsufficientMaterial(color));
   }
 
+  isCheckmate(): boolean {
+    const ctx = this.ctx();
+    if (ctx.checkers.isEmpty()) return false;
+    for (const square of this.board[this.turn]) {
+      if (this.dests(square, ctx).nonEmpty()) return false;
+    }
+    return true;
+  }
+
+  isStalemate(): boolean {
+    const ctx = this.ctx();
+    if (ctx.checkers.nonEmpty()) return false;
+    for (const square of this.board[this.turn]) {
+      if (this.dests(square, ctx).nonEmpty()) return false;
+    }
+    return true;
+  }
+
+
   outcome() {
     const variantOutcome = this.variantOutcome();
     if (variantOutcome) return variantOutcome;
@@ -184,6 +200,61 @@ abstract class Position {
       d.set(square, this.dests(square, ctx));
     }
     return d;
+  }
+
+  protected playCaptureAt(square: Square, captured: Piece) {
+    this.halfmoves = 0;
+    if (captured && captured.role == 'rook') this.castles.discardRook(square);
+    if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
+  }
+
+  playMove(uci: Uci) {
+    const turn = this.turn, epSquare = this.epSquare;
+    this.epSquare = undefined;
+    this.halfmoves += 1;
+    if (turn == 'black') this.fullmoves += 1;
+    this.turn = opposite(turn);
+
+    if (isDrop(uci)) {
+      this.board.set(uci.to, { role: uci.role, color: turn });
+      if (this.pockets) this.pockets[turn][uci.role]--;
+    } else {
+      const piece = this.board.take(uci.from);
+      if (!piece) return;
+
+      if (piece.role == 'pawn') {
+        this.halfmoves = 0;
+        if (uci.to == epSquare) {
+          const pawn = this.board.take(uci.to + (turn == 'white' ? -8 : 8));
+          if (pawn) this.playCaptureAt(epSquare, pawn);
+        }
+        const delta = uci.from - uci.to;
+        if (Math.abs(delta) == 16) this.epSquare = (uci.from + uci.to) >> 1;
+        if (uci.promotion) {
+          piece.role = uci.promotion;
+          piece.promoted = true;
+        }
+      } else if (piece.role == 'rook') {
+         this.castles.discardRook(uci.from)
+      } else if (piece.role == 'king') {
+        const delta = uci.to - uci.from;
+        const isCastling = Math.abs(delta) == 2 || this.board[turn].has(uci.to);
+        if (isCastling) {
+          const side = delta > 0 ? 'h' : 'a';
+          const rookFrom = this.castles.rook[turn][side];
+          if (defined(rookFrom)) {
+            const rook = this.board.take(rookFrom);
+            this.board.set(kingCastlesTo(turn, side), piece);
+            if (rook) this.board.set(rookCastlesTo(turn, side), rook);
+          }
+        }
+        this.castles.discardSide(turn);
+        if (isCastling) return;
+      }
+
+      const capture = this.board.set(uci.to, piece);
+      if (capture) this.playCaptureAt(uci.to, capture);
+    }
   }
 }
 
@@ -359,84 +430,11 @@ export class Chess extends Position {
     return pseudo;
   }
 
-  protected playCaptureAt(square: Square, captured: Piece) {
-    this.halfmoves = 0;
-    if (captured && captured.role == 'rook') this.castles.discardRook(square);
-    if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
-  }
-
-  playMove(uci: Uci) {
-    const turn = this.turn, epSquare = this.epSquare;
-    this.epSquare = undefined;
-    this.halfmoves += 1;
-    if (turn == 'black') this.fullmoves += 1;
-    this.turn = opposite(turn);
-
-    if (isDrop(uci)) {
-      this.board.set(uci.to, { role: uci.role, color: turn });
-      if (this.pockets) this.pockets[turn][uci.role]--;
-    } else {
-      const piece = this.board.take(uci.from);
-      if (!piece) return;
-
-      if (piece.role == 'pawn') {
-        this.halfmoves = 0;
-        if (uci.to == epSquare) {
-          const pawn = this.board.take(uci.to + (turn == 'white' ? -8 : 8));
-          if (pawn) this.playCaptureAt(epSquare, pawn);
-        }
-        const delta = uci.from - uci.to;
-        if (Math.abs(delta) == 16) this.epSquare = (uci.from + uci.to) >> 1;
-        if (uci.promotion) {
-          piece.role = uci.promotion;
-          piece.promoted = true;
-        }
-      } else if (piece.role == 'rook') {
-         this.castles.discardRook(uci.from)
-      } else if (piece.role == 'king') {
-        const delta = uci.to - uci.from;
-        const isCastling = Math.abs(delta) == 2 || this.board[turn].has(uci.to);
-        if (isCastling) {
-          const side = delta > 0 ? 'h' : 'a';
-          const rookFrom = this.castles.rook[turn][side];
-          if (defined(rookFrom)) {
-            const rook = this.board.take(rookFrom);
-            this.board.set(kingCastlesTo(turn, side), piece);
-            if (rook) this.board.set(rookCastlesTo(turn, side), rook);
-          }
-        }
-        this.castles.discardSide(turn);
-        if (isCastling) return;
-      }
-
-      const capture = this.board.set(uci.to, piece);
-      if (capture) this.playCaptureAt(uci.to, capture);
-    }
-  }
-
-  isCheckmate(): boolean {
-    const ctx = this.ctx();
-    if (ctx.checkers.isEmpty()) return false;
-    for (const square of this.board[this.turn]) {
-      if (this.dests(square, ctx).nonEmpty()) return false;
-    }
-    return true;
-  }
-
-  isStalemate(): boolean {
-    const ctx = this.ctx();
-    if (ctx.checkers.nonEmpty()) return false;
-    for (const square of this.board[this.turn]) {
-      if (this.dests(square, ctx).nonEmpty()) return false;
-    }
-    return true;
+  variantOutcome(): Outcome | undefined {
+    return;
   }
 
   hasInsufficientMaterial(color: Color): boolean {
     return false; // TODO
-  }
-
-  variantOutcome(): Outcome | undefined {
-    return;
   }
 }
