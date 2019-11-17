@@ -259,7 +259,7 @@ export abstract class Position {
 }
 
 export class Chess extends Position {
-  private constructor() {
+  protected constructor() {
     super();
   }
 

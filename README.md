@@ -29,8 +29,6 @@ Roadmap
 * [x] normal dests
 * [x] perft test
 * [x] transformations
-
-
 * [x] insufficient material
 * [x] game end
 * [ ] chess variants
