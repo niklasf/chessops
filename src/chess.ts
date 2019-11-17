@@ -298,18 +298,19 @@ export class Chess {
     else if (piece.role == 'knight') pseudo = knightAttacks(square);
     else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occupied);
     else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occupied);
-    else {
-      pseudo = kingAttacks(square).diff(this.board[this.turn]);
-      const occ = this.board.occupied.without(square);
-      for (const to of pseudo) {
-        if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
-      }
-      return pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
-    }
+    else pseudo = kingAttacks(square);
 
     pseudo = pseudo.diff(this.board[this.turn]);
 
     if (defined(ctx.king)) {
+      if (piece.role == 'king') {
+        const occ = this.board.occupied.without(square);
+        for (const to of pseudo) {
+          if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
+        }
+        return pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
+      }
+
       if (ctx.checkers.nonEmpty()) {
         const checker = ctx.checkers.singleSquare();
         if (!checker) return SquareSet.empty();
