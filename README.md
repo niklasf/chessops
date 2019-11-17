@@ -1,7 +1,7 @@
 chessops
 ========
 
-Chess and chess variant rules and operations.
+Chess and chess variant rules and operations in TypeScript.
 
 :warning: Not ready for production :warning:
 
@@ -9,18 +9,31 @@ Features
 --------
 
 * Read and write FEN
-* Vocabulary (Color, Role, Piece, Board, Castles, Setup)
+* Vocabulary (Square, Color, Role, Piece, Board, Castles, Setup, Position)
 * Variant rules: Standard chess, ~Crazyhouse, King of the Hill, Three-check,
   Antichess, Atomic,Horde, Racing Kings~
   - Move making
   - Legal move and drop move generation
   - Game end and outcome
   - Insufficient material
+  - Setup validation
 * Supports Chess960
 * ~Read and write SAN~
 * ~Read and write PGN~
 * ~Position hashing~
 * Transformations: Mirroring and rotating
+
+Example
+-------
+
+```javascript
+import { parseFen } from 'chessops/fen';
+import { Chess } from 'chessops/chess';
+
+const setup = parseFen('r1bqkbnr/ppp2Qpp/2np4/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4');
+const pos = new Chess(setup);
+pos.isCheckmate()
+```
 
 Roadmap
 -------
