@@ -63,10 +63,10 @@ Roadmap
 * [x] transformations
 * [x] insufficient material
 * [x] game end
-* [ ] chess variants
 
 ### 0.1.0-alpha.2
 
+* [ ] chess variants
 * [ ] san writing
 
 ### 0.1.0-alpha.3
