@@ -9,15 +9,17 @@ Features
 --------
 
 * Read and write FEN
-* Vocabulary (Square, Color, Role, Piece, Board, Castles, Setup, Position)
+* Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Castles, Setup,
+  Position)
 * Variant rules: Standard chess, ~Crazyhouse, King of the Hill, Three-check,
-  Antichess, Atomic,Horde, Racing Kings~
+  Antichess, Atomic, Horde, Racing Kings~
   - Move making
   - Legal move and drop move generation
   - Game end and outcome
   - Insufficient material
   - Setup validation
 * Supports Chess960
+* Attacks and rays using hyperbola quintessence
 * ~Read and write SAN~
 * ~Read and write PGN~
 * ~Position hashing~
