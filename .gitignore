@@ -15,6 +15,7 @@ types.js
 util.js
 debug.js
 fen.js
+san.js
 
 attacks.d.ts
 board.d.ts
@@ -27,3 +28,4 @@ types.d.ts
 util.d.ts
 debug.d.ts
 fen.d.ts
+san.d.ts
