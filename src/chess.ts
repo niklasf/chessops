@@ -235,7 +235,7 @@ export abstract class Position {
     return d;
   }
 
-  playMove(uci: Uci): void {
+  play(uci: Uci): void {
     const turn = this.turn, epSquare = this.epSquare;
     this.epSquare = undefined;
     this.halfmoves += 1;

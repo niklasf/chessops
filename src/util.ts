@@ -1,4 +1,4 @@
-import { Color, Square } from './types';
+import { Err, isErr, Color, Square } from './types';
 
 export function opposite(color: Color): Color {
   return color == 'white' ? 'black' : 'white';
@@ -6,6 +6,11 @@ export function opposite(color: Color): Color {
 
 export function defined<A>(v: A | undefined): v is A {
   return typeof v !== 'undefined';
+}
+
+export function unwrap<T>(v: T | Err<any>): T {
+  if (isErr(v)) throw new Error(v.err);
+  return v;
 }
 
 export function strRepeat(str: string, num: number): string {
