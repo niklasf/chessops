@@ -2,7 +2,7 @@ import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
 import { opposite } from './util';
 import { SquareSet } from './squareSet';
 
-export class Board {
+export default class Board {
   occupied: SquareSet;
   promoted: SquareSet;
 
@@ -161,3 +161,5 @@ export class Board {
     return this.king.intersect(this[color]).diff(this.promoted).singleSquare();
   }
 }
+
+export { Board }

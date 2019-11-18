@@ -288,7 +288,7 @@ export abstract class Position {
   }
 }
 
-export class Chess extends Position {
+export default class Chess extends Position {
   constructor(setup?: Setup) {
     super();
     if (setup) {
@@ -472,3 +472,5 @@ export class Chess extends Position {
     return true;
   }
 }
+
+export { Chess }

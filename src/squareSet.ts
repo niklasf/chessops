@@ -20,7 +20,7 @@ function rbit32(n: number): number {
   return n;
 }
 
-export class SquareSet {
+export default class SquareSet {
   constructor(readonly lo: number, readonly hi: number) {
     this.lo = lo | 0;
     this.hi = hi | 0;
@@ -269,3 +269,5 @@ export class SquareSet {
     };
   }
 }
+
+export { SquareSet }

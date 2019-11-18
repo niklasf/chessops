@@ -74,7 +74,7 @@ export class RemainingChecks {
   }
 }
 
-export interface Setup {
+export default interface Setup {
   board: Board;
   pockets: Material | undefined;
   turn: Color;
@@ -84,6 +84,8 @@ export interface Setup {
   halfmoves: number;
   fullmoves: number;
 }
+
+export { Setup }
 
 export function defaultSetup(): Setup {
   return {
