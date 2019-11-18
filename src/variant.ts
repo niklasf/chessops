@@ -59,7 +59,7 @@ export class Crazyhouse extends Chess {
   }
 }
 
-export class Atomic extends Chess {
+/* export */ class Atomic extends Chess {
   clone(): Atomic {
     return super.clone() as Atomic;
   }
@@ -69,7 +69,7 @@ export class Atomic extends Chess {
   }
 }
 
-export class Antichess extends Chess {
+/* export */ class Antichess extends Chess {
   clone(): Antichess {
     return super.clone() as Antichess;
   }
@@ -152,7 +152,7 @@ export class ThreeCheck extends Chess {
   }
 }
 
-export class RacingKings extends Chess {
+/* export */ class RacingKings extends Chess {
   clone(): RacingKings {
     return super.clone() as RacingKings;
   }
@@ -182,7 +182,7 @@ export class RacingKings extends Chess {
   }
 }
 
-export class Horde extends Chess {
+/* export */ class Horde extends Chess {
   clone(): Horde {
     return super.clone() as Horde;
   }
