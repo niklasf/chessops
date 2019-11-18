@@ -32,6 +32,8 @@ export class Crazyhouse extends Chess {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
+    // No material can leave the game, but we can easily check this for
+    // custom positions.
     return this.board.occupied.size() + this.pockets!.count() <= 3 &&
       this.board.pawn.isEmpty() &&
       this.board.rooksAndQueens().isEmpty() &&
@@ -77,6 +79,14 @@ export class Antichess extends Chess {
 }
 
 export class KingOfTheHill extends Chess {
+  static default(): KingOfTheHill {
+    return super.default();
+  }
+
+  static fromSetup(setup: Setup): KingOfTheHill | Err<PositionError> {
+    return super.fromSetup(setup)!;
+  }
+
   clone(): KingOfTheHill {
     return super.clone() as KingOfTheHill;
   }
