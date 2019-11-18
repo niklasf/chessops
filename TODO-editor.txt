@@ -1,8 +1,0 @@
-fix mistake in position selection
-position selection permanence
-correctly validate variants
-game end continue
-fen without move counters
-rules tradeoff
-treat off-rank ep square as syntactically invalid
-keep url in sync

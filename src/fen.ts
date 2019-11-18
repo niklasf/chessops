@@ -163,6 +163,7 @@ export function parseFen(fen: string): Setup {
 interface FenOpts {
   promoted?: boolean;
   shredder?: boolean;
+  epd?: boolean;
 }
 
 function charToRole(ch: string): Role | undefined {
@@ -268,7 +269,6 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     makeCastlingFen(setup.board, setup.unmovedRooks, opts),
     defined(setup.epSquare) ? makeSquare(setup.epSquare) : '-',
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
-    setup.halfmoves,
-    setup.fullmoves,
+    ...(opts && opts.epd ? [] : [setup.halfmoves, setup.fullmoves])
   ].join(' ');
 }
