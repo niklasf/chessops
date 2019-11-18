@@ -137,6 +137,11 @@ export abstract class Position {
 
   protected constructor() { }
 
+  // When subclassing:
+  // - static default()
+  // - static fromSetup()
+  // - Proper signature for clone()
+
   abstract rules(): Rules;
   abstract dests(square: Square, ctx: Context): SquareSet;
   abstract isVariantEnd(): boolean;
@@ -156,6 +161,8 @@ export abstract class Position {
     if (captured && captured.role == 'rook') this.castles.discardRook(square);
     if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
   }
+
+  // The following should be identical in all subclasses.
 
   clone(): Position {
     const pos = new (<any>this).constructor();
