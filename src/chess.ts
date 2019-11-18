@@ -178,8 +178,8 @@ export abstract class Position {
       unmovedRooks: this.castles.unmovedRooks,
       epSquare: this.hasLegalEp() ? this.epSquare : undefined,
       remainingChecks: this.remainingChecks && this.remainingChecks.clone(),
-      halfmoves: this.halfmoves,
-      fullmoves: this.fullmoves,
+      halfmoves: Math.min(this.halfmoves, 150),
+      fullmoves: Math.min(Math.max(this.fullmoves, 1), 9999),
     };
   }
 
@@ -332,7 +332,7 @@ export default class Chess extends Position {
     pos.castles = Castles.fromSetup(setup);
     pos.epSquare = pos.validEpSquare(setup.epSquare);
     pos.remainingChecks = undefined;
-    pos.halfmoves = Math.min(setup.halfmoves, 150);
+    pos.halfmoves = setup.halfmoves;
     pos.fullmoves = setup.fullmoves;
     return pos.validate() || pos;
   }
