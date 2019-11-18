@@ -5,7 +5,7 @@ import { Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
-export type PositionError = 'ERR_EMPTY' | 'ERR_OPPOSITE_CHECK' | 'ERR_TOO_MANY_PAWNS' | 'ERR_TOO_MANY_PIECES' | 'ERR_PAWNS_ON_BACKRANK' | 'ERR_VARIANT' | 'ERR_KINGS';
+export type PositionError = 'ERR_EMPTY' | 'ERR_OPPOSITE_CHECK' | 'ERR_PAWNS_ON_BACKRANK' | 'ERR_VARIANT' | 'ERR_KINGS';
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
@@ -138,11 +138,37 @@ export abstract class Position {
   protected constructor() { }
 
   abstract rules(): Rules;
-  abstract ctx(): Context;
   abstract dests(square: Square, ctx: Context): SquareSet;
   abstract isVariantEnd(): boolean;
   abstract variantOutcome(): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
+
+  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
+    return attacksTo(square, attacker, this.board, occupied);
+  }
+
+  dropDests(ctx: Context): SquareSet {
+    return SquareSet.empty();
+  }
+
+  protected playCaptureAt(square: Square, captured: Piece): void {
+    this.halfmoves = 0;
+    if (captured && captured.role == 'rook') this.castles.discardRook(square);
+    if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
+  }
+
+  clone(): Position {
+    const pos = new (<any>this).constructor();
+    pos.board = this.board.clone();
+    pos.pockets = this.pockets && this.pockets.clone();
+    pos.turn = this.turn;
+    pos.castles = this.castles && this.castles.clone();
+    pos.epSquare = this.epSquare;
+    pos.remainingChecks = this.remainingChecks && this.remainingChecks.clone();
+    pos.halfmoves = this.halfmoves;
+    pos.fullmoves = this.fullmoves;
+    return pos;
+  }
 
   toSetup(): Setup {
     return {
@@ -155,10 +181,6 @@ export abstract class Position {
       halfmoves: this.halfmoves,
       fullmoves: this.fullmoves,
     };
-  }
-
-  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    return attacksTo(square, attacker, this.board, occupied);
   }
 
   isInsufficientMaterial() {
@@ -204,16 +226,6 @@ export abstract class Position {
       d.set(square, this.dests(square, ctx));
     }
     return d;
-  }
-
-  dropDests(ctx: Context): SquareSet {
-    return SquareSet.empty();
-  }
-
-  protected playCaptureAt(square: Square, captured: Piece): void {
-    this.halfmoves = 0;
-    if (captured && captured.role == 'rook') this.castles.discardRook(square);
-    if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
   }
 
   playMove(uci: Uci): void {
@@ -276,17 +288,25 @@ export abstract class Position {
     return false;
   }
 
-  clone(): Position {
-    const pos = new (<any>this).constructor();
-    pos.board = this.board.clone();
-    pos.pockets = this.pockets && this.pockets.clone();
-    pos.turn = this.turn;
-    pos.castles = this.castles && this.castles.clone();
-    pos.epSquare = this.epSquare;
-    pos.remainingChecks = this.remainingChecks && this.remainingChecks.clone();
-    pos.halfmoves = this.halfmoves;
-    pos.fullmoves = this.fullmoves;
-    return pos;
+  ctx(): Context {
+    const variantEnd = this.isVariantEnd();
+    const king = this.board.kingOf(this.turn)!;
+    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd };
+    const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
+      .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
+      .intersect(this.board[opposite(this.turn)]);
+    let blockers = SquareSet.empty();
+    for (const sniper of snipers) {
+      const b = between(king, sniper).intersect(this.board.occupied);
+      if (!b.moreThanOne()) blockers = blockers.union(b);
+    }
+    const checkers = this.kingAttackers(king, opposite(this.turn), this.board.occupied);
+    return {
+      king,
+      blockers,
+      checkers,
+      variantEnd,
+    };
   }
 }
 
@@ -333,10 +353,6 @@ export default class Chess extends Position {
     if (!defined(otherKing)) return { err:'ERR_KINGS' };
     if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) return { err: 'ERR_OPPOSITE_CHECK' };
     if (SquareSet.backranks().intersects(this.board.pawn)) return { err: 'ERR_PAWNS_ON_BACKRANK' };
-    for (const color of COLORS) {
-      if (this.board.pieces(color, 'pawn').size() > 8) return { err: 'ERR_TOO_MANY_PAWNS' };
-      if (this.board[color].size() > 16) return { err: 'ERR_TOO_MANY_PIECES' };
-    }
     return;
   }
 
@@ -349,27 +365,6 @@ export default class Chess extends Position {
     const pawn = square - forward;
     if (!this.board.pawn.has(pawn) || !this.board[opposite(this.turn)].has(pawn)) return;
     return square;
-  }
-
-  ctx(): Context {
-    const variantEnd = this.isVariantEnd();
-    const king = this.board.kingOf(this.turn)!;
-    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd };
-    const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
-      .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
-      .intersect(this.board[opposite(this.turn)]);
-    let blockers = SquareSet.empty();
-    for (const sniper of snipers) {
-      const b = between(king, sniper).intersect(this.board.occupied);
-      if (!b.moreThanOne()) blockers = blockers.union(b);
-    }
-    const checkers = this.kingAttackers(king, opposite(this.turn), this.board.occupied);
-    return {
-      king,
-      blockers,
-      checkers,
-      variantEnd,
-    };
   }
 
   private castlingDest(side: CastlingSide, ctx: Context): SquareSet {

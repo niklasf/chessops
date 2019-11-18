@@ -8,6 +8,54 @@ import { PositionError, Position, Context, Castles, Chess } from './chess';
 
 export { Position, PositionError, Chess, Castles };
 
+export class Crazyhouse extends Chess {
+  static default(): Crazyhouse {
+    const pos = super.default();
+    pos.pockets = Material.empty();
+    return pos;
+  }
+
+  static fromSetup(setup: Setup): Crazyhouse | Err<PositionError> {
+    const pos = super.fromSetup(setup);
+    if (isErr(pos)) return pos;
+    pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
+    if (pos.pockets.white.king > 0 || pos.pockets.black.king > 0) return { err: 'ERR_KINGS' };
+    return pos;
+  }
+
+  clone(): Crazyhouse {
+    return super.clone() as Crazyhouse;
+  }
+
+  rules(): Rules {
+    return 'crazyhouse';
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    return this.board.occupied.size() + this.pockets!.count() <= 3 &&
+      this.board.pawn.isEmpty() &&
+      this.board.rooksAndQueens().isEmpty() &&
+      this.pockets!.white.pawn <= 0 &&
+      this.pockets!.black.pawn <= 0 &&
+      this.pockets!.white.rook <= 0 &&
+      this.pockets!.black.rook <= 0 &&
+      this.pockets!.white.queen <= 0 &&
+      this.pockets!.black.queen <= 0;
+  }
+
+  dropDests(ctx: Context): SquareSet {
+    const mask = this.board.occupied.complement().intersect(
+      (this.pockets && this.pockets[this.turn].hasNonPawn()) ? SquareSet.full() :
+      (this.pockets && this.pockets[this.turn].pawn) ? SquareSet.backranks().complement() : SquareSet.empty());
+
+    if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
+      const checker = ctx.checkers.singleSquare();
+      if (!defined(checker)) return SquareSet.empty();
+      return mask.intersect(between(checker, ctx.king));
+    } else return mask;
+  }
+}
+
 export class Atomic extends Chess {
   clone(): Atomic {
     return super.clone() as Atomic;
@@ -90,32 +138,6 @@ export class ThreeCheck extends Chess {
       }
     }
     return;
-  }
-}
-
-export class Crazyhouse extends Chess {
-  clone(): Crazyhouse {
-    return super.clone() as Crazyhouse;
-  }
-
-  rules(): Rules {
-    return 'crazyhouse';
-  }
-
-  hasInsufficientMaterial(color: Color): boolean {
-    return false; // TODO: maybe check anyway
-  }
-
-  dropDests(ctx: Context): SquareSet {
-    const mask = this.board.occupied.complement().intersect(
-      (this.pockets && this.pockets[this.turn].hasNonPawn()) ? SquareSet.full() :
-      (this.pockets && this.pockets[this.turn].pawn) ? SquareSet.backranks().complement() : SquareSet.empty());
-
-    if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
-      const checker = ctx.checkers.singleSquare();
-      if (!defined(checker)) return SquareSet.empty();
-      return mask.intersect(between(checker, ctx.king));
-    } else return mask;
   }
 }
 

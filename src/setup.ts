@@ -35,6 +35,10 @@ export class MaterialSide {
   hasNonPawn(): boolean {
     return this.knight > 0 || this.bishop > 0 || this.rook > 0 || this.queen > 0 || this.king > 0;
   }
+
+  count(): number {
+    return this.pawn + this.knight + this.bishop + this.rook + this.queen + this.king;
+  }
 }
 
 export class Material {
@@ -53,6 +57,10 @@ export class Material {
     const m = new Material();
     for (const color of COLORS) m[color] = this[color].clone();
     return m;
+  }
+
+  count(): number {
+    return this.white.count() + this.black.count();
   }
 }
 
