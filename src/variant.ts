@@ -6,7 +6,7 @@ import { Board } from './board';
 import { Setup, RemainingChecks, Material } from './setup';
 import { Position, Context, Castles, Chess } from './chess';
 
-export { Position, Chess };
+export { Position, Chess, Castles };
 
 export class Atomic extends Chess {
   clone(): Atomic {
@@ -187,7 +187,7 @@ export class Horde extends Chess {
   }
 }
 
-export function setup(rules: Rules, setup?: Setup): Position {
+export function setupPosition(rules: Rules, setup?: Setup): Position {
   switch (rules) {
     case 'chess': return new Chess(setup);
     case 'antichess': return new Antichess(setup);
