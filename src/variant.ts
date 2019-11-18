@@ -34,15 +34,16 @@ export class Crazyhouse extends Chess {
   hasInsufficientMaterial(color: Color): boolean {
     // No material can leave the game, but we can easily check this for
     // custom positions.
-    return this.board.occupied.size() + this.pockets!.count() <= 3 &&
+    if (!this.pockets) return super.hasInsufficientMaterial(color);
+    return this.board.occupied.size() + this.pockets.count() <= 3 &&
       this.board.pawn.isEmpty() &&
       this.board.rooksAndQueens().isEmpty() &&
-      this.pockets!.white.pawn <= 0 &&
-      this.pockets!.black.pawn <= 0 &&
-      this.pockets!.white.rook <= 0 &&
-      this.pockets!.black.rook <= 0 &&
-      this.pockets!.white.queen <= 0 &&
-      this.pockets!.black.queen <= 0;
+      this.pockets.white.pawn <= 0 &&
+      this.pockets.black.pawn <= 0 &&
+      this.pockets.white.rook <= 0 &&
+      this.pockets.black.rook <= 0 &&
+      this.pockets.white.queen <= 0 &&
+      this.pockets.black.queen <= 0;
   }
 
   dropDests(ctx: Context): SquareSet {
