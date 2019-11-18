@@ -1,5 +1,5 @@
 import { Err, isErr, Square, Outcome, Color, COLORS, Rules } from './types';
-import { defined } from './util';
+import { defined, opposite } from './util';
 import { between } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
@@ -85,7 +85,7 @@ export class KingOfTheHill extends Chess {
   }
 
   static fromSetup(setup: Setup): KingOfTheHill | Err<PositionError> {
-    return super.fromSetup(setup)!;
+    return super.fromSetup(setup) as KingOfTheHill | Err<PositionError>;
   }
 
   clone(): KingOfTheHill {
@@ -182,7 +182,36 @@ export class ThreeCheck extends Chess {
   }
 }
 
-/* export */ class Horde extends Chess {
+export class Horde extends Chess {
+  static default(): Horde {
+    const pos = new this();
+    pos.board = Board.horde();
+    pos.pockets = undefined;
+    pos.turn = 'white';
+    pos.castles = Castles.default();
+    pos.castles.discardSide('white');
+    pos.epSquare = undefined;
+    pos.remainingChecks = undefined;
+    pos.halfmoves = 0;
+    pos.fullmoves = 1;
+    return pos;
+  }
+
+  static fromSetup(setup: Setup): Horde | Err<PositionError> {
+    return super.fromSetup(setup) as Horde | Err<PositionError>;
+  }
+
+  protected validate(): undefined | Err<PositionError> {
+    if (this.board.occupied.isEmpty()) return { err: 'ERR_EMPTY' };
+    if (this.board.king.size() != 1) return { err: 'ERR_KINGS' };
+    if (this.board.king.diff(this.board.promoted).size() != 1) return { err: 'ERR_KINGS' };
+    const otherKing = this.board.kingOf(opposite(this.turn));
+    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) return { err: 'ERR_OPPOSITE_CHECK' };
+    if (this.board.pieces('white', 'pawn').intersects(SquareSet.fromRank(7))) return { err: 'ERR_PAWNS_ON_BACKRANK' };
+    if (this.board.pieces('black', 'pawn').intersects(SquareSet.fromRank(0))) return { err: 'ERR_PAWNS_ON_BACKRANK' };
+    return;
+  }
+
   clone(): Horde {
     return super.clone() as Horde;
   }
@@ -192,7 +221,8 @@ export class ThreeCheck extends Chess {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return false; // TODO: detect when the horde cannot mate
+    // TODO: Detect cases where the horde cannot mate.
+    return false;
   }
 
   isVariantEnd(): boolean {
@@ -200,8 +230,7 @@ export class ThreeCheck extends Chess {
   }
 
   variantOutcome(): Outcome | undefined {
-    if (this.board.occupied.isEmpty()) return { winner: undefined };
-    else if (this.board.white.isEmpty()) return { winner: 'black' };
+    if (this.board.white.isEmpty()) return { winner: 'black' };
     else if (this.board.black.isEmpty()) return { winner: 'white' };
     return;
   }
