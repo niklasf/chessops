@@ -3,7 +3,6 @@ import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
 import { Setup } from '../src/setup';
 import { Castles, Chess } from '../src/chess';
 import { perft } from '../src/debug';
-import { unwrap } from '../src/util';
 
 const tricky: [string, string, number, number, number, number?, number?][] = [
   ['pos-2', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -', 48, 2039, 97862], // Kiwipete by Peter McKenzie
@@ -44,8 +43,8 @@ const random: [string, string, number, number, number, number, number][] = [
 ];
 
 test('castles from setup', () => {
-  const setup = parseFen(INITIAL_FEN);
-  const castles = Castles.fromSetup(unwrap<Setup>(setup));
+  const setup = parseFen(INITIAL_FEN).unwrap();
+  const castles = Castles.fromSetup(setup);
 
   expect(castles.unmovedRooks).toEqual(SquareSet.corners());
 
@@ -61,7 +60,7 @@ test('castles from setup', () => {
 });
 
 test('play move', () => {
-  const pos = unwrap<Chess>(Chess.fromSetup(unwrap<Setup>(parseFen('8/8/8/5k2/3p4/8/4P3/4K3 w - -'))));
+  const pos = Chess.fromSetup(parseFen('8/8/8/5k2/3p4/8/4P3/4K3 w - -').unwrap()).unwrap();
 
   const kd1 = pos.clone();
   kd1.play({ from: 4, to: 3 });
@@ -73,24 +72,24 @@ test('play move', () => {
 });
 
 test('play castling move', () => {
-  let pos = unwrap<Chess>(Chess.fromSetup(unwrap<Setup>(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -'))));
+  let pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -').unwrap()).unwrap();
   pos.play({ from: 3, to: 4 });
   expect(makeFen(pos.toSetup())).toBe('2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
 
-  pos = unwrap<Chess>(Chess.fromSetup(unwrap<Setup>(parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'))));
+  pos = Chess.fromSetup(parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1').unwrap()).unwrap();
   pos.play({ from: 4, to: 0 });
   expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
 });
 
 test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
-  const pos = unwrap<Chess>(Chess.fromSetup(unwrap<Setup>(parseFen(fen))));
+  const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
   expect(perft(pos, 1, false)).toBe(d1);
   expect(perft(pos, 2, false)).toBe(d2);
   expect(perft(pos, 3, false)).toBe(d3);
 });
 
 test.each(random)('random perft: %s: %s', (_, fen, d1, d2, d3, d4, d5) => {
-  const pos = unwrap<Chess>(Chess.fromSetup(unwrap<Setup>(parseFen(fen))));
+  const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
   expect(perft(pos, 1, false)).toBe(d1);
   expect(perft(pos, 2, false)).toBe(d2);
   expect(perft(pos, 3, false)).toBe(d3);
@@ -108,7 +107,7 @@ const insufficientMaterial: [string, boolean, boolean][] = [
 ];
 
 test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black) => {
-  const pos: Chess = unwrap<Chess>(Chess.fromSetup(unwrap<Setup>(parseFen(fen))));
+  const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
   expect(pos.hasInsufficientMaterial('white')).toBe(white);
   expect(pos.hasInsufficientMaterial('black')).toBe(black);
 });

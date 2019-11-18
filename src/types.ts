@@ -56,11 +56,3 @@ export const RULES: Rules[] = ['chess', 'antichess', 'kingOfTheHill', 'threeChec
 export interface Outcome {
   winner: Color | undefined;
 }
-
-export interface Err<T> {
-  err: T
-}
-
-export function isErr<A, T>(v: A | Err<T>): v is Err<T> {
-  return typeof v !== 'undefined' && 'err' in v;
-}

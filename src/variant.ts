@@ -1,4 +1,5 @@
-import { Err, isErr, Square, Outcome, Color, COLORS, Rules } from './types';
+import { Result } from '@badrap/result';
+import { Square, Outcome, Color, COLORS, Rules } from './types';
 import { defined, opposite } from './util';
 import { between } from './attacks';
 import { SquareSet } from './squareSet';
@@ -15,12 +16,14 @@ export class Crazyhouse extends Chess {
     return pos;
   }
 
-  static fromSetup(setup: Setup): Crazyhouse | Err<PositionError> {
-    const pos = super.fromSetup(setup);
-    if (isErr(pos)) return pos;
-    pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
-    if (pos.pockets.white.king > 0 || pos.pockets.black.king > 0) return { err: 'ERR_KINGS' };
-    return pos;
+  static fromSetup(setup: Setup): Result<Crazyhouse, PositionError> {
+    return super.fromSetup(setup).chain(pos => {
+      pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
+      if (pos.pockets.white.king > 0 || pos.pockets.black.king > 0) {
+        return Result.err(new PositionError('ERR_KINGS'));
+      }
+      return Result.ok(pos);
+    });
   }
 
   clone(): Crazyhouse {
@@ -59,7 +62,7 @@ export class Crazyhouse extends Chess {
   }
 }
 
-/* export */ class Atomic extends Chess {
+class Atomic extends Chess {
   clone(): Atomic {
     return super.clone() as Atomic;
   }
@@ -69,7 +72,7 @@ export class Crazyhouse extends Chess {
   }
 }
 
-/* export */ class Antichess extends Chess {
+class Antichess extends Chess {
   clone(): Antichess {
     return super.clone() as Antichess;
   }
@@ -84,8 +87,8 @@ export class KingOfTheHill extends Chess {
     return super.default();
   }
 
-  static fromSetup(setup: Setup): KingOfTheHill | Err<PositionError> {
-    return super.fromSetup(setup) as KingOfTheHill | Err<PositionError>;
+  static fromSetup(setup: Setup): Result<KingOfTheHill, PositionError> {
+    return super.fromSetup(setup);
   }
 
   clone(): KingOfTheHill {
@@ -119,11 +122,11 @@ export class ThreeCheck extends Chess {
     return pos;
   }
 
-  static fromSetup(setup: Setup): ThreeCheck | Err<PositionError> {
-    const pos = super.fromSetup(setup);
-    if (isErr(pos)) return pos;
-    pos.remainingChecks = setup.remainingChecks || RemainingChecks.default();
-    return pos;
+  static fromSetup(setup: Setup): Result<ThreeCheck, PositionError> {
+    return super.fromSetup(setup).map(pos => {
+      pos.remainingChecks = setup.remainingChecks || RemainingChecks.default();
+      return pos;
+    });
   }
 
   clone(): ThreeCheck {
@@ -152,7 +155,7 @@ export class ThreeCheck extends Chess {
   }
 }
 
-/* export */ class RacingKings extends Chess {
+class RacingKings extends Chess {
   clone(): RacingKings {
     return super.clone() as RacingKings;
   }
@@ -197,19 +200,25 @@ export class Horde extends Chess {
     return pos;
   }
 
-  static fromSetup(setup: Setup): Horde | Err<PositionError> {
-    return super.fromSetup(setup) as Horde | Err<PositionError>;
+  static fromSetup(setup: Setup): Result<Horde, PositionError> {
+    return super.fromSetup(setup) as Result<Horde, PositionError>;
   }
 
-  protected validate(): undefined | Err<PositionError> {
-    if (this.board.occupied.isEmpty()) return { err: 'ERR_EMPTY' };
-    if (this.board.king.size() != 1) return { err: 'ERR_KINGS' };
-    if (this.board.king.diff(this.board.promoted).size() != 1) return { err: 'ERR_KINGS' };
+  protected validate(): Result<undefined, PositionError> {
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError('ERR_EMPTY'));
+    if (this.board.king.size() != 1) return Result.err(new PositionError('ERR_KINGS'));
+    if (this.board.king.diff(this.board.promoted).size() != 1) return Result.err(new PositionError('ERR_KINGS'));
     const otherKing = this.board.kingOf(opposite(this.turn));
-    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) return { err: 'ERR_OPPOSITE_CHECK' };
-    if (this.board.pieces('white', 'pawn').intersects(SquareSet.fromRank(7))) return { err: 'ERR_PAWNS_ON_BACKRANK' };
-    if (this.board.pieces('black', 'pawn').intersects(SquareSet.fromRank(0))) return { err: 'ERR_PAWNS_ON_BACKRANK' };
-    return;
+    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
+      return Result.err(new PositionError('ERR_OPPOSITE_CHECK'));
+    }
+    if (this.board.pieces('white', 'pawn').intersects(SquareSet.fromRank(7))) {
+      return Result.err(new PositionError('ERR_PAWNS_ON_BACKRANK'));
+    }
+    if (this.board.pieces('black', 'pawn').intersects(SquareSet.fromRank(0))) {
+      return Result.err(new PositionError('ERR_PAWNS_ON_BACKRANK'));
+    }
+    return Result.ok(undefined);
   }
 
   clone(): Horde {
@@ -236,16 +245,28 @@ export class Horde extends Chess {
   }
 }
 
-export function setupPosition(rules: Rules): Position;
-export function setupPosition(rules: Rules, setup?: Setup): Position | Err<PositionError> {
+export function defaultPosition(rules: Rules): Position {
   switch (rules) {
-    case 'chess': return setup ? Chess.fromSetup(setup) : Chess.default();
-    case 'antichess': return setup ? Antichess.fromSetup(setup) : Antichess.default();
-    case 'atomic': return setup ? Atomic.fromSetup(setup) : Atomic.default();
-    case 'horde': return setup ? Horde.fromSetup(setup) : Horde.default();
-    case 'racingKings': return setup ? RacingKings.fromSetup(setup) : RacingKings.default();
-    case 'kingOfTheHill': return setup ? KingOfTheHill.fromSetup(setup) : KingOfTheHill.default();
-    case 'threeCheck': return setup ? ThreeCheck.fromSetup(setup) : ThreeCheck.default();
-    case 'crazyhouse': return setup ? Crazyhouse.fromSetup(setup) : Crazyhouse.default();
+    case 'chess': return Chess.default();
+    case 'antichess': return Antichess.default();
+    case 'atomic': return Atomic.default();
+    case 'horde': return Horde.default();
+    case 'racingKings': return RacingKings.default();
+    case 'kingOfTheHill': return KingOfTheHill.default();
+    case 'threeCheck': return ThreeCheck.default();
+    case 'crazyhouse': return Crazyhouse.default();
+  }
+}
+
+export function setupPosition(rules: Rules, setup: Setup): Result<Position, PositionError> {
+  switch (rules) {
+    case 'chess': return Chess.fromSetup(setup);
+    case 'antichess': return Antichess.fromSetup(setup);
+    case 'atomic': return Atomic.fromSetup(setup);
+    case 'horde': return Horde.fromSetup(setup);
+    case 'racingKings': return RacingKings.fromSetup(setup);
+    case 'kingOfTheHill': return KingOfTheHill.fromSetup(setup);
+    case 'threeCheck': return ThreeCheck.fromSetup(setup);
+    case 'crazyhouse': return Crazyhouse.fromSetup(setup);
   }
 }

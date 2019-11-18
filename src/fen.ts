@@ -1,4 +1,5 @@
-import { Err, isErr, Role, Piece, Square, Color, COLORS, ROLES } from './types';
+import { Result } from '@badrap/result';
+import { Role, Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
@@ -9,13 +10,25 @@ export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
 export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
 export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
-export type FenError = 'ERR_FEN' | 'ERR_BOARD' | 'ERR_POCKET' | 'ERR_TURN' | 'ERR_CASTLING_FEN' | 'ERR_EP_SQUARE' | 'ERR_REMAINING_CHECKS' | 'ERR_HALFMOVES' | 'ERR_FULLMOVES';
+enum FenErrorCause {
+  Fen = 'ERR_FEN',
+  Board = 'ERR_BOARD',
+  Pocket = 'ERR_POCKET',
+  Turn = 'ERR_TURN',
+  Castling = 'ERR_CASTLING',
+  EpSquare = 'ERR_EP_SQUARE',
+  RemainingChecks = 'ERR_REMAINING_CHECKS',
+  Halfmoves = 'ERR_HALFMOVES',
+  Fullmoves = 'ERR_FULLMOVES',
+}
+
+export class FenError extends Error { }
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
 }
 
-export function parseBoardFen(boardPart: string): Board | Err<'ERR_BOARD'> {
+export function parseBoardFen(boardPart: string): Result<Board, FenError> {
   const board = Board.empty();
   let rank = 7, file = 0;
   for (let i = 0; i < boardPart.length; i++) {
@@ -27,10 +40,10 @@ export function parseBoardFen(boardPart: string): Board | Err<'ERR_BOARD'> {
       const step = parseInt(c, 10);
       if (step) file += step;
       else {
-        if (file >= 8 || rank < 0) return { err: 'ERR_BOARD' };
+        if (file >= 8 || rank < 0) return Result.err(new FenError('ERR_BOARD'));
         const square = file + rank * 8;
         const piece = charToPiece(c);
-        if (!piece) return { err: 'ERR_BOARD' };
+        if (!piece) return Result.err(new FenError('ERR_BOARD'));
         if (boardPart[i + 1] == '~') {
           piece.promoted = true;
           i++;
@@ -40,24 +53,26 @@ export function parseBoardFen(boardPart: string): Board | Err<'ERR_BOARD'> {
       }
     }
   }
-  if (rank != 0 || file != 8) return { err: 'ERR_BOARD' };
-  return board;
+  if (rank != 0 || file != 8) return Result.err(new FenError('ERR_BOARD'));
+  return Result.ok(board);
 }
 
-export function parsePockets(pocketPart: string): Material | Err<'ERR_POCKET'> {
+export function parsePockets(pocketPart: string): Result<Material, FenError> {
   const pockets = Material.empty();
   for (const c of pocketPart) {
     const piece = charToPiece(c);
-    if (!piece) return { err: 'ERR_POCKET' };
+    if (!piece) return Result.err(new FenError('ERR_POCKET'));
     pockets[piece.color][piece.role]++;
   }
-  return pockets;
+  return Result.ok(pockets);
 }
 
-export function parseCastlingFen(board: Board, castlingPart: string): SquareSet | Err<'ERR_CASTLING_FEN'>{
+export function parseCastlingFen(board: Board, castlingPart: string): Result<SquareSet, FenError> {
   let unmovedRooks = SquareSet.empty();
-  if (castlingPart == '-') return unmovedRooks;
-  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return { err: 'ERR_CASTLING_FEN' };
+  if (castlingPart == '-') return Result.ok(unmovedRooks);
+  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) {
+    return Result.err(new FenError('ERR_CASTLING'));
+  }
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
     const color = c == lower ? 'black' : 'white';
@@ -76,30 +91,31 @@ export function parseCastlingFen(board: Board, castlingPart: string): SquareSet 
       }
     }
   }
-  return unmovedRooks;
+  return Result.ok(unmovedRooks);
 }
 
-export function parseRemainingChecks(part: string): RemainingChecks | Err<'ERR_REMAINING_CHECKS'> {
+export function parseRemainingChecks(part: string): Result<RemainingChecks, FenError> {
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return { err: 'ERR_REMAINING_CHECKS' };
-    return new RemainingChecks(3 - white, 3 - black);
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError('ERR_REMAINING_CHECKS'));
+    return Result.ok(new RemainingChecks(3 - white, 3 - black));
   } else if (parts.length == 2) {
     const white = parseSmallUint(parts[0]), black = parseSmallUint(parts[1]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return { err: 'ERR_REMAINING_CHECKS' };
-    return new RemainingChecks(white, black);
-  } else return { err: 'ERR_REMAINING_CHECKS' };
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError('ERR_REMAINING_CHECKS'));
+    return Result.ok(new RemainingChecks(white, black));
+  } else return Result.err(new FenError('ERR_REMAINING_CHECKS'));
 }
 
-export function parseFen(fen: string): Setup | Err<FenError> {
+export function parseFen(fen: string): Result<Setup, FenError> {
   const parts = fen.split(' ');
   const boardPart = parts.shift()!;
 
-  let board, pockets;
+  // Board and pockets
+  let board, pockets = Result.ok<Material | undefined, FenError>(undefined);
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
-    if (pocketStart == -1) return { err: 'ERR_FEN' };
+    if (pocketStart == -1) return Result.err(new FenError('ERR_FEN'));
     board = parseBoardFen(boardPart.substr(0, pocketStart));
     pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
   } else {
@@ -110,59 +126,65 @@ export function parseFen(fen: string): Setup | Err<FenError> {
       pockets = parsePockets(boardPart.substr(pocketStart + 1));
     }
   }
-  if (isErr(board)) return board;
-  if (isErr(pockets)) return pockets;
 
+  // Turn
   let turn: Color;
   const turnPart = parts.shift();
   if (!defined(turnPart) || turnPart == 'w') turn = 'white';
   else if (turnPart == 'b') turn = 'black';
-  else return { err: 'ERR_TURN' };
+  else return Result.err(new FenError('ERR_TURN'));
 
-  const castlingPart = parts.shift();
-  const unmovedRooks = defined(castlingPart) ? parseCastlingFen(board, castlingPart) : SquareSet.empty();
-  if (isErr(unmovedRooks)) return unmovedRooks;
+  return board.chain(board => {
+    // Castling
+    const castlingPart = parts.shift();
+    const unmovedRooks = defined(castlingPart) ? parseCastlingFen(board, castlingPart) : Result.ok(SquareSet.empty());
 
-  const epPart = parts.shift();
-  let epSquare;
-  if (defined(epPart) && epPart != '-') {
-    epSquare = parseSquare(epPart);
-    if (!defined(epSquare)) return { err: 'ERR_EP_SQUARE' };
-  }
+    // En passant square
+    const epPart = parts.shift();
+    let epSquare: Square | undefined;
+    if (defined(epPart) && epPart != '-') {
+      epSquare = parseSquare(epPart);
+      if (!defined(epSquare)) return Result.err(new FenError('ERR_EP_SQUARE'));
+    }
 
-  let halfmovePart = parts.shift();
-  let remainingChecks;
-  if (defined(halfmovePart) && halfmovePart.includes('+')) {
-    remainingChecks = parseRemainingChecks(halfmovePart);
-    halfmovePart = parts.shift();
-  }
-  if (isErr(remainingChecks)) return remainingChecks;
-  const halfmoves = defined(halfmovePart) ? parseSmallUint(halfmovePart) : 0;
-  if (!defined(halfmoves)) return { err: 'ERR_HALFMOVES' };
+    // Halfmoves or remaining checks
+    let halfmovePart = parts.shift();
+    let earlyRemainingChecks: Result<RemainingChecks, FenError> | undefined;
+    if (defined(halfmovePart) && halfmovePart.includes('+')) {
+      earlyRemainingChecks = parseRemainingChecks(halfmovePart);
+      halfmovePart = parts.shift();
+    }
+    const halfmoves = defined(halfmovePart) ? parseSmallUint(halfmovePart) : 0;
+    if (!defined(halfmoves)) return Result.err(new FenError('ERR_HALFMOVES'));
 
-  const fullmovesPart = parts.shift();
-  const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart) : 1;
-  if (!defined(fullmoves)) return { err: 'ERR_FULLMOVES' };
+    const fullmovesPart = parts.shift();
+    const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart) : 1;
+    if (!defined(fullmoves)) return Result.err(new FenError('ERR_FULLMOVES'));
 
-  const remainingChecksPart = parts.shift();
-  if (defined(remainingChecksPart)) {
-    if (defined(remainingChecks)) return { err: 'ERR_REMAINING_CHECKS' };
-    remainingChecks = parseRemainingChecks(remainingChecksPart);
-    if (isErr(remainingChecks)) return remainingChecks;
-  }
+    const remainingChecksPart = parts.shift();
+    let remainingChecks: Result<RemainingChecks | undefined, FenError> = Result.ok(undefined);
+    if (defined(remainingChecksPart)) {
+      if (defined(earlyRemainingChecks)) return Result.err(new FenError('ERR_REMAINING_CHECKS'));
+      remainingChecks = parseRemainingChecks(remainingChecksPart);
+    } else if (defined(earlyRemainingChecks)) {
+      remainingChecks = earlyRemainingChecks
+    };
 
-  if (parts.length) return { err: 'ERR_FEN' };
+    if (parts.length) return Result.err(new FenError('ERR_FEN'));
 
-  return {
-    board,
-    pockets,
-    turn,
-    unmovedRooks,
-    remainingChecks,
-    epSquare,
-    halfmoves,
-    fullmoves: Math.max(1, fullmoves)
-  };
+    return pockets.chain(pockets => unmovedRooks.chain(unmovedRooks => remainingChecks.map(remainingChecks => {
+      return {
+        board,
+        pockets,
+        turn,
+        unmovedRooks,
+        remainingChecks,
+        epSquare,
+        halfmoves,
+        fullmoves: Math.max(1, fullmoves)
+      };
+    })));
+  });
 }
 
 interface FenOpts {

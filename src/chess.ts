@@ -1,11 +1,20 @@
-import { Err, Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
+import { Result } from '@badrap/result';
+import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
-export type PositionError = 'ERR_EMPTY' | 'ERR_OPPOSITE_CHECK' | 'ERR_PAWNS_ON_BACKRANK' | 'ERR_VARIANT' | 'ERR_KINGS';
+export class PositionError extends Error { }
+
+enum PositionErrorCause {
+  Empty = 'ERR_EMPTY',
+  OppositeCheck = 'ERR_OPPOSITE_CHECK',
+  PawnsOnBackrank = 'ERR_PAWNS_ON_BACKRANK',
+  Kings = 'ERR_KINGS',
+  Variant = 'ERR_VARIANT',
+}
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
@@ -331,7 +340,7 @@ export default class Chess extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup): Chess | Err<PositionError> {
+  static fromSetup(setup: Setup): Result<Chess, PositionError> {
     const pos = new this();
     pos.board = setup.board.clone();
     pos.pockets = undefined;
@@ -341,7 +350,7 @@ export default class Chess extends Position {
     pos.remainingChecks = undefined;
     pos.halfmoves = setup.halfmoves;
     pos.fullmoves = setup.fullmoves;
-    return pos.validate() || pos;
+    return pos.validate().map(_ => pos);
   }
 
   clone(): Chess {
@@ -352,15 +361,19 @@ export default class Chess extends Position {
     return 'chess';
   }
 
-  protected validate(): undefined | Err<PositionError> {
-    if (this.board.occupied.isEmpty()) return { err: 'ERR_EMPTY' };
-    if (this.board.king.size() != 2) return { err: 'ERR_KINGS' };
-    if (!defined(this.board.kingOf(this.turn))) return { err: 'ERR_KINGS' };
+  protected validate(): Result<undefined, PositionError> {
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError('ERR_EMPTY'));
+    if (this.board.king.size() != 2) return Result.err(new PositionError('ERR_KINGS'));
+    if (!defined(this.board.kingOf(this.turn))) return Result.err(new PositionError('ERR_KINGS'));
     const otherKing = this.board.kingOf(opposite(this.turn));
-    if (!defined(otherKing)) return { err:'ERR_KINGS' };
-    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) return { err: 'ERR_OPPOSITE_CHECK' };
-    if (SquareSet.backranks().intersects(this.board.pawn)) return { err: 'ERR_PAWNS_ON_BACKRANK' };
-    return;
+    if (!defined(otherKing)) return Result.err(new PositionError('ERR_KINGS'));
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
+      return Result.err(new PositionError('ERR_OPPOSITE_CHECK'));
+    }
+    if (SquareSet.backranks().intersects(this.board.pawn)) {
+      return Result.err(new PositionError('ERR_PAWNS_ON_BACKRANK'));
+    }
+    return Result.ok(undefined);
   }
 
   private validEpSquare(square: Square | undefined): Square | undefined {

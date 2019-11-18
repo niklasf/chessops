@@ -29,20 +29,11 @@ Example
 -------
 
 ```javascript
-import { isErr } from 'chessops/types';
 import { parseFen } from 'chessops/fen';
 import { Chess } from 'chessops/chess';
 
-const setup = parseFen('r1bqkbnr/ppp2Qpp/2np4/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4');
-if (isErr(setup)) {
-  throw new Error('invalid fen');
-}
-
-const pos = Chess.fromSetup(setup);
-if (isErr(pos)) {
-  throw new Error('illegal position');
-}
-
+const setup = parseFen('r1bqkbnr/ppp2Qpp/2np4/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4').unwrap();
+const pos = Chess.fromSetup(setup).unwrap();
 console.assert(pos.isCheckmate());
 ```
 
