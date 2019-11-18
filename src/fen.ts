@@ -9,7 +9,7 @@ export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
 export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
 export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
-export type FenError = 'ERR_FEN' | 'ERR_BOARD' | 'ERR_POCKET' | 'ERR_TURN' | 'ERR_CASTLES' | 'ERR_EPSQUARE' | 'ERR_REMAININGCHECKS' | 'ERR_HALFMOVES' | 'ERR_FULLMOVES';
+export type FenError = 'ERR_FEN' | 'ERR_BOARD' | 'ERR_POCKET' | 'ERR_TURN' | 'ERR_CASTLING_FEN' | 'ERR_EP_SQUARE' | 'ERR_REMAINING_CHECKS' | 'ERR_HALFMOVES' | 'ERR_FULLMOVES';
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
@@ -54,10 +54,10 @@ export function parsePockets(pocketPart: string): Material | Err<'ERR_POCKET'> {
   return pockets;
 }
 
-export function parseCastlingFen(board: Board, castlingPart: string): SquareSet | Err<'ERR_CASTLES'>{
+export function parseCastlingFen(board: Board, castlingPart: string): SquareSet | Err<'ERR_CASTLING_FEN'>{
   let unmovedRooks = SquareSet.empty();
   if (castlingPart == '-') return unmovedRooks;
-  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return { err: 'ERR_CASTLES' };
+  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) return { err: 'ERR_CASTLING_FEN' };
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
     const color = c == lower ? 'black' : 'white';
@@ -79,17 +79,17 @@ export function parseCastlingFen(board: Board, castlingPart: string): SquareSet 
   return unmovedRooks;
 }
 
-export function parseRemainingChecks(part: string): RemainingChecks | Err<'ERR_REMAININGCHECKS'> {
+export function parseRemainingChecks(part: string): RemainingChecks | Err<'ERR_REMAINING_CHECKS'> {
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return { err: 'ERR_REMAININGCHECKS' };
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return { err: 'ERR_REMAINING_CHECKS' };
     return new RemainingChecks(3 - white, 3 - black);
   } else if (parts.length == 2) {
     const white = parseSmallUint(parts[0]), black = parseSmallUint(parts[1]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return { err: 'ERR_REMAININGCHECKS' };
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return { err: 'ERR_REMAINING_CHECKS' };
     return new RemainingChecks(white, black);
-  } else return { err: 'ERR_REMAININGCHECKS' };
+  } else return { err: 'ERR_REMAINING_CHECKS' };
 }
 
 export function parseFen(fen: string): Setup | Err<FenError> {
@@ -127,7 +127,7 @@ export function parseFen(fen: string): Setup | Err<FenError> {
   let epSquare;
   if (defined(epPart) && epPart != '-') {
     epSquare = parseSquare(epPart);
-    if (!defined(epSquare)) return { err: 'ERR_EPSQUARE' };
+    if (!defined(epSquare)) return { err: 'ERR_EP_SQUARE' };
   }
 
   let halfmovePart = parts.shift();
@@ -146,7 +146,7 @@ export function parseFen(fen: string): Setup | Err<FenError> {
 
   const remainingChecksPart = parts.shift();
   if (defined(remainingChecksPart)) {
-    if (defined(remainingChecks)) return { err: 'ERR_REMAININGCHECKS' };
+    if (defined(remainingChecks)) return { err: 'ERR_REMAINING_CHECKS' };
     remainingChecks = parseRemainingChecks(remainingChecksPart);
     if (isErr(remainingChecks)) return remainingChecks;
   }

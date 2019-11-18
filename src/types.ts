@@ -62,5 +62,5 @@ export interface Err<T> {
 }
 
 export function isErr<A, T>(v: A | Err<T>): v is Err<T> {
-  return 'err' in v;
+  return typeof v !== 'undefined' && 'err' in v;
 }

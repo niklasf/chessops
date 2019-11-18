@@ -1,12 +1,12 @@
-import { Square, Outcome, Color, COLORS, Rules } from './types';
+import { Err, isErr, Square, Outcome, Color, COLORS, Rules } from './types';
 import { defined } from './util';
 import { between } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, RemainingChecks, Material } from './setup';
-import { Position, Context, Castles, Chess } from './chess';
+import { PositionError, Position, Context, Castles, Chess } from './chess';
 
-export { Position, Chess, Castles };
+export { Position, PositionError, Chess, Castles };
 
 export class Atomic extends Chess {
   clone(): Atomic {
@@ -54,9 +54,17 @@ export class KingOfTheHill extends Chess {
 }
 
 export class ThreeCheck extends Chess {
-  constructor(setup?: Setup) {
-    super(setup);
-    this.remainingChecks = setup ? setup.remainingChecks : RemainingChecks.default();
+  static default(): ThreeCheck {
+    const pos = super.default();
+    pos.remainingChecks = RemainingChecks.default();
+    return pos;
+  }
+
+  static fromSetup(setup: Setup): ThreeCheck | Err<PositionError> {
+    const pos = super.fromSetup(setup);
+    if (isErr(pos)) return pos;
+    pos.remainingChecks = setup.remainingChecks || RemainingChecks.default();
+    return pos;
   }
 
   clone(): ThreeCheck {
@@ -86,11 +94,6 @@ export class ThreeCheck extends Chess {
 }
 
 export class Crazyhouse extends Chess {
-  constructor(setup?: Setup) {
-    super(setup);
-    this.pockets = setup ? setup.pockets : Material.empty();
-  }
-
   clone(): Crazyhouse {
     return super.clone() as Crazyhouse;
   }
@@ -117,14 +120,6 @@ export class Crazyhouse extends Chess {
 }
 
 export class RacingKings extends Chess {
-  constructor(setup?: Setup) {
-    super(setup);
-    if (!setup) {
-      this.board = Board.racingKings();
-      this.castles = Castles.empty();
-    }
-  }
-
   clone(): RacingKings {
     return super.clone() as RacingKings;
   }
@@ -155,14 +150,6 @@ export class RacingKings extends Chess {
 }
 
 export class Horde extends Chess {
-  constructor(setup?: Setup) {
-    super(setup);
-    if (!setup) {
-      this.board = Board.horde();
-      this.castles.discardSide('white');
-    }
-  }
-
   clone(): Horde {
     return super.clone() as Horde;
   }
@@ -187,15 +174,16 @@ export class Horde extends Chess {
   }
 }
 
-export function setupPosition(rules: Rules, setup?: Setup): Position {
+export function setupPosition(rules: Rules): Position;
+export function setupPosition(rules: Rules, setup?: Setup): Position | Err<PositionError> {
   switch (rules) {
-    case 'chess': return new Chess(setup);
-    case 'antichess': return new Antichess(setup);
-    case 'atomic': return new Atomic(setup);
-    case 'horde': return new Horde(setup);
-    case 'racingKings': return new RacingKings(setup);
-    case 'kingOfTheHill': return new KingOfTheHill(setup);
-    case 'threeCheck': return new ThreeCheck(setup);
-    case 'crazyhouse': return new Crazyhouse(setup);
+    case 'chess': return setup ? Chess.fromSetup(setup) : Chess.default();
+    case 'antichess': return setup ? Antichess.fromSetup(setup) : Antichess.default();
+    case 'atomic': return setup ? Atomic.fromSetup(setup) : Atomic.default();
+    case 'horde': return setup ? Horde.fromSetup(setup) : Horde.default();
+    case 'racingKings': return setup ? RacingKings.fromSetup(setup) : RacingKings.default();
+    case 'kingOfTheHill': return setup ? KingOfTheHill.fromSetup(setup) : KingOfTheHill.default();
+    case 'threeCheck': return setup ? ThreeCheck.fromSetup(setup) : ThreeCheck.default();
+    case 'crazyhouse': return setup ? Crazyhouse.fromSetup(setup) : Crazyhouse.default();
   }
 }

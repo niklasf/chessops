@@ -1,11 +1,11 @@
-import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
+import { Err, Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
-export class PositionError extends Error { }
+export type PositionError = 'ERR_EMPTY' | 'ERR_OPPOSITE_CHECK' | 'ERR_TOO_MANY_PAWNS' | 'ERR_TOO_MANY_PIECES' | 'ERR_PAWNS_ON_BACKRANK' | 'ERR_VARIANT' | 'ERR_KINGS';
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
@@ -134,6 +134,8 @@ export abstract class Position {
   remainingChecks: RemainingChecks | undefined;
   halfmoves: number;
   fullmoves: number;
+
+  protected constructor() { }
 
   abstract rules(): Rules;
   abstract ctx(): Context;
@@ -289,26 +291,30 @@ export abstract class Position {
 }
 
 export default class Chess extends Position {
-  constructor(setup?: Setup) {
-    super();
-    if (setup) {
-      this.board = setup.board.clone();
-      this.turn = setup.turn;
-      this.castles = Castles.fromSetup(setup);
-      this.epSquare = this.validEpSquare(setup.epSquare);
-      this.halfmoves = setup.halfmoves;
-      this.fullmoves = setup.fullmoves;
-      this.validate();
-    } else {
-      this.board = Board.default();
-      this.turn = 'white';
-      this.castles = Castles.default();
-      this.epSquare = undefined;
-      this.halfmoves = 0;
-      this.fullmoves = 0;
-    }
-    this.pockets = undefined;
-    this.remainingChecks = undefined;
+  static default(): Chess {
+    const pos = new this();
+    pos.board = Board.default();
+    pos.pockets = undefined;
+    pos.turn = 'white';
+    pos.castles = Castles.default();
+    pos.epSquare = undefined;
+    pos.remainingChecks = undefined;
+    pos.halfmoves = 0;
+    pos.fullmoves = 1;
+    return pos;
+  }
+
+  static fromSetup(setup: Setup): Chess | Err<PositionError> {
+    const pos = new this();
+    pos.board = setup.board.clone();
+    pos.pockets = undefined;
+    pos.turn = setup.turn;
+    pos.castles = Castles.fromSetup(setup);
+    pos.epSquare = pos.validEpSquare(setup.epSquare);
+    pos.remainingChecks = undefined;
+    pos.halfmoves = Math.min(setup.halfmoves, 150);
+    pos.fullmoves = setup.fullmoves;
+    return pos.validate() || pos;
   }
 
   clone(): Chess {
@@ -319,18 +325,19 @@ export default class Chess extends Position {
     return 'chess';
   }
 
-  protected validate(): void {
-    if (this.board.occupied.isEmpty()) throw new PositionError('empty board');
-    if (this.board.king.size() != 2) throw new PositionError('need exactly two kings');
-    if (!defined(this.board.kingOf(this.turn))) throw new PositionError('stm has no king');
+  protected validate(): undefined | Err<PositionError> {
+    if (this.board.occupied.isEmpty()) return { err: 'ERR_EMPTY' };
+    if (this.board.king.size() != 2) return { err: 'ERR_KINGS' };
+    if (!defined(this.board.kingOf(this.turn))) return { err: 'ERR_KINGS' };
     const otherKing = this.board.kingOf(opposite(this.turn));
-    if (!defined(otherKing)) throw new PositionError('other side has no king');
-    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) throw new PositionError('other side in check');
-    if (SquareSet.backranks().intersects(this.board.pawn)) throw new PositionError('pawns on backrank');
+    if (!defined(otherKing)) return { err:'ERR_KINGS' };
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) return { err: 'ERR_OPPOSITE_CHECK' };
+    if (SquareSet.backranks().intersects(this.board.pawn)) return { err: 'ERR_PAWNS_ON_BACKRANK' };
     for (const color of COLORS) {
-      if (this.board.pieces(color, 'pawn').size() > 8) throw new PositionError('more than 8 pawns');
-      if (this.board[color].size() > 16) throw new PositionError('more than 16 pieces');
+      if (this.board.pieces(color, 'pawn').size() > 8) return { err: 'ERR_TOO_MANY_PAWNS' };
+      if (this.board[color].size() > 16) return { err: 'ERR_TOO_MANY_PIECES' };
     }
+    return;
   }
 
   private validEpSquare(square: Square | undefined): Square | undefined {
