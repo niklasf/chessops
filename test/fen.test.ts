@@ -2,6 +2,7 @@ import { parseFen, makeFen, makeBoardFen, INITIAL_FEN, INITIAL_BOARD_FEN, EMPTY_
 import { SquareSet } from '../src/squareSet';
 import { Board } from '../src/board';
 import { defaultSetup } from '../src/setup';
+import { unwrap } from '../src/util';
 
 test('make board fen', () => {
   expect(makeBoardFen(Board.default())).toEqual(INITIAL_BOARD_FEN);
@@ -15,7 +16,7 @@ test('make initial fen', () => {
 });
 
 test('parse initial fen', () => {
-  const setup = parseFen(INITIAL_FEN);
+  const setup = unwrap(parseFen(INITIAL_FEN));
   expect(setup.board).toEqual(Board.default());
   expect(setup.pockets).toBeUndefined();
   expect(setup.turn).toEqual('white');
@@ -27,7 +28,7 @@ test('parse initial fen', () => {
 });
 
 test('partial fen', () => {
-  const setup = parseFen(INITIAL_BOARD_FEN);
+  const setup = unwrap(parseFen(INITIAL_BOARD_FEN));
   expect(setup.board).toEqual(Board.default());
   expect(setup.pockets).toBeUndefined();
   expect(setup.turn).toEqual('white');
@@ -46,6 +47,6 @@ test.each([
   'rnb1kbnr/ppp1pppp/2Pp2PP/1P3PPP/PPP1PPPP/PPP1PPPP/PPP1PPP1/PPPqPP2 w kq - 0 1',
   '5b1r/1p5p/4ppp1/4Bn2/1PPP1PP1/4P2P/3k4/4K2R w K - 1 1',
 ])('parse and make fen', (fen) => {
-  const setup = parseFen(fen);
+  const setup = unwrap(parseFen(fen));
   expect(makeFen(setup, { promoted: true })).toEqual(fen);
 });
