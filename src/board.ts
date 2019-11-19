@@ -89,7 +89,7 @@ export default class Board {
     return board;
   }
 
-  private getColor(square: Square): Color | undefined {
+  getColor(square: Square): Color | undefined {
     if (this.white.has(square)) return 'white';
     else if (this.black.has(square)) return 'black';
     else return;
