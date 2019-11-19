@@ -5,9 +5,9 @@ import { between } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, RemainingChecks, Material } from './setup';
-import { PositionError, Position, Context, Castles, Chess } from './chess';
+import { PositionError, Position, IllegalSetup, Context, Castles, Chess } from './chess';
 
-export { Position, PositionError, Chess, Castles };
+export { Position, PositionError, IllegalSetup, Context, Chess, Castles };
 
 export class Crazyhouse extends Chess {
   static default(): Crazyhouse {
@@ -20,7 +20,7 @@ export class Crazyhouse extends Chess {
     return super.fromSetup(setup).chain(pos => {
       pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
       if (pos.pockets.white.king > 0 || pos.pockets.black.king > 0) {
-        return Result.err(new PositionError('ERR_KINGS'));
+        return Result.err(new PositionError(IllegalSetup.Kings));
       }
       return Result.ok(pos);
     });
@@ -179,7 +179,7 @@ class RacingKings extends Chess {
 
   protected validate(): Result<undefined, PositionError> {
     if (this.board.pawn.nonEmpty() || this.isCheck()) {
-      return Result.err(new PositionError('ERR_VARIANT'));
+      return Result.err(new PositionError(IllegalSetup.Variant));
     }
     return super.validate();
   }
@@ -253,18 +253,18 @@ export class Horde extends Chess {
   }
 
   protected validate(): Result<undefined, PositionError> {
-    if (this.board.occupied.isEmpty()) return Result.err(new PositionError('ERR_EMPTY'));
-    if (this.board.king.size() != 1) return Result.err(new PositionError('ERR_KINGS'));
-    if (this.board.king.diff(this.board.promoted).size() != 1) return Result.err(new PositionError('ERR_KINGS'));
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (this.board.king.size() != 1) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.king.diff(this.board.promoted).size() != 1) return Result.err(new PositionError(IllegalSetup.Kings));
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
-      return Result.err(new PositionError('ERR_OPPOSITE_CHECK'));
+      return Result.err(new PositionError(IllegalSetup.OppositeCheck));
     }
     if (this.board.pieces('white', 'pawn').intersects(SquareSet.fromRank(7))) {
-      return Result.err(new PositionError('ERR_PAWNS_ON_BACKRANK'));
+      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
     }
     if (this.board.pieces('black', 'pawn').intersects(SquareSet.fromRank(0))) {
-      return Result.err(new PositionError('ERR_PAWNS_ON_BACKRANK'));
+      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
     }
     return Result.ok(undefined);
   }

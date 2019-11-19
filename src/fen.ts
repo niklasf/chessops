@@ -10,10 +10,10 @@ export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
 export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
 export const EMPTY_FEN = EMPTY_BOARD_FEN + ' w - - 0 1';
 
-enum FenErrorCause {
+export enum InvalidFen {
   Fen = 'ERR_FEN',
   Board = 'ERR_BOARD',
-  Pocket = 'ERR_POCKET',
+  Pockets = 'ERR_POCKETS',
   Turn = 'ERR_TURN',
   Castling = 'ERR_CASTLING',
   EpSquare = 'ERR_EP_SQUARE',
@@ -40,10 +40,10 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
       const step = parseInt(c, 10);
       if (step) file += step;
       else {
-        if (file >= 8 || rank < 0) return Result.err(new FenError('ERR_BOARD'));
+        if (file >= 8 || rank < 0) return Result.err(new FenError(InvalidFen.Board));
         const square = file + rank * 8;
         const piece = charToPiece(c);
-        if (!piece) return Result.err(new FenError('ERR_BOARD'));
+        if (!piece) return Result.err(new FenError(InvalidFen.Board));
         if (boardPart[i + 1] == '~') {
           piece.promoted = true;
           i++;
@@ -53,7 +53,7 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
       }
     }
   }
-  if (rank != 0 || file != 8) return Result.err(new FenError('ERR_BOARD'));
+  if (rank != 0 || file != 8) return Result.err(new FenError(InvalidFen.Board));
   return Result.ok(board);
 }
 
@@ -61,7 +61,7 @@ export function parsePockets(pocketPart: string): Result<Material, FenError> {
   const pockets = Material.empty();
   for (const c of pocketPart) {
     const piece = charToPiece(c);
-    if (!piece) return Result.err(new FenError('ERR_POCKET'));
+    if (!piece) return Result.err(new FenError(InvalidFen.Pockets));
     pockets[piece.color][piece.role]++;
   }
   return Result.ok(pockets);
@@ -71,7 +71,7 @@ export function parseCastlingFen(board: Board, castlingPart: string): Result<Squ
   let unmovedRooks = SquareSet.empty();
   if (castlingPart == '-') return Result.ok(unmovedRooks);
   if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) {
-    return Result.err(new FenError('ERR_CASTLING'));
+    return Result.err(new FenError(InvalidFen.Castling));
   }
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
@@ -98,13 +98,13 @@ export function parseRemainingChecks(part: string): Result<RemainingChecks, FenE
   const parts = part.split('+');
   if (parts.length == 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError('ERR_REMAINING_CHECKS'));
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError(InvalidFen.RemainingChecks));
     return Result.ok(new RemainingChecks(3 - white, 3 - black));
   } else if (parts.length == 2) {
     const white = parseSmallUint(parts[0]), black = parseSmallUint(parts[1]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError('ERR_REMAINING_CHECKS'));
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError(InvalidFen.RemainingChecks));
     return Result.ok(new RemainingChecks(white, black));
-  } else return Result.err(new FenError('ERR_REMAINING_CHECKS'));
+  } else return Result.err(new FenError(InvalidFen.RemainingChecks));
 }
 
 export function parseFen(fen: string): Result<Setup, FenError> {
@@ -115,7 +115,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   let board, pockets = Result.ok<Material | undefined, FenError>(undefined);
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
-    if (pocketStart == -1) return Result.err(new FenError('ERR_FEN'));
+    if (pocketStart == -1) return Result.err(new FenError(InvalidFen.Fen));
     board = parseBoardFen(boardPart.substr(0, pocketStart));
     pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
   } else {
@@ -132,7 +132,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   const turnPart = parts.shift();
   if (!defined(turnPart) || turnPart == 'w') turn = 'white';
   else if (turnPart == 'b') turn = 'black';
-  else return Result.err(new FenError('ERR_TURN'));
+  else return Result.err(new FenError(InvalidFen.Turn));
 
   return board.chain(board => {
     // Castling
@@ -144,7 +144,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
     let epSquare: Square | undefined;
     if (defined(epPart) && epPart != '-') {
       epSquare = parseSquare(epPart);
-      if (!defined(epSquare)) return Result.err(new FenError('ERR_EP_SQUARE'));
+      if (!defined(epSquare)) return Result.err(new FenError(InvalidFen.EpSquare));
     }
 
     // Halfmoves or remaining checks
@@ -155,22 +155,22 @@ export function parseFen(fen: string): Result<Setup, FenError> {
       halfmovePart = parts.shift();
     }
     const halfmoves = defined(halfmovePart) ? parseSmallUint(halfmovePart) : 0;
-    if (!defined(halfmoves)) return Result.err(new FenError('ERR_HALFMOVES'));
+    if (!defined(halfmoves)) return Result.err(new FenError(InvalidFen.Halfmoves));
 
     const fullmovesPart = parts.shift();
     const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart) : 1;
-    if (!defined(fullmoves)) return Result.err(new FenError('ERR_FULLMOVES'));
+    if (!defined(fullmoves)) return Result.err(new FenError(InvalidFen.Fullmoves));
 
     const remainingChecksPart = parts.shift();
     let remainingChecks: Result<RemainingChecks | undefined, FenError> = Result.ok(undefined);
     if (defined(remainingChecksPart)) {
-      if (defined(earlyRemainingChecks)) return Result.err(new FenError('ERR_REMAINING_CHECKS'));
+      if (defined(earlyRemainingChecks)) return Result.err(new FenError(InvalidFen.RemainingChecks));
       remainingChecks = parseRemainingChecks(remainingChecksPart);
     } else if (defined(earlyRemainingChecks)) {
       remainingChecks = earlyRemainingChecks
     };
 
-    if (parts.length) return Result.err(new FenError('ERR_FEN'));
+    if (parts.length) return Result.err(new FenError(InvalidFen.Fen));
 
     return pockets.chain(pockets => unmovedRooks.chain(unmovedRooks => remainingChecks.map(remainingChecks => {
       return {
