@@ -207,6 +207,15 @@ export function makePiece(piece: Piece, opts?: FenOpts): string {
   return r;
 }
 
+export function parsePiece(str: string): Piece | undefined {
+  if (!str) return;
+  const piece = charToPiece(str[0]);
+  if (!piece) return;
+  if (str.length == 2 && str[1] == '~') piece.promoted = true;
+  else if (str.length > 1) return;
+  return piece;
+}
+
 export function makeBoardFen(board: Board, opts?: FenOpts) {
   let fen = '', empty = 0;
   for (let rank = 7; rank >= 0; rank--) {
