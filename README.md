@@ -46,43 +46,6 @@ Documentation
 
 [View TypeDoc](https://niklasf.github.io/chessops/)
 
-Roadmap
--------
-
-### 0.1.0-alpha.0
-
-* [x] square set
-* [x] attacks
-* [x] board representation
-
-### 0.1.0-alpha.1
-
-* [x] board to fen
-* [x] castling to fen
-* [x] setup to fen
-* [x] fen to board
-* [x] fen to castling
-* [x] fen to setup
-* [x] validate setup
-* [x] move making
-* [x] en passant dests
-* [x] castling dests
-* [x] normal dests
-* [x] perft test
-* [x] transformations
-* [x] insufficient material
-* [x] game end
-
-### 0.1.0-alpha.2
-
-* [ ] chess variants
-* [ ] san writing
-
-### 0.1.0-alpha.3
-
-* [ ] san parsing
-* [ ] pgn parsing
-
 License
 -------
 
