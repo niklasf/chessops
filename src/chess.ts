@@ -265,7 +265,9 @@ export abstract class Position {
           if (pawn) this.playCaptureAt(epSquare, pawn);
         }
         const delta = uci.from - uci.to;
-        if (Math.abs(delta) == 16) this.epSquare = (uci.from + uci.to) >> 1;
+        if (Math.abs(delta) == 16 && 8 <= uci.from && uci.from <= 55) {
+          this.epSquare = (uci.from + uci.to) >> 1;
+        }
         if (uci.promotion) {
           piece.role = uci.promotion;
           piece.promoted = true;
