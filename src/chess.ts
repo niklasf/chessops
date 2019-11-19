@@ -224,6 +224,11 @@ export abstract class Position {
     }
   }
 
+  isCheck(): boolean {
+    const king = this.board.kingOf(this.turn);
+    return defined(king) && this.kingAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
+  }
+
   isEnd(): boolean {
     return this.isVariantEnd() || this.isInsufficientMaterial() || !this.hasDests(this.ctx());
   }

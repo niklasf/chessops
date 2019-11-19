@@ -173,11 +173,6 @@ class RacingKings extends Chess {
     return super.fromSetup(setup) as Result<RacingKings, PositionError>;
   }
 
-  private isCheck(): boolean {
-    const king = this.board.kingOf(this.turn);
-    return defined(king) && this.kingAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
-  }
-
   protected validate(): Result<undefined, PositionError> {
     if (this.board.pawn.nonEmpty() || this.isCheck()) {
       return Result.err(new PositionError(IllegalSetup.Variant));
