@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Setup Node.js
+    - name: Setup node.js
       uses: actions/setup-node@v1
     - name: npm install, compile, and test
       run: |
