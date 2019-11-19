@@ -20,6 +20,7 @@ Features
   - Setup validation
 * Supports Chess960
 * Attacks and rays using hyperbola quintessence
+* Read and write UCI move notation
 * ~Read and write SAN~
 * ~Read and write PGN~
 * ~Position hashing~
