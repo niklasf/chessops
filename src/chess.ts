@@ -210,6 +210,20 @@ export abstract class Position {
     return this.dropDests(ctx).nonEmpty();
   }
 
+  isLegal(uci: Uci, ctx: Context): boolean {
+    if (isDrop(uci)) {
+      if (!this.pockets || this.pockets[this.turn][uci.role] <= 0) return false;
+      if (uci.role == 'pawn' && SquareSet.backranks().has(uci.to)) return false;
+      return this.dropDests(ctx).has(uci.to);
+    } else {
+      if (uci.promotion == 'pawn') return false;
+      if (uci.promotion == 'king' && this.rules() != 'antichess') return false;
+      if (!uci.promotion && this.board.pawn.has(uci.from) && SquareSet.backranks().has(uci.to)) return false;
+      return this.dests(uci.from, ctx).has(uci.to);
+
+    }
+  }
+
   isEnd(): boolean {
     return this.isVariantEnd() || this.isInsufficientMaterial() || !this.hasDests(this.ctx());
   }
