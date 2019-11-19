@@ -1,9 +1,9 @@
-import { Square, Piece, Role, ByRole, BySquare } from './types';
+import { Square, Piece, Role, ROLES, ByRole, BySquare } from './types';
 import { makeSquare } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
-import { Chess } from './chess';
+import { Position } from './chess';
 
 export function squareSet(squares: SquareSet): string {
   let r = '';
@@ -47,10 +47,16 @@ export function dests(dests: Map<Square, SquareSet>) {
   return lines.join('\n');
 }
 
-export function perft(pos: Chess, depth: number, outer: boolean = false): number {
-  const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
+export function perft(pos: Position, depth: number, outer: boolean = false): number {
   if (depth < 1) return 1;
-  else if (!outer && depth == 1) {
+
+  const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
+  if (pos.rules() == 'antichess') promotionRoles.push('king');
+
+  const dropDests = pos.dropDests(pos.ctx());
+
+  if (!outer && depth == 1 && dropDests.isEmpty()) {
+    // Optimization for leaf nodes.
     let nodes = 0;
     for (const [from, to] of pos.allDests()) {
       nodes += to.size();
@@ -73,6 +79,19 @@ export function perft(pos: Chess, depth: number, outer: boolean = false): number
           const children = perft(child, depth - 1, false);
           if (outer) console.log(square(from), square(to), promotion, children);
           nodes += children;
+        }
+      }
+    }
+    if (pos.pockets) {
+      for (const role of ROLES) {
+        if (pos.pockets[pos.turn][role] > 0) {
+          for (const to of (role == 'pawn' ? dropDests.diff(SquareSet.backranks()) : dropDests)) {
+            const child = pos.clone();
+            child.play({ role, to });
+            const children = perft(child, depth - 1, false);
+            if (outer) console.log(role, to, children);
+            nodes += children;
+          }
         }
       }
     }
