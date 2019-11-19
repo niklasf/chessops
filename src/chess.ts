@@ -277,11 +277,11 @@ export abstract class Position {
       const piece = this.board.take(uci.from);
       if (!piece) return;
 
+      let epCapture: Piece | undefined;
       if (piece.role == 'pawn') {
         this.halfmoves = 0;
         if (uci.to == epSquare) {
-          const pawn = this.board.take(uci.to + (turn == 'white' ? -8 : 8));
-          if (pawn) this.playCaptureAt(epSquare, pawn);
+          epCapture = this.board.take(uci.to + (turn == 'white' ? -8 : 8));
         }
         const delta = uci.from - uci.to;
         if (Math.abs(delta) == 16 && 8 <= uci.from && uci.from <= 55) {
@@ -309,7 +309,7 @@ export abstract class Position {
         if (isCastling) return;
       }
 
-      const capture = this.board.set(uci.to, piece);
+      const capture = this.board.set(uci.to, piece) || epCapture;
       if (capture) this.playCaptureAt(uci.to, capture);
     }
   }

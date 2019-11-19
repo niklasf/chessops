@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
-import { Square, Outcome, Color, COLORS, Rules } from './types';
+import { Square, Outcome, Color, COLORS, Piece, Rules } from './types';
 import { defined, opposite } from './util';
-import { between } from './attacks';
+import { between, kingAttacks } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, RemainingChecks, Material } from './setup';
@@ -63,13 +63,70 @@ export class Crazyhouse extends Chess {
   }
 }
 
+function pseudoDests(board: Board, square: Square): SquareSet {
+  return SquareSet.empty(); // TODO
+}
+
 class Atomic extends Chess {
+  static default(): Atomic {
+    return super.default() as Atomic;
+  }
+
+  static fromSetup(setup: Setup): Result<Atomic, PositionError> {
+    return super.fromSetup(setup) as Result<Atomic, PositionError>; // TODO: allow king of side to move to be missing
+  }
+
   clone(): Atomic {
     return super.clone() as Atomic;
   }
 
   rules(): Rules {
     return 'atomic';
+  }
+
+  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
+    if (kingAttacks(square).intersects(this.board.pieces(attacker, 'king'))) {
+      return SquareSet.empty()
+    }
+    return super.kingAttackers(square, attacker, occupied);
+  }
+
+  protected playCaptureAt(square: Square, captured: Piece): void {
+    super.playCaptureAt(square, captured);
+    this.board.take(square);
+    for (const explode of kingAttacks(square).intersect(this.board.occupied).diff(this.board.pawn)) {
+      const piece = this.board.take(explode);
+      if (piece && piece.role == 'rook') this.castles.discardRook(explode);
+      if (piece && piece.role == 'king') this.castles.discardSide(piece.color);
+    }
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    return false; // TODO
+  }
+
+  dests(square: Square, ctx: Context): SquareSet {
+    let dests = SquareSet.empty();
+    for (const to of pseudoDests(this.board, square)) {
+      const after = this.clone();
+      after.play({ from: square, to });
+      const ourKing = after.board.kingOf(this.turn);
+      if (defined(ourKing) && (!after.board.kingOf(after.turn) || !after.isCheck())) {
+        dests = dests.with(to);
+      }
+    }
+    return dests;
+  }
+
+  isVariantEnd(): boolean {
+    return !!this.variantOutcome();
+  }
+
+  variantOutcome(): Outcome | undefined {
+    for (const color of COLORS) {
+      if (this.board.pieces(color, 'king').isEmpty()) return { winner: opposite(color) };
+    }
+    return;
   }
 }
 
@@ -198,9 +255,9 @@ class RacingKings extends Chess {
       // Valid, because there are no promotions (or even pawns).
       const uci = { from: square, to };
 
-      const child = this.clone();
-      child.play(uci);
-      if (!child.isCheck()) dests = dests.with(to);
+      const after = this.clone();
+      after.play(uci);
+      if (!after.isCheck()) dests = dests.with(to);
     }
     return dests;
   }
