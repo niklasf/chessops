@@ -7,7 +7,7 @@ function rol32(n: number, left: number): number {
   return (n << left) | (n >>> (32 - left));
 }
 
-export function fxhash(word: number, state: number = 0) {
+export function fxhash(word: number, state: number = 0): number {
   return Math.imul(rol32(state, 5) ^ word, 0x9e3779b9);
 }
 
