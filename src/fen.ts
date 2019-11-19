@@ -3,7 +3,7 @@ import { Role, Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
-import { defined, strRepeat, nthIndexOf, parseSquare, makeSquare } from './util';
+import { defined, strRepeat, nthIndexOf, parseSquare, makeSquare, roleToChar, charToRole } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_FEN = INITIAL_BOARD_FEN + ' w KQkq - 0 1';
@@ -193,34 +193,11 @@ interface FenOpts {
   epd?: boolean;
 }
 
-function charToRole(ch: string): Role | undefined {
-  switch (ch) {
-    case 'p': return 'pawn';
-    case 'n': return 'knight';
-    case 'b': return 'bishop';
-    case 'r': return 'rook';
-    case 'q': return 'queen';
-    case 'k': return 'king';
-    default: return;
-  }
-}
-
 function charToPiece(ch: string): Piece | undefined {
   const lower = ch.toLowerCase();
   const role = charToRole(lower);
   if (!role) return;
   return { role, color: lower == ch ? 'black' : 'white' };
-}
-
-function roleToChar(role: Role): string {
-  switch (role) {
-    case 'pawn': return 'p';
-    case 'knight': return 'n';
-    case 'bishop': return 'b';
-    case 'rook': return 'r';
-    case 'queen': return 'q';
-    case 'king': return 'k';
-  }
 }
 
 export function makePiece(piece: Piece, opts?: FenOpts): string {

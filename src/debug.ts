@@ -1,5 +1,5 @@
 import { Square, Piece, Role, ROLES, ByRole, BySquare } from './types';
-import { makeSquare } from './util';
+import { makeSquare, makeUci } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
@@ -75,9 +75,10 @@ export function perft(pos: Position, depth: number, outer: boolean = false): num
       for (const to of dests) {
         for (const promotion of promotions) {
           const child = pos.clone();
-          child.play({ from, to, promotion });
+          const uci = { from, to, promotion };
+          child.play(uci);
           const children = perft(child, depth - 1, false);
-          if (outer) console.log(square(from), square(to), promotion, children);
+          if (outer) console.log(makeUci(uci), children);
           nodes += children;
         }
       }
@@ -87,9 +88,10 @@ export function perft(pos: Position, depth: number, outer: boolean = false): num
         if (pos.pockets[pos.turn][role] > 0) {
           for (const to of (role == 'pawn' ? dropDests.diff(SquareSet.backranks()) : dropDests)) {
             const child = pos.clone();
-            child.play({ role, to });
+            const uci = { role, to };
+            child.play(uci);
             const children = perft(child, depth - 1, false);
-            if (outer) console.log(role, to, children);
+            if (outer) console.log(makeUci(uci), children);
             nodes += children;
           }
         }
