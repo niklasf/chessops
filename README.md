@@ -12,7 +12,7 @@ Features
 * Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Castles, Setup,
   Position)
 * Variant rules: Standard chess, Crazyhouse, King of the Hill, Three-check,
-  ~Antichess~, ~Atomic~, Horde, ~Racing Kings~
+  ~Antichess~, ~Atomic~, Horde, Racing Kings
   - Move making
   - Legal move and drop move generation
   - Game end and outcome

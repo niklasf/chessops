@@ -156,12 +156,57 @@ export class ThreeCheck extends Chess {
 }
 
 class RacingKings extends Chess {
+  static default(): RacingKings {
+    const pos = new this();
+    pos.board = Board.racingKings();
+    pos.turn = 'white';
+    pos.castles = Castles.empty();
+    pos.epSquare = undefined;
+    pos.remainingChecks = undefined;
+    pos.halfmoves = 0;
+    pos.fullmoves = 1;
+    return pos;
+  }
+
+  static fromSetup(setup: Setup): Result<RacingKings, PositionError> {
+    return super.fromSetup(setup) as Result<RacingKings, PositionError>;
+  }
+
+  private isCheck(): boolean {
+    const king = this.board.kingOf(this.turn);
+    return defined(king) && this.kingAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
+  }
+
+  protected validate(): Result<undefined, PositionError> {
+    if (this.board.pawn.nonEmpty() || this.isCheck()) {
+      return Result.err(new PositionError('ERR_VARIANT'));
+    }
+    return super.validate();
+  }
+
   clone(): RacingKings {
     return super.clone() as RacingKings;
   }
 
   rules(): Rules {
     return 'racingKings';
+  }
+
+  dests(square: Square, ctx: Context): SquareSet {
+    // Kings cannot give check.
+    if (square == ctx.king) return super.dests(square, ctx);
+
+    // TODO: This could be optimized considerably.
+    let dests = SquareSet.empty();
+    for (const to of super.dests(square, ctx)) {
+      // Valid, because there are no promotions (or even pawns).
+      const uci = { from: square, to };
+
+      const child = this.clone();
+      child.play(uci);
+      if (!child.isCheck()) dests = dests.with(to);
+    }
+    return dests;
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -173,15 +218,18 @@ class RacingKings extends Chess {
     if (inGoal.isEmpty()) return false;
     if (this.turn == 'white' || inGoal.intersects(this.board.black)) return true;
 
-    // TODO: White has reached the backrank, check if black can catch up
-
-    return true;
+    // White has reached the backrank, check if black can catch up.
+    const ctx = this.ctx();
+    return !defined(ctx.king) || !this.dests(ctx.king, ctx).intersects(SquareSet.fromRank(7));
   }
 
   variantOutcome(): Outcome | undefined {
     if (!this.isVariantEnd()) return;
-    // TODO
-    return;
+    const blackInGoal = this.board.pieces('black', 'king').intersects(SquareSet.fromRank(7));
+    const whiteInGoal = this.board.pieces('white', 'king').intersects(SquareSet.fromRank(7));
+    if (blackInGoal && !whiteInGoal) return { winner: 'black' };
+    if (whiteInGoal && !blackInGoal) return { winner: 'white' };
+    return { winner: undefined };
   }
 }
 
