@@ -14,10 +14,9 @@ jobs:
     - name: npm install, compile, test, generate docs
       run: |
         npm install
-        npm run compile
-        npm test
         npm run doc
     - name: GitHub pages deploy
       uses: maxheld83/ghpages@d79d57aa5f407fd3e0b06ed5b36a8d4fd74b8c1c
       env:
         BUILD_DIR: "docs/"
+        GH_PAT: ${{ secrets.GH_PAT }}
