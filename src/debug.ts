@@ -47,7 +47,7 @@ export function dests(dests: Map<Square, SquareSet>) {
   return lines.join('\n');
 }
 
-export function perft(pos: Position, depth: number, outer: boolean = false): number {
+export function perft(pos: Position, depth: number, log: boolean = false): number {
   if (depth < 1) return 1;
 
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
@@ -55,7 +55,7 @@ export function perft(pos: Position, depth: number, outer: boolean = false): num
 
   const dropDests = pos.dropDests(pos.ctx());
 
-  if (!outer && depth == 1 && dropDests.isEmpty()) {
+  if (!log && depth == 1 && dropDests.isEmpty()) {
     // Optimization for leaf nodes.
     let nodes = 0;
     for (const [from, to] of pos.allDests()) {
@@ -78,7 +78,7 @@ export function perft(pos: Position, depth: number, outer: boolean = false): num
           const uci = { from, to, promotion };
           child.play(uci);
           const children = perft(child, depth - 1, false);
-          if (outer) console.log(makeUci(uci), children);
+          if (log) console.log(makeUci(uci), children);
           nodes += children;
         }
       }
@@ -91,7 +91,7 @@ export function perft(pos: Position, depth: number, outer: boolean = false): num
             const uci = { role, to };
             child.play(uci);
             const children = perft(child, depth - 1, false);
-            if (outer) console.log(makeUci(uci), children);
+            if (log) console.log(makeUci(uci), children);
             nodes += children;
           }
         }
