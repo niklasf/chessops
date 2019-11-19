@@ -1,6 +1,9 @@
 chessops
 ========
 
+[![Test](https://github.com/niklasf/chessops/workflows/Test/badge.svg)](https://github.com/niklasf/chessops/actions)
+[![npm](https://img.shields.io/npm/v/chessops)](https://www.npmjs.com/package/chessops)
+
 Chess and chess variant rules and operations in TypeScript.
 
 :warning: Not ready for production :warning:
