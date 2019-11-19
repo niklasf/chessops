@@ -32,7 +32,7 @@ export function rotate180(s: SquareSet): SquareSet {
   return s.rbit();
 }
 
-export function board(board: Board, f: (s: SquareSet) => SquareSet): Board {
+export function transformBoard(board: Board, f: (s: SquareSet) => SquareSet): Board {
   const b = Board.empty();
   b.occupied = f(board.occupied);
   b.promoted = f(board.promoted);
@@ -41,9 +41,9 @@ export function board(board: Board, f: (s: SquareSet) => SquareSet): Board {
   return b;
 }
 
-export function setup(setup: Setup, f: (s: SquareSet) => SquareSet): Setup {
+export function transformSetup(setup: Setup, f: (s: SquareSet) => SquareSet): Setup {
   return {
-    board: board(setup.board, f),
+    board: transformBoard(setup.board, f),
     pockets: setup.pockets && setup.pockets.clone(),
     turn: setup.turn,
     unmovedRooks: f(setup.unmovedRooks),

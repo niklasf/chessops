@@ -26,7 +26,7 @@ Features
 * Read and write UCI move notation
 * ~Read and write SAN~
 * ~Read and write PGN~
-* ~Position hashing~
+* [Position hashing](https://niklasf.github.io/chessops/modules/_hash_.html)
 * [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
 
 Example

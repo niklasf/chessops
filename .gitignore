@@ -16,6 +16,7 @@ util.js
 debug.js
 fen.js
 san.js
+hash.js
 
 attacks.d.ts
 board.d.ts
@@ -29,3 +30,4 @@ util.d.ts
 debug.d.ts
 fen.d.ts
 san.d.ts
+hash.d.ts
