@@ -49,6 +49,10 @@ export function isDrop(v: Uci): v is UciDrop {
   return 'role' in v;
 }
 
+export function isMove(v: Uci): v is UciMove {
+  return 'from' in v;
+}
+
 export type Rules = 'chess' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse';
 
 export const RULES: Rules[] = ['chess', 'antichess', 'kingOfTheHill', 'threeCheck', 'atomic', 'horde', 'racingKings', 'crazyhouse'];

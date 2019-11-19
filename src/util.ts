@@ -1,9 +1,5 @@
 import { Color, Square, Role, Uci, isDrop } from './types';
 
-export function opposite(color: Color): Color {
-  return color == 'white' ? 'black' : 'white';
-}
-
 export function defined<A>(v: A | undefined): v is A {
   return typeof v !== 'undefined';
 }
@@ -21,6 +17,24 @@ export function nthIndexOf(haystack: string, needle: string, n: number): number 
     index = haystack.indexOf(needle, index + 1);
   }
   return index;
+}
+
+export function opposite(color: Color): Color {
+  return color == 'white' ? 'black' : 'white';
+}
+
+export function squareDist(a: Square, b: Square): number {
+  const x1 = a & 7, x2 = b & 7;
+  const y1 = a >> 3, y2 = b >> 3;
+  return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+}
+
+export function squareRank(square: Square): number {
+  return square >> 3;
+}
+
+export function squareFile(square: Square): number {
+  return square & 7;
 }
 
 export function roleToChar(role: Role): string {

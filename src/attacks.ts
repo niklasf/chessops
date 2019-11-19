@@ -1,11 +1,6 @@
+import { squareDist } from './util';
 import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
-
-function squareDist(a: Square, b: Square): number {
-  const x1 = a & 7, x2 = b & 7;
-  const y1 = a >> 3, y2 = b >> 3;
-  return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
-}
 
 function slidingAttacks(square: Square, occupied: SquareSet, deltas: number[]): SquareSet {
   let attacks = SquareSet.empty();

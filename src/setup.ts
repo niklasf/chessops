@@ -32,7 +32,11 @@ export class MaterialSide {
     return !this.nonEmpty();
   }
 
-  hasNonPawn(): boolean {
+  hasPawns(): boolean {
+    return this.pawn > 0;
+  }
+
+  hasNonPawns(): boolean {
     return this.knight > 0 || this.bishop > 0 || this.rook > 0 || this.queen > 0 || this.king > 0;
   }
 
@@ -61,6 +65,22 @@ export class Material {
 
   count(): number {
     return this.white.count() + this.black.count();
+  }
+
+  isEmpty(): boolean {
+    return this.white.isEmpty() && this.black.isEmpty();
+  }
+
+  nonEmpty(): boolean {
+    return !this.isEmpty();
+  }
+
+  hasPawns(): boolean {
+    return this.white.hasPawns() || this.black.hasPawns();
+  }
+
+  hasNonPawns(): boolean {
+    return this.white.hasNonPawns() || this.black.hasNonPawns();
   }
 }
 
