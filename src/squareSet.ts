@@ -33,7 +33,7 @@ export default class SquareSet {
   }
 
   static fromRank(rank: number): SquareSet {
-    return new SquareSet(0xff, 0).shl(8 * rank);
+    return new SquareSet(0xff, 0).shl64(8 * rank);
   }
 
   static fromFile(file: number): SquareSet {
@@ -104,25 +104,25 @@ export default class SquareSet {
     return this.diff(other).isEmpty();
   }
 
-  shr(shift: number): SquareSet {
+  shr64(shift: number): SquareSet {
     if (shift >= 64) return SquareSet.empty();
     else if (shift >= 32) return new SquareSet(this.hi >>> (shift - 32), 0);
     else if (shift > 0) return new SquareSet((this.lo >>> shift) ^ (this.hi << (32 - shift)), this.hi >>> shift);
     else return this;
   }
 
-  shl(shift: number): SquareSet {
+  shl64(shift: number): SquareSet {
     if (shift >= 64) return SquareSet.empty();
     else if (shift >= 32) return new SquareSet(0, this.lo << (shift - 32));
     else if (shift > 0) return new SquareSet(this.lo << shift, (this.hi << shift) ^ (this.lo >>> (32 - shift)));
     else return this;
   }
 
-  bswap(): SquareSet {
+  bswap64(): SquareSet {
     return new SquareSet(bswap32(this.hi), bswap32(this.lo));
   }
 
-  rbit(): SquareSet {
+  rbit64(): SquareSet {
     return new SquareSet(rbit32(this.hi), rbit32(this.lo));
   }
 
@@ -236,12 +236,12 @@ export default class SquareSet {
     };
   }
 
-  plusOne(): SquareSet {
+  inc64(): SquareSet {
     const lo = this.lo + 1;
     return new SquareSet(lo, lo ? this.hi : (this.hi + 1));
   }
 
-  minus(other: SquareSet) {
+  minus64(other: SquareSet) {
     const lo = this.lo - other.lo;
     const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
     return new SquareSet(lo, this.hi - (other.hi + c));
@@ -259,7 +259,7 @@ export default class SquareSet {
             if (first || !subset.isEmpty()) {
               first = false;
               const value = subset;
-              subset = subset.union(complement).plusOne().intersect(mask);
+              subset = subset.union(complement).inc64().intersect(mask);
               return { value, done: false };
             }
             return { done: true } as IteratorResult<SquareSet>;

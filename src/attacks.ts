@@ -55,10 +55,10 @@ const ANTI_DIAG_RANGE = slidingRangeTable([-7, 7]);
 
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
   let forward = occupied.intersect(range);
-  let reverse = forward.bswap(); // Assumes no more than 1 bit per rank
-  forward = forward.minus(bit);
-  reverse = reverse.minus(bit.bswap());
-  forward = forward.xor(reverse.bswap());
+  let reverse = forward.bswap64(); // Assumes no more than 1 bit per rank
+  forward = forward.minus64(bit);
+  reverse = reverse.minus64(bit.bswap64());
+  forward = forward.xor(reverse.bswap64());
   return forward.intersect(range);
 }
 
@@ -69,10 +69,10 @@ function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
 function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
   const range = RANK_RANGE[square];
   let forward = occupied.intersect(range);
-  let reverse = forward.rbit();
-  forward = forward.minus(SquareSet.fromSquare(square));
-  reverse = reverse.minus(SquareSet.fromSquare(63 - square));
-  forward = forward.xor(reverse.rbit());
+  let reverse = forward.rbit64();
+  forward = forward.minus64(SquareSet.fromSquare(square));
+  reverse = reverse.minus64(SquareSet.fromSquare(63 - square));
+  forward = forward.xor(reverse.rbit64());
   return forward.intersect(range);
 }
 
