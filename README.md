@@ -8,6 +8,9 @@ Chess and chess variant rules and operations in TypeScript.
 
 :warning: Not ready for production :warning:
 
+[Documentation](https://niklasf.github.io/chessops/)
+----------------------------------------------------
+
 Features
 --------
 

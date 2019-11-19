@@ -29,7 +29,7 @@
     "test": "jest",
     "compile": "tsc",
     "prepare": "tsc",
-    "doc": "typedoc --excludeNotExported --theme minimal"
+    "doc": "typedoc --excludeNotExported"
   },
   "files": [
     "*.js",
