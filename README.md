@@ -8,16 +8,13 @@ Chess and chess variant rules and operations in TypeScript.
 
 :warning: Not ready for production :warning:
 
-[Documentation](https://niklasf.github.io/chessops/)
-----------------------------------------------------
-
 Features
 --------
 
-* Read and write FEN
+* [Read and write FEN](https://niklasf.github.io/chessops/modules/_fen_.html)
 * Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Castles, Setup,
   Position)
-* Variant rules: Standard chess, Crazyhouse, King of the Hill, Three-check,
+* [Variant rules](https://niklasf.github.io/chessops/modules/_variant_.html): Standard chess, Crazyhouse, King of the Hill, Three-check,
   ~Antichess~, ~Atomic~, Horde, Racing Kings
   - Move making
   - Legal move and drop move generation
@@ -25,12 +22,12 @@ Features
   - Insufficient material
   - Setup validation
 * Supports Chess960
-* Attacks and rays using hyperbola quintessence
+* [Attacks and rays](https://niklasf.github.io/chessops/modules/_attacks_.html) using hyperbola quintessence
 * Read and write UCI move notation
 * ~Read and write SAN~
 * ~Read and write PGN~
 * ~Position hashing~
-* Transformations: Mirroring and rotating
+* [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
 
 Example
 -------
@@ -43,6 +40,11 @@ const setup = parseFen('r1bqkbnr/ppp2Qpp/2np4/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQ
 const pos = Chess.fromSetup(setup).unwrap();
 console.assert(pos.isCheckmate());
 ```
+
+Documentation
+-------------
+
+[View TypeDoc](https://niklasf.github.io/chessops/)
 
 Roadmap
 -------
