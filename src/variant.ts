@@ -230,15 +230,25 @@ export class Antichess extends Chess {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return false; // TODO
+    if (this.board.occupied.equals(this.board.bishop)) {
+      const weSomeOnLight = this.board[color].intersects(SquareSet.lightSquares());
+      const weSomeOnDark = this.board[color].intersects(SquareSet.darkSquares());
+      const theyAllOnDark = this.board[opposite(color)].isDisjoint(SquareSet.lightSquares());
+      const theyAllOnLight = this.board[opposite(color)].isDisjoint(SquareSet.darkSquares());
+      return (weSomeOnLight && theyAllOnDark) || (weSomeOnDark && theyAllOnLight);
+    }
+    return false;
   }
 
   isVariantEnd(): boolean {
-    return false; // TODO
+    return this.board[this.turn].isEmpty();
   }
 
   variantOutcome(): Outcome | undefined {
-    return; // TODO
+    if (this.isVariantEnd() || this.isStalemate()) {
+      return { winner: this.turn };
+    }
+    return;
   }
 }
 
