@@ -32,8 +32,32 @@
     "doc": "typedoc --excludeNotExported"
   },
   "files": [
-    "*.js",
-    "*.d.ts"
+    "attacks.js",
+    "board.js",
+    "chess.js",
+    "variant.js",
+    "transform.js",
+    "setup.js",
+    "squareSet.js",
+    "types.js",
+    "util.js",
+    "debug.js",
+    "fen.js",
+    "san.js",
+    "hash.js",
+    "attacks.d.ts",
+    "board.d.ts",
+    "chess.d.ts",
+    "variant.d.ts",
+    "transform.d.ts",
+    "setup.d.ts",
+    "squareSet.d.ts",
+    "types.d.ts",
+    "util.d.ts",
+    "debug.d.ts",
+    "fen.d.ts",
+    "san.d.ts",
+    "hash.d.ts"
   ],
   "jest": {
     "transform": {
