@@ -113,7 +113,39 @@ class Atomic extends Chess {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return false; // TODO
+    // Remaining material does not matter if the enemy king is already
+    // exploded.
+    if (this.board.pieces(opposite(color), 'king').isEmpty()) return false;
+
+    // Bare king cannot mate.
+    if (this.board[color].diff(this.board.king).isEmpty()) return true;
+
+    // As long as the enemy king is not alone, there is always a chance their
+    // own pieces explode next to it.
+    if (this.board[opposite(color)].diff(this.board.king).isEmpty()) {
+      // Unless there are only bishops that cannot explode each other.
+      if (this.board.occupied.equals(this.board.bishop.union(this.board.king))) {
+        if (!this.board.bishop.intersect(this.board.white).intersects(SquareSet.darkSquares())) {
+          return !this.board.bishop.intersect(this.board.black).intersects(SquareSet.lightSquares());
+        }
+        if (!this.board.bishop.intersect(this.board.white).intersects(SquareSet.lightSquares())) {
+          return !this.board.bishop.intersect(this.board.black).intersects(SquareSet.darkSquares());
+        }
+      }
+    }
+
+    // Queen or pawn (future queen) can give mate against bare king.
+    if (this.board.queen.nonEmpty() || this.board.pawn.nonEmpty()) return false;
+
+    // Single knight, bishop or rook cannot mate against bare king.
+    if (this.board.knight.union(this.board.bishop).union(this.board.rook).size() == 1) return true;
+
+    // If only knights, more than two are required to mate bare king.
+    if (this.board.occupied.equals(this.board.knight.union(this.board.king))) {
+      return this.board.knight.size() <= 2;
+    }
+
+    return false;
   }
 
   dests(square: Square, ctx: Context): SquareSet {
