@@ -23,6 +23,10 @@ const variantPerfts: [Rules, string, string, number, number, number][] = [
   ['atomic', 'atomic960-castle-2', 'r3k1rR/5K2/8/8/8/8/8/8 b kq -', 25, 282, 6753],
   ['atomic', 'atomic960-castle-3', 'Rr2k1rR/3K4/3p4/8/8/8/7P/8 w kq -', 21, 465, 10631],
   ['atomic', 'shakmaty-bench', 'rn2kb1r/1pp1p2p/p2q1pp1/3P4/2P3b1/4PN2/PP3PPP/R2QKB1R b KQkq -', 40, 1238, 45237],
+
+  ['antichess', 'antichess-start', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - -', 20, 400, 8067],
+  ['antichess', 'a-pawn-vs-b-pawn', '8/1p6/8/8/8/8/P7/8 w - -', 2, 4, 4],
+  ['antichess', 'a-pawn-vs-c-pawn', '8/2p5/8/8/8/8/P7/8 w - -', 2, 4, 4],
 ];
 
 test.each(variantPerfts)('variant perft: %s (%s): %s', (rules, name, fen, d1, d2, d3) => {

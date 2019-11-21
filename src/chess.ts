@@ -132,6 +132,7 @@ export interface Context {
   blockers: SquareSet;
   checkers: SquareSet;
   variantEnd: boolean;
+  mustCapture: boolean;
 }
 
 export abstract class Position {
@@ -328,7 +329,7 @@ export abstract class Position {
   ctx(): Context {
     const variantEnd = this.isVariantEnd();
     const king = this.board.kingOf(this.turn)!;
-    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd };
+    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
     const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
       .intersect(this.board[opposite(this.turn)]);
@@ -343,6 +344,7 @@ export abstract class Position {
       blockers,
       checkers,
       variantEnd,
+      mustCapture: false,
     };
   }
 }

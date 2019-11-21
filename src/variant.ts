@@ -174,13 +174,59 @@ export class Atomic extends Chess {
   }
 }
 
-class Antichess extends Chess {
+export class Antichess extends Chess {
+  static default(): Antichess {
+    const pos = new this();
+    pos.board = Board.default();
+    pos.turn = 'white';
+    pos.castles = Castles.empty();
+    pos.epSquare = undefined;
+    pos.remainingChecks = undefined;
+    pos.halfmoves = 0;
+    pos.fullmoves = 1;
+    return pos;
+  }
+
+  static fromSetup(setup: Setup): Result<Antichess, PositionError> {
+    return super.fromSetup(setup) as Result<Antichess, PositionError>;
+  }
+
   clone(): Antichess {
     return super.clone() as Antichess;
   }
 
   rules(): Rules {
     return 'antichess';
+  }
+
+  ctx(): Context {
+    const ctx = super.ctx();
+    const enemy = this.board[opposite(this.turn)];
+    for (const from of this.board[this.turn]) {
+      if (this.pseudoDests(from, ctx).intersects(enemy)) {
+        ctx.mustCapture = true;
+        break;
+      }
+    }
+    return ctx;
+  }
+
+  dests(square: Square, ctx: Context): SquareSet {
+    const dests = this.pseudoDests(square, ctx);
+    if (!ctx.mustCapture) return dests;
+    else return dests.intersect(this.board[opposite(this.turn)]);
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    return false; // TODO
+  }
+
+  isVariantEnd(): boolean {
+    return false; // TODO
+  }
+
+  variantOutcome(): Outcome | undefined {
+    return; // TODO
   }
 }
 
