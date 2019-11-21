@@ -48,7 +48,7 @@ export function roleToChar(role: Role): string {
   }
 }
 
-export function charToRole(ch: 'p' | 'n' | 'b' | 'r' | 'q' | 'k'): Role;
+export function charToRole(ch: 'p' | 'n' | 'b' | 'r' | 'q' | 'k' | 'P' | 'N' | 'B' | 'R' | 'Q' | 'K'): Role;
 export function charToRole(ch: string): Role | undefined;
 export function charToRole(ch: string): Role | undefined {
   switch (ch) {
