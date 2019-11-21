@@ -69,7 +69,7 @@ class Atomic extends Chess {
   }
 
   static fromSetup(setup: Setup): Result<Atomic, PositionError> {
-    return super.fromSetup(setup) as Result<Atomic, PositionError>; // TODO: allow king of side to move to be missing
+    return super.fromSetup(setup) as Result<Atomic, PositionError>;
   }
 
   clone(): Atomic {
@@ -78,6 +78,21 @@ class Atomic extends Chess {
 
   rules(): Rules {
     return 'atomic';
+  }
+
+  protected validate(): Result<undefined, PositionError> {
+    // Like chess, but allow our king to be missing.
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (this.board.king.size() > 2) return Result.err(new PositionError(IllegalSetup.Kings));
+    const otherKing = this.board.kingOf(opposite(this.turn));
+    if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
+      return Result.err(new PositionError(IllegalSetup.OppositeCheck));
+    }
+    if (SquareSet.backranks().intersects(this.board.pawn)) {
+      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
+    }
+    return Result.ok(undefined);
   }
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
