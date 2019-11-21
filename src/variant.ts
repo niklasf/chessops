@@ -122,7 +122,7 @@ class Atomic extends Chess {
 
     // As long as the enemy king is not alone, there is always a chance their
     // own pieces explode next to it.
-    if (this.board[opposite(color)].diff(this.board.king).isEmpty()) {
+    if (this.board[opposite(color)].diff(this.board.king).nonEmpty()) {
       // Unless there are only bishops that cannot explode each other.
       if (this.board.occupied.equals(this.board.bishop.union(this.board.king))) {
         if (!this.board.bishop.intersect(this.board.white).intersects(SquareSet.darkSquares())) {
@@ -132,6 +132,7 @@ class Atomic extends Chess {
           return !this.board.bishop.intersect(this.board.black).intersects(SquareSet.darkSquares());
         }
       }
+      return false;
     }
 
     // Queen or pawn (future queen) can give mate against bare king.
