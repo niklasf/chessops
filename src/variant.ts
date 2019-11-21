@@ -63,7 +63,7 @@ export class Crazyhouse extends Chess {
   }
 }
 
-class Atomic extends Chess {
+export class Atomic extends Chess {
   static default(): Atomic {
     return super.default() as Atomic;
   }
@@ -155,7 +155,7 @@ class Atomic extends Chess {
       const after = this.clone();
       after.play({ from: square, to });
       const ourKing = after.board.kingOf(this.turn);
-      if (defined(ourKing) && (!after.board.kingOf(after.turn) || !after.isCheck())) {
+      if (defined(ourKing) && (!defined(after.board.kingOf(after.turn)) || after.kingAttackers(ourKing, after.turn, after.board.occupied).isEmpty())) {
         dests = dests.with(to);
       }
     }
