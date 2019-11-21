@@ -199,6 +199,18 @@ export class Antichess extends Chess {
     return 'antichess';
   }
 
+  protected validate() {
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (SquareSet.backranks().intersects(this.board.pawn)) {
+      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
+    }
+    return Result.ok(undefined);
+  }
+
+  protected kingAttackers(_square: Square, _attacker: Color, _occupied: SquareSet): SquareSet {
+    return SquareSet.empty();
+  }
+
   ctx(): Context {
     const ctx = super.ctx();
     const enemy = this.board[opposite(this.turn)];
