@@ -463,11 +463,11 @@ export default class Chess extends Position {
     else if (piece.role == 'knight') pseudo = knightAttacks(square);
     else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occupied);
     else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occupied);
-    else {
-      pseudo = kingAttacks(square);
-      if (square === ctx.king) pseudo = pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
-    }
-    return pseudo.diff(this.board[this.turn]);
+    else pseudo = kingAttacks(square);
+
+    pseudo = pseudo.diff(this.board[this.turn]);
+    if (square === ctx.king) return pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
+    else return pseudo;
   }
 
   dests(square: Square, ctx: Context): SquareSet {
