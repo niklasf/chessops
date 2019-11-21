@@ -437,6 +437,39 @@ export default class Chess extends Position {
     return !this.kingAttackers(ctx.king, opposite(this.turn), occupied).intersects(occupied);
   }
 
+  protected pseudoDests(square: Square, ctx: Context): SquareSet {
+    if (ctx.variantEnd) return SquareSet.empty();
+    const piece = this.board.get(square);
+    if (!piece || piece.color != this.turn) return SquareSet.empty();
+
+    let pseudo;
+    if (piece.role == 'pawn') {
+      let captureTargets = this.board[opposite(this.turn)];
+      if (defined(this.epSquare)) captureTargets = captureTargets.with(this.epSquare);
+      pseudo = pawnAttacks(this.turn, square).intersect(captureTargets);
+      const delta = this.turn == 'white' ? 8 : -8;
+      const step = square + delta;
+      if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
+        pseudo = pseudo.with(step);
+        const canDoubleStep = this.turn == 'white' ? (square < 16) : (square >= 64 - 16);
+        const doubleStep = step + delta;
+        if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
+          pseudo = pseudo.with(doubleStep);
+        }
+      }
+      return pseudo;
+    }
+    else if (piece.role == 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
+    else if (piece.role == 'knight') pseudo = knightAttacks(square);
+    else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occupied);
+    else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occupied);
+    else {
+      pseudo = kingAttacks(square);
+      if (square === ctx.king) pseudo = pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
+    }
+    return pseudo.diff(this.board[this.turn]);
+  }
+
   dests(square: Square, ctx: Context): SquareSet {
     if (ctx.variantEnd) return SquareSet.empty();
     const piece = this.board.get(square);

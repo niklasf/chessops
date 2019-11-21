@@ -63,10 +63,6 @@ export class Crazyhouse extends Chess {
   }
 }
 
-function pseudoDests(board: Board, square: Square): SquareSet {
-  return SquareSet.empty(); // TODO
-}
-
 class Atomic extends Chess {
   static default(): Atomic {
     return super.default() as Atomic;
@@ -107,7 +103,7 @@ class Atomic extends Chess {
 
   dests(square: Square, ctx: Context): SquareSet {
     let dests = SquareSet.empty();
-    for (const to of pseudoDests(this.board, square)) {
+    for (const to of this.pseudoDests(square, ctx)) {
       const after = this.clone();
       after.play({ from: square, to });
       const ourKing = after.board.kingOf(this.turn);
