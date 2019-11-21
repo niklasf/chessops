@@ -197,7 +197,7 @@ export class KingOfTheHill extends Chess {
   }
 
   rules(): Rules {
-    return 'kingOfTheHill';
+    return 'kingofthehill';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -235,7 +235,7 @@ export class ThreeCheck extends Chess {
   }
 
   rules(): Rules {
-    return 'threeCheck';
+    return '3check';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -285,7 +285,7 @@ class RacingKings extends Chess {
   }
 
   rules(): Rules {
-    return 'racingKings';
+    return 'racingkings';
   }
 
   dests(square: Square, ctx: Context): SquareSet {
@@ -395,9 +395,9 @@ export function defaultPosition(rules: Rules): Position {
     case 'antichess': return Antichess.default();
     case 'atomic': return Atomic.default();
     case 'horde': return Horde.default();
-    case 'racingKings': return RacingKings.default();
-    case 'kingOfTheHill': return KingOfTheHill.default();
-    case 'threeCheck': return ThreeCheck.default();
+    case 'racingkings': return RacingKings.default();
+    case 'kingofthehill': return KingOfTheHill.default();
+    case '3check': return ThreeCheck.default();
     case 'crazyhouse': return Crazyhouse.default();
   }
 }
@@ -408,9 +408,9 @@ export function setupPosition(rules: Rules, setup: Setup): Result<Position, Posi
     case 'antichess': return Antichess.fromSetup(setup);
     case 'atomic': return Atomic.fromSetup(setup);
     case 'horde': return Horde.fromSetup(setup);
-    case 'racingKings': return RacingKings.fromSetup(setup);
-    case 'kingOfTheHill': return KingOfTheHill.fromSetup(setup);
-    case 'threeCheck': return ThreeCheck.fromSetup(setup);
+    case 'racingkings': return RacingKings.fromSetup(setup);
+    case 'kingofthehill': return KingOfTheHill.fromSetup(setup);
+    case '3check': return ThreeCheck.fromSetup(setup);
     case 'crazyhouse': return Crazyhouse.fromSetup(setup);
   }
 }

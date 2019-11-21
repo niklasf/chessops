@@ -53,9 +53,9 @@ export function isMove(v: Uci): v is UciMove {
   return 'from' in v;
 }
 
-export type Rules = 'chess' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse';
+export type Rules = 'chess' | 'antichess' | 'kingofthehill' | '3check' | 'atomic' | 'horde' | 'racingkings' | 'crazyhouse';
 
-export const RULES: Rules[] = ['chess', 'antichess', 'kingOfTheHill', 'threeCheck', 'atomic', 'horde', 'racingKings', 'crazyhouse'];
+export const RULES: Rules[] = ['chess', 'antichess', 'kingofthehill', '3check', 'atomic', 'horde', 'racingkings', 'crazyhouse'];
 
 export interface Outcome {
   winner: Color | undefined;

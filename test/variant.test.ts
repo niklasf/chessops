@@ -23,3 +23,41 @@ test.each(variantPerfts)('variant perft: %s (%s): %s', (rules, name, fen, d1, d2
   if (d2) expect(perft(pos, 2, false)).toBe(d2);
   if (d3) expect(perft(pos, 3, false)).toBe(d3);
 });
+
+const falseNegative = false;
+
+const insufficientMaterial: [Rules, string, boolean, boolean][] = [
+  ['atomic', '8/3k4/8/8/2N5/8/3K4/8 b - -', true, true],
+  ['atomic', '8/4rk2/8/8/8/8/3K4/8 w - -', true, true],
+  ['atomic', '8/4qk2/8/8/8/8/3K4/8 w - -', true, false],
+  ['atomic', '8/1k6/8/2n5/8/3NK3/8/8 b - -', false, false],
+  ['atomic', '8/4bk2/8/8/8/8/3KB3/8 w - -', true, true],
+  ['atomic', '4b3/5k2/8/8/8/8/3KB3/8 w - -', false, false],
+  ['atomic', '3Q4/5kKB/8/8/8/8/8/8 b - -', false, true],
+  ['atomic', '8/5k2/8/8/8/8/5K2/4bb2 w - -', true, false],
+  ['atomic', '8/5k2/8/8/8/8/5K2/4nb2 w - -', true, false],
+
+  ['antichess', '8/4bk2/8/8/8/8/3KB3/8 w - -', false, false],
+  ['antichess', '4b3/5k2/8/8/8/8/3KB3/8 w - -', false, false],
+  ['antichess', '8/8/8/6b1/8/3B4/4B3/5B2 w - -', true, true],
+  ['antichess', '8/8/5b2/8/8/3B4/3B4/8 w - -', true, false],
+  ['antichess', '8/5p2/5P2/8/3B4/1bB5/8/8 b - -', falseNegative, falseNegative],
+
+  ['kingOfTheHill', '8/5k2/8/8/8/8/3K4/8 w - -', false, false],
+
+  ['racingKings', '8/5k2/8/8/8/8/3K4/8 w - -', false, false],
+
+  ['threeCheck', '8/5k2/8/8/8/8/3K4/8 w - - 3+3', true, true],
+  ['threeCheck', '8/5k2/8/8/8/8/3K2N1/8 w - - 3+3', false, true],
+
+  ['crazyhouse', '8/5k2/8/8/8/8/3K2N1/8[] w - -', true, true],
+  ['crazyhouse', '8/5k2/8/8/8/5B2/3KB3/8[] w - -', false, false],
+
+  ['horde', '8/5k2/8/8/8/4NN2/8/8 w - - 0 1', falseNegative, false],
+];
+
+test.each(insufficientMaterial)('%s insufficient material: %s', (rules, fen, white, black) => {
+  const pos = setupPosition(rules, parseFen(fen).unwrap()).unwrap();
+  expect(pos.hasInsufficientMaterial('white')).toBe(white);
+  expect(pos.hasInsufficientMaterial('black')).toBe(black);
+});
