@@ -51,11 +51,11 @@ export function perft(pos: Position, depth: number, log = false): number {
   if (depth < 1) return 1;
 
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
-  if (pos.rules() == 'antichess') promotionRoles.push('king');
+  if (pos.rules() === 'antichess') promotionRoles.push('king');
 
   const dropDests = pos.dropDests(pos.ctx());
 
-  if (!log && depth == 1 && dropDests.isEmpty()) {
+  if (!log && depth === 1 && dropDests.isEmpty()) {
     // Optimization for leaf nodes.
     let nodes = 0;
     for (const [from, to] of pos.allDests()) {
@@ -70,7 +70,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     let nodes = 0;
     for (const [from, dests] of pos.allDests()) {
       const promotions: Array<Role | undefined> =
-        ((from >> 3) == (pos.turn == 'white' ? 6 : 1) && pos.board.pawn.has(from)) ?
+        ((from >> 3) === (pos.turn === 'white' ? 6 : 1) && pos.board.pawn.has(from)) ?
           promotionRoles : [undefined];
       for (const to of dests) {
         for (const promotion of promotions) {
@@ -86,7 +86,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     if (pos.pockets) {
       for (const role of ROLES) {
         if (pos.pockets[pos.turn][role] > 0) {
-          for (const to of (role == 'pawn' ? dropDests.diff(SquareSet.backranks()) : dropDests)) {
+          for (const to of (role === 'pawn' ? dropDests.diff(SquareSet.backranks()) : dropDests)) {
             const child = pos.clone();
             const uci = { role, to };
             child.play(uci);

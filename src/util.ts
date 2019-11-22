@@ -13,14 +13,14 @@ export function strRepeat(str: string, num: number): string {
 export function nthIndexOf(haystack: string, needle: string, n: number): number {
   let index = haystack.indexOf(needle);
   while (n-- > 0) {
-    if (index == -1) break;
+    if (index === -1) break;
     index = haystack.indexOf(needle, index + 1);
   }
   return index;
 }
 
 export function opposite(color: Color): Color {
-  return color == 'white' ? 'black' : 'white';
+  return color === 'white' ? 'black' : 'white';
 }
 
 export function squareDist(a: Square, b: Square): number {
@@ -72,15 +72,15 @@ export function makeSquare(square: Square): string {
 }
 
 export function parseUci(str: string): Uci | undefined {
-  if (str[1] == '@' && str.length == 4) {
+  if (str[1] === '@' && str.length === 4) {
     const role = charToRole(str[0]);
     const to = parseSquare(str.slice(2));
     if (role && defined(to)) return { role, to };
-  } else if (str.length == 4 || str.length == 5) {
+  } else if (str.length === 4 || str.length === 5) {
     const from = parseSquare(str.slice(0, 2));
     const to = parseSquare(str.slice(2, 4));
     let promotion: Role | undefined;
-    if (str.length == 5) {
+    if (str.length === 5) {
       promotion = charToRole(str[4]);
       if (!promotion) return;
     }

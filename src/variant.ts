@@ -108,8 +108,8 @@ export class Atomic extends Chess {
     this.board.take(square);
     for (const explode of kingAttacks(square).intersect(this.board.occupied).diff(this.board.pawn)) {
       const piece = this.board.take(explode);
-      if (piece && piece.role == 'rook') this.castles.discardRook(explode);
-      if (piece && piece.role == 'king') this.castles.discardSide(piece.color);
+      if (piece && piece.role === 'rook') this.castles.discardRook(explode);
+      if (piece && piece.role === 'king') this.castles.discardSide(piece.color);
     }
   }
 
@@ -140,7 +140,7 @@ export class Atomic extends Chess {
     if (this.board.queen.nonEmpty() || this.board.pawn.nonEmpty()) return false;
 
     // Single knight, bishop or rook cannot mate against bare king.
-    if (this.board.knight.union(this.board.bishop).union(this.board.rook).size() == 1) return true;
+    if (this.board.knight.union(this.board.bishop).union(this.board.rook).isSingleSquare()) return true;
 
     // If only knights, more than two are required to mate bare king.
     if (this.board.occupied.equals(this.board.knight.union(this.board.king))) {
@@ -366,7 +366,7 @@ class RacingKings extends Chess {
 
   dests(square: Square, ctx: Context): SquareSet {
     // Kings cannot give check.
-    if (square == ctx.king) return super.dests(square, ctx);
+    if (square === ctx.king) return super.dests(square, ctx);
 
     // TODO: This could be optimized considerably.
     let dests = SquareSet.empty();
@@ -389,7 +389,7 @@ class RacingKings extends Chess {
     const goal = SquareSet.fromRank(7);
     const inGoal = this.board.king.intersect(goal);
     if (inGoal.isEmpty()) return false;
-    if (this.turn == 'white' || inGoal.intersects(this.board.black)) return true;
+    if (this.turn === 'white' || inGoal.intersects(this.board.black)) return true;
 
     // White has reached the backrank, check if black can catch up.
     const ctx = this.ctx();
@@ -427,13 +427,15 @@ export class Horde extends Chess {
   }
 
   protected validate(): Result<undefined, PositionError> {
-    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.king.size() != 1) return Result.err(new PositionError(IllegalSetup.Kings));
-    if (this.board.king.diff(this.board.promoted).size() != 1) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.occupied.isEmpty())
+      return Result.err(new PositionError(IllegalSetup.Empty));
+    if (!this.board.king.isSingleSquare())
+      return Result.err(new PositionError(IllegalSetup.Kings));
+    if (!this.board.king.diff(this.board.promoted).isSingleSquare())
+      return Result.err(new PositionError(IllegalSetup.Kings));
     const otherKing = this.board.kingOf(opposite(this.turn));
-    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
+    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
-    }
     for (const color of COLORS) {
       if (this.board.pieces(color, 'pawn').intersects(SquareSet.backrank(opposite(color)))) {
         return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
@@ -451,7 +453,7 @@ export class Horde extends Chess {
   }
 
   hasInsufficientMaterial(_color: Color): boolean {
-    // TODO: Detect cases where the horde cannot mate.
+    // TODO: Could detect cases where the horde cannot mate.
     return false;
   }
 
@@ -461,7 +463,7 @@ export class Horde extends Chess {
 
   variantOutcome(): Outcome | undefined {
     if (this.board.white.isEmpty()) return { winner: 'black' };
-    else if (this.board.black.isEmpty()) return { winner: 'white' };
+    if (this.board.black.isEmpty()) return { winner: 'white' };
     return;
   }
 }

@@ -31,18 +31,18 @@ function parseSmallUint(str: string): number | undefined {
 }
 
 function charToPiece(ch: string): Piece | undefined {
-  const lower = ch.toLowerCase();
-  const role = charToRole(lower);
+  const role = charToRole(ch);
   if (!role) return;
-  return { role, color: lower == ch ? 'black' : 'white' };
+  return { role, color: ch.toLowerCase() === ch ? 'black' : 'white' };
 }
 
 export function parseBoardFen(boardPart: string): Result<Board, FenError> {
   const board = Board.empty();
-  let rank = 7, file = 0;
+  let rank = 7;
+  let file = 0;
   for (let i = 0; i < boardPart.length; i++) {
     const c = boardPart[i];
-    if (c == '/' && file == 8) {
+    if (c === '/' && file === 8) {
       file = 0;
       rank--;
     } else {
@@ -53,7 +53,7 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
         const square = file + rank * 8;
         const piece = charToPiece(c);
         if (!piece) return Result.err(new FenError(InvalidFen.Board));
-        if (boardPart[i + 1] == '~') {
+        if (boardPart[i + 1] === '~') {
           piece.promoted = true;
           i++;
         }
@@ -62,7 +62,7 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
       }
     }
   }
-  if (rank != 0 || file != 8) return Result.err(new FenError(InvalidFen.Board));
+  if (rank !== 0 || file !== 8) return Result.err(new FenError(InvalidFen.Board));
   return Result.ok(board);
 }
 
@@ -78,23 +78,23 @@ export function parsePockets(pocketPart: string): Result<Material, FenError> {
 
 export function parseCastlingFen(board: Board, castlingPart: string): Result<SquareSet, FenError> {
   let unmovedRooks = SquareSet.empty();
-  if (castlingPart == '-') return Result.ok(unmovedRooks);
+  if (castlingPart === '-') return Result.ok(unmovedRooks);
   if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) {
     return Result.err(new FenError(InvalidFen.Castling));
   }
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
-    const color = c == lower ? 'black' : 'white';
-    const rank = color == 'white' ? 0 : 7;
-    const files = (lower == 'q') ? [0, 1, 2, 3, 4, 5, 6, 7] :
-      (lower == 'k') ? [7, 6, 5, 4, 3, 2, 1, 0] :
+    const color = c === lower ? 'black' : 'white';
+    const rank = color === 'white' ? 0 : 7;
+    const files = (lower === 'q') ? [0, 1, 2, 3, 4, 5, 6, 7] :
+      (lower === 'k') ? [7, 6, 5, 4, 3, 2, 1, 0] :
         [lower.charCodeAt(0) - 'a'.charCodeAt(0)];
     for (const file of files) {
       const square = file + 8 * rank;
       const piece = board.get(square);
       if (!piece) continue;
-      if (piece.color == color && piece.role == 'king') break;
-      if (piece.color == color && piece.role == 'rook') {
+      if (piece.color === color && piece.role === 'king') break;
+      if (piece.color === color && piece.role === 'rook') {
         unmovedRooks = unmovedRooks.with(square);
         break;
       }
@@ -105,12 +105,14 @@ export function parseCastlingFen(board: Board, castlingPart: string): Result<Squ
 
 export function parseRemainingChecks(part: string): Result<RemainingChecks, FenError> {
   const parts = part.split('+');
-  if (parts.length == 3 && parts[0] === '') {
-    const white = parseSmallUint(parts[1]), black = parseSmallUint(parts[2]);
+  if (parts.length === 3 && parts[0] === '') {
+    const white = parseSmallUint(parts[1]);
+    const black = parseSmallUint(parts[2]);
     if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError(InvalidFen.RemainingChecks));
     return Result.ok(new RemainingChecks(3 - white, 3 - black));
-  } else if (parts.length == 2) {
-    const white = parseSmallUint(parts[0]), black = parseSmallUint(parts[1]);
+  } else if (parts.length === 2) {
+    const white = parseSmallUint(parts[0]);
+    const black = parseSmallUint(parts[1]);
     if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError(InvalidFen.RemainingChecks));
     return Result.ok(new RemainingChecks(white, black));
   } else return Result.err(new FenError(InvalidFen.RemainingChecks));
@@ -124,12 +126,12 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   let board, pockets = Result.ok<Material | undefined, FenError>(undefined);
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
-    if (pocketStart == -1) return Result.err(new FenError(InvalidFen.Fen));
+    if (pocketStart === -1) return Result.err(new FenError(InvalidFen.Fen));
     board = parseBoardFen(boardPart.substr(0, pocketStart));
     pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 7);
-    if (pocketStart == -1) board = parseBoardFen(boardPart);
+    if (pocketStart === -1) board = parseBoardFen(boardPart);
     else {
       board = parseBoardFen(boardPart.substr(0, pocketStart));
       pockets = parsePockets(boardPart.substr(pocketStart + 1));
@@ -139,8 +141,8 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   // Turn
   let turn: Color;
   const turnPart = parts.shift();
-  if (!defined(turnPart) || turnPart == 'w') turn = 'white';
-  else if (turnPart == 'b') turn = 'black';
+  if (!defined(turnPart) || turnPart === 'w') turn = 'white';
+  else if (turnPart === 'b') turn = 'black';
   else return Result.err(new FenError(InvalidFen.Turn));
 
   return board.chain(board => {
@@ -151,7 +153,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
     // En passant square
     const epPart = parts.shift();
     let epSquare: Square | undefined;
-    if (defined(epPart) && epPart != '-') {
+    if (defined(epPart) && epPart !== '-') {
       epSquare = parseSquare(epPart);
       if (!defined(epSquare)) return Result.err(new FenError(InvalidFen.EpSquare));
     }
@@ -206,20 +208,21 @@ export function parsePiece(str: string): Piece | undefined {
   if (!str) return;
   const piece = charToPiece(str[0]);
   if (!piece) return;
-  if (str.length == 2 && str[1] == '~') piece.promoted = true;
+  if (str.length === 2 && str[1] === '~') piece.promoted = true;
   else if (str.length > 1) return;
   return piece;
 }
 
 export function makePiece(piece: Piece, opts?: FenOpts): string {
   let r = roleToChar(piece.role);
-  if (piece.color == 'white') r = r.toUpperCase();
+  if (piece.color === 'white') r = r.toUpperCase();
   if (opts && opts.promoted && piece.promoted) r += '~';
   return r;
 }
 
 export function makeBoardFen(board: Board, opts?: FenOpts): string {
-  let fen = '', empty = 0;
+  let fen = '';
+  let empty = 0;
   for (let rank = 7; rank >= 0; rank--) {
     for (let file = 0; file < 8; file++) {
       const square = file + rank * 8;
@@ -233,12 +236,12 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
         fen += makePiece(piece, opts);
       }
 
-      if (file == 7) {
+      if (file === 7) {
         if (empty) {
           fen += empty;
           empty = 0;
         }
-        if (rank != 0) fen += '/';
+        if (rank !== 0) fen += '/';
       }
     }
   }
@@ -262,11 +265,11 @@ export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: Fe
     const candidates = board.pieces(color, 'rook').intersect(backrank);
     for (const rook of unmovedRooks.intersect(candidates).reversed()) {
       if (!shredder && rook === candidates.first() && king && rook < king) {
-        fen += color == 'white' ? 'Q' : 'q';
+        fen += color === 'white' ? 'Q' : 'q';
       } else if (!shredder && rook === candidates.last() && king && king < rook) {
-        fen += color == 'white' ? 'K' : 'k';
+        fen += color === 'white' ? 'K' : 'k';
       } else {
-        fen += (color == 'white' ? 'ABCDEFGH' : 'abcdefgh')[rook & 0x7];
+        fen += (color === 'white' ? 'ABCDEFGH' : 'abcdefgh')[rook & 0x7];
       }
     }
   }

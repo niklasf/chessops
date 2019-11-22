@@ -26,11 +26,11 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
 }
 
 function kingCastlesTo(color: Color, side: CastlingSide): Square {
-  return color == 'white' ? (side == 'a' ? 2 : 6) : (side == 'a' ? 58 : 62);
+  return color === 'white' ? (side === 'a' ? 2 : 6) : (side === 'a' ? 58 : 62);
 }
 
 function rookCastlesTo(color: Color, side: CastlingSide): Square {
-  return color == 'white' ? (side == 'a' ? 3 : 5) : (side == 'a' ? 59 : 61);
+  return color === 'white' ? (side === 'a' ? 3 : 5) : (side === 'a' ? 59 : 61);
 }
 
 export class Castles {
@@ -97,7 +97,7 @@ export class Castles {
     const rooks = setup.unmovedRooks.intersect(setup.board.rook);
     for (const color of COLORS) {
       const king = setup.board.kingOf(color);
-      if (!defined(king) || (king >> 3) != (color == 'white' ? 0 : 7)) continue;
+      if (!defined(king) || (king >> 3) !== (color === 'white' ? 0 : 7)) continue;
       const side = rooks.intersect(setup.board[color]).intersect(SquareSet.backrank(color));
       const aSide = side.first();
       if (defined(aSide) && (aSide & 0x7) < (king & 0x7)) castles.add(color, 'a', king, aSide);
@@ -112,7 +112,7 @@ export class Castles {
       this.unmovedRooks = this.unmovedRooks.without(square);
       for (const color of COLORS) {
         for (const side of CASTLING_SIDES) {
-          if (this.rook[color][side] == square) this.rook[color][side] = undefined;
+          if (this.rook[color][side] === square) this.rook[color][side] = undefined;
         }
       }
     }
@@ -166,7 +166,7 @@ export abstract class Position {
 
   protected playCaptureAt(square: Square, captured: Piece): void {
     this.halfmoves = 0;
-    if (captured && captured.role == 'rook') this.castles.discardRook(square);
+    if (captured && captured.role === 'rook') this.castles.discardRook(square);
     if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
   }
 
@@ -212,11 +212,11 @@ export abstract class Position {
   isLegal(uci: Uci, ctx: Context): boolean {
     if (isDrop(uci)) {
       if (!this.pockets || this.pockets[this.turn][uci.role] <= 0) return false;
-      if (uci.role == 'pawn' && SquareSet.backranks().has(uci.to)) return false;
+      if (uci.role === 'pawn' && SquareSet.backranks().has(uci.to)) return false;
       return this.dropDests(ctx).has(uci.to);
     } else {
-      if (uci.promotion == 'pawn') return false;
-      if (uci.promotion == 'king' && this.rules() != 'antichess') return false;
+      if (uci.promotion === 'pawn') return false;
+      if (uci.promotion === 'king' && this.rules() !== 'antichess') return false;
       if (!uci.promotion && this.board.pawn.has(uci.from) && SquareSet.backranks().has(uci.to)) return false;
       return this.dests(uci.from, ctx).has(uci.to);
 
@@ -266,7 +266,7 @@ export abstract class Position {
     const turn = this.turn, epSquare = this.epSquare;
     this.epSquare = undefined;
     this.halfmoves += 1;
-    if (turn == 'black') this.fullmoves += 1;
+    if (turn === 'black') this.fullmoves += 1;
     this.turn = opposite(turn);
 
     if (isDrop(uci)) {
@@ -277,24 +277,24 @@ export abstract class Position {
       if (!piece) return;
 
       let epCapture: Piece | undefined;
-      if (piece.role == 'pawn') {
+      if (piece.role === 'pawn') {
         this.halfmoves = 0;
-        if (uci.to == epSquare) {
-          epCapture = this.board.take(uci.to + (turn == 'white' ? -8 : 8));
+        if (uci.to === epSquare) {
+          epCapture = this.board.take(uci.to + (turn === 'white' ? -8 : 8));
         }
         const delta = uci.from - uci.to;
-        if (Math.abs(delta) == 16 && 8 <= uci.from && uci.from <= 55) {
+        if (Math.abs(delta) === 16 && 8 <= uci.from && uci.from <= 55) {
           this.epSquare = (uci.from + uci.to) >> 1;
         }
         if (uci.promotion) {
           piece.role = uci.promotion;
           piece.promoted = true;
         }
-      } else if (piece.role == 'rook') {
+      } else if (piece.role === 'rook') {
         this.castles.discardRook(uci.from);
-      } else if (piece.role == 'king') {
+      } else if (piece.role === 'king') {
         const delta = uci.to - uci.from;
-        const isCastling = Math.abs(delta) == 2 || this.board[turn].has(uci.to);
+        const isCastling = Math.abs(delta) === 2 || this.board[turn].has(uci.to);
         if (isCastling) {
           const side = delta > 0 ? 'h' : 'a';
           const rookFrom = this.castles.rook[turn][side];
@@ -384,7 +384,7 @@ export default class Chess extends Position {
 
   protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.king.size() != 2) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
     if (!defined(this.board.kingOf(this.turn))) return Result.err(new PositionError(IllegalSetup.Kings));
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
@@ -399,9 +399,9 @@ export default class Chess extends Position {
 
   private validEpSquare(square: Square | undefined): Square | undefined {
     if (!square) return;
-    const epRank = this.turn == 'white' ? 5 : 2;
-    const forward = this.turn == 'white' ? 8 : -8;
-    if ((square >> 3) != epRank) return;
+    const epRank = this.turn === 'white' ? 5 : 2;
+    const forward = this.turn === 'white' ? 8 : -8;
+    if ((square >> 3) !== epRank) return;
     if (this.board.occupied.has(square + forward)) return;
     const pawn = square - forward;
     if (!this.board.pawn.has(pawn) || !this.board[opposite(this.turn)].has(pawn)) return;
@@ -432,7 +432,7 @@ export default class Chess extends Position {
     if (!defined(this.epSquare)) return false;
     if (!pawnAttacks(this.turn, pawn).has(this.epSquare)) return false;
     if (!defined(ctx.king)) return true;
-    const captured = this.epSquare + ((this.turn == 'white') ? -8 : 8);
+    const captured = this.epSquare + ((this.turn === 'white') ? -8 : 8);
     const occupied = this.board.occupied.toggle(pawn).toggle(this.epSquare).toggle(captured);
     return !this.kingAttackers(ctx.king, opposite(this.turn), occupied).intersects(occupied);
   }
@@ -440,18 +440,18 @@ export default class Chess extends Position {
   protected pseudoDests(square: Square, ctx: Context): SquareSet {
     if (ctx.variantEnd) return SquareSet.empty();
     const piece = this.board.get(square);
-    if (!piece || piece.color != this.turn) return SquareSet.empty();
+    if (!piece || piece.color !== this.turn) return SquareSet.empty();
 
     let pseudo;
-    if (piece.role == 'pawn') {
+    if (piece.role === 'pawn') {
       let captureTargets = this.board[opposite(this.turn)];
       if (defined(this.epSquare)) captureTargets = captureTargets.with(this.epSquare);
       pseudo = pawnAttacks(this.turn, square).intersect(captureTargets);
-      const delta = this.turn == 'white' ? 8 : -8;
+      const delta = this.turn === 'white' ? 8 : -8;
       const step = square + delta;
       if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
         pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn == 'white' ? (square < 16) : (square >= 64 - 16);
+        const canDoubleStep = this.turn === 'white' ? (square < 16) : (square >= 64 - 16);
         const doubleStep = step + delta;
         if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
           pseudo = pseudo.with(doubleStep);
@@ -459,10 +459,10 @@ export default class Chess extends Position {
       }
       return pseudo;
     }
-    else if (piece.role == 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
-    else if (piece.role == 'knight') pseudo = knightAttacks(square);
-    else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occupied);
-    else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occupied);
+    else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
+    else if (piece.role === 'knight') pseudo = knightAttacks(square);
+    else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
+    else if (piece.role === 'queen') pseudo = queenAttacks(square, this.board.occupied);
     else pseudo = kingAttacks(square);
 
     pseudo = pseudo.diff(this.board[this.turn]);
@@ -473,16 +473,16 @@ export default class Chess extends Position {
   dests(square: Square, ctx: Context): SquareSet {
     if (ctx.variantEnd) return SquareSet.empty();
     const piece = this.board.get(square);
-    if (!piece || piece.color != this.turn) return SquareSet.empty();
+    if (!piece || piece.color !== this.turn) return SquareSet.empty();
 
     let pseudo, legal;
-    if (piece.role == 'pawn') {
+    if (piece.role === 'pawn') {
       pseudo = pawnAttacks(this.turn, square).intersect(this.board[opposite(this.turn)]);
-      const delta = this.turn == 'white' ? 8 : -8;
+      const delta = this.turn === 'white' ? 8 : -8;
       const step = square + delta;
       if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
         pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn == 'white' ? (square < 16) : (square >= 64 - 16);
+        const canDoubleStep = this.turn === 'white' ? (square < 16) : (square >= 64 - 16);
         const doubleStep = step + delta;
         if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
           pseudo = pseudo.with(doubleStep);
@@ -490,21 +490,21 @@ export default class Chess extends Position {
       }
       if (defined(this.epSquare) && this.canCaptureEp(square, ctx)) {
         const pawn = this.epSquare - delta;
-        if (ctx.checkers.isEmpty() || ctx.checkers.singleSquare() == pawn) {
+        if (ctx.checkers.isEmpty() || ctx.checkers.singleSquare() === pawn) {
           legal = SquareSet.fromSquare(this.epSquare);
         }
       }
     }
-    else if (piece.role == 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
-    else if (piece.role == 'knight') pseudo = knightAttacks(square);
-    else if (piece.role == 'rook') pseudo = rookAttacks(square, this.board.occupied);
-    else if (piece.role == 'queen') pseudo = queenAttacks(square, this.board.occupied);
+    else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
+    else if (piece.role === 'knight') pseudo = knightAttacks(square);
+    else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
+    else if (piece.role === 'queen') pseudo = queenAttacks(square, this.board.occupied);
     else pseudo = kingAttacks(square);
 
     pseudo = pseudo.diff(this.board[this.turn]);
 
     if (defined(ctx.king)) {
-      if (piece.role == 'king') {
+      if (piece.role === 'king') {
         const occ = this.board.occupied.without(square);
         for (const to of pseudo) {
           if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
@@ -514,7 +514,7 @@ export default class Chess extends Position {
 
       if (ctx.checkers.nonEmpty()) {
         const checker = ctx.checkers.singleSquare();
-        if (!checker) return SquareSet.empty();
+        if (!checker) return SquareSet.empty(); // TODO: Broken but not caught by tests
         pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
       }
 

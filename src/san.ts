@@ -7,24 +7,24 @@ import { kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } 
 function makeSanWithoutSuffix(pos: Position, uci: Uci): string {
   let san = '';
   if (isDrop(uci)) {
-    if (uci.role != 'pawn') san = roleToChar(uci.role).toUpperCase();
+    if (uci.role !== 'pawn') san = roleToChar(uci.role).toUpperCase();
     san += '@' + makeSquare(uci.to);
   } else {
     const role = pos.board.getRole(uci.from);
     if (!role) return '--';
-    if (role == 'king' && (pos.board[pos.turn].has(uci.to) || Math.abs(uci.to - uci.from) == 2)) {
+    if (role === 'king' && (pos.board[pos.turn].has(uci.to) || Math.abs(uci.to - uci.from) === 2)) {
       san = uci.to > uci.from ? 'O-O' : 'O-O-O';
     } else {
       const capture = pos.board.occupied.has(uci.to);
-      if (role != 'pawn') {
+      if (role !== 'pawn') {
         san = roleToChar(role).toUpperCase();
 
         // Disambiguation
         let others;
-        if (role == 'king') others = kingAttacks(uci.to).intersect(pos.board.king);
-        else if (role == 'queen') others = queenAttacks(uci.to, pos.board.occupied).intersect(pos.board.queen);
-        else if (role == 'rook') others = rookAttacks(uci.to, pos.board.occupied).intersect(pos.board.rook);
-        else if (role == 'bishop') others = bishopAttacks(uci.to, pos.board.occupied).intersect(pos.board.bishop);
+        if (role === 'king') others = kingAttacks(uci.to).intersect(pos.board.king);
+        else if (role === 'queen') others = queenAttacks(uci.to, pos.board.occupied).intersect(pos.board.queen);
+        else if (role === 'rook') others = rookAttacks(uci.to, pos.board.occupied).intersect(pos.board.rook);
+        else if (role === 'bishop') others = bishopAttacks(uci.to, pos.board.occupied).intersect(pos.board.bishop);
         else others = knightAttacks(uci.to).intersect(pos.board.knight);
         others = others.intersect(pos.board[pos.turn]).without(uci.from);
         const ctx = pos.ctx();
@@ -62,15 +62,15 @@ export function makeVariationSan(pos: Position, variation: Uci[]): string {
   pos = pos.clone();
   let line = '';
   for (let i = 0; i < variation.length; i++) {
-    if (i != 0) line += ' ';
-    if (pos.turn == 'white') line += pos.fullmoves + '. ';
-    else if (i == 0) line = pos.fullmoves + '... ';
+    if (i !== 0) line += ' ';
+    if (pos.turn === 'white') line += pos.fullmoves + '. ';
+    else if (i === 0) line = pos.fullmoves + '... ';
     const san = makeSanWithoutSuffix(pos, variation[i]);
     pos.play(variation[i]);
     line += san;
-    if (san == '--') return line;
+    if (san === '--') return line;
     let over = false;
-    if (i == variation.length - 1) {
+    if (i === variation.length - 1) {
       const outcome = pos.outcome();
       over = !!(outcome && outcome.winner);
     }

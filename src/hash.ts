@@ -34,7 +34,7 @@ export function hashRemainingChecks(checks: RemainingChecks, state = 0): number 
 export function hashSetup(setup: Setup, state = 0): number {
   state = hashBoard(setup.board, state);
   if (setup.pockets) state = hashMaterial(setup.pockets, state);
-  if (setup.turn == 'white') state = fxhash32(1, state);
+  if (setup.turn === 'white') state = fxhash32(1, state);
   state = fxhash32(setup.unmovedRooks.lo, fxhash32(setup.unmovedRooks.hi, state));
   if (defined(setup.epSquare)) state = fxhash32(setup.epSquare, state);
   if (setup.remainingChecks) state = hashRemainingChecks(setup.remainingChecks, state);
