@@ -1,5 +1,5 @@
 import { isDrop, Uci } from './types';
-import { defined, roleToChar, makeSquare } from './util';
+import { roleToChar, makeSquare } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './chess';
 import { kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks';
