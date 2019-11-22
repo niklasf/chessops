@@ -240,35 +240,10 @@ export default class SquareSet {
     };
   }
 
-  inc64(): SquareSet {
-    const lo = this.lo + 1;
-    return new SquareSet(lo, lo ? this.hi : (this.hi + 1));
-  }
-
   minus64(other: SquareSet): SquareSet {
     const lo = this.lo - other.lo;
     const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
     return new SquareSet(lo, this.hi - (other.hi + c));
-  }
-
-  subsets(): Iterable<SquareSet> {
-    const complement = this.complement();
-    let subset = SquareSet.empty();
-    let first = true;
-    const next: () => IteratorResult<SquareSet> = () => {
-      if (first || !subset.isEmpty()) {
-        first = false;
-        const value = subset;
-        subset = subset.union(complement).inc64().intersect(this);
-        return { value, done: false };
-      }
-      return { done: true } as IteratorResult<SquareSet>;
-    };
-    return {
-      [Symbol.iterator](): Iterator<SquareSet> {
-        return { next };
-      }
-    };
   }
 }
 
