@@ -18,7 +18,7 @@ export function opposite(color: Color): Color {
 }
 
 export function squareDist(a: Square, b: Square): number {
-  const x1 = a & 7, x2 = b & 7;
+  const x1 = a & 0x7, x2 = b & 0x7;
   const y1 = a >> 3, y2 = b >> 3;
   return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
 }
@@ -28,7 +28,7 @@ export function squareRank(square: Square): number {
 }
 
 export function squareFile(square: Square): number {
-  return square & 7;
+  return square & 0x7;
 }
 
 export function roleToChar(role: Role): string {
