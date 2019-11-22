@@ -166,8 +166,8 @@ export abstract class Position {
 
   protected playCaptureAt(square: Square, captured: Piece): void {
     this.halfmoves = 0;
-    if (captured && captured.role === 'rook') this.castles.discardRook(square);
-    if (this.pockets && captured) this.pockets[opposite(captured.color)][captured.role]++;
+    if (captured.role === 'rook') this.castles.discardRook(square);
+    if (this.pockets) this.pockets[opposite(captured.color)][captured.role]++;
   }
 
   // The following should be identical in all subclasses.
@@ -177,7 +177,7 @@ export abstract class Position {
     pos.board = this.board.clone();
     pos.pockets = this.pockets && this.pockets.clone();
     pos.turn = this.turn;
-    pos.castles = this.castles && this.castles.clone();
+    pos.castles = this.castles.clone();
     pos.epSquare = this.epSquare;
     pos.remainingChecks = this.remainingChecks && this.remainingChecks.clone();
     pos.halfmoves = this.halfmoves;

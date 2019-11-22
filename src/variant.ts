@@ -298,7 +298,7 @@ export class ThreeCheck extends Chess {
 
   static fromSetup(setup: Setup): Result<ThreeCheck, PositionError> {
     return super.fromSetup(setup).map(pos => {
-      pos.remainingChecks = setup.remainingChecks || RemainingChecks.default();
+      pos.remainingChecks = setup.remainingChecks ? setup.remainingChecks.clone() : RemainingChecks.default();
       return pos;
     });
   }
