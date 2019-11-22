@@ -24,7 +24,9 @@ export enum InvalidFen {
   Fullmoves = 'ERR_FULLMOVES',
 }
 
-export class FenError extends Error { }
+export class FenError extends Error {
+  message: InvalidFen;
+}
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
