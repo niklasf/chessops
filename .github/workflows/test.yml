@@ -7,7 +7,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Setup node.js
       uses: actions/setup-node@v1
-    - name: npm install, compile, and test
+    - name: npm install, compile, test, lint
       run: |
         npm install
         npm test

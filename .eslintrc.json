@@ -15,14 +15,14 @@
   "rules": {
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "single"],
+    "quotes": ["warn", "single"],
     "semi": ["error", "always"],
     "semi": "off",
-    "@typescript-eslint/semi": ["error"],
+    "@typescript-eslint/semi": ["warn"],
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
   },
   "root": true
 }
