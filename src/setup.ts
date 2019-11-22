@@ -4,9 +4,9 @@ import { Board } from './board';
 
 export class MaterialSide {
   pawn: number;
-  knight: number
+  knight: number;
   bishop: number;
-  rook: number
+  rook: number;
   queen: number;
   king: number;
 

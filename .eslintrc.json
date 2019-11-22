@@ -17,6 +17,8 @@
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
+    "semi": "off",
+    "@typescript-eslint/semi": ["error"],
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-explicit-any": "off",
