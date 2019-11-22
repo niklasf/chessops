@@ -46,7 +46,7 @@ export class MaterialSide {
 }
 
 export class Material {
-  constructor(public white: Material, public black: Material) { }
+  constructor(public white: MaterialSide, public black: MaterialSide) { }
 
   static empty(): Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
