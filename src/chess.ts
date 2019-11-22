@@ -6,16 +6,14 @@ import { Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
+export class PositionError extends Error { }
+
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
   PawnsOnBackrank = 'ERR_PAWNS_ON_BACKRANK',
   Kings = 'ERR_KINGS',
   Variant = 'ERR_VARIANT',
-}
-
-export class PositionError extends Error {
-  message: IllegalSetup;
 }
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
