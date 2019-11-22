@@ -106,16 +106,16 @@ export default class SquareSet {
 
   shr64(shift: number): SquareSet {
     if (shift >= 64) return SquareSet.empty();
-    else if (shift >= 32) return new SquareSet(this.hi >>> (shift - 32), 0);
-    else if (shift > 0) return new SquareSet((this.lo >>> shift) ^ (this.hi << (32 - shift)), this.hi >>> shift);
-    else return this;
+    if (shift >= 32) return new SquareSet(this.hi >>> (shift - 32), 0);
+    if (shift > 0) return new SquareSet((this.lo >>> shift) ^ (this.hi << (32 - shift)), this.hi >>> shift);
+    return this;
   }
 
   shl64(shift: number): SquareSet {
     if (shift >= 64) return SquareSet.empty();
-    else if (shift >= 32) return new SquareSet(0, this.lo << (shift - 32));
-    else if (shift > 0) return new SquareSet(this.lo << shift, (this.hi << shift) ^ (this.lo >>> (32 - shift)));
-    else return this;
+    if (shift >= 32) return new SquareSet(0, this.lo << (shift - 32));
+    if (shift > 0) return new SquareSet(this.lo << shift, (this.hi << shift) ^ (this.lo >>> (32 - shift)));
+    return this;
   }
 
   bswap64(): SquareSet {
@@ -127,7 +127,7 @@ export default class SquareSet {
   }
 
   equals(other: SquareSet): boolean {
-    return this.lo == other.lo && this.hi == other.hi;
+    return this.lo === other.lo && this.hi === other.hi;
   }
 
   size(): number {
@@ -135,11 +135,11 @@ export default class SquareSet {
   }
 
   isEmpty(): boolean {
-    return this.lo == 0 && this.hi == 0;
+    return this.lo === 0 && this.hi === 0;
   }
 
   nonEmpty(): boolean {
-    return this.lo != 0 || this.hi != 0;
+    return this.lo !== 0 || this.hi !== 0;
   }
 
   has(square: Square): boolean {
@@ -169,15 +169,15 @@ export default class SquareSet {
   }
 
   last(): Square | undefined {
-    if (this.hi != 0) return 63 - Math.clz32(this.hi);
-    else if (this.lo != 0) return 31 - Math.clz32(this.lo);
-    else return undefined;
+    if (this.hi !== 0) return 63 - Math.clz32(this.hi);
+    if (this.lo !== 0) return 31 - Math.clz32(this.lo);
+    return;
   }
 
   first(): Square | undefined {
-    if (this.lo != 0) return 31 - Math.clz32(this.lo & -this.lo);
-    else if (this.hi != 0) return 63 - Math.clz32(this.hi & -this.hi);
-    else return undefined;
+    if (this.lo !== 0) return 31 - Math.clz32(this.lo & -this.lo);
+    if (this.hi !== 0) return 63 - Math.clz32(this.hi & -this.hi);
+    return;
   }
 
   moreThanOne(): boolean {
@@ -199,7 +199,8 @@ export default class SquareSet {
   }
 
   [Symbol.iterator](): Iterator<Square> {
-    let lo = this.lo, hi = this.hi;
+    let lo = this.lo;
+    let hi = this.hi;
     return {
       next(): IteratorResult<Square> {
         if (lo) {
@@ -218,7 +219,8 @@ export default class SquareSet {
   }
 
   reversed(): Iterable<Square> {
-    let lo = this.lo, hi = this.hi;
+    let lo = this.lo;
+    let hi = this.hi;
     return {
       [Symbol.iterator](): Iterator<Square> {
         return {
