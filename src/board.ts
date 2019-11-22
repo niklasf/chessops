@@ -120,10 +120,6 @@ export default class Board {
     return piece;
   }
 
-  delete(square: Square): boolean {
-    return !!this.take(square);
-  }
-
   set(square: Square, piece: Piece): Piece | undefined {
     const old = this.take(square);
     this.occupied = this.occupied.with(square);

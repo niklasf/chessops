@@ -109,7 +109,8 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
 }
 
 function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSet>>] {
-  const ray: BySquare<BySquare<SquareSet>> = [], between: BySquare<BySquare<SquareSet>> = [];
+  const ray: BySquare<BySquare<SquareSet>> = [];
+  const between: BySquare<BySquare<SquareSet>> = [];
   const zero = SquareSet.empty();
   for (let a = 0; a < 64; a++) {
     ray[a] = [];

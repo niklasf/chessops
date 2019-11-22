@@ -6,7 +6,11 @@ chessops
 
 Chess and chess variant rules and operations in TypeScript.
 
-:warning: Not ready for production :warning:
+Documentation
+-------------
+
+[View TypeDoc](https://niklasf.github.io/chessops/)
+
 
 Features
 --------
@@ -39,11 +43,6 @@ const setup = parseFen('r1bqkbnr/ppp2Qpp/2np4/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQ
 const pos = Chess.fromSetup(setup).unwrap();
 console.assert(pos.isCheckmate());
 ```
-
-Documentation
--------------
-
-[View TypeDoc](https://niklasf.github.io/chessops/)
 
 License
 -------
