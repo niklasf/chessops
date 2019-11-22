@@ -85,13 +85,7 @@ export class Material {
 }
 
 export class RemainingChecks {
-  white: number;
-  black: number;
-
-  constructor(white: number, black: number) {
-    this.white = white;
-    this.black = black;
-  }
+  constructor(public white: number, public black: number) { }
 
   static default(): RemainingChecks {
     return new RemainingChecks(3, 3);
