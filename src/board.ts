@@ -94,14 +94,19 @@ export default class Board {
     else return;
   }
 
+  getRole(square: Square): Role | undefined {
+    for (const role of ROLES) {
+      if (this[role].has(square)) return role;
+    }
+    return;
+  }
+
   get(square: Square): Piece | undefined {
     const color = this.getColor(square);
     if (!color) return;
     const promoted = this.promoted.has(square);
-    for (const role of ROLES) {
-      if (this[role].has(square)) return { color, promoted, role };
-    }
-    return;
+    const role = this.getRole(square)!;
+    return { color, role, promoted };
   }
 
   take(square: Square): Piece | undefined {
