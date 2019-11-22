@@ -1,4 +1,4 @@
-import { Color, COLORS, ROLES, Square } from './types';
+import { Color, ROLES, Square } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 
@@ -46,21 +46,14 @@ export class MaterialSide {
 }
 
 export class Material {
-  white: MaterialSide;
-  black: MaterialSide;
-
-  private constructor() { }
+  constructor(public white: Material, public black: Material) { }
 
   static empty(): Material {
-    const m = new Material();
-    for (const color of COLORS) m[color] = MaterialSide.empty();
-    return m;
+    return new Material(MaterialSide.empty(), MaterialSide.empty());
   }
 
   clone(): Material {
-    const m = new Material();
-    for (const color of COLORS) m[color] = this[color].clone();
-    return m;
+    return new Material(this.white.clone(), this.black.clone());
   }
 
   count(): number {
