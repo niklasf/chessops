@@ -189,7 +189,10 @@ export class Antichess extends Chess {
   }
 
   static fromSetup(setup: Setup): Result<Antichess, PositionError> {
-    return super.fromSetup(setup) as Result<Antichess, PositionError>;
+    return super.fromSetup(setup).map(pos => {
+      pos.castles = Castles.empty();
+      return pos as Antichess;
+    });
   }
 
   clone(): Antichess {
@@ -201,10 +204,10 @@ export class Antichess extends Chess {
   }
 
   protected validate(): Result<undefined, PositionError> {
-    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (SquareSet.backranks().intersects(this.board.pawn)) {
+    if (this.board.occupied.isEmpty())
+      return Result.err(new PositionError(IllegalSetup.Empty));
+    if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
-    }
     return Result.ok(undefined);
   }
 
@@ -340,7 +343,10 @@ class RacingKings extends Chess {
   }
 
   static fromSetup(setup: Setup): Result<RacingKings, PositionError> {
-    return super.fromSetup(setup) as Result<RacingKings, PositionError>;
+    return super.fromSetup(setup).map(pos => {
+      pos.castles = Castles.empty();
+      return pos as RacingKings;
+    });
   }
 
   protected validate(): Result<undefined, PositionError> {
