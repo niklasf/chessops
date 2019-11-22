@@ -1,4 +1,4 @@
-import { Square, Piece, Role, ROLES, ByRole, BySquare } from './types';
+import { Square, Piece, Role, ROLES } from './types';
 import { makeSquare, makeUci } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
@@ -39,7 +39,7 @@ export function square(sq: Square): string {
   return makeSquare(sq);
 }
 
-export function dests(dests: Map<Square, SquareSet>) {
+export function dests(dests: Map<Square, SquareSet>): string {
   const lines = [];
   for (const [from, to] of dests) {
     lines.push(`${makeSquare(from)}: ${to.toArray().map(square).join(' ')}`);
@@ -47,7 +47,7 @@ export function dests(dests: Map<Square, SquareSet>) {
   return lines.join('\n');
 }
 
-export function perft(pos: Position, depth: number, log: boolean = false): number {
+export function perft(pos: Position, depth: number, log = false): number {
   if (depth < 1) return 1;
 
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];

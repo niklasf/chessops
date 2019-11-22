@@ -53,7 +53,8 @@ export class Crazyhouse extends Chess {
   dropDests(ctx: Context): SquareSet {
     const mask = this.board.occupied.complement().intersect(
       (this.pockets && this.pockets[this.turn].hasNonPawns()) ? SquareSet.full() :
-      (this.pockets && this.pockets[this.turn].pawn) ? SquareSet.backranks().complement() : SquareSet.empty());
+        (this.pockets && this.pockets[this.turn].pawn) ? SquareSet.backranks().complement() :
+          SquareSet.empty());
 
     if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
       const checker = ctx.checkers.singleSquare();
@@ -97,7 +98,7 @@ export class Atomic extends Chess {
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     if (kingAttacks(square).intersects(this.board.pieces(attacker, 'king'))) {
-      return SquareSet.empty()
+      return SquareSet.empty();
     }
     return super.kingAttackers(square, attacker, occupied);
   }
@@ -199,7 +200,7 @@ export class Antichess extends Chess {
     return 'antichess';
   }
 
-  protected validate() {
+  protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (SquareSet.backranks().intersects(this.board.pawn)) {
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
@@ -269,7 +270,7 @@ export class KingOfTheHill extends Chess {
     return 'kingofthehill';
   }
 
-  hasInsufficientMaterial(color: Color): boolean {
+  hasInsufficientMaterial(_color: Color): boolean {
     return false;
   }
 
@@ -374,7 +375,7 @@ class RacingKings extends Chess {
     return dests;
   }
 
-  hasInsufficientMaterial(color: Color): boolean {
+  hasInsufficientMaterial(_color: Color): boolean {
     return false;
   }
 
@@ -442,7 +443,7 @@ export class Horde extends Chess {
     return 'horde';
   }
 
-  hasInsufficientMaterial(color: Color): boolean {
+  hasInsufficientMaterial(_color: Color): boolean {
     // TODO: Detect cases where the horde cannot mate.
     return false;
   }
@@ -460,26 +461,26 @@ export class Horde extends Chess {
 
 export function defaultPosition(rules: Rules): Position {
   switch (rules) {
-    case 'chess': return Chess.default();
-    case 'antichess': return Antichess.default();
-    case 'atomic': return Atomic.default();
-    case 'horde': return Horde.default();
-    case 'racingkings': return RacingKings.default();
-    case 'kingofthehill': return KingOfTheHill.default();
-    case '3check': return ThreeCheck.default();
-    case 'crazyhouse': return Crazyhouse.default();
+  case 'chess': return Chess.default();
+  case 'antichess': return Antichess.default();
+  case 'atomic': return Atomic.default();
+  case 'horde': return Horde.default();
+  case 'racingkings': return RacingKings.default();
+  case 'kingofthehill': return KingOfTheHill.default();
+  case '3check': return ThreeCheck.default();
+  case 'crazyhouse': return Crazyhouse.default();
   }
 }
 
 export function setupPosition(rules: Rules, setup: Setup): Result<Position, PositionError> {
   switch (rules) {
-    case 'chess': return Chess.fromSetup(setup);
-    case 'antichess': return Antichess.fromSetup(setup);
-    case 'atomic': return Atomic.fromSetup(setup);
-    case 'horde': return Horde.fromSetup(setup);
-    case 'racingkings': return RacingKings.fromSetup(setup);
-    case 'kingofthehill': return KingOfTheHill.fromSetup(setup);
-    case '3check': return ThreeCheck.fromSetup(setup);
-    case 'crazyhouse': return Crazyhouse.fromSetup(setup);
+  case 'chess': return Chess.fromSetup(setup);
+  case 'antichess': return Antichess.fromSetup(setup);
+  case 'atomic': return Atomic.fromSetup(setup);
+  case 'horde': return Horde.fromSetup(setup);
+  case 'racingkings': return RacingKings.fromSetup(setup);
+  case 'kingofthehill': return KingOfTheHill.fromSetup(setup);
+  case '3check': return ThreeCheck.fromSetup(setup);
+  case 'crazyhouse': return Crazyhouse.fromSetup(setup);
   }
 }

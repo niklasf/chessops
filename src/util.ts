@@ -39,12 +39,12 @@ export function squareFile(square: Square): number {
 
 export function roleToChar(role: Role): string {
   switch (role) {
-    case 'pawn': return 'p';
-    case 'knight': return 'n';
-    case 'bishop': return 'b';
-    case 'rook': return 'r';
-    case 'queen': return 'q';
-    case 'king': return 'k';
+  case 'pawn': return 'p';
+  case 'knight': return 'n';
+  case 'bishop': return 'b';
+  case 'rook': return 'r';
+  case 'queen': return 'q';
+  case 'king': return 'k';
   }
 }
 
@@ -52,13 +52,13 @@ export function charToRole(ch: 'p' | 'n' | 'b' | 'r' | 'q' | 'k'): Role;
 export function charToRole(ch: string): Role | undefined;
 export function charToRole(ch: string): Role | undefined {
   switch (ch) {
-    case 'P': case 'p': return 'pawn';
-    case 'N': case 'n': return 'knight';
-    case 'B': case 'b': return 'bishop';
-    case 'R': case 'r': return 'rook';
-    case 'Q': case 'q': return 'queen';
-    case 'K': case 'k': return 'king';
-    default: return;
+  case 'P': case 'p': return 'pawn';
+  case 'N': case 'n': return 'knight';
+  case 'B': case 'b': return 'bishop';
+  case 'R': case 'r': return 'rook';
+  case 'Q': case 'q': return 'queen';
+  case 'K': case 'k': return 'king';
+  default: return;
   }
 }
 

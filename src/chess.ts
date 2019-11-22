@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, BySquare, Uci, isDrop, Piece, Outcome } from './types';
+import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, Uci, isDrop, Piece, Outcome } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
@@ -25,11 +25,11 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
       .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn)));
 }
 
-function kingCastlesTo(color: Color, side: CastlingSide) {
+function kingCastlesTo(color: Color, side: CastlingSide): Square {
   return color == 'white' ? (side == 'a' ? 2 : 6) : (side == 'a' ? 58 : 62);
 }
 
-function rookCastlesTo(color: Color, side: CastlingSide) {
+function rookCastlesTo(color: Color, side: CastlingSide): Square {
   return color == 'white' ? (side == 'a' ? 3 : 5) : (side == 'a' ? 59 : 61);
 }
 
@@ -82,7 +82,7 @@ export class Castles {
     return castles;
   }
 
-  private add(color: Color, side: CastlingSide, king: Square, rook: Square) {
+  private add(color: Color, side: CastlingSide, king: Square, rook: Square): void {
     const kingTo = kingCastlesTo(color, side);
     const rookTo = rookCastlesTo(color, side);
     this.unmovedRooks = this.unmovedRooks.with(rook);
@@ -108,7 +108,7 @@ export class Castles {
     return castles;
   }
 
-  discardRook(square: Square) {
+  discardRook(square: Square): void {
     if (this.unmovedRooks.has(square)) {
       this.unmovedRooks = this.unmovedRooks.without(square);
       for (const color of COLORS) {
@@ -119,7 +119,7 @@ export class Castles {
     }
   }
 
-  discardSide(color: Color) {
+  discardSide(color: Color): void {
     const otherBackrank = SquareSet.fromRank(color == 'white' ? 7 : 0);
     this.unmovedRooks = this.unmovedRooks.intersect(otherBackrank);
     this.rook[color].a = undefined;
@@ -162,7 +162,7 @@ export abstract class Position {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
-  dropDests(ctx: Context): SquareSet {
+  dropDests(_ctx: Context): SquareSet {
     return SquareSet.empty();
   }
 
@@ -175,7 +175,7 @@ export abstract class Position {
   // The following should be identical in all subclasses.
 
   clone(): Position {
-    const pos = new (<any>this).constructor();
+    const pos = new (this as any).constructor();
     pos.board = this.board.clone();
     pos.pockets = this.pockets && this.pockets.clone();
     pos.turn = this.turn;
@@ -200,7 +200,7 @@ export abstract class Position {
     };
   }
 
-  isInsufficientMaterial() {
+  isInsufficientMaterial(): boolean {
     return COLORS.every(color => this.hasInsufficientMaterial(color));
   }
 
@@ -293,7 +293,7 @@ export abstract class Position {
           piece.promoted = true;
         }
       } else if (piece.role == 'rook') {
-         this.castles.discardRook(uci.from)
+        this.castles.discardRook(uci.from);
       } else if (piece.role == 'king') {
         const delta = uci.to - uci.from;
         const isCastling = Math.abs(delta) == 2 || this.board[turn].has(uci.to);
@@ -551,4 +551,4 @@ export default class Chess extends Position {
   }
 }
 
-export { Chess }
+export { Chess };

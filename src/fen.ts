@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Role, Piece, Square, Color, COLORS, ROLES } from './types';
+import { Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
@@ -28,6 +28,13 @@ export class FenError extends Error { }
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
+}
+
+function charToPiece(ch: string): Piece | undefined {
+  const lower = ch.toLowerCase();
+  const role = charToRole(lower);
+  if (!role) return;
+  return { role, color: lower == ch ? 'black' : 'white' };
 }
 
 export function parseBoardFen(boardPart: string): Result<Board, FenError> {
@@ -80,8 +87,8 @@ export function parseCastlingFen(board: Board, castlingPart: string): Result<Squ
     const color = c == lower ? 'black' : 'white';
     const rank = color == 'white' ? 0 : 7;
     const files = (lower == 'q') ? [0, 1, 2, 3, 4, 5, 6, 7] :
-                  (lower == 'k') ? [7, 6, 5, 4, 3, 2, 1, 0] :
-                                   [lower.charCodeAt(0) - 'a'.charCodeAt(0)];
+      (lower == 'k') ? [7, 6, 5, 4, 3, 2, 1, 0] :
+        [lower.charCodeAt(0) - 'a'.charCodeAt(0)];
     for (const file of files) {
       const square = file + 8 * rank;
       const piece = board.get(square);
@@ -169,7 +176,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
       if (defined(earlyRemainingChecks)) return Result.err(new FenError(InvalidFen.RemainingChecks));
       remainingChecks = parseRemainingChecks(remainingChecksPart);
     } else if (defined(earlyRemainingChecks)) {
-      remainingChecks = earlyRemainingChecks
+      remainingChecks = earlyRemainingChecks;
     };
 
     if (parts.length) return Result.err(new FenError(InvalidFen.Fen));
@@ -195,20 +202,6 @@ interface FenOpts {
   epd?: boolean;
 }
 
-function charToPiece(ch: string): Piece | undefined {
-  const lower = ch.toLowerCase();
-  const role = charToRole(lower);
-  if (!role) return;
-  return { role, color: lower == ch ? 'black' : 'white' };
-}
-
-export function makePiece(piece: Piece, opts?: FenOpts): string {
-  let r = roleToChar(piece.role);
-  if (piece.color == 'white') r = r.toUpperCase();
-  if (opts && opts.promoted && piece.promoted) r += '~';
-  return r;
-}
-
 export function parsePiece(str: string): Piece | undefined {
   if (!str) return;
   const piece = charToPiece(str[0]);
@@ -218,7 +211,14 @@ export function parsePiece(str: string): Piece | undefined {
   return piece;
 }
 
-export function makeBoardFen(board: Board, opts?: FenOpts) {
+export function makePiece(piece: Piece, opts?: FenOpts): string {
+  let r = roleToChar(piece.role);
+  if (piece.color == 'white') r = r.toUpperCase();
+  if (opts && opts.promoted && piece.promoted) r += '~';
+  return r;
+}
+
+export function makeBoardFen(board: Board, opts?: FenOpts): string {
   let fen = '', empty = 0;
   for (let rank = 7; rank >= 0; rank--) {
     for (let file = 0; file < 8; file++) {

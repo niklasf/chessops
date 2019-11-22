@@ -189,7 +189,7 @@ export default class SquareSet {
   }
 
   toArray(): Square[] {
-    const r = []
+    const r = [];
     for (const sq of this) r.push(sq);
     return r;
   }
@@ -216,7 +216,7 @@ export default class SquareSet {
   reversed(): Iterable<Square> {
     let lo = this.lo, hi = this.hi;
     return {
-      [Symbol.iterator]() {
+      [Symbol.iterator](): Iterator<Square> {
         return {
           next(): IteratorResult<Square> {
             if (hi) {
@@ -241,33 +241,31 @@ export default class SquareSet {
     return new SquareSet(lo, lo ? this.hi : (this.hi + 1));
   }
 
-  minus64(other: SquareSet) {
+  minus64(other: SquareSet): SquareSet {
     const lo = this.lo - other.lo;
     const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
     return new SquareSet(lo, this.hi - (other.hi + c));
   }
 
   subsets(): Iterable<SquareSet> {
-    const mask = this;
     const complement = this.complement();
     let subset = SquareSet.empty();
     let first = true;
+    const next: () => IteratorResult<SquareSet> = () => {
+      if (first || !subset.isEmpty()) {
+        first = false;
+        const value = subset;
+        subset = subset.union(complement).inc64().intersect(this);
+        return { value, done: false };
+      }
+      return { done: true } as IteratorResult<SquareSet>;
+    };
     return {
-      [Symbol.iterator]() {
-        return {
-          next(): IteratorResult<SquareSet> {
-            if (first || !subset.isEmpty()) {
-              first = false;
-              const value = subset;
-              subset = subset.union(complement).inc64().intersect(mask);
-              return { value, done: false };
-            }
-            return { done: true } as IteratorResult<SquareSet>;
-          }
-        }
+      [Symbol.iterator](): Iterator<SquareSet> {
+        return { next };
       }
     };
   }
 }
 
-export { SquareSet }
+export { SquareSet };

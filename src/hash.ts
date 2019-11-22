@@ -7,31 +7,31 @@ function rol32(n: number, left: number): number {
   return (n << left) | (n >>> (32 - left));
 }
 
-export function fxhash32(word: number, state: number = 0): number {
+export function fxhash32(word: number, state = 0): number {
   return Math.imul(rol32(state, 5) ^ word, 0x9e3779b9);
 }
 
-export function hashBoard(board: Board, state: number = 0): number {
+export function hashBoard(board: Board, state = 0): number {
   state = fxhash32(board.white.lo, fxhash32(board.white.hi, state));
   for (const role of ROLES) state = fxhash32(board[role].lo, fxhash32(board[role].hi, state));
   return state;
 }
 
-export function hashMaterialSide(side: MaterialSide, state: number = 0): number {
+export function hashMaterialSide(side: MaterialSide, state = 0): number {
   for (const role of ROLES) state = fxhash32(side[role], state);
   return state;
 }
 
-export function hashMaterial(material: Material, state: number = 0): number {
+export function hashMaterial(material: Material, state = 0): number {
   for (const color of COLORS) state = hashMaterialSide(material[color], state);
   return state;
 }
 
-export function hashRemainingChecks(checks: RemainingChecks, state: number = 0): number {
+export function hashRemainingChecks(checks: RemainingChecks, state = 0): number {
   return fxhash32(checks.white, fxhash32(checks.black, state));
 }
 
-export function hashSetup(setup: Setup, state: number = 0): number {
+export function hashSetup(setup: Setup, state = 0): number {
   state = hashBoard(setup.board, state);
   if (setup.pockets) state = hashMaterial(setup.pockets, state);
   if (setup.turn == 'white') state = fxhash32(1, state);

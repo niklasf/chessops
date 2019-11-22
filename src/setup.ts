@@ -1,4 +1,4 @@
-import { CastlingSide, Color, COLORS, ROLES, Square, ByCastlingSide, ByColor, Rules } from './types';
+import { Color, COLORS, ROLES, Square } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 
@@ -113,7 +113,7 @@ export default interface Setup {
   fullmoves: number;
 }
 
-export { Setup }
+export { Setup };
 
 export function defaultSetup(): Setup {
   return {
