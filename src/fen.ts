@@ -3,7 +3,7 @@ import { Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
-import { defined, strRepeat, nthIndexOf, parseSquare, makeSquare, roleToChar, charToRole } from './util';
+import { defined, nthIndexOf, parseSquare, makeSquare, roleToChar, charToRole } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' w KQkq -';
@@ -249,7 +249,7 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
 }
 
 function makePocket(material: MaterialSide): string {
-  return ROLES.map(role => strRepeat(roleToChar(role), material[role])).join('');
+  return ROLES.map(role => roleToChar(role).repeat(material[role])).join('');
 }
 
 export function makePockets(pocket: Material): string {
