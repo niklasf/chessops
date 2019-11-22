@@ -386,19 +386,21 @@ class RacingKings extends Chess {
   }
 
   isVariantEnd(): boolean {
-    const inGoal = this.board.king.intersect(SquareSet.fromRank(7));
+    const goal = SquareSet.fromRank(7);
+    const inGoal = this.board.king.intersect(goal);
     if (inGoal.isEmpty()) return false;
     if (this.turn == 'white' || inGoal.intersects(this.board.black)) return true;
 
     // White has reached the backrank, check if black can catch up.
     const ctx = this.ctx();
-    return !defined(ctx.king) || !this.dests(ctx.king, ctx).intersects(SquareSet.fromRank(7));
+    return !defined(ctx.king) || !this.dests(ctx.king, ctx).intersects(goal);
   }
 
   variantOutcome(): Outcome | undefined {
     if (!this.isVariantEnd()) return;
-    const blackInGoal = this.board.pieces('black', 'king').intersects(SquareSet.fromRank(7));
-    const whiteInGoal = this.board.pieces('white', 'king').intersects(SquareSet.fromRank(7));
+    const goal = SquareSet.fromRank(7);
+    const blackInGoal = this.board.pieces('black', 'king').intersects(goal);
+    const whiteInGoal = this.board.pieces('white', 'king').intersects(goal);
     if (blackInGoal && !whiteInGoal) return { winner: 'black' };
     if (whiteInGoal && !blackInGoal) return { winner: 'white' };
     return { winner: undefined };
@@ -432,11 +434,10 @@ export class Horde extends Chess {
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
     }
-    if (this.board.pieces('white', 'pawn').intersects(SquareSet.fromRank(7))) {
-      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
-    }
-    if (this.board.pieces('black', 'pawn').intersects(SquareSet.fromRank(0))) {
-      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
+    for (const color of COLORS) {
+      if (this.board.pieces(color, 'pawn').intersects(SquareSet.backrank(opposite(color)))) {
+        return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
+      }
     }
     return Result.ok(undefined);
   }

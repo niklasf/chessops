@@ -1,4 +1,4 @@
-import { Square } from './types';
+import { Square, Color } from './types';
 
 function popcnt32(n: number): number {
   n = n - ((n >>> 1) & 0x55555555);
@@ -58,6 +58,10 @@ export default class SquareSet {
 
   static backranks(): SquareSet {
     return new SquareSet(0xff, 0xff000000);
+  }
+
+  static backrank(color: Color): SquareSet {
+    return color === 'white' ? new SquareSet(0xff, 0) : new SquareSet(0, 0xff000000);
   }
 
   static lightSquares(): SquareSet {

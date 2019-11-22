@@ -6,8 +6,6 @@ import { Setup, Material, RemainingChecks } from './setup';
 import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
-export class PositionError extends Error { }
-
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
@@ -15,6 +13,8 @@ export enum IllegalSetup {
   Kings = 'ERR_KINGS',
   Variant = 'ERR_VARIANT',
 }
+
+export class PositionError extends Error { }
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
@@ -96,10 +96,9 @@ export class Castles {
     const castles = Castles.empty();
     const rooks = setup.unmovedRooks.intersect(setup.board.rook);
     for (const color of COLORS) {
-      const backrank = color == 'white' ? 0 : 7;
       const king = setup.board.kingOf(color);
-      if (!defined(king) || (king >> 3) != backrank) continue;
-      const side = rooks.intersect(setup.board[color]).intersect(SquareSet.fromRank(backrank));
+      if (!defined(king) || (king >> 3) != (color == 'white' ? 0 : 7)) continue;
+      const side = rooks.intersect(setup.board[color]).intersect(SquareSet.backrank(color));
       const aSide = side.first();
       if (defined(aSide) && (aSide & 0x7) < (king & 0x7)) castles.add(color, 'a', king, aSide);
       const hSide = side.last();
@@ -120,8 +119,7 @@ export class Castles {
   }
 
   discardSide(color: Color): void {
-    const otherBackrank = SquareSet.fromRank(color == 'white' ? 7 : 0);
-    this.unmovedRooks = this.unmovedRooks.intersect(otherBackrank);
+    this.unmovedRooks = this.unmovedRooks.diff(SquareSet.backrank(color));
     this.rook[color].a = undefined;
     this.rook[color].h = undefined;
   }

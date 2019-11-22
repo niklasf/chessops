@@ -1,5 +1,5 @@
 import { Square, Piece, Role, ROLES } from './types';
-import { makeSquare, makeUci } from './util';
+import { opposite, makeSquare, makeUci } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
@@ -61,7 +61,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     for (const [from, to] of pos.allDests()) {
       nodes += to.size();
       if (pos.board.pawn.has(from)) {
-        const backrank = SquareSet.fromRank(pos.turn == 'white' ? 7 : 0);
+        const backrank = SquareSet.backrank(opposite(pos.turn));
         nodes += to.intersect(backrank).size() * (promotionRoles.length - 1);
       }
     }

@@ -90,8 +90,8 @@ export default class Board {
 
   getColor(square: Square): Color | undefined {
     if (this.white.has(square)) return 'white';
-    else if (this.black.has(square)) return 'black';
-    else return;
+    if (this.black.has(square)) return 'black';
+    return;
   }
 
   getRole(square: Square): Role | undefined {
@@ -138,7 +138,7 @@ export default class Board {
     const next: () => IteratorResult<[Square, Piece]> = () => {
       const entry = keys.next();
       if (entry.done) return { done: true } as IteratorResult<[Square, Piece]>;
-      else return { value: [entry.value, this.get(entry.value)!], done: false };
+      return { value: [entry.value, this.get(entry.value)!], done: false };
     };
     return { next };
   }
