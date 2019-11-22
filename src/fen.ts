@@ -32,8 +32,7 @@ function parseSmallUint(str: string): number | undefined {
 
 function charToPiece(ch: string): Piece | undefined {
   const role = charToRole(ch);
-  if (!role) return;
-  return { role, color: ch.toLowerCase() === ch ? 'black' : 'white' };
+  return role && { role, color: ch.toLowerCase() === ch ? 'black' : 'white' };
 }
 
 export function parseBoardFen(boardPart: string): Result<Board, FenError> {
