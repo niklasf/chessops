@@ -1,6 +1,8 @@
 import { isDrop, Uci } from './types';
 import { defined, roleToChar, makeSquare } from './util';
+import { SquareSet } from './squareSet';
 import { Position } from './chess';
+import { kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks';
 
 export function makeSanAndPlay(pos: Position, uci: Uci): string {
   let san = '';
@@ -13,10 +15,31 @@ export function makeSanAndPlay(pos: Position, uci: Uci): string {
     if (role == 'king' && (pos.board[pos.turn].has(uci.to) || Math.abs(uci.to - uci.from) == 2)) {
       san = uci.to > uci.from ? 'O-O' : 'O-O-O';
     } else {
-      if (role != 'pawn') san = roleToChar(role).toUpperCase();
-      san += makeSquare(uci.from);
-      san += pos.board.occupied.has(uci.to) ? 'x' : '-';
+      const capture = pos.board.occupied.has(uci.to);
+      if (role != 'pawn') {
+        san = roleToChar(role).toUpperCase();
+
+        // Sloppy disambiguation
+        let others;
+        if (role == 'king') others = kingAttacks(uci.to).intersect(pos.board.king);
+        else if (role == 'queen') others = queenAttacks(uci.to, pos.board.occupied).intersect(pos.board.queen);
+        else if (role == 'rook') others = rookAttacks(uci.to, pos.board.occupied).intersect(pos.board.rook);
+        else if (role == 'bishop') others = bishopAttacks(uci.to, pos.board.occupied).intersect(pos.board.bishop);
+        else others = knightAttacks(uci.to).intersect(pos.board.knight);
+        others = others.intersect(pos.board[pos.turn]).without(uci.from);
+        if (others.nonEmpty()) {
+          let row = false;
+          let column = others.intersects(SquareSet.fromRank(uci.from >> 3));
+          if (others.intersects(SquareSet.fromFile(uci.from & 0x7))) row = true;
+          else column = true;
+          if (column) san += 'acbdefgh'[uci.from & 0x7];
+          if (row) san += '12345678'[uci.from >> 3];
+        }
+      } else if (capture) san = 'abcdefgh'[uci.from & 0x7];
+
+      if (capture) san += 'x';
       san += makeSquare(uci.to);
+      if (uci.promotion) san += '=' + roleToChar(uci.promotion).toUpperCase();
     }
   }
 
