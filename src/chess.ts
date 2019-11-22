@@ -96,13 +96,14 @@ export class Castles {
     const castles = Castles.empty();
     const rooks = setup.unmovedRooks.intersect(setup.board.rook);
     for (const color of COLORS) {
+      const backrank = SquareSet.backrank(color);
       const king = setup.board.kingOf(color);
-      if (!defined(king) || (king >> 3) !== (color === 'white' ? 0 : 7)) continue;
-      const side = rooks.intersect(setup.board[color]).intersect(SquareSet.backrank(color));
+      if (!defined(king) || !backrank.has(king)) continue;
+      const side = rooks.intersect(setup.board[color]).intersect(backrank);
       const aSide = side.first();
-      if (defined(aSide) && (aSide & 0x7) < (king & 0x7)) castles.add(color, 'a', king, aSide);
+      if (defined(aSide) && aSide < king) castles.add(color, 'a', king, aSide);
       const hSide = side.last();
-      if (defined(hSide) && (king & 0x7) < (hSide & 0x7)) castles.add(color, 'h', king, hSide);
+      if (defined(hSide) && king < hSide) castles.add(color, 'h', king, hSide);
     }
     return castles;
   }

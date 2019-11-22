@@ -259,13 +259,14 @@ export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: Fe
   const shredder = opts && opts.shredder;
   let fen = '';
   for (const color of COLORS) {
-    const king = board.kingOf(color);
     const backrank = SquareSet.backrank(color);
+    const king = board.kingOf(color);
+    if (!defined(king) || !backrank.has(king)) continue;
     const candidates = board.pieces(color, 'rook').intersect(backrank);
     for (const rook of unmovedRooks.intersect(candidates).reversed()) {
-      if (!shredder && rook === candidates.first() && king && rook < king) {
+      if (!shredder && rook === candidates.first() && rook < king) {
         fen += color === 'white' ? 'Q' : 'q';
-      } else if (!shredder && rook === candidates.last() && king && king < rook) {
+      } else if (!shredder && rook === candidates.last() && king < rook) {
         fen += color === 'white' ? 'K' : 'k';
       } else {
         fen += (color === 'white' ? 'ABCDEFGH' : 'abcdefgh')[rook & 0x7];
