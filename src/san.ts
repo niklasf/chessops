@@ -19,7 +19,7 @@ export function makeSanAndPlay(pos: Position, uci: Uci): string {
       if (role != 'pawn') {
         san = roleToChar(role).toUpperCase();
 
-        // Sloppy disambiguation
+        // Disambiguation
         let others;
         if (role == 'king') others = kingAttacks(uci.to).intersect(pos.board.king);
         else if (role == 'queen') others = queenAttacks(uci.to, pos.board.occupied).intersect(pos.board.queen);
@@ -27,6 +27,10 @@ export function makeSanAndPlay(pos: Position, uci: Uci): string {
         else if (role == 'bishop') others = bishopAttacks(uci.to, pos.board.occupied).intersect(pos.board.bishop);
         else others = knightAttacks(uci.to).intersect(pos.board.knight);
         others = others.intersect(pos.board[pos.turn]).without(uci.from);
+        const ctx = pos.ctx();
+        for (const from of others) {
+          if (!pos.dests(from, ctx).has(uci.to)) others = others.without(from);
+        }
         if (others.nonEmpty()) {
           let row = false;
           let column = others.intersects(SquareSet.fromRank(uci.from >> 3));
