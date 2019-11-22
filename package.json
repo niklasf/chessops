@@ -29,7 +29,8 @@
     "test": "jest",
     "compile": "tsc",
     "prepare": "tsc",
-    "doc": "typedoc --excludeNotExported"
+    "doc": "typedoc --excludeNotExported",
+    "lint": "eslint src/*.ts"
   },
   "files": [
     "attacks.js",
