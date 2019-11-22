@@ -21,6 +21,7 @@ const tricky: [string, string, number, number, number, number?, number?][] = [
   // Regression tests
   ['ep-evasion', '8/8/8/5k2/3p4/8/4P3/4K3 w - -', 6, 54, 343, 2810, 19228],
   ['prison', '2b5/kpPp4/1p1P4/1P6/6p1/4p1P1/4PpPK/5B2 w - -', 1, 1, 1],
+  ['a1-check', '4k3/5p2/5p1p/8/rbR5/1N6/5PPP/5K2 b - - 1 29', 22, 580, 12309],
 
   // https://github.com/ornicar/lila/issues/4625
   ['hside-rook-blocks-aside-castling', '4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff -', 42, 1743, 71908],

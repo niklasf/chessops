@@ -514,7 +514,7 @@ export default class Chess extends Position {
 
       if (ctx.checkers.nonEmpty()) {
         const checker = ctx.checkers.singleSquare();
-        if (!checker) return SquareSet.empty(); // TODO: Broken but not caught by tests
+        if (!defined(checker)) return SquareSet.empty();
         pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
       }
 
