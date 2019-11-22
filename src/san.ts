@@ -4,7 +4,7 @@ import { SquareSet } from './squareSet';
 import { Position } from './chess';
 import { kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks';
 
-export function makeSanAndPlay(pos: Position, uci: Uci): string {
+function makeSanWithoutSuffix(pos: Position, uci: Uci): string {
   let san = '';
   if (isDrop(uci)) {
     if (uci.role != 'pawn') san = roleToChar(uci.role).toUpperCase();
@@ -46,24 +46,38 @@ export function makeSanAndPlay(pos: Position, uci: Uci): string {
       if (uci.promotion) san += '=' + roleToChar(uci.promotion).toUpperCase();
     }
   }
+  return san;
+}
 
+export function makeSanAndPlay(pos: Position, uci: Uci): string {
+  const san = makeSanWithoutSuffix(pos, uci);
   pos.play(uci);
   const outcome = pos.outcome();
-  if (outcome && defined(outcome.winner)) san += '#';
-  else if (pos.isCheck()) san += '+';
-  return san;
+  if (outcome && outcome.winner) return san + '#';
+  else if (pos.isCheck()) return san + '+';
+  else return san;
 }
 
 export function makeVariationSan(pos: Position, variation: Uci[]): string {
   pos = pos.clone();
-  let first = true;
-  return variation.map(uci => {
-    let prefix = '';
-    if (pos.turn == 'white') prefix = pos.fullmoves + '. ';
-    else if (first) prefix = pos.fullmoves + '... ';
-    first = false;
-    return prefix + makeSanAndPlay(pos, uci);
-  }).join(' ');
+  let line = '';
+  for (let i = 0; i < variation.length; i++) {
+    if (i != 0) line += ' ';
+    if (pos.turn == 'white') line += pos.fullmoves + '. ';
+    else if (i == 0) line = pos.fullmoves + '... ';
+    const san = makeSanWithoutSuffix(pos, variation[i]);
+    pos.play(variation[i]);
+    line += san;
+    if (san == '--') return line;
+    let over = false;
+    if (i == variation.length - 1) {
+      const outcome = pos.outcome();
+      over = !!(outcome && outcome.winner);
+    }
+    if (over) line += '#';
+    else if (pos.isCheck()) line += '+';
+  }
+  return line;
 }
 
 export function makeSan(pos: Position, uci: Uci): string {
