@@ -99,12 +99,12 @@ export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
 
 export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {
   switch (piece.role) {
-    case 'pawn': return pawnAttacks(piece.color, square);
-    case 'knight': return knightAttacks(square);
-    case 'bishop': return bishopAttacks(square, occupied);
-    case 'rook': return rookAttacks(square, occupied);
-    case 'queen': return queenAttacks(square, occupied);
-    case 'king': return kingAttacks(square);
+  case 'pawn': return pawnAttacks(piece.color, square);
+  case 'knight': return knightAttacks(square);
+  case 'bishop': return bishopAttacks(square, occupied);
+  case 'rook': return rookAttacks(square, occupied);
+  case 'queen': return queenAttacks(square, occupied);
+  case 'king': return kingAttacks(square);
   }
 }
 

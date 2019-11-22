@@ -1,5 +1,4 @@
 import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
-import { opposite } from './util';
 import { SquareSet } from './squareSet';
 
 export default class Board {
@@ -134,15 +133,13 @@ export default class Board {
   }
 
   [Symbol.iterator](): Iterator<[Square, Piece]> {
-    const self = this;
     const keys = this.occupied[Symbol.iterator]();
-    return {
-      next(): IteratorResult<[Square, Piece]> {
-        const entry = keys.next();
-        if (entry.done) return { done: true } as IteratorResult<[Square, Piece]>;
-        else return { value: [entry.value, self.get(entry.value)!], done: false };
-      }
+    const next: () => IteratorResult<[Square, Piece]> = () => {
+      const entry = keys.next();
+      if (entry.done) return { done: true } as IteratorResult<[Square, Piece]>;
+      else return { value: [entry.value, this.get(entry.value)!], done: false };
     };
+    return { next };
   }
 
   pieces(color: Color, role: Role): SquareSet {
@@ -162,4 +159,4 @@ export default class Board {
   }
 }
 
-export { Board }
+export { Board };
