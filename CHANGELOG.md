@@ -8,7 +8,7 @@ v0.2.0
 * Fix insufficient material with same-color bishops.
 * Fix Crazyhouse validation and limit pocket size.
 * Fix `Position.fromSetup()` entangles position with setup.
-* Made `Position.rules()` as read-only property.
+* Made `Position.rules()` a read-only property `Position.rules`.
 * Removed `SquareSet.subsets()`.
 * Removed `utils.strRepeat()`.
 * Micro optimizations and misc non-functional tweaks.
