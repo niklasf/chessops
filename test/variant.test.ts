@@ -73,3 +73,13 @@ test.each(insufficientMaterial)('%s insufficient material: %s', (rules, fen, whi
   expect(pos.hasInsufficientMaterial('white')).toBe(white);
   expect(pos.hasInsufficientMaterial('black')).toBe(black);
 });
+
+test('king of the hill not over', () => {
+  const pos = setupPosition('kingofthehill', parseFen('rnbqkbnr/pppppppp/8/1Q6/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1').unwrap()).unwrap();
+  expect(pos.isInsufficientMaterial()).toBe(false);
+  expect(pos.isCheck()).toBe(false);
+  expect(pos.isVariantEnd()).toBe(false);
+  expect(pos.variantOutcome()).toBeUndefined();
+  expect(pos.outcome()).toBeUndefined();
+  expect(pos.isEnd()).toBe(false);
+});
