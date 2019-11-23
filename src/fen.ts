@@ -84,16 +84,14 @@ export function parseCastlingFen(board: Board, castlingPart: string): Result<Squ
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
     const color = c === lower ? 'black' : 'white';
-    const rank = color === 'white' ? 0 : 7;
-    const files = (lower === 'q') ? [0, 1, 2, 3, 4, 5, 6, 7] :
-      (lower === 'k') ? [7, 6, 5, 4, 3, 2, 1, 0] :
-        [lower.charCodeAt(0) - 'a'.charCodeAt(0)];
-    for (const file of files) {
-      const square = file + 8 * rank;
-      const piece = board.get(square);
-      if (!piece) continue;
-      if (piece.color === color && piece.role === 'king') break;
-      if (piece.color === color && piece.role === 'rook') {
+    const backrank = SquareSet.backrank(color).intersect(board[color]);
+    let candidates: Iterable<Square>;
+    if (lower === 'q') candidates = backrank;
+    else if (lower === 'k') candidates = backrank.reversed();
+    else candidates = SquareSet.fromSquare(lower.charCodeAt(0) - 'a'.charCodeAt(0)).intersect(backrank);
+    for (const square of candidates) {
+      if (board.king.has(square) && !board.promoted.has(square)) break;
+      if (board.rook.has(square)) {
         unmovedRooks = unmovedRooks.with(square);
         break;
       }
