@@ -17,17 +17,22 @@ export class Crazyhouse extends Chess {
   static default(): Crazyhouse {
     const pos = super.default();
     pos.pockets = Material.empty();
-    return pos;
+    return pos as Crazyhouse;
   }
 
   static fromSetup(setup: Setup): Result<Crazyhouse, PositionError> {
-    return super.fromSetup(setup).chain(pos => {
+    return super.fromSetup(setup).map(pos => {
       pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
-      // TODO: Move to validate
-      if (pos.pockets.white.king > 0 || pos.pockets.black.king > 0) {
+      return pos as Crazyhouse;
+    });
+  }
+
+  protected validate(): Result<undefined, PositionError> {
+    return super.validate().chain(_ => {
+      if (this.pockets && (this.pockets.white.king > 0 || this.pockets.black.king > 0)) {
         return Result.err(new PositionError(IllegalSetup.Kings));
       }
-      return Result.ok(pos);
+      return Result.ok(undefined);
     });
   }
 
