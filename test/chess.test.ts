@@ -105,6 +105,7 @@ const insufficientMaterial: [string, boolean, boolean][] = [
   ['8/4qk2/8/8/8/8/3K4/8 w - - 0 1', true, false],
   ['8/4bk2/8/8/8/8/3KB3/8 w - - 0 1', false, false],
   ['8/8/3Q4/2bK4/B7/8/1k6/8 w - - 1 68', false, false],
+  ['8/5k2/8/8/8/4B3/3K1B2/8 w - - 0 1', true, true],
 ];
 
 test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black) => {
