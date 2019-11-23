@@ -10,6 +10,10 @@ import { PositionError, Position, IllegalSetup, Context, Castles, Chess } from '
 export { Position, PositionError, IllegalSetup, Context, Chess, Castles };
 
 export class Crazyhouse extends Chess {
+  protected constructor() {
+    super('crazyhouse');
+  }
+
   static default(): Crazyhouse {
     const pos = super.default();
     pos.pockets = Material.empty();
@@ -19,6 +23,7 @@ export class Crazyhouse extends Chess {
   static fromSetup(setup: Setup): Result<Crazyhouse, PositionError> {
     return super.fromSetup(setup).chain(pos => {
       pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
+      // TODO: Move to validate
       if (pos.pockets.white.king > 0 || pos.pockets.black.king > 0) {
         return Result.err(new PositionError(IllegalSetup.Kings));
       }
@@ -28,10 +33,6 @@ export class Crazyhouse extends Chess {
 
   clone(): Crazyhouse {
     return super.clone() as Crazyhouse;
-  }
-
-  rules(): Rules {
-    return 'crazyhouse';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -65,6 +66,10 @@ export class Crazyhouse extends Chess {
 }
 
 export class Atomic extends Chess {
+  protected constructor() {
+    super('atomic');
+  }
+
   static default(): Atomic {
     return super.default() as Atomic;
   }
@@ -75,10 +80,6 @@ export class Atomic extends Chess {
 
   clone(): Atomic {
     return super.clone() as Atomic;
-  }
-
-  rules(): Rules {
-    return 'atomic';
   }
 
   protected validate(): Result<undefined, PositionError> {
@@ -176,6 +177,10 @@ export class Atomic extends Chess {
 }
 
 export class Antichess extends Chess {
+  protected constructor() {
+    super('antichess');
+  }
+
   static default(): Antichess {
     const pos = new this();
     pos.board = Board.default();
@@ -197,10 +202,6 @@ export class Antichess extends Chess {
 
   clone(): Antichess {
     return super.clone() as Antichess;
-  }
-
-  rules(): Rules {
-    return 'antichess';
   }
 
   protected validate(): Result<undefined, PositionError> {
@@ -257,6 +258,10 @@ export class Antichess extends Chess {
 }
 
 export class KingOfTheHill extends Chess {
+  protected constructor() {
+    super('kingofthehill');
+  }
+
   static default(): KingOfTheHill {
     return super.default();
   }
@@ -267,10 +272,6 @@ export class KingOfTheHill extends Chess {
 
   clone(): KingOfTheHill {
     return super.clone() as KingOfTheHill;
-  }
-
-  rules(): Rules {
-    return 'kingofthehill';
   }
 
   hasInsufficientMaterial(_color: Color): boolean {
@@ -290,6 +291,10 @@ export class KingOfTheHill extends Chess {
 }
 
 export class ThreeCheck extends Chess {
+  protected constructor() {
+    super('3check');
+  }
+
   static default(): ThreeCheck {
     const pos = super.default();
     pos.remainingChecks = RemainingChecks.default();
@@ -305,10 +310,6 @@ export class ThreeCheck extends Chess {
 
   clone(): ThreeCheck {
     return super.clone() as ThreeCheck;
-  }
-
-  rules(): Rules {
-    return '3check';
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -330,6 +331,10 @@ export class ThreeCheck extends Chess {
 }
 
 class RacingKings extends Chess {
+  protected constructor() {
+    super('racingkings');
+  }
+
   static default(): RacingKings {
     const pos = new this();
     pos.board = Board.racingKings();
@@ -358,10 +363,6 @@ class RacingKings extends Chess {
 
   clone(): RacingKings {
     return super.clone() as RacingKings;
-  }
-
-  rules(): Rules {
-    return 'racingkings';
   }
 
   dests(square: Square, ctx: Context): SquareSet {
@@ -408,6 +409,10 @@ class RacingKings extends Chess {
 }
 
 export class Horde extends Chess {
+  protected constructor() {
+    super('horde');
+  }
+
   static default(): Horde {
     const pos = new this();
     pos.board = Board.horde();
@@ -446,10 +451,6 @@ export class Horde extends Chess {
 
   clone(): Horde {
     return super.clone() as Horde;
-  }
-
-  rules(): Rules {
-    return 'horde';
   }
 
   hasInsufficientMaterial(_color: Color): boolean {

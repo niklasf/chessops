@@ -51,7 +51,7 @@ export function perft(pos: Position, depth: number, log = false): number {
   if (depth < 1) return 1;
 
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
-  if (pos.rules() === 'antichess') promotionRoles.push('king');
+  if (pos.rules === 'antichess') promotionRoles.push('king');
 
   const dropDests = pos.dropDests(pos.ctx());
 

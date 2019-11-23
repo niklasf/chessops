@@ -144,14 +144,13 @@ export abstract class Position {
   halfmoves: number;
   fullmoves: number;
 
-  protected constructor() { }
+  protected constructor(readonly rules: Rules) { }
 
   // When subclassing:
   // - static default()
   // - static fromSetup()
   // - Proper signature for clone()
 
-  abstract rules(): Rules;
   abstract dests(square: Square, ctx: Context): SquareSet;
   abstract isVariantEnd(): boolean;
   abstract variantOutcome(): Outcome | undefined;
@@ -239,7 +238,7 @@ export abstract class Position {
       return this.dropDests(ctx).has(uci.to);
     } else {
       if (uci.promotion === 'pawn') return false;
-      if (uci.promotion === 'king' && this.rules() !== 'antichess') return false;
+      if (uci.promotion === 'king' && this.rules !== 'antichess') return false;
       if (!uci.promotion && this.board.pawn.has(uci.from) && SquareSet.backranks().has(uci.to)) return false;
       return this.dests(uci.from, ctx).has(uci.to);
 
@@ -349,6 +348,10 @@ export abstract class Position {
 }
 
 export default class Chess extends Position {
+  protected constructor(rules?: Rules) {
+    super(rules || 'chess');
+  }
+
   static default(): Chess {
     const pos = new this();
     pos.board = Board.default();
@@ -377,10 +380,6 @@ export default class Chess extends Position {
 
   clone(): Chess {
     return super.clone() as Chess;
-  }
-
-  rules(): Rules {
-    return 'chess';
   }
 
   protected validate(): Result<undefined, PositionError> {
