@@ -32,6 +32,9 @@ export class Crazyhouse extends Chess {
       if (this.pockets && (this.pockets.white.king > 0 || this.pockets.black.king > 0)) {
         return Result.err(new PositionError(IllegalSetup.Kings));
       }
+      if ((this.pockets ? this.pockets.count() : 0) + this.board.occupied.size() > 64) {
+        return Result.err(new PositionError(IllegalSetup.Variant));
+      }
       return Result.ok(undefined);
     });
   }
