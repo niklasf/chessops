@@ -171,7 +171,29 @@ export abstract class Position {
     if (this.pockets) this.pockets[opposite(captured.color)][captured.role]++;
   }
 
-  // The following should be identical in all subclasses.
+  ctx(): Context {
+    const variantEnd = this.isVariantEnd();
+    const king = this.board.kingOf(this.turn)!;
+    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
+    const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
+      .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
+      .intersect(this.board[opposite(this.turn)]);
+    let blockers = SquareSet.empty();
+    for (const sniper of snipers) {
+      const b = between(king, sniper).intersect(this.board.occupied);
+      if (!b.moreThanOne()) blockers = blockers.union(b);
+    }
+    const checkers = this.kingAttackers(king, opposite(this.turn), this.board.occupied);
+    return {
+      king,
+      blockers,
+      checkers,
+      variantEnd,
+      mustCapture: false,
+    };
+  }
+
+  // The following should be identical in all subclasses
 
   clone(): Position {
     const pos = new (this as any).constructor();
@@ -323,28 +345,6 @@ export abstract class Position {
       if (this.dests(candidate, ctx).has(this.epSquare)) return true;
     }
     return false;
-  }
-
-  ctx(): Context {
-    const variantEnd = this.isVariantEnd();
-    const king = this.board.kingOf(this.turn)!;
-    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
-    const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
-      .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
-      .intersect(this.board[opposite(this.turn)]);
-    let blockers = SquareSet.empty();
-    for (const sniper of snipers) {
-      const b = between(king, sniper).intersect(this.board.occupied);
-      if (!b.moreThanOne()) blockers = blockers.union(b);
-    }
-    const checkers = this.kingAttackers(king, opposite(this.turn), this.board.occupied);
-    return {
-      king,
-      blockers,
-      checkers,
-      variantEnd,
-      mustCapture: false,
-    };
   }
 }
 
