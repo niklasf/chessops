@@ -2,38 +2,30 @@ import { squareDist } from './util';
 import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
 
-function slidingAttacks(square: Square, occupied: SquareSet, deltas: number[]): SquareSet {
+function computeRange(square: Square, deltas: number[], stepper: boolean): SquareSet {
   let attacks = SquareSet.empty();
   for (const delta of deltas) {
     for (let sq = square + delta; 0 <= sq && sq < 64 && squareDist(sq, sq - delta) <= 2; sq += delta) {
       attacks = attacks.with(sq);
-      if (occupied.has(sq)) break;
+      if (stepper) break;
     }
   }
   return attacks;
 }
 
-function slidingRangeTable(deltas: number[]): BySquare<SquareSet> {
+function computeTable(deltas: number[], stepper: boolean): BySquare<SquareSet> {
   const table = [];
   for (let square = 0; square < 64; square++) {
-    table[square] = slidingAttacks(square, SquareSet.empty(), deltas);
+    table[square] = computeRange(square, deltas, stepper);
   }
   return table;
 }
 
-function stepAttackTable(deltas: number[]): BySquare<SquareSet> {
-  const table = [];
-  for (let square = 0; square < 64; square++) {
-    table[square] = slidingAttacks(square, SquareSet.full(), deltas);
-  }
-  return table;
-}
-
-const KING_ATTACKS = stepAttackTable([-9, -8, -7, -1, 1, 7, 8, 9]);
-const KNIGHT_ATTACKS = stepAttackTable([-17, -15, -10, -6, 6, 10, 15, 17]);
+const KING_ATTACKS = computeTable([-9, -8, -7, -1, 1, 7, 8, 9], true);
+const KNIGHT_ATTACKS = computeTable([-17, -15, -10, -6, 6, 10, 15, 17], true);
 const PAWN_ATTACKS = {
-  white: stepAttackTable([7, 9]),
-  black: stepAttackTable([-7, -9])
+  white: computeTable([7, 9], true),
+  black: computeTable([-7, -9], true),
 };
 
 export function kingAttacks(square: Square): SquareSet {
@@ -48,10 +40,10 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
   return PAWN_ATTACKS[color][square];
 }
 
-const FILE_RANGE = slidingRangeTable([-8, 8]);
-const RANK_RANGE = slidingRangeTable([-1, 1]);
-const DIAG_RANGE = slidingRangeTable([-9, 9]);
-const ANTI_DIAG_RANGE = slidingRangeTable([-7, 7]);
+const FILE_RANGE = computeTable([-8, 8], false);
+const RANK_RANGE = computeTable([-1, 1], false);
+const DIAG_RANGE = computeTable([-9, 9], false);
+const ANTI_DIAG_RANGE = computeTable([-7, 7], false);
 
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
   let forward = occupied.intersect(range);
