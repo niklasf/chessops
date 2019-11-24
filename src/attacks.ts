@@ -140,7 +140,3 @@ export function ray(a: Square, b: Square): SquareSet {
 export function between(a: Square, b: Square): SquareSet {
   return BETWEEN[a][b];
 }
-
-export function aligned(a: Square, b: Square, c: Square): boolean {
-  return RAY[a][b].has(c);
-}
