@@ -196,12 +196,6 @@ export default class SquareSet {
     return this.nonEmpty() && !this.moreThanOne();
   }
 
-  toArray(): Square[] {
-    const r = [];
-    for (const sq of this) r.push(sq);
-    return r;
-  }
-
   [Symbol.iterator](): Iterator<Square> {
     let lo = this.lo;
     let hi = this.hi;

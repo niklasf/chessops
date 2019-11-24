@@ -42,7 +42,7 @@ export function square(sq: Square): string {
 export function dests(dests: Map<Square, SquareSet>): string {
   const lines = [];
   for (const [from, to] of dests) {
-    lines.push(`${makeSquare(from)}: ${to.toArray().map(square).join(' ')}`);
+    lines.push(`${makeSquare(from)}: ${Array.from(to, square).join(' ')}`);
   }
   return lines.join('\n');
 }

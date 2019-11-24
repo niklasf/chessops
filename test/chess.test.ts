@@ -54,10 +54,10 @@ test('castles from setup', () => {
   expect(castles.rook.black.a).toBe(56);
   expect(castles.rook.black.h).toBe(63);
 
-  expect(castles.path.white.a.toArray()).toEqual([1, 2, 3]);
-  expect(castles.path.white.h.toArray()).toEqual([5, 6]);
-  expect(castles.path.black.a.toArray()).toEqual([57, 58, 59]);
-  expect(castles.path.black.h.toArray()).toEqual([61, 62]);
+  expect(Array.from(castles.path.white.a)).toEqual([1, 2, 3]);
+  expect(Array.from(castles.path.white.h)).toEqual([5, 6]);
+  expect(Array.from(castles.path.black.a)).toEqual([57, 58, 59]);
+  expect(Array.from(castles.path.black.h)).toEqual([61, 62]);
 });
 
 test('play move', () => {
