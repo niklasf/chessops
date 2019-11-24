@@ -3,7 +3,7 @@ import { Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
-import { defined, nthIndexOf, parseSquare, makeSquare, roleToChar, charToRole } from './util';
+import { defined, parseSquare, makeSquare, roleToChar, charToRole } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' w KQkq -';
@@ -25,6 +25,15 @@ export enum InvalidFen {
 }
 
 export class FenError extends Error { }
+
+function nthIndexOf(haystack: string, needle: string, n: number): number {
+  let index = haystack.indexOf(needle);
+  while (n-- > 0) {
+    if (index === -1) break;
+    index = haystack.indexOf(needle, index + needle.length);
+  }
+  return index;
+}
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
