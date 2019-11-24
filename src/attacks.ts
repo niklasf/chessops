@@ -3,14 +3,14 @@ import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
 
 function computeRange(square: Square, deltas: number[], stepper: boolean): SquareSet {
-  let attacks = SquareSet.empty();
+  let range = SquareSet.empty();
   for (const delta of deltas) {
     for (let sq = square + delta; 0 <= sq && sq < 64 && squareDist(sq, sq - delta) <= 2; sq += delta) {
-      attacks = attacks.with(sq);
+      range = range.with(sq);
       if (stepper) break;
     }
   }
-  return attacks;
+  return range;
 }
 
 function computeTable(deltas: number[], stepper: boolean): BySquare<SquareSet> {
