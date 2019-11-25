@@ -347,7 +347,7 @@ export abstract class Position {
   }
 }
 
-export default class Chess extends Position {
+export class Chess extends Position {
   protected constructor(rules?: Rules) {
     super(rules || 'chess');
   }
@@ -548,5 +548,3 @@ export default class Chess extends Position {
     return true;
   }
 }
-
-export { Chess };

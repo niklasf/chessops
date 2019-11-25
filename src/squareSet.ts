@@ -20,7 +20,7 @@ function rbit32(n: number): number {
   return n;
 }
 
-export default class SquareSet implements Iterable<Square> {
+export class SquareSet implements Iterable<Square> {
   constructor(readonly lo: number, readonly hi: number) {
     this.lo = lo | 0;
     this.hi = hi | 0;
@@ -246,5 +246,3 @@ export default class SquareSet implements Iterable<Square> {
     return new SquareSet(lo, this.hi - (other.hi + c));
   }
 }
-
-export { SquareSet };

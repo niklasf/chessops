@@ -1,7 +1,7 @@
 import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 
-export default class Board implements Iterable<[Square, Piece]> {
+export class Board implements Iterable<[Square, Piece]> {
   occupied: SquareSet;
   promoted: SquareSet;
 
@@ -159,5 +159,3 @@ export default class Board implements Iterable<[Square, Piece]> {
     return this.king.intersect(this[color]).diff(this.promoted).singleSquare();
   }
 }
-
-export { Board };
