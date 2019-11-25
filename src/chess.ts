@@ -3,7 +3,7 @@ import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, By
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
-import { bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
+import { attacks, bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
 import { opposite, defined } from './util';
 
 export enum IllegalSetup {
@@ -442,11 +442,11 @@ export class Chess extends Position {
     const piece = this.board.get(square);
     if (!piece || piece.color !== this.turn) return SquareSet.empty();
 
-    let pseudo;
+    let pseudo = attacks(piece, square, this.board.occupied);
     if (piece.role === 'pawn') {
       let captureTargets = this.board[opposite(this.turn)];
       if (defined(this.epSquare)) captureTargets = captureTargets.with(this.epSquare);
-      pseudo = pawnAttacks(this.turn, square).intersect(captureTargets);
+      pseudo = pseudo.intersect(captureTargets);
       const delta = this.turn === 'white' ? 8 : -8;
       const step = square + delta;
       if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
@@ -458,14 +458,9 @@ export class Chess extends Position {
         }
       }
       return pseudo;
+    } else {
+      pseudo = pseudo.diff(this.board[this.turn]);
     }
-    else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
-    else if (piece.role === 'knight') pseudo = knightAttacks(square);
-    else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
-    else if (piece.role === 'queen') pseudo = queenAttacks(square, this.board.occupied);
-    else pseudo = kingAttacks(square);
-
-    pseudo = pseudo.diff(this.board[this.turn]);
     if (square === ctx.king) return pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
     else return pseudo;
   }
