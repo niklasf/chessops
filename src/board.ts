@@ -40,30 +40,30 @@ export class Board implements Iterable<[Square, Piece]> {
 
   static horde(): Board {
     const board = new Board();
-    board.occupied = new SquareSet(0xffffffff, 0xffff0066);
+    board.occupied = new SquareSet(0xffff_ffff, 0xffff_0066);
     board.promoted = SquareSet.empty();
-    board.white = new SquareSet(0xffffffff, 0x00000066);
-    board.black = new SquareSet(0, 0xffff0000);
-    board.pawn = new SquareSet(0xffffffff, 0x00ff0066);
-    board.knight = new SquareSet(0, 0x42000000);
-    board.bishop = new SquareSet(0, 0x24000000);
-    board.rook = new SquareSet(0, 0x81000000);
-    board.queen = new SquareSet(0, 0x08000000);
-    board.king = new SquareSet(0, 0x10000000);
+    board.white = new SquareSet(0xffff_ffff, 0x0000_0066);
+    board.black = new SquareSet(0, 0xffff_0000);
+    board.pawn = new SquareSet(0xffff_ffff, 0x00ff_0066);
+    board.knight = new SquareSet(0, 0x4200_0000);
+    board.bishop = new SquareSet(0, 0x2400_0000);
+    board.rook = new SquareSet(0, 0x8100_0000);
+    board.queen = new SquareSet(0, 0x0800_0000);
+    board.king = new SquareSet(0, 0x1000_0000);
     return board;
   }
 
   reset(): void {
-    this.occupied = new SquareSet(0xffff, 0xffff0000);
+    this.occupied = new SquareSet(0xffff, 0xffff_0000);
     this.promoted = SquareSet.empty();
     this.white = new SquareSet(0xffff, 0);
-    this.black = new SquareSet(0, 0xffff0000);
-    this.pawn = new SquareSet(0xff00, 0xff0000);
-    this.knight = new SquareSet(0x42, 0x42000000);
-    this.bishop = new SquareSet(0x24, 0x24000000);
-    this.rook = new SquareSet(0x81, 0x81000000);
-    this.queen = new SquareSet(0x8, 0x8000000);
-    this.king = new SquareSet(0x10, 0x10000000);
+    this.black = new SquareSet(0, 0xffff_0000);
+    this.pawn = new SquareSet(0xff00, 0x00ff_0000);
+    this.knight = new SquareSet(0x42, 0x4200_0000);
+    this.bishop = new SquareSet(0x24, 0x2400_0000);
+    this.rook = new SquareSet(0x81, 0x8100_0000);
+    this.queen = new SquareSet(0x8, 0x0800_0000);
+    this.king = new SquareSet(0x10, 0x1000_0000);
   }
 
   static empty(): Board {

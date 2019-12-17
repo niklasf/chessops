@@ -1,22 +1,22 @@
 import { Square, Color } from './types';
 
 function popcnt32(n: number): number {
-  n = n - ((n >>> 1) & 0x55555555);
-  n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
-  return ((n + (n >>> 4) & 0xf0f0f0f) * 0x1010101) >> 24;
+  n = n - ((n >>> 1) & 0x5555_5555);
+  n = (n & 0x3333_3333) + ((n >>> 2) & 0x3333_3333);
+  return ((n + (n >>> 4) & 0x0f0f_0f0f) * 0x0101_0101) >> 24;
 }
 
 function bswap32(n: number): number {
-  n = (n >>> 8) & 0x00ff00ff | ((n & 0x00ff00ff) << 8);
+  n = (n >>> 8) & 0x00ff_00ff | ((n & 0x00ff_00ff) << 8);
   return (n >>> 16) & 0xffff | ((n & 0xffff) << 16);
 }
 
 function rbit32(n: number): number {
-  n = ((n >>> 1) & 0x55555555) | ((n & 0x55555555) << 1);
-  n = ((n >>> 2) & 0x33333333) | ((n & 0x33333333) << 2);
-  n = ((n >>> 4) & 0x0f0f0f0f) | ((n & 0x0f0f0f0f) << 4);
-  n = ((n >>> 8) & 0x00ff00ff) | ((n & 0x00ff00ff) << 8);
-  n = ((n >>> 16) & 0x0000ffff) | ((n & 0x0000ffff) << 16);
+  n = ((n >>> 1) & 0x5555_5555) | ((n & 0x5555_5555) << 1);
+  n = ((n >>> 2) & 0x3333_3333) | ((n & 0x3333_3333) << 2);
+  n = ((n >>> 4) & 0x0f0f_0f0f) | ((n & 0x0f0f_0f0f) << 4);
+  n = ((n >>> 8) & 0x00ff_00ff) | ((n & 0x00ff_00ff) << 8);
+  n = ((n >>> 16) & 0x0000_ffff) | ((n & 0x0000_ffff) << 16);
   return n;
 }
 
@@ -37,7 +37,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   static fromFile(file: number): SquareSet {
-    return new SquareSet(0x01010101 << file, 0x01010101 << file);
+    return new SquareSet(0x0101_0101 << file, 0x0101_0101 << file);
   }
 
   static empty(): SquareSet {
@@ -45,31 +45,31 @@ export class SquareSet implements Iterable<Square> {
   }
 
   static full(): SquareSet {
-    return new SquareSet(0xffffffff, 0xffffffff);
+    return new SquareSet(0xffff_ffff, 0xffff_ffff);
   }
 
   static corners(): SquareSet {
-    return new SquareSet(0x81, 0x81000000);
+    return new SquareSet(0x81, 0x8100_0000);
   }
 
   static center(): SquareSet {
-    return new SquareSet(0x18000000, 0x18);
+    return new SquareSet(0x1800_0000, 0x18);
   }
 
   static backranks(): SquareSet {
-    return new SquareSet(0xff, 0xff000000);
+    return new SquareSet(0xff, 0xff00_0000);
   }
 
   static backrank(color: Color): SquareSet {
-    return color === 'white' ? new SquareSet(0xff, 0) : new SquareSet(0, 0xff000000);
+    return color === 'white' ? new SquareSet(0xff, 0) : new SquareSet(0, 0xff00_0000);
   }
 
   static lightSquares(): SquareSet {
-    return new SquareSet(0x55aa55aa, 0x55aa55aa);
+    return new SquareSet(0x55aa_55aa, 0x55aa_55aa);
   }
 
   static darkSquares(): SquareSet {
-    return new SquareSet(0xaa55aa55, 0xaa55aa55);
+    return new SquareSet(0xaa55_aa55, 0xaa55_aa55);
   }
 
   complement(): SquareSet {
