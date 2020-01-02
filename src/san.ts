@@ -58,7 +58,7 @@ export function makeSanAndPlay(pos: Position, uci: Uci): string {
   else return san;
 }
 
-export function makeVariationSan(pos: Position, variation: Uci[]): string {
+export function makeSanVariation(pos: Position, variation: Uci[]): string {
   pos = pos.clone();
   let line = '';
   for (let i = 0; i < variation.length; i++) {
