@@ -1,13 +1,19 @@
 Changelog for chessops
 ======================
 
+v0.3.0
+------
+
+* Renamed `san.makeVariationSan()` to `san.makeSanVariation()`.
+* Fixed SAN disambiguation on b and c file.
+
 v0.2.0
 ------
 
-* Fix check from a1.
-* Fix insufficient material with same-color bishops.
-* Fix Crazyhouse validation and limit pocket size.
-* Fix `Position.fromSetup()` entangles position with setup.
+* Fixed check from a1.
+* Fixed insufficient material with same-color bishops.
+* Fixed Crazyhouse validation and limit pocket size.
+* Fixed `Position.fromSetup()` entangles position with setup.
 * Made `Position.rules()` a read-only property `Position.rules`.
 * Removed `SquareSet.subsets()`.
 * Removed `utils.strRepeat()`.
