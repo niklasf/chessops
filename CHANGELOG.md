@@ -1,6 +1,11 @@
 Changelog for chessops
 ======================
 
+v0.3.1
+------
+
+* Optimize SAN disambiguation by adding a fast path for unambiguous moves.
+
 v0.3.0
 ------
 

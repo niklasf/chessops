@@ -1,6 +1,6 @@
 {
   "name": "chessops",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Chess and chess variant rules and operations",
   "keywords": [
     "chess",
