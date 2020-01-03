@@ -36,7 +36,7 @@ function makeSanWithoutSuffix(pos: Position, uci: Uci): string {
           let column = others.intersects(SquareSet.fromRank(uci.from >> 3));
           if (others.intersects(SquareSet.fromFile(uci.from & 0x7))) row = true;
           else column = true;
-          if (column) san += 'acbdefgh'[uci.from & 0x7];
+          if (column) san += 'abcdefgh'[uci.from & 0x7];
           if (row) san += '12345678'[uci.from >> 3];
         }
       } else if (capture) san = 'abcdefgh'[uci.from & 0x7];
