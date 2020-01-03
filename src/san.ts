@@ -27,17 +27,19 @@ function makeSanWithoutSuffix(pos: Position, uci: Uci): string {
         else if (role === 'bishop') others = bishopAttacks(uci.to, pos.board.occupied).intersect(pos.board.bishop);
         else others = knightAttacks(uci.to).intersect(pos.board.knight);
         others = others.intersect(pos.board[pos.turn]).without(uci.from);
-        const ctx = pos.ctx();
-        for (const from of others) {
-          if (!pos.dests(from, ctx).has(uci.to)) others = others.without(from);
-        }
         if (others.nonEmpty()) {
-          let row = false;
-          let column = others.intersects(SquareSet.fromRank(uci.from >> 3));
-          if (others.intersects(SquareSet.fromFile(uci.from & 0x7))) row = true;
-          else column = true;
-          if (column) san += 'abcdefgh'[uci.from & 0x7];
-          if (row) san += '12345678'[uci.from >> 3];
+          const ctx = pos.ctx();
+          for (const from of others) {
+            if (!pos.dests(from, ctx).has(uci.to)) others = others.without(from);
+          }
+          if (others.nonEmpty()) {
+            let row = false;
+            let column = others.intersects(SquareSet.fromRank(uci.from >> 3));
+            if (others.intersects(SquareSet.fromFile(uci.from & 0x7))) row = true;
+            else column = true;
+            if (column) san += 'abcdefgh'[uci.from & 0x7];
+            if (row) san += '12345678'[uci.from >> 3];
+          }
         }
       } else if (capture) san = 'abcdefgh'[uci.from & 0x7];
 
