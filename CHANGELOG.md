@@ -1,6 +1,11 @@
 Changelog for chessops
 ======================
 
+v0.3.2
+------
+
+* Fixed SAN of en passant captures.
+
 v0.3.1
 ------
 
