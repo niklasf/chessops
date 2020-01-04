@@ -1,5 +1,5 @@
 import { parseUci } from '../src/util';
-import { makeSanVariation } from '../src/san';
+import { makeSan, makeSanVariation } from '../src/san';
 import { Chess } from '../src/chess';
 import { parseFen } from '../src/fen';
 import { Crazyhouse } from '../src/variant';
@@ -25,4 +25,11 @@ test('stockfish line with many knight moves', () => {
   const variation = 'b3d2 c6b4 e1d1 f8e8 d2f1 b4d3 f3e1 d3e1 d1e1 d7f8 f2f4 f8e6 c1e3 h7h5 f4f5 e6g5 e3g5 e7g5 f5f6 d8c7'.split(' ').map(uci => parseUci(uci)!);
   expect(makeSanVariation(pos, variation)).toBe('16. Nbd2 Nb4 17. Rd1 Re8 18. Nf1 Nd3 19. Ne1 Nxe1 20. Rxe1 Nf8 21. f4 Ne6 22. Be3 h5 23. f5 Ng5 24. Bxg5 Bxg5 25. f6 Qc7');
   expect(pos).toEqual(Chess.fromSetup(setup).unwrap());
+});
+
+test('en passant', () => {
+  const setup = parseFen('6bk/7b/8/3pP3/8/8/8/Q3K3 w - d6 0 2').unwrap();
+  const pos = Chess.fromSetup(setup).unwrap();
+  const uci = parseUci('e5d6')!;
+  expect(makeSan(pos, uci)).toBe('exd6#');
 });

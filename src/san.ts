@@ -15,7 +15,7 @@ function makeSanWithoutSuffix(pos: Position, uci: Uci): string {
     if (role === 'king' && (pos.board[pos.turn].has(uci.to) || Math.abs(uci.to - uci.from) === 2)) {
       san = uci.to > uci.from ? 'O-O' : 'O-O-O';
     } else {
-      const capture = pos.board.occupied.has(uci.to);
+      const capture = pos.board.occupied.has(uci.to) || (role === 'pawn' && (uci.from & 0x7) != (uci.to & 0x7));
       if (role !== 'pawn') {
         san = roleToChar(role).toUpperCase();
 
