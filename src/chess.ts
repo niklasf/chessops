@@ -172,7 +172,7 @@ export abstract class Position {
 
   ctx(): Context {
     const variantEnd = this.isVariantEnd();
-    const king = this.board.kingOf(this.turn)!;
+    const king = this.board.kingOf(this.turn);
     if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
     const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))

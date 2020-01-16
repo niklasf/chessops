@@ -7,6 +7,7 @@ const skip = 0;
 
 const variantPerfts: [Rules, string, string, number, number, number][] = [
   ['racingkings', 'racingkings-start', '8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - -', 21, 421, 11264],
+  ['racingkings', 'occupied-goal', '4brn1/2K2k2/8/8/8/8/8/8 w - -', 6, 33, 178],
 
   ['crazyhouse', 'zh-all-drop-types', '2k5/8/8/8/8/8/8/4K3[QRBNPqrbnp] w - -', 301, 75353, skip],
   ['crazyhouse', 'zh-drops', '2k5/8/8/8/8/8/8/4K3[Qn] w - -', 67, 3083, 88634],

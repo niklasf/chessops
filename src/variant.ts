@@ -400,9 +400,15 @@ class RacingKings extends Chess {
     if (inGoal.isEmpty()) return false;
     if (this.turn === 'white' || inGoal.intersects(this.board.black)) return true;
 
-    // White has reached the backrank, check if black can catch up.
-    const ctx = this.ctx();
-    return !defined(ctx.king) || !this.dests(ctx.king, ctx).intersects(goal);
+    // White has reached the backrank. Check if black can catch up.
+    const blackKing = this.board.kingOf('black');
+    if (defined(blackKing)) {
+      const occ = this.board.occupied.without(blackKing);
+      for (const target of kingAttacks(blackKing).intersect(goal).diff(this.board.black)) {
+        if (this.kingAttackers(target, opposite(this.turn), occ).isEmpty()) return false;
+      }
+    }
+    return true;
   }
 
   variantOutcome(): Outcome | undefined {
