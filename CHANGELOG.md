@@ -1,6 +1,12 @@
 Changelog for chessops
 ======================
 
+v0.3.3
+------
+
+* Fixed Racing Kings move generation with king near goal.
+* Pawn drops in Crazyhouse reset `pos.halfmoves`.
+
 v0.3.2
 ------
 
