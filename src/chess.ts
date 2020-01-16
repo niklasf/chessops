@@ -294,6 +294,7 @@ export abstract class Position {
     if (isDrop(uci)) {
       this.board.set(uci.to, { role: uci.role, color: turn });
       if (this.pockets) this.pockets[turn][uci.role]--;
+      if (uci.role === 'pawn') this.halfmoves = 0;
     } else {
       const piece = this.board.take(uci.from);
       if (!piece) return;
