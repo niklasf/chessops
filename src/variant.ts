@@ -405,7 +405,7 @@ class RacingKings extends Chess {
     if (defined(blackKing)) {
       const occ = this.board.occupied.without(blackKing);
       for (const target of kingAttacks(blackKing).intersect(goal).diff(this.board.black)) {
-        if (this.kingAttackers(target, opposite(this.turn), occ).isEmpty()) return false;
+        if (this.kingAttackers(target, 'white', occ).isEmpty()) return false;
       }
     }
     return true;
