@@ -1,6 +1,12 @@
 Changelog for chessops
 ======================
 
+v0.3.4
+------
+
+* Fixed castling paths in `Castles.default()` and `Chess.default()`, leading
+  to illegal king moves.
+
 v0.3.3
 ------
 
