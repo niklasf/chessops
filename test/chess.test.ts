@@ -82,6 +82,14 @@ test('play castling move', () => {
   expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
 });
 
+test('starting perft', () => {
+  const pos = Chess.default();
+  expect(perft(pos, 0, false)).toBe(1);
+  expect(perft(pos, 1, false)).toBe(20);
+  expect(perft(pos, 2, false)).toBe(400);
+  expect(perft(pos, 3, false)).toBe(8902);
+});
+
 test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
   const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
   expect(perft(pos, 1, false)).toBe(d1);
