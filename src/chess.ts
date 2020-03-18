@@ -48,8 +48,8 @@ export class Castles {
       black: { a: 56 , h: 63 },
     };
     castles.path = {
-      white: { a: new SquareSet(0x60, 0), h: new SquareSet(0, 0xe) },
-      black: { a: new SquareSet(0, 0x60000000), h: new SquareSet(0, 0x0e000000) },
+      white: { a: new SquareSet(0xe, 0), h: new SquareSet(0x60, 0) },
+      black: { a: new SquareSet(0, 0x0e000000), h: new SquareSet(0, 0x60000000) },
     };
     return castles;
   }
