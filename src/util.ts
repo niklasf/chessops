@@ -1,4 +1,4 @@
-import { Color, Square, Role, Uci, isDrop } from './types';
+import { Color, Square, Role, Uci, isDrop, SquareName } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return typeof v !== 'undefined';
@@ -47,13 +47,15 @@ export function charToRole(ch: string): Role | undefined {
   }
 }
 
+export function parseSquare(str: SquareName): Square;
+export function parseSquare(str: string): Square | undefined;
 export function parseSquare(str: string): Square | undefined {
   if (!/^[a-h][1-8]$/.test(str)) return;
   return str.charCodeAt(0) - 'a'.charCodeAt(0) + 8 * (str.charCodeAt(1) - '1'.charCodeAt(0));
 }
 
-export function makeSquare(square: Square): string {
-  return 'abcdefgh'[square & 0x7] + '12345678'[square >> 3];
+export function makeSquare(square: Square): SquareName {
+  return ('abcdefgh'[square & 0x7] + '12345678'[square >> 3]) as SquareName;
 }
 
 export function parseUci(str: string): Uci | undefined {
