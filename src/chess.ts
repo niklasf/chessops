@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, Uci, isDrop, Piece, Outcome } from './types';
+import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, Uci, UciMove, isDrop, Piece, Outcome } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
@@ -284,8 +284,28 @@ export abstract class Position {
     return d;
   }
 
+  castlingSide(uci: Uci): CastlingSide | undefined {
+    if (isDrop(uci)) return;
+    const delta = uci.to - uci.from;
+    if (delta !== 2 && !this.board[this.turn].has(uci.to)) return;
+    if (!this.board.king.has(uci.from)) return;
+    return delta > 0 ? 'h' : 'a';
+  }
+
+  normalizeMove(uci: Uci): Uci {
+    const castlingSide = this.castlingSide(uci);
+    if (castlingSide) return {
+      from: (uci as UciMove).from,
+      to: this.castles.rook[this.turn][castlingSide] || uci.to,
+    };
+    else return uci;
+  }
+
   play(uci: Uci): void {
-    const turn = this.turn, epSquare = this.epSquare;
+    const turn = this.turn;
+    const epSquare = this.epSquare;
+    const castlingSide = this.castlingSide(uci);
+
     this.epSquare = undefined;
     this.halfmoves += 1;
     if (turn === 'black') this.fullmoves += 1;
@@ -316,19 +336,16 @@ export abstract class Position {
       } else if (piece.role === 'rook') {
         this.castles.discardRook(uci.from);
       } else if (piece.role === 'king') {
-        const delta = uci.to - uci.from;
-        const isCastling = Math.abs(delta) === 2 || this.board[turn].has(uci.to);
-        if (isCastling) {
-          const side = delta > 0 ? 'h' : 'a';
-          const rookFrom = this.castles.rook[turn][side];
+        if (castlingSide) {
+          const rookFrom = this.castles.rook[turn][castlingSide];
           if (defined(rookFrom)) {
             const rook = this.board.take(rookFrom);
-            this.board.set(kingCastlesTo(turn, side), piece);
-            if (rook) this.board.set(rookCastlesTo(turn, side), rook);
+            this.board.set(kingCastlesTo(turn, castlingSide), piece);
+            if (rook) this.board.set(rookCastlesTo(turn, castlingSide), rook);
           }
         }
         this.castles.discardSide(turn);
-        if (isCastling) return;
+        if (castlingSide) return;
       }
 
       const capture = this.board.set(uci.to, piece) || epCapture;
