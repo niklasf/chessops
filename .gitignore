@@ -7,6 +7,7 @@ yarn.lock
 /attacks.js
 /board.js
 /chess.js
+/compat.js
 /variant.js
 /transform.js
 /setup.js
@@ -21,6 +22,7 @@ yarn.lock
 /attacks.d.ts
 /board.d.ts
 /chess.d.ts
+/compat.d.ts
 /variant.d.ts
 /transform.d.ts
 /setup.d.ts
