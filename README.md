@@ -31,6 +31,7 @@ Features
 * [Write SAN](https://niklasf.github.io/chessops/modules/_san_.html)
 * [Position hashing](https://niklasf.github.io/chessops/modules/_hash_.html)
 * [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
+* [Chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess) [comatibility](https://niklasf.github.io/chessops/modules/_compat_.html)
 
 Example
 -------
