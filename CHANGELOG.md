@@ -1,6 +1,16 @@
 Changelog for chessops
 ======================
 
+v0.3.5
+------
+
+* Added `compat` module for
+  [chessground](https://github.com/ornicar/chessground) and
+  [scalachess](https://github.com/ornicar/scalachess) interoperability.
+* Added `Position.castlingSide()`.
+* Added `Position.normalizeMove()`.
+* Overloaded `parseSquare()` for known valid `SquareName`.
+
 v0.3.4
 ------
 
