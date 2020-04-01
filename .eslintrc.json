@@ -21,11 +21,12 @@
     "semi": "off",
     "eqeqeq": ["error", "smart"],
     "@typescript-eslint/semi": ["warn"],
-    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }],
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-unnecessary-condition": ["error", {"ignoreRhs": true}]
+    "@typescript-eslint/no-unnecessary-condition": ["error", { "ignoreRhs": true }],
+    "@typescript-eslint/strict-boolean-expressions": ["error", { "allowSafe": true, "allowNullable": true }]
   },
   "root": true
 }

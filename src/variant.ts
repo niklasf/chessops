@@ -62,7 +62,7 @@ export class Crazyhouse extends Chess {
   dropDests(ctx: Context): SquareSet {
     const mask = this.board.occupied.complement().intersect(
       (this.pockets && this.pockets[this.turn].hasNonPawns()) ? SquareSet.full() :
-        (this.pockets && this.pockets[this.turn].pawn) ? SquareSet.backranks().complement() :
+        (this.pockets && this.pockets[this.turn].hasPawns()) ? SquareSet.backranks().complement() :
           SquareSet.empty());
 
     if (defined(ctx.king) && ctx.checkers.nonEmpty()) {

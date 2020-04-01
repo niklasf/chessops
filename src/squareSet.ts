@@ -147,7 +147,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   has(square: Square): boolean {
-    return !!(square >= 32 ? this.hi & (1 << (square - 32)) : this.lo & (1 << square));
+    return (square >= 32 ? this.hi & (1 << (square - 32)) : this.lo & (1 << square)) !== 0;
   }
 
   set(square: Square, on: boolean): SquareSet {
@@ -185,7 +185,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   moreThanOne(): boolean {
-    return !!((this.hi && this.lo) || this.lo & (this.lo - 1) || this.hi & (this.hi - 1));
+    return (this.hi !== 0 && this.lo !== 0) || (this.lo & (this.lo - 1)) !== 0 || (this.hi & (this.hi - 1)) !== 0;
   }
 
   singleSquare(): Square | undefined {
@@ -201,12 +201,12 @@ export class SquareSet implements Iterable<Square> {
     let hi = this.hi;
     return {
       next(): IteratorResult<Square> {
-        if (lo) {
+        if (lo !== 0) {
           const idx = 31 - Math.clz32(lo & -lo);
           lo ^= 1 << idx;
           return { value: idx, done: false };
         }
-        if (hi) {
+        if (hi !== 0) {
           const idx = 31 - Math.clz32(hi & -hi);
           hi ^= 1 << idx;
           return { value: 32 + idx, done: false };
@@ -223,12 +223,12 @@ export class SquareSet implements Iterable<Square> {
       [Symbol.iterator](): Iterator<Square> {
         return {
           next(): IteratorResult<Square> {
-            if (hi) {
+            if (hi !== 0) {
               const idx = 31 - Math.clz32(hi);
               hi ^= 1 << idx;
               return { value: 32 + idx, done: false };
             }
-            if (lo) {
+            if (lo !== 0) {
               const idx = 31 - Math.clz32(lo);
               lo ^= 1 << idx;
               return { value: idx, done: false };

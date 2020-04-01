@@ -355,7 +355,7 @@ export abstract class Position {
   }
 
   protected hasLegalEp(): boolean {
-    if (!this.epSquare) return false;
+    if (!defined(this.epSquare)) return false;
     const ctx = this.ctx();
     const ourPawns = this.board.pieces(this.turn, 'pawn');
     const candidates = ourPawns.intersect(pawnAttacks(opposite(this.turn), this.epSquare));
@@ -417,7 +417,7 @@ export class Chess extends Position {
   }
 
   private validEpSquare(square: Square | undefined): Square | undefined {
-    if (!square) return;
+    if (!defined(square)) return;
     const epRank = this.turn === 'white' ? 5 : 2;
     const forward = this.turn === 'white' ? 8 : -8;
     if ((square >> 3) !== epRank) return;

@@ -55,7 +55,7 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
       rank--;
     } else {
       const step = parseInt(c, 10);
-      if (step) file += step;
+      if (step > 0) file += step;
       else {
         if (file >= 8 || rank < 0) return Result.err(new FenError(InvalidFen.Board));
         const square = file + rank * 8;
@@ -188,7 +188,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
       remainingChecks = earlyRemainingChecks;
     };
 
-    if (parts.length) return Result.err(new FenError(InvalidFen.Fen));
+    if (parts.length > 0) return Result.err(new FenError(InvalidFen.Fen));
 
     return pockets.chain(pockets => unmovedRooks.chain(unmovedRooks => remainingChecks.map(remainingChecks => {
       return {
@@ -236,7 +236,7 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
       const piece = board.get(square);
       if (!piece) empty++;
       else {
-        if (empty) {
+        if (empty > 0) {
           fen += empty;
           empty = 0;
         }
@@ -244,7 +244,7 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
       }
 
       if (file === 7) {
-        if (empty) {
+        if (empty > 0) {
           fen += empty;
           empty = 0;
         }
