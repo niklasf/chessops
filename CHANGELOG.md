@@ -1,6 +1,13 @@
 Changelog for chessops
 ======================
 
+v0.3.6
+------
+
+* Fixed alternative queenside castling moves (king moved by two squares instead
+  of onto rook). These moves were not correctly classified, normalized or
+  played.
+
 v0.3.5
 ------
 
