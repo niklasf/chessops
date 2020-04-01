@@ -287,18 +287,19 @@ export abstract class Position {
   castlingSide(uci: Uci): CastlingSide | undefined {
     if (isDrop(uci)) return;
     const delta = uci.to - uci.from;
-    if (delta !== 2 && !this.board[this.turn].has(uci.to)) return;
+    if (Math.abs(delta) !== 2 && !this.board[this.turn].has(uci.to)) return;
     if (!this.board.king.has(uci.from)) return;
     return delta > 0 ? 'h' : 'a';
   }
 
   normalizeMove(uci: Uci): Uci {
     const castlingSide = this.castlingSide(uci);
-    if (castlingSide) return {
+    if (!castlingSide) return uci;
+    const rookFrom = this.castles.rook[this.turn][castlingSide];
+    return {
       from: (uci as UciMove).from,
-      to: this.castles.rook[this.turn][castlingSide] || uci.to,
+      to: defined(rookFrom) ? rookFrom : uci.to,
     };
-    else return uci;
   }
 
   play(uci: Uci): void {

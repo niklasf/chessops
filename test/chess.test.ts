@@ -72,7 +72,7 @@ test('play move', () => {
   expect(makeFen(e4.toSetup())).toBe('8/8/8/5k2/3pP3/8/8/4K3 b - e3 0 1');
 });
 
-test('play castling move', () => {
+test('castling moves', () => {
   let pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -').unwrap()).unwrap();
   pos.play({ from: 3, to: 4 });
   expect(makeFen(pos.toSetup())).toBe('2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
@@ -80,6 +80,16 @@ test('play castling move', () => {
   pos = Chess.fromSetup(parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1').unwrap()).unwrap();
   pos.play({ from: 4, to: 0 });
   expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
+
+  pos = Chess.fromSetup(parseFen('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/R3K2R w KQk - 0 20').unwrap()).unwrap();
+  const queenSide = { from: 4, to: 0 };
+  const altQueenSide = { from: 4, to: 2 }
+  expect(pos.castlingSide(queenSide)).toBe('a');
+  expect(pos.normalizeMove(queenSide)).toEqual(queenSide);
+  expect(pos.castlingSide(altQueenSide)).toBe('a');
+  expect(pos.normalizeMove(altQueenSide)).toEqual(queenSide);
+  pos.play({ from: 4, to: 2 });
+  expect(makeFen(pos.toSetup())).toBe('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/2KR3R b k - 1 20');
 });
 
 test('starting perft', () => {
