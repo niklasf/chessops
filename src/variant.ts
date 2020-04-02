@@ -59,12 +59,13 @@ export class Crazyhouse extends Chess {
       this.pockets.black.queen <= 0;
   }
 
-  dropDests(ctx: Context): SquareSet {
+  dropDests(ctx?: Context): SquareSet {
     const mask = this.board.occupied.complement().intersect(
       (this.pockets && this.pockets[this.turn].hasNonPawns()) ? SquareSet.full() :
         (this.pockets && this.pockets[this.turn].hasPawns()) ? SquareSet.backranks().complement() :
           SquareSet.empty());
 
+    ctx = ctx || this.ctx();
     if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
       const checker = ctx.checkers.singleSquare();
       if (!defined(checker)) return SquareSet.empty();
@@ -159,7 +160,8 @@ export class Atomic extends Chess {
     return false;
   }
 
-  dests(square: Square, ctx: Context): SquareSet {
+  dests(square: Square, ctx?: Context): SquareSet {
+    ctx = ctx || this.ctx();
     let dests = SquareSet.empty();
     for (const to of this.pseudoDests(square, ctx)) {
       const after = this.clone();
@@ -176,7 +178,7 @@ export class Atomic extends Chess {
     return !!this.variantOutcome();
   }
 
-  variantOutcome(): Outcome | undefined {
+  variantOutcome(_ctx?: Context): Outcome | undefined {
     for (const color of COLORS) {
       if (this.board.pieces(color, 'king').isEmpty()) return { winner: opposite(color) };
     }
@@ -236,7 +238,8 @@ export class Antichess extends Chess {
     return ctx;
   }
 
-  dests(square: Square, ctx: Context): SquareSet {
+  dests(square: Square, ctx?: Context): SquareSet {
+    ctx = ctx || this.ctx();
     const dests = this.pseudoDests(square, ctx);
     if (!ctx.mustCapture) return dests;
     else return dests.intersect(this.board[opposite(this.turn)]);
@@ -257,8 +260,9 @@ export class Antichess extends Chess {
     return this.board[this.turn].isEmpty();
   }
 
-  variantOutcome(): Outcome | undefined {
-    if (this.isVariantEnd() || this.isStalemate()) {
+  variantOutcome(ctx?: Context): Outcome | undefined {
+    ctx = ctx || this.ctx();
+    if (ctx.variantEnd || this.isStalemate(ctx)) {
       return { winner: this.turn };
     }
     return;
@@ -290,7 +294,7 @@ export class KingOfTheHill extends Chess {
     return this.board.king.intersects(SquareSet.center());
   }
 
-  variantOutcome(): Outcome | undefined {
+  variantOutcome(_ctx?: Context): Outcome | undefined {
     for (const color of COLORS) {
       if (this.board.pieces(color, 'king').intersects(SquareSet.center())) return { winner: color };
     }
@@ -328,7 +332,7 @@ export class ThreeCheck extends Chess {
     return !!this.remainingChecks && (this.remainingChecks.white <= 0 || this.remainingChecks.black <= 0);
   }
 
-  variantOutcome(): Outcome | undefined {
+  variantOutcome(_ctx?: Context): Outcome | undefined {
     if (this.remainingChecks) {
       for (const color of COLORS) {
         if (this.remainingChecks[color] <= 0) return { winner: color };
@@ -373,7 +377,9 @@ class RacingKings extends Chess {
     return super.clone() as RacingKings;
   }
 
-  dests(square: Square, ctx: Context): SquareSet {
+  dests(square: Square, ctx?: Context): SquareSet {
+    ctx = ctx || this.ctx();
+
     // Kings cannot give check.
     if (square === ctx.king) return super.dests(square, ctx);
 
@@ -411,8 +417,8 @@ class RacingKings extends Chess {
     return true;
   }
 
-  variantOutcome(): Outcome | undefined {
-    if (!this.isVariantEnd()) return;
+  variantOutcome(ctx?: Context): Outcome | undefined {
+    if (ctx ? !ctx.variantEnd : !this.isVariantEnd()) return;
     const goal = SquareSet.fromRank(7);
     const blackInGoal = this.board.pieces('black', 'king').intersects(goal);
     const whiteInGoal = this.board.pieces('white', 'king').intersects(goal);
@@ -476,7 +482,7 @@ export class Horde extends Chess {
     return this.board.white.isEmpty() || this.board.black.isEmpty();
   }
 
-  variantOutcome(): Outcome | undefined {
+  variantOutcome(_ctx?: Context): Outcome | undefined {
     if (this.board.white.isEmpty()) return { winner: 'black' };
     if (this.board.black.isEmpty()) return { winner: 'white' };
     return;

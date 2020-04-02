@@ -151,16 +151,16 @@ export abstract class Position {
   // - static fromSetup()
   // - Proper signature for clone()
 
-  abstract dests(square: Square, ctx: Context): SquareSet;
+  abstract dests(square: Square, ctx?: Context): SquareSet;
   abstract isVariantEnd(): boolean;
-  abstract variantOutcome(): Outcome | undefined;
+  abstract variantOutcome(ctx?: Context): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
-  dropDests(_ctx: Context): SquareSet {
+  dropDests(_ctx?: Context): SquareSet {
     return SquareSet.empty();
   }
 
@@ -224,14 +224,15 @@ export abstract class Position {
     return COLORS.every(color => this.hasInsufficientMaterial(color));
   }
 
-  hasDests(ctx: Context): boolean {
+  hasDests(ctx?: Context): boolean {
+    ctx = ctx || this.ctx();
     for (const square of this.board[this.turn]) {
       if (this.dests(square, ctx).nonEmpty()) return true;
     }
     return this.dropDests(ctx).nonEmpty();
   }
 
-  isLegal(uci: Uci, ctx: Context): boolean {
+  isLegal(uci: Uci, ctx?: Context): boolean {
     if (isDrop(uci)) {
       if (!this.pockets || this.pockets[this.turn][uci.role] <= 0) return false;
       if (uci.role === 'pawn' && SquareSet.backranks().has(uci.to)) return false;
@@ -250,32 +251,32 @@ export abstract class Position {
     return defined(king) && this.kingAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
   }
 
-  isEnd(): boolean {
-    return this.isVariantEnd() || this.isInsufficientMaterial() || !this.hasDests(this.ctx());
+  isEnd(ctx?: Context): boolean {
+    if (ctx ? ctx.variantEnd : this.isVariantEnd()) return true;
+    return this.isInsufficientMaterial() || !this.hasDests(ctx);
   }
 
-  isCheckmate(): boolean {
-    if (this.isVariantEnd()) return false;
-    const ctx = this.ctx();
-    return ctx.checkers.nonEmpty() && !this.hasDests(ctx);
+  isCheckmate(ctx?: Context): boolean {
+    ctx = ctx || this.ctx();
+    return !ctx.variantEnd && ctx.checkers.nonEmpty() && !this.hasDests(ctx);
   }
 
-  isStalemate(): boolean {
-    if (this.isVariantEnd()) return false;
-    const ctx = this.ctx();
-    return ctx.checkers.isEmpty() && !this.hasDests(ctx);
+  isStalemate(ctx?: Context): boolean {
+    ctx = ctx || this.ctx();
+    return !ctx.variantEnd && ctx.checkers.isEmpty() && !this.hasDests(ctx);
   }
 
-  outcome(): Outcome | undefined {
-    const variantOutcome = this.variantOutcome();
+  outcome(ctx?: Context): Outcome | undefined {
+    const variantOutcome = this.variantOutcome(ctx);
     if (variantOutcome) return variantOutcome;
-    else if (this.isCheckmate()) return { winner: opposite(this.turn) };
-    else if (this.isInsufficientMaterial() || this.isStalemate()) return { winner: undefined };
+    ctx = ctx || this.ctx();
+    if (this.isCheckmate(ctx)) return { winner: opposite(this.turn) };
+    else if (this.isInsufficientMaterial() || this.isStalemate(ctx)) return { winner: undefined };
     else return;
   }
 
-  allDests(): Map<Square, SquareSet> {
-    const ctx = this.ctx();
+  allDests(ctx?: Context): Map<Square, SquareSet> {
+    ctx = ctx || this.ctx();
     const d = new Map();
     if (ctx.variantEnd) return d;
     for (const square of this.board[this.turn]) {
@@ -354,9 +355,9 @@ export abstract class Position {
     }
   }
 
-  protected hasLegalEp(): boolean {
+  protected hasLegalEp(ctx?: Context): boolean {
     if (!defined(this.epSquare)) return false;
-    const ctx = this.ctx();
+    ctx = ctx || this.ctx();
     const ourPawns = this.board.pieces(this.turn, 'pawn');
     const candidates = ourPawns.intersect(pawnAttacks(opposite(this.turn), this.epSquare));
     for (const candidate of candidates) {
@@ -484,7 +485,8 @@ export class Chess extends Position {
     else return pseudo;
   }
 
-  dests(square: Square, ctx: Context): SquareSet {
+  dests(square: Square, ctx?: Context): SquareSet {
+    ctx = ctx || this.ctx();
     if (ctx.variantEnd) return SquareSet.empty();
     const piece = this.board.get(square);
     if (!piece || piece.color !== this.turn) return SquareSet.empty();
@@ -543,7 +545,7 @@ export class Chess extends Position {
     return false;
   }
 
-  variantOutcome(): Outcome | undefined {
+  variantOutcome(_ctx?: Context): Outcome | undefined {
     return;
   }
 

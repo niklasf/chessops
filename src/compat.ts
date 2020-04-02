@@ -8,12 +8,12 @@ export interface CgDests {
 
 export function chessgroundDests(pos: Position): CgDests {
   const result: CgDests = {};
-  const king = pos.board.kingOf(pos.turn);
-  for (const [from, squares] of pos.allDests()) {
+  const ctx = pos.ctx();
+  for (const [from, squares] of pos.allDests(ctx)) {
     if (squares.isEmpty()) continue;
     const orig = makeSquare(from);
     result[orig] = Array.from(squares, makeSquare);
-    if (from === king && squareFile(from) === 4) {
+    if (from === ctx.king && squareFile(from) === 4) {
       if (squares.has(0)) result[orig].push('c1');
       else if (squares.has(56)) result[orig].push('c8');
       if (squares.has(7)) result[orig].push('g1');
