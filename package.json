@@ -4,6 +4,7 @@
   "description": "Chess and chess variant rules and operations",
   "keywords": [
     "chess",
+    "lichess",
     "fen",
     "pgn",
     "uci",
