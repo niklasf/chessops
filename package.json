@@ -48,6 +48,7 @@
     "fen.js",
     "san.js",
     "hash.js",
+    "index.js",
     "attacks.d.ts",
     "board.d.ts",
     "chess.d.ts",
@@ -61,7 +62,8 @@
     "debug.d.ts",
     "fen.d.ts",
     "san.d.ts",
-    "hash.d.ts"
+    "hash.d.ts",
+    "index.d.ts"
   ],
   "jest": {
     "transform": {
