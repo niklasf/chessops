@@ -33,6 +33,8 @@ Features
 * [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
 * [Compatibility](https://niklasf.github.io/chessops/modules/_compat_.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
 
+[File an issue](https://github.com/niklasf/chessops/issues/new) to request more.
+
 Example
 -------
 

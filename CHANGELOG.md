@@ -1,6 +1,15 @@
 Changelog for chessops
 ======================
 
+v0.4.0
+------
+
+* Renamed `Uci` to `Move`, `UciMove` to `NormalMove`, `UciDrop` to `DropMove`,
+  and `isMove` to `isNormal`.
+* Renamed `uciCharPair` to `scalachessId`.
+* All `ctx` parameters are now optional.
+* Added `index` module with re-exports.
+
 v0.3.6
 ------
 
