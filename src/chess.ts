@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, Uci, UciMove, isDrop, Piece, Outcome } from './types';
+import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, Move, NormalMove, isDrop, Piece, Outcome } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
@@ -232,16 +232,16 @@ export abstract class Position {
     return this.dropDests(ctx).nonEmpty();
   }
 
-  isLegal(uci: Uci, ctx?: Context): boolean {
-    if (isDrop(uci)) {
-      if (!this.pockets || this.pockets[this.turn][uci.role] <= 0) return false;
-      if (uci.role === 'pawn' && SquareSet.backranks().has(uci.to)) return false;
-      return this.dropDests(ctx).has(uci.to);
+  isLegal(move: Move, ctx?: Context): boolean {
+    if (isDrop(move)) {
+      if (!this.pockets || this.pockets[this.turn][move.role] <= 0) return false;
+      if (move.role === 'pawn' && SquareSet.backranks().has(move.to)) return false;
+      return this.dropDests(ctx).has(move.to);
     } else {
-      if (uci.promotion === 'pawn') return false;
-      if (uci.promotion === 'king' && this.rules !== 'antichess') return false;
-      if (!uci.promotion && this.board.pawn.has(uci.from) && SquareSet.backranks().has(uci.to)) return false;
-      return this.dests(uci.from, ctx).has(uci.to);
+      if (move.promotion === 'pawn') return false;
+      if (move.promotion === 'king' && this.rules !== 'antichess') return false;
+      if (!move.promotion && this.board.pawn.has(move.from) && SquareSet.backranks().has(move.to)) return false;
+      return this.dests(move.from, ctx).has(move.to);
 
     }
   }
@@ -285,58 +285,58 @@ export abstract class Position {
     return d;
   }
 
-  castlingSide(uci: Uci): CastlingSide | undefined {
-    if (isDrop(uci)) return;
-    const delta = uci.to - uci.from;
-    if (Math.abs(delta) !== 2 && !this.board[this.turn].has(uci.to)) return;
-    if (!this.board.king.has(uci.from)) return;
+  castlingSide(move: Move): CastlingSide | undefined {
+    if (isDrop(move)) return;
+    const delta = move.to - move.from;
+    if (Math.abs(delta) !== 2 && !this.board[this.turn].has(move.to)) return;
+    if (!this.board.king.has(move.from)) return;
     return delta > 0 ? 'h' : 'a';
   }
 
-  normalizeMove(uci: Uci): Uci {
-    const castlingSide = this.castlingSide(uci);
-    if (!castlingSide) return uci;
+  normalizeMove(move: Move): Move {
+    const castlingSide = this.castlingSide(move);
+    if (!castlingSide) return move;
     const rookFrom = this.castles.rook[this.turn][castlingSide];
     return {
-      from: (uci as UciMove).from,
-      to: defined(rookFrom) ? rookFrom : uci.to,
+      from: (move as NormalMove).from,
+      to: defined(rookFrom) ? rookFrom : move.to,
     };
   }
 
-  play(uci: Uci): void {
+  play(move: Move): void {
     const turn = this.turn;
     const epSquare = this.epSquare;
-    const castlingSide = this.castlingSide(uci);
+    const castlingSide = this.castlingSide(move);
 
     this.epSquare = undefined;
     this.halfmoves += 1;
     if (turn === 'black') this.fullmoves += 1;
     this.turn = opposite(turn);
 
-    if (isDrop(uci)) {
-      this.board.set(uci.to, { role: uci.role, color: turn });
-      if (this.pockets) this.pockets[turn][uci.role]--;
-      if (uci.role === 'pawn') this.halfmoves = 0;
+    if (isDrop(move)) {
+      this.board.set(move.to, { role: move.role, color: turn });
+      if (this.pockets) this.pockets[turn][move.role]--;
+      if (move.role === 'pawn') this.halfmoves = 0;
     } else {
-      const piece = this.board.take(uci.from);
+      const piece = this.board.take(move.from);
       if (!piece) return;
 
       let epCapture: Piece | undefined;
       if (piece.role === 'pawn') {
         this.halfmoves = 0;
-        if (uci.to === epSquare) {
-          epCapture = this.board.take(uci.to + (turn === 'white' ? -8 : 8));
+        if (move.to === epSquare) {
+          epCapture = this.board.take(move.to + (turn === 'white' ? -8 : 8));
         }
-        const delta = uci.from - uci.to;
-        if (Math.abs(delta) === 16 && 8 <= uci.from && uci.from <= 55) {
-          this.epSquare = (uci.from + uci.to) >> 1;
+        const delta = move.from - move.to;
+        if (Math.abs(delta) === 16 && 8 <= move.from && move.from <= 55) {
+          this.epSquare = (move.from + move.to) >> 1;
         }
-        if (uci.promotion) {
-          piece.role = uci.promotion;
+        if (move.promotion) {
+          piece.role = move.promotion;
           piece.promoted = true;
         }
       } else if (piece.role === 'rook') {
-        this.castles.discardRook(uci.from);
+        this.castles.discardRook(move.from);
       } else if (piece.role === 'king') {
         if (castlingSide) {
           const rookFrom = this.castles.rook[turn][castlingSide];
@@ -350,8 +350,8 @@ export abstract class Position {
         if (castlingSide) return;
       }
 
-      const capture = this.board.set(uci.to, piece) || epCapture;
-      if (capture) this.playCaptureAt(uci.to, capture);
+      const capture = this.board.set(move.to, piece) || epCapture;
+      if (capture) this.playCaptureAt(move.to, capture);
     }
   }
 

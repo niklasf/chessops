@@ -1,4 +1,4 @@
-import { Color, Square, Role, Uci, isDrop, SquareName } from './types';
+import { Color, Square, Role, Move, isDrop, SquareName } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return typeof v !== 'undefined';
@@ -58,7 +58,7 @@ export function makeSquare(square: Square): SquareName {
   return ('abcdefgh'[square & 0x7] + '12345678'[square >> 3]) as SquareName;
 }
 
-export function parseUci(str: string): Uci | undefined {
+export function parseUci(str: string): Move | undefined {
   if (str[1] === '@' && str.length === 4) {
     const role = charToRole(str[0]);
     const to = parseSquare(str.slice(2));
@@ -76,7 +76,7 @@ export function parseUci(str: string): Uci | undefined {
   return;
 }
 
-export function makeUci(uci: Uci): string {
-  if (isDrop(uci)) return `${roleToChar(uci.role).toUpperCase()}@${makeSquare(uci.to)}`;
-  return makeSquare(uci.from) + makeSquare(uci.to) + (uci.promotion ? roleToChar(uci.promotion) : '');
+export function makeUci(move: Move): string {
+  if (isDrop(move)) return `${roleToChar(move.role).toUpperCase()}@${makeSquare(move.to)}`;
+  return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? roleToChar(move.promotion) : '');
 }

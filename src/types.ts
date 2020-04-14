@@ -41,24 +41,24 @@ export interface Piece {
   promoted?: boolean;
 }
 
-export interface UciMove {
+export interface NormalMove {
   from: Square;
   to: Square;
   promotion?: Role;
 }
 
-export interface UciDrop {
+export interface DropMove {
   role: Role;
   to: Square;
 }
 
-export type Uci = UciMove | UciDrop;
+export type Move = NormalMove | DropMove;
 
-export function isDrop(v: Uci): v is UciDrop {
+export function isDrop(v: Move): v is DropMove {
   return 'role' in v;
 }
 
-export function isMove(v: Uci): v is UciMove {
+export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 

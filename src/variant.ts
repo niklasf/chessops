@@ -387,10 +387,9 @@ class RacingKings extends Chess {
     let dests = SquareSet.empty();
     for (const to of super.dests(square, ctx)) {
       // Valid, because there are no promotions (or even pawns).
-      const uci = { from: square, to };
-
+      const move = { from: square, to };
       const after = this.clone();
-      after.play(uci);
+      after.play(move);
       if (!after.isCheck()) dests = dests.with(to);
     }
     return dests;

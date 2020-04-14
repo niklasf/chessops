@@ -75,10 +75,10 @@ export function perft(pos: Position, depth: number, log = false): number {
       for (const to of dests) {
         for (const promotion of promotions) {
           const child = pos.clone();
-          const uci = { from, to, promotion };
-          child.play(uci);
+          const move = { from, to, promotion };
+          child.play(move);
           const children = perft(child, depth - 1, false);
-          if (log) console.log(makeUci(uci), children);
+          if (log) console.log(makeUci(move), children);
           nodes += children;
         }
       }
@@ -88,10 +88,10 @@ export function perft(pos: Position, depth: number, log = false): number {
         if (pos.pockets[pos.turn][role] > 0) {
           for (const to of (role === 'pawn' ? dropDests.diff(SquareSet.backranks()) : dropDests)) {
             const child = pos.clone();
-            const uci = { role, to };
-            child.play(uci);
+            const move = { role, to };
+            child.play(move);
             const children = perft(child, depth - 1, false);
-            if (log) console.log(makeUci(uci), children);
+            if (log) console.log(makeUci(move), children);
             nodes += children;
           }
         }

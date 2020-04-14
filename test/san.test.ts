@@ -30,6 +30,6 @@ test('stockfish line with many knight moves', () => {
 test('en passant', () => {
   const setup = parseFen('6bk/7b/8/3pP3/8/8/8/Q3K3 w - d6 0 2').unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
-  const uci = parseUci('e5d6')!;
-  expect(makeSan(pos, uci)).toBe('exd6#');
+  const move = parseUci('e5d6')!;
+  expect(makeSan(pos, move)).toBe('exd6#');
 });
