@@ -84,3 +84,25 @@ test('king of the hill not over', () => {
   expect(pos.outcome()).toBeUndefined();
   expect(pos.isEnd()).toBe(false);
 });
+
+test('racing kings end', () => {
+  // Both players reached the backrank.
+  const draw = setupPosition('racingkings', parseFen('kr3NK1/1q2R3/8/8/8/5n2/2N5/1rb2B1R w - - 11 14').unwrap()).unwrap();
+  expect(draw.isEnd()).toBe(true);
+  expect(draw.outcome()).toStrictEqual({winner: undefined});
+
+  // White to move is lost because black reached the backrank.
+  const black = setupPosition('racingkings', parseFen('1k6/6K1/8/8/8/8/8/8 w - - 0 1').unwrap()).unwrap();
+  expect(black.isEnd()).toBe(true);
+  expect(black.outcome()).toStrictEqual({winner: 'black'});
+
+  // Black is given a chance to catch up.
+  const pos = setupPosition('racingkings', parseFen('1K6/7k/8/8/8/8/8/8 b - - 0 1').unwrap()).unwrap();
+  expect(pos.isEnd()).toBe(false);
+  expect(pos.outcome()).toBeUndefined();
+
+  // Black near backrank but cannot move there.
+  const white = setupPosition('racingkings', parseFen('2KR4/k7/2Q5/4q3/8/8/8/2N5 b - - 0 1').unwrap()).unwrap();
+  expect(white.isEnd()).toBe(true);
+  expect(white.outcome()).toStrictEqual({winner: 'white'});
+});
