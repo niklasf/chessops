@@ -1,4 +1,4 @@
-import { SquareName, Move, isDrop } from './types';
+import { Rules, SquareName, Move, isDrop } from './types';
 import { makeSquare, squareFile } from './util';
 import { Position } from './chess';
 
@@ -34,4 +34,21 @@ export function scalachessId(move: Move): string {
       (35 + 64 + 8 * ['queen', 'rook', 'bishop', 'knight', 'king'].indexOf(move.promotion) + squareFile(move.to)) :
       (35 + move.to)
   );
+}
+
+export function lichessVariantRules(variant: 'standard' | 'chess960' | 'antichess' | 'fromPosition' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse'): Rules {
+  switch (variant) {
+    case 'standard':
+    case 'chess960':
+    case 'fromPosition':
+      return 'chess';
+    case 'threeCheck':
+      return '3check';
+    case 'kingOfTheHill':
+      return 'kingofthehill';
+    case 'racingKings':
+      return 'racingkings';
+    default:
+      return variant;
+  }
 }
