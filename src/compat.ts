@@ -38,17 +38,17 @@ export function scalachessId(move: Move): string {
 
 export function lichessVariantRules(variant: 'standard' | 'chess960' | 'antichess' | 'fromPosition' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse'): Rules {
   switch (variant) {
-    case 'standard':
-    case 'chess960':
-    case 'fromPosition':
-      return 'chess';
-    case 'threeCheck':
-      return '3check';
-    case 'kingOfTheHill':
-      return 'kingofthehill';
-    case 'racingKings':
-      return 'racingkings';
-    default:
-      return variant;
+  case 'standard':
+  case 'chess960':
+  case 'fromPosition':
+    return 'chess';
+  case 'threeCheck':
+    return '3check';
+  case 'kingOfTheHill':
+    return 'kingofthehill';
+  case 'racingKings':
+    return 'racingkings';
+  default:
+    return variant;
   }
 }
