@@ -1,6 +1,11 @@
 Changelog for chessops
 ======================
 
+v0.4.1
+------
+
+* Added `lichessVariantRules` compatibility.
+
 v0.4.0
 ------
 
