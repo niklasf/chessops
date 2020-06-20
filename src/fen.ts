@@ -186,7 +186,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
       remainingChecks = parseRemainingChecks(remainingChecksPart);
     } else if (defined(earlyRemainingChecks)) {
       remainingChecks = earlyRemainingChecks;
-    };
+    }
 
     if (parts.length > 0) return Result.err(new FenError(InvalidFen.Fen));
 

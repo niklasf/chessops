@@ -4,7 +4,7 @@ import { Position } from './chess';
 
 export interface CgDests {
   [key: string]: SquareName[];
-};
+}
 
 export function chessgroundDests(pos: Position): CgDests {
   const result: CgDests = {};
