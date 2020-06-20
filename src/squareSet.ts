@@ -15,9 +15,7 @@ function rbit32(n: number): number {
   n = ((n >>> 1) & 0x5555_5555) | ((n & 0x5555_5555) << 1);
   n = ((n >>> 2) & 0x3333_3333) | ((n & 0x3333_3333) << 2);
   n = ((n >>> 4) & 0x0f0f_0f0f) | ((n & 0x0f0f_0f0f) << 4);
-  n = ((n >>> 8) & 0x00ff_00ff) | ((n & 0x00ff_00ff) << 8);
-  n = ((n >>> 16) & 0x0000_ffff) | ((n & 0x0000_ffff) << 16);
-  return n;
+  return bswap32(n);
 }
 
 export class SquareSet implements Iterable<Square> {
