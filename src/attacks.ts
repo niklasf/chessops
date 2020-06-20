@@ -100,43 +100,26 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
   }
 }
 
-function rayTables(): [BySquare<BySquare<SquareSet>>, BySquare<BySquare<SquareSet>>] {
+function computeRayTable(): BySquare<BySquare<SquareSet>> {
   const ray: BySquare<BySquare<SquareSet>> = [];
-  const between: BySquare<BySquare<SquareSet>> = [];
   const zero = SquareSet.empty();
   for (let a = 0; a < 64; a++) {
     ray[a] = [];
-    between[a] = [];
-    for (let b = 0; b < 64; b++) {
-      ray[a][b] = zero;
-      between[a][b] = zero;
-    }
-    for (const b of DIAG_RANGE[a]) {
-      ray[a][b] = DIAG_RANGE[a].with(a);
-      between[a][b] = diagAttacks(a, SquareSet.fromSquare(b)).intersect(diagAttacks(b, SquareSet.fromSquare(a)));
-    }
-    for (const b of ANTI_DIAG_RANGE[a]) {
-      ray[a][b] = ANTI_DIAG_RANGE[a].with(a);
-      between[a][b] = antiDiagAttacks(a, SquareSet.fromSquare(b)).intersect(antiDiagAttacks(b, SquareSet.fromSquare(a)));
-    }
-    for (const b of FILE_RANGE[a]) {
-      ray[a][b] = FILE_RANGE[a].with(a);
-      between[a][b] = fileAttacks(a, SquareSet.fromSquare(b)).intersect(fileAttacks(b, SquareSet.fromSquare(a)));
-    }
-    for (const b of RANK_RANGE[a]) {
-      ray[a][b] = RANK_RANGE[a].with(a);
-      between[a][b] = rankAttacks(a, SquareSet.fromSquare(b)).intersect(rankAttacks(b, SquareSet.fromSquare(a)));
-    }
+    for (let b = 0; b < 64; b++) ray[a][b] = zero;
+    for (const b of DIAG_RANGE[a]) ray[a][b] = DIAG_RANGE[a].with(a);
+    for (const b of ANTI_DIAG_RANGE[a]) ray[a][b] = ANTI_DIAG_RANGE[a].with(a);
+    for (const b of FILE_RANGE[a]) ray[a][b] = FILE_RANGE[a].with(a);
+    for (const b of RANK_RANGE[a]) ray[a][b] = RANK_RANGE[a].with(a);
   }
-  return [ray, between];
+  return ray;
 }
 
-const [RAY, BETWEEN] = rayTables();
+const RAY = computeRayTable();
 
 export function ray(a: Square, b: Square): SquareSet {
   return RAY[a][b];
 }
 
 export function between(a: Square, b: Square): SquareSet {
-  return BETWEEN[a][b];
+  return RAY[a][b].intersect(SquareSet.full().shl64(a).xor(SquareSet.full().shl64(b))).withoutFirst();
 }

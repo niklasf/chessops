@@ -245,4 +245,9 @@ export class SquareSet implements Iterable<Square> {
     const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
     return new SquareSet(lo, this.hi - (other.hi + c));
   }
+
+  withoutFirst(): SquareSet {
+    if (this.lo !== 0) return new SquareSet(this.lo & (this.lo - 1), this.hi);
+    return new SquareSet(0, this.hi & (this.hi - 1));
+  }
 }
