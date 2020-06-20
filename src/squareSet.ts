@@ -130,6 +130,12 @@ export class SquareSet implements Iterable<Square> {
     return new SquareSet(rbit32(this.hi), rbit32(this.lo));
   }
 
+  minus64(other: SquareSet): SquareSet {
+    const lo = this.lo - other.lo;
+    const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
+    return new SquareSet(lo, this.hi - (other.hi + c));
+  }
+
   equals(other: SquareSet): boolean {
     return this.lo === other.lo && this.hi === other.hi;
   }
@@ -182,6 +188,11 @@ export class SquareSet implements Iterable<Square> {
     if (this.lo !== 0) return 31 - Math.clz32(this.lo & -this.lo);
     if (this.hi !== 0) return 63 - Math.clz32(this.hi & -this.hi);
     return;
+  }
+
+  withoutFirst(): SquareSet {
+    if (this.lo !== 0) return new SquareSet(this.lo & (this.lo - 1), this.hi);
+    return new SquareSet(0, this.hi & (this.hi - 1));
   }
 
   moreThanOne(): boolean {
@@ -238,16 +249,5 @@ export class SquareSet implements Iterable<Square> {
         };
       }
     };
-  }
-
-  minus64(other: SquareSet): SquareSet {
-    const lo = this.lo - other.lo;
-    const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
-    return new SquareSet(lo, this.hi - (other.hi + c));
-  }
-
-  withoutFirst(): SquareSet {
-    if (this.lo !== 0) return new SquareSet(this.lo & (this.lo - 1), this.hi);
-    return new SquareSet(0, this.hi & (this.hi - 1));
   }
 }
