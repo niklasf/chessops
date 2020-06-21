@@ -13,7 +13,7 @@ export type BySquare<T> = T[];
 
 export type Color = 'white' | 'black';
 
-export const COLORS: Color[] = ['white', 'black'];
+export const COLORS: readonly Color[] = ['white', 'black'];
 
 export type ByColor<T> = {
   [color in Color]: T;
@@ -21,7 +21,7 @@ export type ByColor<T> = {
 
 export type Role = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
 
-export const ROLES: Role[] = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
+export const ROLES: readonly Role[] = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
 
 export type ByRole<T> = {
   [role in Role]: T;
@@ -29,7 +29,7 @@ export type ByRole<T> = {
 
 export type CastlingSide = 'a' | 'h';
 
-export const CASTLING_SIDES: CastlingSide[] = ['a', 'h'];
+export const CASTLING_SIDES: readonly CastlingSide[] = ['a', 'h'];
 
 export type ByCastlingSide<T> = {
   [side in CastlingSide]: T;
@@ -64,7 +64,7 @@ export function isNormal(v: Move): v is NormalMove {
 
 export type Rules = 'chess' | 'antichess' | 'kingofthehill' | '3check' | 'atomic' | 'horde' | 'racingkings' | 'crazyhouse';
 
-export const RULES: Rules[] = ['chess', 'antichess', 'kingofthehill', '3check', 'atomic', 'horde', 'racingkings', 'crazyhouse'];
+export const RULES: readonly Rules[] = ['chess', 'antichess', 'kingofthehill', '3check', 'atomic', 'horde', 'racingkings', 'crazyhouse'];
 
 export interface Outcome {
   winner: Color | undefined;
