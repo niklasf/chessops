@@ -1,6 +1,13 @@
 Changelog for chessops
 ======================
 
+v0.4.2
+------
+
+* Performance optimizations, significantly faster initilization.
+* Added `SquareSet.withoutFirst()`.
+* Bumped target to ES2016.
+
 v0.4.1
 ------
 
