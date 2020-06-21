@@ -68,14 +68,6 @@ function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
   return forward.intersect(range);
 }
 
-function diagAttacks(square: Square, occupied: SquareSet): SquareSet {
-  return hyperbola(SquareSet.fromSquare(square), DIAG_RANGE[square], occupied);
-}
-
-function antiDiagAttacks(square: Square, occupied: SquareSet): SquareSet {
-  return hyperbola(SquareSet.fromSquare(square), ANTI_DIAG_RANGE[square], occupied);
-}
-
 export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
   const bit = SquareSet.fromSquare(square);
   return hyperbola(bit, DIAG_RANGE[square], occupied).xor(hyperbola(bit, ANTI_DIAG_RANGE[square], occupied));
