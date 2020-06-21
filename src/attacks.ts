@@ -102,10 +102,9 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
 
 function computeRayTable(): BySquare<BySquare<SquareSet>> {
   const ray: BySquare<BySquare<SquareSet>> = [];
-  const zero = SquareSet.empty();
   for (let a = 0; a < 64; a++) {
-    ray[a] = [];
-    for (let b = 0; b < 64; b++) ray[a][b] = zero;
+    ray[a] = new Array(64);
+    ray[a].fill(SquareSet.empty());
     for (const b of DIAG_RANGE[a]) ray[a][b] = DIAG_RANGE[a].with(a);
     for (const b of ANTI_DIAG_RANGE[a]) ray[a][b] = ANTI_DIAG_RANGE[a].with(a);
     for (const b of FILE_RANGE[a]) ray[a][b] = FILE_RANGE[a].with(a);
