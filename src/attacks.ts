@@ -92,25 +92,15 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
   }
 }
 
-function computeRayTable(): BySquare<BySquare<SquareSet>> {
-  const ray: BySquare<BySquare<SquareSet>> = [];
-  for (let a = 0; a < 64; a++) {
-    ray[a] = new Array(64);
-    ray[a].fill(SquareSet.empty());
-    for (const b of DIAG_RANGE[a]) ray[a][b] = DIAG_RANGE[a].with(a);
-    for (const b of ANTI_DIAG_RANGE[a]) ray[a][b] = ANTI_DIAG_RANGE[a].with(a);
-    for (const b of FILE_RANGE[a]) ray[a][b] = FILE_RANGE[a].with(a);
-    for (const b of RANK_RANGE[a]) ray[a][b] = RANK_RANGE[a].with(a);
-  }
-  return ray;
-}
-
-const RAY = computeRayTable();
-
 export function ray(a: Square, b: Square): SquareSet {
-  return RAY[a][b];
+  const other = SquareSet.fromSquare(b);
+  if (RANK_RANGE[a].intersects(other)) return RANK_RANGE[a].with(a);
+  if (ANTI_DIAG_RANGE[a].intersects(other)) return ANTI_DIAG_RANGE[a].with(a);
+  if (DIAG_RANGE[a].intersects(other)) return DIAG_RANGE[a].with(a);
+  if (FILE_RANGE[a].intersects(other)) return FILE_RANGE[a].with(a);
+  return SquareSet.empty();
 }
 
 export function between(a: Square, b: Square): SquareSet {
-  return RAY[a][b].intersect(SquareSet.full().shl64(a).xor(SquareSet.full().shl64(b))).withoutFirst();
+  return ray(a, b).intersect(SquareSet.full().shl64(a).xor(SquareSet.full().shl64(b))).withoutFirst();
 }
