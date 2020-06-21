@@ -44,11 +44,11 @@ export function transformBoard(board: Board, f: (s: SquareSet) => SquareSet): Bo
 export function transformSetup(setup: Setup, f: (s: SquareSet) => SquareSet): Setup {
   return {
     board: transformBoard(setup.board, f),
-    pockets: setup.pockets && setup.pockets.clone(),
+    pockets: setup.pockets?.clone(),
     turn: setup.turn,
     unmovedRooks: f(setup.unmovedRooks),
     epSquare: defined(setup.epSquare) ? f(SquareSet.fromSquare(setup.epSquare)).first() : undefined,
-    remainingChecks: setup.remainingChecks && setup.remainingChecks.clone(),
+    remainingChecks: setup.remainingChecks?.clone(),
     halfmoves: setup.halfmoves,
     fullmoves: setup.fullmoves,
   };

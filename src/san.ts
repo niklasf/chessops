@@ -54,8 +54,7 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
 export function makeSanAndPlay(pos: Position, move: Move): string {
   const san = makeSanWithoutSuffix(pos, move);
   pos.play(move);
-  const outcome = pos.outcome();
-  if (outcome && outcome.winner) return san + '#';
+  if (pos.outcome()?.winner) return san + '#';
   else if (pos.isCheck()) return san + '+';
   else return san;
 }
@@ -71,12 +70,7 @@ export function makeSanVariation(pos: Position, variation: Move[]): string {
     pos.play(variation[i]);
     line += san;
     if (san === '--') return line;
-    let over = false;
-    if (i === variation.length - 1) {
-      const outcome = pos.outcome();
-      over = !!(outcome && outcome.winner);
-    }
-    if (over) line += '#';
+    if (i === variation.length - 1 && pos.outcome()?.winner) line += '#';
     else if (pos.isCheck()) line += '+';
   }
   return line;

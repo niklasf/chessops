@@ -197,11 +197,11 @@ export abstract class Position {
   clone(): Position {
     const pos = new (this as any).constructor();
     pos.board = this.board.clone();
-    pos.pockets = this.pockets && this.pockets.clone();
+    pos.pockets = this.pockets?.clone();
     pos.turn = this.turn;
     pos.castles = this.castles.clone();
     pos.epSquare = this.epSquare;
-    pos.remainingChecks = this.remainingChecks && this.remainingChecks.clone();
+    pos.remainingChecks = this.remainingChecks?.clone();
     pos.halfmoves = this.halfmoves;
     pos.fullmoves = this.fullmoves;
     return pos;
@@ -210,11 +210,11 @@ export abstract class Position {
   toSetup(): Setup {
     return {
       board: this.board.clone(),
-      pockets: this.pockets && this.pockets.clone(),
+      pockets: this.pockets?.clone(),
       turn: this.turn,
       unmovedRooks: this.castles.unmovedRooks,
       epSquare: this.hasLegalEp() ? this.epSquare : undefined,
-      remainingChecks: this.remainingChecks && this.remainingChecks.clone(),
+      remainingChecks: this.remainingChecks?.clone(),
       halfmoves: Math.min(this.halfmoves, 150),
       fullmoves: Math.min(Math.max(this.fullmoves, 1), 9999),
     };
