@@ -1,7 +1,7 @@
 import { Color, Square, Role, Move, isDrop, SquareName } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
-  return typeof v !== 'undefined';
+  return v !== undefined;
 }
 
 export function opposite(color: Color): Color {
