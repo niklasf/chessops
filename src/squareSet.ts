@@ -205,47 +205,33 @@ export class SquareSet implements Iterable<Square> {
     return this.nonEmpty() && !this.moreThanOne();
   }
 
-  [Symbol.iterator](): Iterator<Square> {
+  *[Symbol.iterator](): Iterator<Square> {
     let lo = this.lo;
     let hi = this.hi;
-    return {
-      next(): IteratorResult<Square> {
-        if (lo !== 0) {
-          const idx = 31 - Math.clz32(lo & -lo);
-          lo ^= 1 << idx;
-          return { value: idx, done: false };
-        }
-        if (hi !== 0) {
-          const idx = 31 - Math.clz32(hi & -hi);
-          hi ^= 1 << idx;
-          return { value: 32 + idx, done: false };
-        }
-        return { done: true } as IteratorResult<Square>;
-      }
-    };
+    while (lo !== 0) {
+      const idx = 31 - Math.clz32(lo & -lo);
+      lo ^= 1 << idx;
+      yield idx;
+    }
+    while (hi !== 0) {
+      const idx = 31 - Math.clz32(hi & -hi);
+      hi ^= 1 << idx;
+      yield 32 + idx;
+    }
   }
 
-  reversed(): Iterable<Square> {
+  *reversed(): Iterable<Square> {
     let lo = this.lo;
     let hi = this.hi;
-    return {
-      [Symbol.iterator](): Iterator<Square> {
-        return {
-          next(): IteratorResult<Square> {
-            if (hi !== 0) {
-              const idx = 31 - Math.clz32(hi);
-              hi ^= 1 << idx;
-              return { value: 32 + idx, done: false };
-            }
-            if (lo !== 0) {
-              const idx = 31 - Math.clz32(lo);
-              lo ^= 1 << idx;
-              return { value: idx, done: false };
-            }
-            return { done: true } as IteratorResult<Square>;
-          }
-        };
-      }
-    };
+    while (hi !== 0) {
+      const idx = 31 - Math.clz32(hi);
+      hi ^= 1 << idx;
+      yield 32 + idx;
+    }
+    while (lo !== 0) {
+      const idx = 31 - Math.clz32(lo);
+      lo ^= 1 << idx;
+      yield idx;
+    }
   }
 }

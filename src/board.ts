@@ -133,14 +133,10 @@ export class Board implements Iterable<[Square, Piece]> {
     return this.occupied.has(square);
   }
 
-  [Symbol.iterator](): Iterator<[Square, Piece]> {
-    const keys = this.occupied[Symbol.iterator]();
-    const next: () => IteratorResult<[Square, Piece]> = () => {
-      const entry = keys.next();
-      if (entry.done) return { done: true } as IteratorResult<[Square, Piece]>;
-      return { value: [entry.value, this.get(entry.value)!], done: false };
-    };
-    return { next };
+  *[Symbol.iterator](): Iterator<[Square, Piece]> {
+    for (const square of this.occupied) {
+      yield [square, this.get(square)!];
+    }
   }
 
   pieces(color: Color, role: Role): SquareSet {
