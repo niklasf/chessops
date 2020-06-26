@@ -36,3 +36,21 @@ test('shl64', () => {
   expect(r.shl64(62)).toEqual(new SquareSet(0x0, 0x80000000));
   expect(r.shl64(63)).toEqual(new SquareSet(0x0, 0x0));
 });
+
+test('more than one', () => {
+  expect(new SquareSet(0, 0).moreThanOne()).toBe(false);
+  expect(new SquareSet(1, 0).moreThanOne()).toBe(false);
+  expect(new SquareSet(2, 0).moreThanOne()).toBe(false);
+  expect(new SquareSet(4, 0).moreThanOne()).toBe(false);
+  expect(new SquareSet(-2147483648, 0).moreThanOne()).toBe(false);
+  expect(new SquareSet(0, 1).moreThanOne()).toBe(false);
+  expect(new SquareSet(0, 2).moreThanOne()).toBe(false);
+  expect(new SquareSet(0, 4).moreThanOne()).toBe(false);
+  expect(new SquareSet(0, -2147483648).moreThanOne()).toBe(false);
+
+  expect(new SquareSet(1, 1).moreThanOne()).toBe(true);
+  expect(new SquareSet(3, 0).moreThanOne()).toBe(true);
+  expect(new SquareSet(-1, 0).moreThanOne()).toBe(true);
+  expect(new SquareSet(0, 3).moreThanOne()).toBe(true);
+  expect(new SquareSet(0, -1).moreThanOne()).toBe(true);
+});
