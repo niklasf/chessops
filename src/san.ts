@@ -1,5 +1,5 @@
 import { isDrop, Move } from './types';
-import { roleToChar, makeSquare } from './util';
+import { roleToChar, makeSquare, squareFile, squareRank } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './chess';
 import { kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks';
@@ -15,7 +15,7 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
     if (role === 'king' && (pos.board[pos.turn].has(move.to) || Math.abs(move.to - move.from) === 2)) {
       san = move.to > move.from ? 'O-O' : 'O-O-O';
     } else {
-      const capture = pos.board.occupied.has(move.to) || (role === 'pawn' && (move.from & 0x7) !== (move.to & 0x7));
+      const capture = pos.board.occupied.has(move.to) || (role === 'pawn' && squareFile(move.from) !== squareFile(move.to));
       if (role !== 'pawn') {
         san = roleToChar(role).toUpperCase();
 
@@ -34,14 +34,14 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
           }
           if (others.nonEmpty()) {
             let row = false;
-            let column = others.intersects(SquareSet.fromRank(move.from >> 3));
-            if (others.intersects(SquareSet.fromFile(move.from & 0x7))) row = true;
+            let column = others.intersects(SquareSet.fromRank(squareRank(move.from)));
+            if (others.intersects(SquareSet.fromFile(squareFile(move.from)))) row = true;
             else column = true;
-            if (column) san += 'abcdefgh'[move.from & 0x7];
-            if (row) san += '12345678'[move.from >> 3];
+            if (column) san += 'abcdefgh'[squareFile(move.from)];
+            if (row) san += '12345678'[squareRank(move.from)];
           }
         }
-      } else if (capture) san = 'abcdefgh'[move.from & 0x7];
+      } else if (capture) san = 'abcdefgh'[squareFile(move.from)];
 
       if (capture) san += 'x';
       san += makeSquare(move.to);

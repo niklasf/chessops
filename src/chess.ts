@@ -4,7 +4,7 @@ import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
 import { attacks, bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
-import { opposite, defined } from './util';
+import { opposite, defined, squareRank } from './util';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
@@ -421,7 +421,7 @@ export class Chess extends Position {
     if (!defined(square)) return;
     const epRank = this.turn === 'white' ? 5 : 2;
     const forward = this.turn === 'white' ? 8 : -8;
-    if ((square >> 3) !== epRank) return;
+    if (squareRank(square) !== epRank) return;
     if (this.board.occupied.has(square + forward)) return;
     const pawn = square - forward;
     if (!this.board.pawn.has(pawn) || !this.board[opposite(this.turn)].has(pawn)) return;

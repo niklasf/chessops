@@ -1,5 +1,5 @@
 import { Square, Piece, Role, ROLES } from './types';
-import { opposite, makeSquare, makeUci } from './util';
+import { opposite, squareRank, makeSquare, makeUci } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
@@ -70,7 +70,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     let nodes = 0;
     for (const [from, dests] of pos.allDests()) {
       const promotions: Array<Role | undefined> =
-        ((from >> 3) === (pos.turn === 'white' ? 6 : 1) && pos.board.pawn.has(from)) ?
+        (squareRank(from) === (pos.turn === 'white' ? 6 : 1) && pos.board.pawn.has(from)) ?
           promotionRoles : [undefined];
       for (const to of dests) {
         for (const promotion of promotions) {

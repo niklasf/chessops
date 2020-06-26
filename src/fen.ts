@@ -3,7 +3,7 @@ import { Piece, Square, Color, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
-import { defined, parseSquare, makeSquare, roleToChar, charToRole } from './util';
+import { defined, squareFile, parseSquare, makeSquare, roleToChar, charToRole } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' w KQkq -';
@@ -277,7 +277,7 @@ export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: Fe
       } else if (!shredder && rook === candidates.last() && king < rook) {
         fen += color === 'white' ? 'K' : 'k';
       } else {
-        fen += (color === 'white' ? 'ABCDEFGH' : 'abcdefgh')[rook & 0x7];
+        fen += (color === 'white' ? 'ABCDEFGH' : 'abcdefgh')[squareFile(rook)];
       }
     }
   }

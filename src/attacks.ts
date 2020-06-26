@@ -1,4 +1,4 @@
-import { squareDist } from './util';
+import { squareDist, squareFile, squareRank } from './util';
 import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
 
@@ -36,18 +36,18 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
   return PAWN_ATTACKS[color][square];
 }
 
-const FILE_RANGE = tabulate(sq => SquareSet.fromFile(sq & 0x7).without(sq));
-const RANK_RANGE = tabulate(sq => SquareSet.fromRank(sq >> 3).without(sq));
+const FILE_RANGE = tabulate(sq => SquareSet.fromFile(squareFile(sq)).without(sq));
+const RANK_RANGE = tabulate(sq => SquareSet.fromRank(squareRank(sq)).without(sq));
 
 const DIAG_RANGE = tabulate(sq => {
   const diag = new SquareSet(0x0804_0201, 0x8040_2010);
-  const n = (sq >> 3) - (sq & 0x7);
+  const n = squareRank(sq) - squareFile(sq);
   return (n >= 0 ? diag.shl64(n * 8) : diag.shr64(n * -8)).without(sq);
 });
 
 const ANTI_DIAG_RANGE = tabulate(sq => {
   const diag = new SquareSet(0x1020_4080, 0x0102_0408);
-  const n = (sq >> 3) + (sq & 0x7) - 7;
+  const n = squareRank(sq) + squareFile(sq) - 7;
   return (n >= 0 ? diag.shl64(n * 8) : diag.shr64(n * -8)).without(sq);
 });
 

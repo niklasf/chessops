@@ -8,18 +8,18 @@ export function opposite(color: Color): Color {
   return color === 'white' ? 'black' : 'white';
 }
 
-export function squareDist(a: Square, b: Square): number {
-  const x1 = a & 0x7, x2 = b & 0x7;
-  const y1 = a >> 3, y2 = b >> 3;
-  return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
-}
-
 export function squareRank(square: Square): number {
   return square >> 3;
 }
 
 export function squareFile(square: Square): number {
   return square & 0x7;
+}
+
+export function squareDist(a: Square, b: Square): number {
+  const x1 = squareFile(a), x2 = squareFile(b);
+  const y1 = squareRank(a), y2 = squareRank(b);
+  return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
 }
 
 export function roleToChar(role: Role): string {
@@ -55,7 +55,7 @@ export function parseSquare(str: string): Square | undefined {
 }
 
 export function makeSquare(square: Square): SquareName {
-  return ('abcdefgh'[square & 0x7] + '12345678'[square >> 3]) as SquareName;
+  return ('abcdefgh'[squareFile(square)] + '12345678'[squareRank(square)]) as SquareName;
 }
 
 export function parseUci(str: string): Move | undefined {
