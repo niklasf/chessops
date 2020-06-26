@@ -104,8 +104,8 @@ export class Board implements Iterable<[Square, Piece]> {
   get(square: Square): Piece | undefined {
     const color = this.getColor(square);
     if (!color) return;
-    const promoted = this.promoted.has(square);
     const role = this.getRole(square)!;
+    const promoted = this.promoted.has(square);
     return { color, role, promoted };
   }
 
