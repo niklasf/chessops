@@ -242,7 +242,7 @@ export class Antichess extends Chess {
     ctx = ctx || this.ctx();
     const dests = this.pseudoDests(square, ctx);
     if (!ctx.mustCapture) return dests;
-    else return dests.intersect(this.board[opposite(this.turn)]);
+    return dests.intersect(this.board[opposite(this.turn)]);
   }
 
   hasInsufficientMaterial(color: Color): boolean {

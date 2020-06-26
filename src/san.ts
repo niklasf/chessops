@@ -55,8 +55,8 @@ export function makeSanAndPlay(pos: Position, move: Move): string {
   const san = makeSanWithoutSuffix(pos, move);
   pos.play(move);
   if (pos.outcome()?.winner) return san + '#';
-  else if (pos.isCheck()) return san + '+';
-  else return san;
+  if (pos.isCheck()) return san + '+';
+  return san;
 }
 
 export function makeSanVariation(pos: Position, variation: Move[]): string {

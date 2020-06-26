@@ -19,7 +19,7 @@
     "quotes": ["warn", "single"],
     "semi": ["error", "always"],
     "eqeqeq": ["error", "smart"],
-    "@typescript-eslint/semi": ["warn"],
+    "@typescript-eslint/semi": "warn",
     "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }],
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-explicit-any": "off",
