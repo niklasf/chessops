@@ -3,7 +3,7 @@ import { Square, Color } from './types';
 function popcnt32(n: number): number {
   n = n - ((n >>> 1) & 0x5555_5555);
   n = (n & 0x3333_3333) + ((n >>> 2) & 0x3333_3333);
-  return ((n + (n >>> 4) & 0x0f0f_0f0f) * 0x0101_0101) >> 24;
+  return Math.imul(n + (n >>> 4) & 0x0f0f_0f0f, 0x0101_0101) >> 24;
 }
 
 function bswap32(n: number): number {
