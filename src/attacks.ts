@@ -2,30 +2,26 @@ import { squareDist } from './util';
 import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
 
-function computeRange(square: Square, deltas: number[], stepper: boolean): SquareSet {
+function computeRange(square: Square, deltas: number[]): SquareSet {
   let range = SquareSet.empty();
   for (const delta of deltas) {
-    for (let sq = square + delta; 0 <= sq && sq < 64 && squareDist(sq, sq - delta) <= 2; sq += delta) {
-      range = range.with(sq);
-      if (stepper) break;
-    }
+    const sq = square + delta;
+    if (0 <= sq && sq < 64 && squareDist(square, sq) <= 2) range = range.with(sq);
   }
   return range;
 }
 
-function computeTable(deltas: number[], stepper: boolean): BySquare<SquareSet> {
+function tabulate<T>(f: (square: Square) => T): BySquare<T> {
   const table = [];
-  for (let square = 0; square < 64; square++) {
-    table[square] = computeRange(square, deltas, stepper);
-  }
+  for (let square = 0; square < 64; square++) table[square] = f(square);
   return table;
 }
 
-const KING_ATTACKS = computeTable([-9, -8, -7, -1, 1, 7, 8, 9], true);
-const KNIGHT_ATTACKS = computeTable([-17, -15, -10, -6, 6, 10, 15, 17], true);
+const KING_ATTACKS = tabulate(sq => computeRange(sq, [-9, -8, -7, -1, 1, 7, 8, 9]));
+const KNIGHT_ATTACKS = tabulate(sq => computeRange(sq, [-17, -15, -10, -6, 6, 10, 15, 17]));
 const PAWN_ATTACKS = {
-  white: computeTable([7, 9], true),
-  black: computeTable([-7, -9], true),
+  white: tabulate(sq => computeRange(sq, [7, 9])),
+  black: tabulate(sq => computeRange(sq, [-7, -9])),
 };
 
 export function kingAttacks(square: Square): SquareSet {
@@ -40,10 +36,20 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
   return PAWN_ATTACKS[color][square];
 }
 
-const FILE_RANGE = computeTable([-8, 8], false);
-const RANK_RANGE = computeTable([-1, 1], false);
-const DIAG_RANGE = computeTable([-9, 9], false);
-const ANTI_DIAG_RANGE = computeTable([-7, 7], false);
+const FILE_RANGE = tabulate(sq => SquareSet.fromFile(sq & 0x7).without(sq));
+const RANK_RANGE = tabulate(sq => SquareSet.fromRank(sq >> 3).without(sq));
+
+const DIAG_RANGE = tabulate(sq => {
+  const diag = new SquareSet(0x0804_0201, 0x8040_2010);
+  const n = (sq >> 3) - (sq & 0x7);
+  return (n >= 0 ? diag.shl64(n * 8) : diag.shr64(n * -8)).without(sq);
+});
+
+const ANTI_DIAG_RANGE = tabulate(sq => {
+  const diag = new SquareSet(0x1020_4080, 0x0102_0408);
+  const n = (sq >> 3) + (sq & 0x7) - 7;
+  return (n >= 0 ? diag.shl64(n * 8) : diag.shr64(n * -8)).without(sq);
+});
 
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
   let forward = occupied.intersect(range);
