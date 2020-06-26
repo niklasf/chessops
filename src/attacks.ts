@@ -43,14 +43,14 @@ const RANK_RANGE = tabulate(sq => SquareSet.fromRank(squareRank(sq)).without(sq)
 
 const DIAG_RANGE = tabulate(sq => {
   const diag = new SquareSet(0x0804_0201, 0x8040_2010);
-  const n = squareRank(sq) - squareFile(sq);
-  return (n >= 0 ? diag.shl64(n * 8) : diag.shr64(n * -8)).without(sq);
+  const shift = 8 * (squareRank(sq) - squareFile(sq));
+  return (shift >= 0 ? diag.shl64(shift) : diag.shr64(-shift)).without(sq);
 });
 
 const ANTI_DIAG_RANGE = tabulate(sq => {
   const diag = new SquareSet(0x1020_4080, 0x0102_0408);
-  const n = squareRank(sq) + squareFile(sq) - 7;
-  return (n >= 0 ? diag.shl64(n * 8) : diag.shr64(n * -8)).without(sq);
+  const shift = 8 * (squareRank(sq) + squareFile(sq) - 7);
+  return (shift >= 0 ? diag.shl64(shift) : diag.shr64(-shift)).without(sq);
 });
 
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
