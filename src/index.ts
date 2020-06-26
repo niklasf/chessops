@@ -31,7 +31,6 @@ export {
   parseSquare,
   parseUci,
   roleToChar,
-  squareDist,
   squareFile,
   squareRank,
 } from './util';

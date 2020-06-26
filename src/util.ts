@@ -16,12 +16,6 @@ export function squareFile(square: Square): number {
   return square & 0x7;
 }
 
-export function squareDist(a: Square, b: Square): number {
-  const x1 = squareFile(a), x2 = squareFile(b);
-  const y1 = squareRank(a), y2 = squareRank(b);
-  return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
-}
-
 export function roleToChar(role: Role): string {
   switch (role) {
   case 'pawn': return 'p';

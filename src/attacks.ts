@@ -1,4 +1,4 @@
-import { squareDist, squareFile, squareRank } from './util';
+import { squareFile, squareRank } from './util';
 import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
 
@@ -6,7 +6,9 @@ function computeRange(square: Square, deltas: number[]): SquareSet {
   let range = SquareSet.empty();
   for (const delta of deltas) {
     const sq = square + delta;
-    if (0 <= sq && sq < 64 && squareDist(square, sq) <= 2) range = range.with(sq);
+    if (0 <= sq && sq < 64 && Math.abs(squareFile(square) - squareFile(sq)) <= 2) {
+      range = range.with(sq);
+    }
   }
   return range;
 }
