@@ -12,7 +12,8 @@
     "module": "commonjs",
     "outDir": "",
     "declarationDir": "",
-    "declaration": true
+    "declaration": true,
+    "sourceMap": true
   },
   "include": ["src"]
 }
