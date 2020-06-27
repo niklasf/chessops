@@ -13,6 +13,7 @@
   "repository": "https://github.com/niklasf/chessops",
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>",
   "license": "GPL-3.0-or-later",
+  "type": "commonjs",
   "dependencies": {
     "@badrap/result": "^0.2.6"
   },
