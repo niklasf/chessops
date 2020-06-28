@@ -1,6 +1,13 @@
 Changelog for chessops
 ======================
 
+v0.5.0
+------
+
+* Removed `util.squareDist()`.
+* Further optimized initialization.
+* Packaged source map.
+
 v0.4.2
 ------
 
