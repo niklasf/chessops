@@ -242,7 +242,6 @@ export abstract class Position {
       if (move.promotion === 'king' && this.rules !== 'antichess') return false;
       if (!move.promotion && this.board.pawn.has(move.from) && SquareSet.backranks().has(move.to)) return false;
       return this.dests(move.from, ctx).has(move.to);
-
     }
   }
 
