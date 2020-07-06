@@ -2,17 +2,20 @@ import { Rules, SquareName, Move, isDrop } from './types';
 import { makeSquare, squareFile } from './util';
 import { Position } from './chess';
 
-export function chessgroundDests(pos: Position): Map<SquareName, SquareName[]> {
+export interface ChessgroundDestsOpts {
+  chess960?: boolean;
+}
+
+export function chessgroundDests(pos: Position, opts?: ChessgroundDestsOpts): Map<SquareName, SquareName[]> {
   const result = new Map();
   const ctx = pos.ctx();
   for (const [from, squares] of pos.allDests(ctx)) {
     if (squares.isEmpty()) continue;
 
     // Chessground needs both types of castling dests and filters based on a
-    // rookCastles setting. The following will also allow 2-step castling moves
-    // in some Chess960 positions.
+    // rookCastles setting.
     const d = Array.from(squares, makeSquare);
-    if (from === ctx.king && squareFile(from) === 4) {
+    if (!opts?.chess960 && from === ctx.king && squareFile(from) === 4) {
       if (squares.has(0)) d.push('c1');
       else if (squares.has(56)) d.push('c8');
       if (squares.has(7)) d.push('g1');
