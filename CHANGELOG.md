@@ -1,6 +1,14 @@
 Changelog for chessops
 ======================
 
+v0.6.0 (upcoming)
+-----------------
+
+* Updated `chessgroundDests` for chessground 7.8 compatibility.
+* Added `chessgroundDests(pos, {chess960: true})` to generate only
+  Chess960-style castling moves.
+* Renamed `scalachessId` to `scalachessCharPair`.
+
 v0.5.0
 ------
 
