@@ -109,8 +109,8 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   if (promotion === 'king' && pos.rules !== 'antichess') return;
 
   let candidates = pos.board.pieces(pos.turn, role);
-  if (match[1]) candidates = candidates.intersect(SquareSet.fromFile(match[1].charCodeAt(0) - 97));
-  if (match[2]) candidates = candidates.intersect(SquareSet.fromRank(match[2].charCodeAt(0) - 49));
+  if (match[2]) candidates = candidates.intersect(SquareSet.fromFile(match[1].charCodeAt(0) - 97));
+  if (match[3]) candidates = candidates.intersect(SquareSet.fromRank(match[2].charCodeAt(0) - 49));
 
   // Optimization: Reduce set of candidates
   const pawnAdvance = role === 'pawn' ? SquareSet.fromFile(squareFile(to)) : SquareSet.empty();
