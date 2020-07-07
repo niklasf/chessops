@@ -1,5 +1,5 @@
 import { parseUci } from '../src/util';
-import { makeSan, makeSanVariation } from '../src/san';
+import { makeSan, makeSanVariation, parseSan } from '../src/san';
 import { Chess } from '../src/chess';
 import { parseFen } from '../src/fen';
 import { Crazyhouse } from '../src/variant';
@@ -32,4 +32,10 @@ test('en passant', () => {
   const pos = Chess.fromSetup(setup).unwrap();
   const move = parseUci('e5d6')!;
   expect(makeSan(pos, move)).toBe('exd6#');
+});
+
+test('parse', () => {
+  const pos = Chess.default();
+  const move = parseSan(pos, 'e4');
+  expect(move).toEqual(parseUci('e2e4'));
 });
