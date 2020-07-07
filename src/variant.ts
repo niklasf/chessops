@@ -192,15 +192,9 @@ export class Antichess extends Chess {
   }
 
   static default(): Antichess {
-    const pos = new this();
-    pos.board = Board.default();
-    pos.turn = 'white';
+    const pos = super.default();
     pos.castles = Castles.empty();
-    pos.epSquare = undefined;
-    pos.remainingChecks = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
-    return pos;
+    return pos as Antichess;
   }
 
   static fromSetup(setup: Setup): Result<Antichess, PositionError> {
@@ -350,6 +344,7 @@ class RacingKings extends Chess {
   static default(): RacingKings {
     const pos = new this();
     pos.board = Board.racingKings();
+    pos.pockets = undefined;
     pos.turn = 'white';
     pos.castles = Castles.empty();
     pos.epSquare = undefined;
