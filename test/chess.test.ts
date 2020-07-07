@@ -92,6 +92,11 @@ test('castling moves', () => {
   expect(makeFen(pos.toSetup())).toBe('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/2KR3R b k - 1 20');
 });
 
+test('test illegal promotion', () => {
+  const pos = Chess.default();
+  expect(pos.isLegal({from: 12, to: 20, promotion: 'queen'})).toBe(false);
+});
+
 test('starting perft', () => {
   const pos = Chess.default();
   expect(perft(pos, 0, false)).toBe(1);
