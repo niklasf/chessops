@@ -47,8 +47,11 @@ export function charToRole(ch: string): Role | undefined {
 export function parseSquare(str: SquareName): Square;
 export function parseSquare(str: string): Square | undefined;
 export function parseSquare(str: string): Square | undefined {
-  if (!/^[a-h][1-8]$/.test(str)) return;
-  return str.charCodeAt(0) - 'a'.charCodeAt(0) + 8 * (str.charCodeAt(1) - '1'.charCodeAt(0));
+  if (str.length !== 2) return;
+  const file = str.charCodeAt(0) - 'a'.charCodeAt(0);
+  const rank = str.charCodeAt(1) - '1'.charCodeAt(0);
+  if (file < 0 || file >= 8 || rank < 0 || rank >= 8) return;
+  return file + 8 * rank;
 }
 
 export function makeSquare(square: Square): SquareName {
