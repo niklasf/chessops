@@ -64,8 +64,8 @@ export function makeSanVariation(pos: Position, variation: Move[]): string {
   const line = [];
   for (let i = 0; i < variation.length; i++) {
     if (i !== 0) line.push(' ');
-    if (pos.turn === 'white') line.push(pos.fullmoves + '. ');
-    else if (i === 0) line.push(pos.fullmoves + '... ');
+    if (pos.turn === 'white') line.push(pos.fullmoves, '. ');
+    else if (i === 0) line.push(pos.fullmoves, '... ');
     const san = makeSanWithoutSuffix(pos, variation[i]);
     pos.play(variation[i]);
     line.push(san);
