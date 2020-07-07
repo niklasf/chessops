@@ -6,15 +6,15 @@ import { Board } from './board';
 import { Position } from './chess';
 
 export function squareSet(squares: SquareSet): string {
-  let r = '';
+  const r = [];
   for (let y = 7; y >= 0; y--) {
     for (let x = 0; x < 8; x++) {
       const square = x + y * 8;
-      r += squares.has(square) ? '1' : '.';
-      r += x < 7 ? ' ' : '\n';
+      r.push(squares.has(square) ? '1' : '.');
+      r.push(x < 7 ? ' ' : '\n');
     }
   }
-  return r;
+  return r.join('');
 }
 
 export function piece(piece: Piece): string {
@@ -22,17 +22,17 @@ export function piece(piece: Piece): string {
 }
 
 export function board(board: Board): string {
-  let r = '';
+  const r = [];
   for (let y = 7; y >= 0; y--) {
     for (let x = 0; x < 8; x++) {
       const square = x + y * 8;
       const p = board.get(square);
       const col = p ? piece(p) : '.';
-      r += col;
-      r += x < 7 ? (col.length < 2 ? ' ' : '') : '\n';
+      r.push(col);
+      r.push(x < 7 ? (col.length < 2 ? ' ' : '') : '\n');
     }
   }
-  return r;
+  return r.join('');
 }
 
 export function square(sq: Square): string {
@@ -53,12 +53,13 @@ export function perft(pos: Position, depth: number, log = false): number {
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
   if (pos.rules === 'antichess') promotionRoles.push('king');
 
-  const dropDests = pos.dropDests(pos.ctx());
+  const ctx = pos.ctx();
+  const dropDests = pos.dropDests(ctx);
 
   if (!log && depth === 1 && dropDests.isEmpty()) {
     // Optimization for leaf nodes.
     let nodes = 0;
-    for (const [from, to] of pos.allDests()) {
+    for (const [from, to] of pos.allDests(ctx)) {
       nodes += to.size();
       if (pos.board.pawn.has(from)) {
         const backrank = SquareSet.backrank(opposite(pos.turn));
@@ -68,7 +69,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     return nodes;
   } else {
     let nodes = 0;
-    for (const [from, dests] of pos.allDests()) {
+    for (const [from, dests] of pos.allDests(ctx)) {
       const promotions: Array<Role | undefined> =
         (squareRank(from) === (pos.turn === 'white' ? 6 : 1) && pos.board.pawn.has(from)) ?
           promotionRoles : [undefined];
