@@ -28,7 +28,7 @@ Features
 * Supports Chess960
 * [Attacks and rays](https://niklasf.github.io/chessops/modules/_attacks_.html) using hyperbola quintessence
 * Read and write UCI move notation
-* [Write SAN](https://niklasf.github.io/chessops/modules/_san_.html)
+* [Read and write SAN](https://niklasf.github.io/chessops/modules/_san_.html)
 * [Position hashing](https://niklasf.github.io/chessops/modules/_hash_.html)
 * [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
 * [Compatibility](https://niklasf.github.io/chessops/modules/_compat_.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
