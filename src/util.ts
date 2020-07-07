@@ -1,5 +1,8 @@
 import { Color, Square, Role, Move, isDrop, SquareName } from './types';
 
+export const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+export const RANKS = ['1', '2', '3', '4', '5', '6', '7', '8'];
+
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
 }
@@ -49,7 +52,7 @@ export function parseSquare(str: string): Square | undefined {
 }
 
 export function makeSquare(square: Square): SquareName {
-  return ('abcdefgh'[squareFile(square)] + '12345678'[squareRank(square)]) as SquareName;
+  return FILES[squareFile(square)] + RANKS[squareRank(square)] as SquareName;
 }
 
 export function parseUci(str: string): Move | undefined {
