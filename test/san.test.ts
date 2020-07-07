@@ -34,7 +34,7 @@ test('en passant', () => {
   expect(makeSan(pos, move)).toBe('exd6#');
 });
 
-test('parse', () => {
+test('parse basic san', () => {
   const pos = Chess.default();
   expect(parseSan(pos, 'e4')).toEqual(parseUci('e2e4'));
   expect(parseSan(pos, 'Nf3')).toEqual(parseUci('g1f3'));
@@ -43,4 +43,16 @@ test('parse', () => {
   expect(parseSan(pos, 'O-O')).toBeUndefined();
   expect(parseSan(pos, 'O-O-O')).toBeUndefined();
   expect(parseSan(pos, 'Q@e3')).toBeUndefined();
+});
+
+test('parse fools mate', () => {
+  const pos = Chess.default();
+  pos.play(parseSan(pos, 'e4')!);
+  pos.play(parseSan(pos, 'e5')!);
+  pos.play(parseSan(pos, 'Qh5')!);
+  pos.play(parseSan(pos, 'Nf6')!);
+  pos.play(parseSan(pos, 'Bc4')!);
+  pos.play(parseSan(pos, 'Nc6')!);
+  pos.play(parseSan(pos, 'Qxf7#')!);
+  expect(pos.isCheckmate()).toBe(true);
 });
