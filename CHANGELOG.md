@@ -1,8 +1,8 @@
 Changelog for chessops
 ======================
 
-v0.6.0 (upcoming)
------------------
+v0.6.0
+------
 
 * Updated `chessgroundDests` for chessground 7.8 compatibility.
 * Added `chessgroundDests(pos, {chess960: true})` to generate only
