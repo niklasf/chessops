@@ -61,19 +61,19 @@ export function makeSanAndPlay(pos: Position, move: Move): string {
 
 export function makeSanVariation(pos: Position, variation: Move[]): string {
   pos = pos.clone();
-  let line = '';
+  const line = [];
   for (let i = 0; i < variation.length; i++) {
-    if (i !== 0) line += ' ';
-    if (pos.turn === 'white') line += pos.fullmoves + '. ';
-    else if (i === 0) line = pos.fullmoves + '... ';
+    if (i !== 0) line.push(' ');
+    if (pos.turn === 'white') line.push(pos.fullmoves + '. ');
+    else if (i === 0) line.push(pos.fullmoves + '... ');
     const san = makeSanWithoutSuffix(pos, variation[i]);
     pos.play(variation[i]);
-    line += san;
-    if (san === '--') return line;
-    if (i === variation.length - 1 && pos.outcome()?.winner) line += '#';
-    else if (pos.isCheck()) line += '+';
+    line.push(san);
+    if (san === '--') return line.join('');
+    if (i === variation.length - 1 && pos.outcome()?.winner) line.push('#');
+    else if (pos.isCheck()) line.push('+');
   }
-  return line;
+  return line.join('');
 }
 
 export function makeSan(pos: Position, move: Move): string {
