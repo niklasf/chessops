@@ -36,6 +36,11 @@ test('en passant', () => {
 
 test('parse', () => {
   const pos = Chess.default();
-  const move = parseSan(pos, 'e4');
-  expect(move).toEqual(parseUci('e2e4'));
+  expect(parseSan(pos, 'e4')).toEqual(parseUci('e2e4'));
+  expect(parseSan(pos, 'Nf3')).toEqual(parseUci('g1f3'));
+  expect(parseSan(pos, 'Nf6')).toBeUndefined();
+  expect(parseSan(pos, 'Ke2')).toBeUndefined();
+  expect(parseSan(pos, 'O-O')).toBeUndefined();
+  expect(parseSan(pos, 'O-O-O')).toBeUndefined();
+  expect(parseSan(pos, 'Q@e3')).toBeUndefined();
 });
