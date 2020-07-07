@@ -96,11 +96,18 @@ export function parseSan(pos: Position, san: string): Move | undefined {
     };
   }
 
-  // TODO: Drop
-
   // Normal move
-  const match = san.match(/^([nbkrqNBKRQ])?([a-h])?([1-8])?[\-x]?([a-h][1-8])(=?[nbrqkNBRQK])?[\+#]?$/);
-  if (!match) return;
+  const match = san.match(/^([nbrqkNBRQK])?([a-h])?([1-8])?[\-x]?([a-h][1-8])(=?[nbrqkNBRQK])?[\+#]?$/);
+  if (!match) {
+    // Drop
+    const match = san.match(/^([pnbrqkPNBRQK])?@([a-h][1-8])[\+#]?$/);
+    if (!match) return;
+    const move = {
+      role: charToRole(match[1]) || 'pawn',
+      to: parseSquare(match[2])!,
+    };
+    return pos.isLegal(move) ? move : undefined;
+  }
   const role = charToRole(match[1]) || 'pawn';
   const to = parseSquare(match[4])!;
 
@@ -109,8 +116,8 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   if (promotion === 'king' && pos.rules !== 'antichess') return;
 
   let candidates = pos.board.pieces(pos.turn, role);
-  if (match[2]) candidates = candidates.intersect(SquareSet.fromFile(match[1].charCodeAt(0) - 97));
-  if (match[3]) candidates = candidates.intersect(SquareSet.fromRank(match[2].charCodeAt(0) - 49));
+  if (match[2]) candidates = candidates.intersect(SquareSet.fromFile(match[1].charCodeAt(0) - 'a'.charCodeAt(0)));
+  if (match[3]) candidates = candidates.intersect(SquareSet.fromRank(match[2].charCodeAt(0) - '1'.charCodeAt(0)));
 
   // Optimization: Reduce set of candidates
   const pawnAdvance = role === 'pawn' ? SquareSet.fromFile(squareFile(to)) : SquareSet.empty();
