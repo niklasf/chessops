@@ -106,7 +106,7 @@ export function parseSan(pos: Position, san: string): Move | undefined {
       role: charToRole(match[1]) || 'pawn',
       to: parseSquare(match[2])!,
     };
-    return pos.isLegal(move) ? move : undefined;
+    return pos.isLegal(move, ctx) ? move : undefined;
   }
   const role = charToRole(match[1]) || 'pawn';
   const to = parseSquare(match[4])!;
