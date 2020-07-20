@@ -78,6 +78,6 @@ export * as hash from './hash';
 
 export * as san from './san';
 
-export * as transfrom from './transform';
+export * as transform from './transform';
 
 export * as variant from './variant';
