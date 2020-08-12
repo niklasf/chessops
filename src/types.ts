@@ -62,9 +62,9 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
-export type Rules = 'chess' | 'antichess' | 'kingofthehill' | '3check' | 'atomic' | 'horde' | 'racingkings' | 'crazyhouse';
+export type Rules = 'chess' | 'giveaway' | 'kingofthehill' | '3check' | 'atomic' | 'horde' | 'racingkings' | 'crazyhouse';
 
-export const RULES: readonly Rules[] = ['chess', 'antichess', 'kingofthehill', '3check', 'atomic', 'horde', 'racingkings', 'crazyhouse'];
+export const RULES: readonly Rules[] = ['chess', 'giveaway', 'kingofthehill', '3check', 'atomic', 'horde', 'racingkings', 'crazyhouse'];
 
 export interface Outcome {
   winner: Color | undefined;

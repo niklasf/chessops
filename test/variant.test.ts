@@ -25,9 +25,9 @@ const variantPerfts: [Rules, string, string, number, number, number][] = [
   ['atomic', 'atomic960-castle-3', 'Rr2k1rR/3K4/3p4/8/8/8/7P/8 w kq -', 21, 465, 10631],
   ['atomic', 'shakmaty-bench', 'rn2kb1r/1pp1p2p/p2q1pp1/3P4/2P3b1/4PN2/PP3PPP/R2QKB1R b KQkq -', 40, 1238, 45237],
 
-  ['antichess', 'antichess-start', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - -', 20, 400, 8067],
-  ['antichess', 'a-pawn-vs-b-pawn', '8/1p6/8/8/8/8/P7/8 w - -', 2, 4, 4],
-  ['antichess', 'a-pawn-vs-c-pawn', '8/2p5/8/8/8/8/P7/8 w - -', 2, 4, 4],
+  ['giveaway', 'giveaway-start', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - -', 20, 400, 8067],
+  ['giveaway', 'a-pawn-vs-b-pawn', '8/1p6/8/8/8/8/P7/8 w - -', 2, 4, 4],
+  ['giveaway', 'a-pawn-vs-c-pawn', '8/2p5/8/8/8/8/P7/8 w - -', 2, 4, 4],
 ];
 
 test.each(variantPerfts)('variant perft: %s (%s): %s', (rules, name, fen, d1, d2, d3) => {
@@ -50,11 +50,11 @@ const insufficientMaterial: [Rules, string, boolean, boolean][] = [
   ['atomic', '8/5k2/8/8/8/8/5K2/4bb2 w - -', true, false],
   ['atomic', '8/5k2/8/8/8/8/5K2/4nb2 w - -', true, false],
 
-  ['antichess', '8/4bk2/8/8/8/8/3KB3/8 w - -', false, false],
-  ['antichess', '4b3/5k2/8/8/8/8/3KB3/8 w - -', false, false],
-  ['antichess', '8/8/8/6b1/8/3B4/4B3/5B2 w - -', true, true],
-  ['antichess', '8/8/5b2/8/8/3B4/3B4/8 w - -', true, false],
-  ['antichess', '8/5p2/5P2/8/3B4/1bB5/8/8 b - -', falseNegative, falseNegative],
+  ['giveaway', '8/4bk2/8/8/8/8/3KB3/8 w - -', false, false],
+  ['giveaway', '4b3/5k2/8/8/8/8/3KB3/8 w - -', false, false],
+  ['giveaway', '8/8/8/6b1/8/3B4/4B3/5B2 w - -', true, true],
+  ['giveaway', '8/8/5b2/8/8/3B4/3B4/8 w - -', true, false],
+  ['giveaway', '8/5p2/5P2/8/3B4/1bB5/8/8 b - -', falseNegative, falseNegative],
 
   ['kingofthehill', '8/5k2/8/8/8/8/3K4/8 w - -', false, false],
 

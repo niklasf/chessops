@@ -52,6 +52,8 @@ export function lichessVariantRules(variant: 'standard' | 'chess960' | 'antiches
     return 'kingofthehill';
   case 'racingKings':
     return 'racingkings';
+  case 'antichess':
+    return 'giveaway';
   default:
     return variant;
   }

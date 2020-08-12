@@ -113,7 +113,7 @@ export function parseSan(pos: Position, san: string): Move | undefined {
 
   const promotion = charToRole(match[5]);
   if (!!promotion !== (role === 'pawn' && SquareSet.backranks().has(to))) return;
-  if (promotion === 'king' && pos.rules !== 'antichess') return;
+  if (promotion === 'king' && pos.rules !== 'giveaway') return;
 
   let candidates = pos.board.pieces(pos.turn, role);
   if (match[2]) candidates = candidates.intersect(SquareSet.fromFile(match[1].charCodeAt(0) - 'a'.charCodeAt(0)));

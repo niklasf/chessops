@@ -186,26 +186,26 @@ export class Atomic extends Chess {
   }
 }
 
-export class Antichess extends Chess {
+export class Giveaway extends Chess {
   protected constructor() {
-    super('antichess');
+    super('giveaway');
   }
 
-  static default(): Antichess {
+  static default(): Giveaway {
     const pos = super.default();
     pos.castles = Castles.empty();
-    return pos as Antichess;
+    return pos as Giveaway;
   }
 
-  static fromSetup(setup: Setup): Result<Antichess, PositionError> {
+  static fromSetup(setup: Setup): Result<Giveaway, PositionError> {
     return super.fromSetup(setup).map(pos => {
       pos.castles = Castles.empty();
-      return pos as Antichess;
+      return pos as Giveaway;
     });
   }
 
-  clone(): Antichess {
-    return super.clone() as Antichess;
+  clone(): Giveaway {
+    return super.clone() as Giveaway;
   }
 
   protected validate(): Result<undefined, PositionError> {
@@ -486,7 +486,7 @@ export class Horde extends Chess {
 export function defaultPosition(rules: Rules): Position {
   switch (rules) {
   case 'chess': return Chess.default();
-  case 'antichess': return Antichess.default();
+  case 'giveaway': return Giveaway.default();
   case 'atomic': return Atomic.default();
   case 'horde': return Horde.default();
   case 'racingkings': return RacingKings.default();
@@ -499,7 +499,7 @@ export function defaultPosition(rules: Rules): Position {
 export function setupPosition(rules: Rules, setup: Setup): Result<Position, PositionError> {
   switch (rules) {
   case 'chess': return Chess.fromSetup(setup);
-  case 'antichess': return Antichess.fromSetup(setup);
+  case 'giveaway': return Giveaway.fromSetup(setup);
   case 'atomic': return Atomic.fromSetup(setup);
   case 'horde': return Horde.fromSetup(setup);
   case 'racingkings': return RacingKings.fromSetup(setup);
