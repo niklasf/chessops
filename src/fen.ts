@@ -296,6 +296,9 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     makeCastlingFen(setup.board, setup.unmovedRooks, opts),
     defined(setup.epSquare) ? makeSquare(setup.epSquare) : '-',
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
-    ...(opts && opts.epd ? [] : [setup.halfmoves, setup.fullmoves])
+    ...(opts && opts.epd ? [] : [
+      Math.max(0, Math.min(setup.halfmoves, 9999)),
+      Math.max(1, Math.min(setup.fullmoves, 9999)),
+    ])
   ].join(' ');
 }
