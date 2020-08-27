@@ -223,7 +223,7 @@ export function parsePiece(str: string): Piece | undefined {
 export function makePiece(piece: Piece, opts?: FenOpts): string {
   let r = roleToChar(piece.role);
   if (piece.color === 'white') r = r.toUpperCase();
-  if (opts && opts.promoted && piece.promoted) r += '~';
+  if (opts?.promoted && piece.promoted) r += '~';
   return r;
 }
 
@@ -264,7 +264,7 @@ export function makePockets(pocket: Material): string {
 }
 
 export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: FenOpts): string {
-  const shredder = opts && opts.shredder;
+  const shredder = opts?.shredder;
   let fen = '';
   for (const color of COLORS) {
     const backrank = SquareSet.backrank(color);
@@ -296,7 +296,7 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     makeCastlingFen(setup.board, setup.unmovedRooks, opts),
     defined(setup.epSquare) ? makeSquare(setup.epSquare) : '-',
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
-    ...(opts && opts.epd ? [] : [
+    ...(opts?.epd ? [] : [
       Math.max(0, Math.min(setup.halfmoves, 9999)),
       Math.max(1, Math.min(setup.fullmoves, 9999)),
     ])
