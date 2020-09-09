@@ -27,6 +27,11 @@ export function chessgroundDests(pos: Position, opts?: ChessgroundDestsOpts): Ma
   return result;
 }
 
+export function chessgroundMove(move: Move): SquareName[] {
+  if (isDrop(move)) return [makeSquare(move.to)];
+  return [makeSquare(move.from), makeSquare(move.to)];
+}
+
 export function scalachessCharPair(move: Move): string {
   if (isDrop(move)) return String.fromCharCode(
     35 + move.to,
