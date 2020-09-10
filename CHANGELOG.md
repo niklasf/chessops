@@ -1,6 +1,18 @@
 Changelog for chessops
 ======================
 
+v0.7.0
+------
+
+* Added `parseSan`.
+* Added `chessgroundMove` compatibility.
+* Added `FILES` and `RANKS` constants.
+* Fix spelling of export: `transfrom` -> `transform`.
+* Added `{MaterialSide,Material}.{fromBoard,add}()`.
+* Clamp move counters in FEN export for guaranteed reparsability.
+* Reject promotions not on backrank.
+* Micro-optimizations.
+
 v0.6.0
 ------
 

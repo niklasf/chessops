@@ -25,11 +25,13 @@ export {
 export {
   charToRole,
   defined,
+  FILES,
   makeSquare,
   makeUci,
   opposite,
   parseSquare,
   parseUci,
+  RANKS,
   roleToChar,
   squareFile,
   squareRank,

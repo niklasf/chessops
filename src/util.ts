@@ -1,7 +1,7 @@
 import { Color, Square, Role, Move, isDrop, SquareName } from './types';
 
-export const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-export const RANKS = ['1', '2', '3', '4', '5', '6', '7', '8'];
+export const FILES: readonly string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+export const RANKS: readonly string[] = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
