@@ -255,7 +255,7 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
   return fen;
 }
 
-function makePocket(material: MaterialSide): string {
+export function makePocket(material: MaterialSide): string {
   return ROLES.map(role => roleToChar(role).repeat(material[role])).join('');
 }
 

@@ -18,9 +18,21 @@ export class MaterialSide {
     return m;
   }
 
+  static fromBoard(board: Board, color: Color): MaterialSide {
+    const m = new MaterialSide();
+    for (const role of ROLES) m[role] = board.pieces(color, role).size();
+    return m;
+  }
+
   clone(): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = this[role];
+    return m;
+  }
+
+  add(other: MaterialSide): MaterialSide {
+    const m = new MaterialSide();
+    for (const role of ROLES) m[role] = this[role] + other[role];
     return m;
   }
 
@@ -52,8 +64,16 @@ export class Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
   }
 
+  static fromBoard(board: Board): Material {
+    return new Material(MaterialSide.fromBoard(board, 'white'), MaterialSide.fromBoard(board, 'black'));
+  }
+
   clone(): Material {
     return new Material(this.white.clone(), this.black.clone());
+  }
+
+  add(other: Material): Material {
+    return new Material(this.white.add(other.white), this.black.add(other.black));
   }
 
   count(): number {
