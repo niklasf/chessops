@@ -11,25 +11,25 @@ export type SquareName = 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' |
 
 export type BySquare<T> = T[];
 
-export type Color = typeof COLORS[number];
-
 export const COLORS = ['white', 'black'] as const;
+
+export type Color = typeof COLORS[number];
 
 export type ByColor<T> = {
   [color in Color]: T;
 };
 
-export type Role = typeof ROLES[number];
-
 export const ROLES = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'] as const;
+
+export type Role = typeof ROLES[number];
 
 export type ByRole<T> = {
   [role in Role]: T;
 };
 
-export type CastlingSide = typeof CASTLING_SIDES[number];
-
 export const CASTLING_SIDES = ['a', 'h'] as const;
+
+export type CastlingSide = typeof CASTLING_SIDES[number];
 
 export type ByCastlingSide<T> = {
   [side in CastlingSide]: T;
@@ -62,9 +62,9 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
-export type Rules = typeof RULES[number];
-
 export const RULES = ['chess', 'antichess', 'kingofthehill', '3check', 'atomic', 'horde', 'racingkings', 'crazyhouse'] as const;
+
+export type Rules = typeof RULES[number];
 
 export interface Outcome {
   winner: Color | undefined;
