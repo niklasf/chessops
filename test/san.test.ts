@@ -2,16 +2,16 @@ import { parseUci } from '../src/util';
 import { makeSan, makeSanVariation, parseSan } from '../src/san';
 import { Chess } from '../src/chess';
 import { parseFen, makeFen } from '../src/fen';
-import { Crazyhouse } from '../src/variant';
+import { Antichess, Crazyhouse } from '../src/variant';
 
-test('variation with king move', () => {
+test('make variation with king move', () => {
   const pos = Chess.default();
   const variation = 'e2e4 e7e5 e1e2'.split(' ').map(uci => parseUci(uci)!);
   expect(makeSanVariation(pos, variation)).toBe('1. e4 e5 2. Ke2');
   expect(pos).toEqual(Chess.default());
 });
 
-test('crazyhouse variation', () => {
+test('make crazyhouse variation', () => {
   const setup = parseFen('r4b1N~/1ppk1P2/p1b5/6p1/8/1PBPPq2/P1PR1P2/1K4N1/PNBRPPPrqnn b - - 71 36').unwrap();
   const pos = Crazyhouse.fromSetup(setup).unwrap();
   const variation = 'N@a3 b1b2 R@b1'.split(' ').map(uci => parseUci(uci)!);
@@ -19,7 +19,7 @@ test('crazyhouse variation', () => {
   expect(pos).toEqual(Crazyhouse.fromSetup(setup).unwrap());
 });
 
-test('stockfish line with many knight moves', () => {
+test('make stockfish line with many knight moves', () => {
   const setup = parseFen('2rq1rk1/pb1nbp1p/1pn3p1/3pP3/2pP4/1N3NPQ/PP3PBP/R1B1R1K1 w - - 0 16').unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
   const variation = 'b3d2 c6b4 e1d1 f8e8 d2f1 b4d3 f3e1 d3e1 d1e1 d7f8 f2f4 f8e6 c1e3 h7h5 f4f5 e6g5 e3g5 e7g5 f5f6 d8c7'.split(' ').map(uci => parseUci(uci)!);
@@ -27,7 +27,7 @@ test('stockfish line with many knight moves', () => {
   expect(pos).toEqual(Chess.fromSetup(setup).unwrap());
 });
 
-test('en passant', () => {
+test('make en passant', () => {
   const setup = parseFen('6bk/7b/8/3pP3/8/8/8/Q3K3 w - d6 0 2').unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
   const move = parseUci('e5d6')!;
@@ -57,4 +57,19 @@ test('parse pawn capture', () => {
   const line = ['e4', 'd5', 'c4', 'nf6', 'exd5'];
   for (const san of line) pos.play(parseSan(pos, san)!);
   expect(makeFen(pos.toSetup())).toBe('rnbqkb1r/ppp1pppp/5n2/3P4/2P5/8/PP1P1PPP/RNBQKBNR b KQkq - 0 3');
+});
+
+test('parse antichess', () => {
+  const pos = Antichess.default();
+  const line = [
+    'g3', 'Nh6', 'g4', 'Nxg4', 'b3', 'Nxh2', 'Rxh2', 'g5', 'Rxh7', 'Rxh7',
+    'Bh3', 'Rxh3', 'Nxh3', 'Na6', 'Nxg5', 'Nb4', 'Nxf7', 'Nxc2', 'Qxc2', 'Kxf7',
+    'Qxc7', 'Qxc7', 'a4', 'Qxc1', 'Ra3', 'Qxa3', 'Nxa3', 'b5', 'Nxb5', 'Rb8',
+    'Nxa7', 'Rxb3', 'Nxc8', 'Rg3', 'Nxe7', 'Bxe7', 'fxg3', 'Bh4', 'gxh4', 'd5',
+    'e4', 'dxe4', 'd3', 'exd3', 'Kf1', 'd2', 'Kg1', 'Kf6', 'a5', 'Ke6', 'a6',
+    'Kd7', 'a7', 'Kc7', 'h5',  'd1=B', 'a8=B', 'Bxh5', 'Bf3', 'Bxf3', 'Kg2',
+    'Bxg2#',
+  ];
+  for (const san of line) pos.play(parseSan(pos, san)!);
+  expect(makeFen(pos.toSetup())).toBe('8/2k5/8/8/8/8/6b1/8 w - - 0 32');
 });
