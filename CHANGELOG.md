@@ -1,6 +1,12 @@
 Changelog for chessops
 ======================
 
+v0.7.1
+------
+
+* Fixed `parseSan` with regard to pawn captures, promotions and some
+  disambiguated moves.
+
 v0.7.0
 ------
 
