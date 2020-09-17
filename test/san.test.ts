@@ -73,3 +73,16 @@ test('parse antichess', () => {
   for (const san of line) pos.play(parseSan(pos, san)!);
   expect(makeFen(pos.toSetup())).toBe('8/2k5/8/8/8/8/6b1/8 w - - 0 32');
 });
+
+test('parse crazyhouse', () => {
+  const pos = Crazyhouse.default();
+  const line = [
+    'd4', 'd5', 'Nc3', 'Bf5', 'e3', 'e6', 'Bd3', 'Bg6', 'Nf3', 'Bd6', 'O-O',
+    'Ne7', 'g3', 'Nbc6', 'Re1', 'O-O', 'Ne2', 'e5', 'dxe5', 'Nxe5', 'Nxe5',
+    'Bxe5', 'f4', 'N@f3+', 'Kg2', 'Nxe1+', 'Qxe1', 'Bd6', '@f3', '@e4', 'fxe4',
+    'dxe4', 'Bc4', '@f3+', 'Kf2', 'fxe2', 'Qxe2', 'N@h3+', 'Kg2', 'R@f2+',
+    'Qxf2', 'Nxf2', 'Kxf2', 'Q@f3+', 'Ke1', 'Bxf4', 'gxf4', 'Qdd1#',
+  ];
+  for (const san of line) pos.play(parseSan(pos, san)!);
+  expect(makeFen(pos.toSetup())).toBe('r4rk1/ppp1nppp/6b1/8/2B1pP2/4Pq2/PPP4P/R1BqK3[PPNNNBRp] w - - 1 25');
+});
