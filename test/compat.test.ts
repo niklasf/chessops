@@ -11,6 +11,12 @@ test('chessground dests with Kh8', () => {
   expect(dests.get('g7')).not.toContain('g8');
 });
 
+test('chessground dests with chess960 castle', () => {
+  const setup = parseFen('rk2r3/pppbnppp/3p2n1/P2Pp3/4P2q/R5NP/1PP2PP1/1KNQRB2 b Kkq - 0 1').unwrap();
+  const pos = Chess.fromSetup(setup).unwrap();
+  expect(chessgroundDests(pos).get('b8')).toEqual(['a8', 'c8', 'e8']);
+});
+
 test('uci char pair', () => {
   // regular moves
   expect(scalachessCharPair(parseUci('a1b1')!)).toBe('#$');
