@@ -1,7 +1,7 @@
 import { parseUci } from '../src/util';
 import { makeSan, makeSanVariation, parseSan } from '../src/san';
 import { Chess } from '../src/chess';
-import { parseFen } from '../src/fen';
+import { parseFen, makeFen } from '../src/fen';
 import { Crazyhouse } from '../src/variant';
 
 test('variation with king move', () => {
@@ -47,12 +47,14 @@ test('parse basic san', () => {
 
 test('parse fools mate', () => {
   const pos = Chess.default();
-  pos.play(parseSan(pos, 'e4')!);
-  pos.play(parseSan(pos, 'e5')!);
-  pos.play(parseSan(pos, 'Qh5')!);
-  pos.play(parseSan(pos, 'Nf6')!);
-  pos.play(parseSan(pos, 'Bc4')!);
-  pos.play(parseSan(pos, 'Nc6')!);
-  pos.play(parseSan(pos, 'Qxf7#')!);
+  const line = ['e4', 'e5', 'Qh5', 'Nf6', 'Bc4', 'Nc6', 'Qxf7#'];
+  for (const san of line) pos.play(parseSan(pos, san)!);
   expect(pos.isCheckmate()).toBe(true);
+});
+
+test('parse pawn capture', () => {
+  const pos = Chess.default();
+  const line = ['e4', 'd5', 'c4', 'nf6', 'exd5'];
+  for (const san of line) pos.play(parseSan(pos, san)!);
+  expect(makeFen(pos.toSetup())).toBe('rnbqkb1r/ppp1pppp/5n2/3P4/2P5/8/PP1P1PPP/RNBQKBNR b KQkq - 0 3');
 });
