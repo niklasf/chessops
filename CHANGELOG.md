@@ -1,6 +1,11 @@
 Changelog for chessops
 ======================
 
+v0.7.2
+------
+
+* Fixed insufficient material with same-color bishops on both sides.
+
 v0.7.1
 ------
 
