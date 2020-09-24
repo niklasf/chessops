@@ -558,7 +558,7 @@ export class Chess extends Position {
       const sameColor =
         !this.board.bishop.intersects(SquareSet.darkSquares()) ||
         !this.board.bishop.intersects(SquareSet.lightSquares());
-      return sameColor && this.board[opposite(color)].diff(this.board.king).diff(this.board.rook).diff(this.board.queen).isEmpty();
+      return sameColor && this.board.pawn.isEmpty() && this.board.knight.isEmpty();
     }
     return true;
   }
