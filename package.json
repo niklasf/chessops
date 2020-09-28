@@ -1,6 +1,6 @@
 {
   "name": "chessops",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Chess and chess variant rules and operations",
   "keywords": [
     "chess",
@@ -19,11 +19,11 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
-    "@typescript-eslint/eslint-plugin": "^4.2.0",
-    "@typescript-eslint/parser": "^4.2.0",
-    "eslint": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^4.3.0",
+    "@typescript-eslint/parser": "^4.3.0",
+    "eslint": "^7.10.0",
     "jest": "^26.1.0",
-    "ts-jest": "^26.4.0",
+    "ts-jest": "^26.4.1",
     "typedoc": "^0.19.2",
     "typescript": "^4.0.3"
   },

@@ -1,6 +1,15 @@
 Changelog for chessops
 ======================
 
+v0.7.3
+------
+
+* Fixed `parseSan()` to properly interpret moves like `bxc6` as a pawn capture
+  instead of a bishop move. Lowercase piece letters are no longer accepted,
+  e.g., `nf3` must be `Nf3`.
+* Fixed `Position.isLegal()` was not accepting the king-moves-two-squares
+  encoding for castling castling moves.
+
 v0.7.2
 ------
 
