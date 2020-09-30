@@ -97,7 +97,7 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   }
 
   // Normal move
-  const match = san.match(/^([nbrqkNBRQK])?([a-h])?([1-8])?[\-x]?([a-h][1-8])(?:=?([nbrqkNBRQK]))?[\+#]?$/);
+  const match = san.match(/^([NBRQK])?([a-h])?([1-8])?[\-x]?([a-h][1-8])(?:=?([nbrqkNBRQK]))?[\+#]?$/);
   if (!match) {
     // Drop
     const match = san.match(/^([pnbrqkPNBRQK])?@([a-h][1-8])[\+#]?$/);
