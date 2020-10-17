@@ -10,26 +10,24 @@ export function chessgroundDests(pos: Position, opts?: ChessgroundDestsOpts): Ma
   const result = new Map();
   const ctx = pos.ctx();
   for (const [from, squares] of pos.allDests(ctx)) {
-    if (squares.isEmpty()) continue;
-
-    // Chessground needs both types of castling dests and filters based on a
-    // rookCastles setting.
-    const d = Array.from(squares, makeSquare);
-    if (!opts?.chess960 && from === ctx.king && squareFile(from) === 4) {
-      if (squares.has(0)) d.push('c1');
-      else if (squares.has(56)) d.push('c8');
-      if (squares.has(7)) d.push('g1');
-      else if (squares.has(63)) d.push('g8');
+    if (squares.nonEmpty()) {
+      const d = Array.from(squares, makeSquare);
+      if (!opts?.chess960 && from === ctx.king && squareFile(from) === 4) {
+        // Chessground needs both types of castling dests and filters based on
+        // a rookCastles setting.
+        if (squares.has(0)) d.push('c1');
+        else if (squares.has(56)) d.push('c8');
+        if (squares.has(7)) d.push('g1');
+        else if (squares.has(63)) d.push('g8');
+      }
+      result.set(makeSquare(from), d);
     }
-
-    result.set(makeSquare(from), d);
   }
   return result;
 }
 
 export function chessgroundMove(move: Move): SquareName[] {
-  if (isDrop(move)) return [makeSquare(move.to)];
-  return [makeSquare(move.from), makeSquare(move.to)];
+  return isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
 }
 
 export function scalachessCharPair(move: Move): string {
