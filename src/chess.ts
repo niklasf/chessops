@@ -217,10 +217,6 @@ export abstract class Position {
       ((other.remainingChecks && this.remainingChecks?.equals(other.remainingChecks)) || (!this.remainingChecks && !other.remainingChecks));
   }
 
-  private legalEpSquare(): Square | undefined {
-    return this.hasLegalEp() ? this.epSquare : undefined;
-  }
-
   toSetup(): Setup {
     return {
       board: this.board.clone(),
@@ -369,15 +365,15 @@ export abstract class Position {
     }
   }
 
-  protected hasLegalEp(ctx?: Context): boolean {
-    if (!defined(this.epSquare)) return false;
+  private legalEpSquare(ctx?: Context): Square | undefined {
+    if (!defined(this.epSquare)) return;
     ctx = ctx || this.ctx();
     const ourPawns = this.board.pieces(this.turn, 'pawn');
     const candidates = ourPawns.intersect(pawnAttacks(opposite(this.turn), this.epSquare));
     for (const candidate of candidates) {
-      if (this.dests(candidate, ctx).has(this.epSquare)) return true;
+      if (this.dests(candidate, ctx).has(this.epSquare)) return this.epSquare;
     }
-    return false;
+    return;
   }
 }
 
