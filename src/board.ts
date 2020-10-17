@@ -88,6 +88,15 @@ export class Board implements Iterable<[Square, Piece]> {
     return board;
   }
 
+  equalsIgnorePromoted(other: Board): boolean {
+    if (!this.white.equals(other.white)) return false;
+    return ROLES.every(role => this[role].equals(other[role]));
+  }
+
+  equals(other: Board): boolean {
+    return this.equalsIgnorePromoted(other) && this.promoted.equals(other.promoted);
+  }
+
   getColor(square: Square): Color | undefined {
     if (this.white.has(square)) return 'white';
     if (this.black.has(square)) return 'black';

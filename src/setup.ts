@@ -30,6 +30,10 @@ export class MaterialSide {
     return m;
   }
 
+  equals(other: MaterialSide): boolean {
+    return ROLES.every(role => this[role] === other[role]);
+  }
+
   add(other: MaterialSide): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = this[role] + other[role];
@@ -72,6 +76,10 @@ export class Material {
     return new Material(this.white.clone(), this.black.clone());
   }
 
+  equals(other: Material): boolean {
+    return this.white.equals(other.white) && this.black.equals(other.black);
+  }
+
   add(other: Material): Material {
     return new Material(this.white.add(other.white), this.black.add(other.black));
   }
@@ -106,6 +114,10 @@ export class RemainingChecks {
 
   clone(): RemainingChecks {
     return new RemainingChecks(this.white, this.black);
+  }
+
+  equals(other: RemainingChecks): boolean {
+    return this.white === other.white && this.black === other.black;
   }
 }
 

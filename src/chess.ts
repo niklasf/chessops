@@ -207,13 +207,27 @@ export abstract class Position {
     return pos;
   }
 
+  equalsIgnoreHalfMoves(other: Position): boolean {
+    return this.rules === other.rules &&
+      (this.pockets ? this.board.equals(other.board) : this.board.equalsIgnorePromoted(other.board)) &&
+      ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
+      this.turn === other.turn &&
+      this.castles.unmovedRooks.equals(other.castles.unmovedRooks) &&
+      this.legalEpSquare() === other.legalEpSquare() &&
+      ((other.remainingChecks && this.remainingChecks?.equals(other.remainingChecks)) || (!this.remainingChecks && !other.remainingChecks));
+  }
+
+  private legalEpSquare(): Square | undefined {
+    return this.hasLegalEp() ? this.epSquare : undefined;
+  }
+
   toSetup(): Setup {
     return {
       board: this.board.clone(),
       pockets: this.pockets?.clone(),
       turn: this.turn,
       unmovedRooks: this.castles.unmovedRooks,
-      epSquare: this.hasLegalEp() ? this.epSquare : undefined,
+      epSquare: this.legalEpSquare(),
       remainingChecks: this.remainingChecks?.clone(),
       halfmoves: Math.min(this.halfmoves, 150),
       fullmoves: Math.min(Math.max(this.fullmoves, 1), 9999),
