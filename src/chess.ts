@@ -208,7 +208,7 @@ export abstract class Position {
     return pos;
   }
 
-  equalsIgnoreHalfMoves(other: Position): boolean {
+  equalsIgnoreMoves(other: Position): boolean {
     return this.rules === other.rules &&
       (this.pockets ? this.board.equals(other.board) : this.board.equalsIgnorePromoted(other.board)) &&
       ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
