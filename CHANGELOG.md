@@ -1,6 +1,15 @@
 Changelog for chessops
 ======================
 
+v0.7.4
+------
+
+* Added `IllegalSetup.ImpossibleCheck` and will now reject setups with too many
+  checkers or aligned sliding checkers. These positions are impossible to reach
+  and Stockfish does not work properly on them.
+* Added `equals()` to most classes, `Board.equalsIgnorePromoted()`, and
+  `Position.equalsIgnoreMoves()`.
+
 v0.7.3
 ------
 
