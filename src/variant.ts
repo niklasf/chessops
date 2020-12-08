@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
 import { Square, Outcome, Color, COLORS, Piece, Rules } from './types';
 import { defined, opposite } from './util';
-import { between, kingAttacks } from './attacks';
+import { between, kingAttacks, ray } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, RemainingChecks, Material } from './setup';
@@ -92,7 +92,7 @@ export class Atomic extends Chess {
   }
 
   protected validate(): Result<undefined, PositionError> {
-    // Like chess, but allow our king to be missing.
+    // Like chess, but allow our king to be missing and any number of checkers.
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() > 2) return Result.err(new PositionError(IllegalSetup.Kings));
     const otherKing = this.board.kingOf(opposite(this.turn));
@@ -362,9 +362,8 @@ class RacingKings extends Chess {
   }
 
   protected validate(): Result<undefined, PositionError> {
-    if (this.board.pawn.nonEmpty() || this.isCheck()) {
-      return Result.err(new PositionError(IllegalSetup.Variant));
-    }
+    if (this.isCheck()) return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+    if (this.board.pawn.nonEmpty()) return Result.err(new PositionError(IllegalSetup.Variant));
     return super.validate();
   }
 
@@ -452,6 +451,12 @@ export class Horde extends Chess {
       return Result.err(new PositionError(IllegalSetup.Kings));
     if (!this.board.king.diff(this.board.promoted).isSingleSquare())
       return Result.err(new PositionError(IllegalSetup.Kings));
+    const ourKing = this.board.kingOf(this.turn);
+    if (defined(ourKing)) {
+      const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
+      if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
+        return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+    }
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));

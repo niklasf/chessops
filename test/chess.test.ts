@@ -1,7 +1,6 @@
 import { SquareSet } from '../src/squareSet';
 import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
-import { Setup } from '../src/setup';
-import { Castles, Chess } from '../src/chess';
+import { Castles, Chess, IllegalSetup } from '../src/chess';
 import { perft } from '../src/debug';
 
 const tricky: [string, string, number, number, number, number?, number?][] = [
@@ -144,4 +143,9 @@ test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black)
   const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
   expect(pos.hasInsufficientMaterial('white')).toBe(white);
   expect(pos.hasInsufficientMaterial('black')).toBe(black);
+});
+
+test('impossible checker alignment', () => {
+  const result = Chess.fromSetup(parseFen('3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - - 0 1').unwrap());
+  expect(result.unwrap(_ => undefined, err => err.message)).toEqual(IllegalSetup.ImpossibleCheck);
 });

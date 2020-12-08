@@ -9,6 +9,7 @@ import { opposite, defined, squareRank } from './util';
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
+  ImpossibleCheck = 'ERR_IMPOSSIBLE_CHECK',
   PawnsOnBackrank = 'ERR_PAWNS_ON_BACKRANK',
   Kings = 'ERR_KINGS',
   Variant = 'ERR_VARIANT',
@@ -415,15 +416,21 @@ export class Chess extends Position {
   protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
-    if (!defined(this.board.kingOf(this.turn))) return Result.err(new PositionError(IllegalSetup.Kings));
+
+    const ourKing = this.board.kingOf(this.turn);
+    if (!defined(ourKing)) return Result.err(new PositionError(IllegalSetup.Kings));
+    const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
+    if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
+      return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
-    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
-    }
-    if (SquareSet.backranks().intersects(this.board.pawn)) {
+
+    if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
-    }
+
     return Result.ok(undefined);
   }
 

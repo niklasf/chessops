@@ -106,3 +106,10 @@ test('racing kings end', () => {
   expect(white.isEnd()).toBe(true);
   expect(white.outcome()).toStrictEqual({winner: 'white'});
 });
+
+test('atomic king exploded', () => {
+  const pos = setupPosition('atomic', parseFen('r4b1r/ppp1pppp/7n/8/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 3').unwrap()).unwrap();
+  expect(pos.isEnd()).toBe(true);
+  expect(pos.isVariantEnd()).toBe(true);
+  expect(pos.outcome()).toStrictEqual({winner: 'white'});
+});
