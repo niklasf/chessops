@@ -4,9 +4,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Setup node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
     - name: npm install, compile, test, lint
       run: |
         npm install
