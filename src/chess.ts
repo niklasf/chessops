@@ -417,17 +417,7 @@ export class Chess extends Position {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
 
-    const ourKing = this.board.kingOf(this.turn);
-    if (!defined(ourKing)) return Result.err(new PositionError(IllegalSetup.Kings));
-    const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
-    if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
-      return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-    if (defined(this.epSquare)) {
-      for (const checker of checkers) {
-        if (ray(checker, this.epSquare).has(ourKing))
-          return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-      }
-    }
+    if (!defined(this.board.kingOf(this.turn))) return Result.err(new PositionError(IllegalSetup.Kings));
 
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
@@ -437,6 +427,24 @@ export class Chess extends Position {
     if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
 
+    return this.validateCheckers();
+  }
+
+  protected validateCheckers(): Result<undefined, PositionError> {
+    const ourKing = this.board.kingOf(this.turn);
+    if (defined(ourKing)) {
+      // Multiple sliding checkers aligned with king.
+      const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
+      if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
+        return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+
+      // En passant square aligned with checker and king.
+      if (defined(this.epSquare)) {
+        for (const checker of checkers) {
+          if (ray(checker, this.epSquare).has(ourKing)) return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+        }
+      }
+    }
     return Result.ok(undefined);
   }
 

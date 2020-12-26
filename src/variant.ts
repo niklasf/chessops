@@ -451,12 +451,7 @@ export class Horde extends Chess {
       return Result.err(new PositionError(IllegalSetup.Kings));
     if (!this.board.king.diff(this.board.promoted).isSingleSquare())
       return Result.err(new PositionError(IllegalSetup.Kings));
-    const ourKing = this.board.kingOf(this.turn);
-    if (defined(ourKing)) {
-      const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
-      if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
-        return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-    }
+
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
@@ -465,7 +460,7 @@ export class Horde extends Chess {
         return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
       }
     }
-    return Result.ok(undefined);
+    return this.validateCheckers();
   }
 
   clone(): Horde {
