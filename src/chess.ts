@@ -422,6 +422,12 @@ export class Chess extends Position {
     const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
     if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
       return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+    if (defined(this.epSquare)) {
+      for (const checker of checkers) {
+        if (ray(checker, this.epSquare).has(ourKing))
+          return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+      }
+    }
 
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
