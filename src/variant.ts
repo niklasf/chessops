@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
 import { Square, Outcome, Color, COLORS, Piece, Rules } from './types';
 import { defined, opposite } from './util';
-import { between, kingAttacks, ray } from './attacks';
+import { between, kingAttacks } from './attacks';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, RemainingChecks, Material } from './setup';
