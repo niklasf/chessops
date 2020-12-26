@@ -146,6 +146,10 @@ test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black)
 });
 
 test('impossible checker alignment', () => {
+  // Multiple checkers aligned with king.
   const result = Chess.fromSetup(parseFen('3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - - 0 1').unwrap());
   expect(result.unwrap(_ => undefined, err => err.message)).toEqual(IllegalSetup.ImpossibleCheck);
+
+  // Checkers aligned with opponent king are fine.
+  Chess.fromSetup(parseFen('8/8/5k2/p1q5/PP1rp1P1/3P1N2/2RK1r2/5nN1 w - - 0 3').unwrap()).unwrap();
 });
