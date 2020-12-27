@@ -1,6 +1,8 @@
-import { FILES, RANKS } from './util';
+export const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 
 export type File = typeof FILES[number];
+
+export const RANKS = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
 
 export type Rank = typeof RANKS[number];
 
