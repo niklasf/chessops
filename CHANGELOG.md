@@ -1,6 +1,14 @@
 Changelog for chessops
 ======================
 
+v0.8.0
+------
+
+* Moved `FILES` and `RANKS` from `chessops/util` to `chessops/types`, and added
+  `File` and `Rank` string literal types.
+* Also reject positions where a checker is aligned with the en passant square
+  and the king as `IllegalSetup.ImpossibleCheck`.
+
 v0.7.4
 ------
 
