@@ -1,9 +1,9 @@
 import { Result } from '@badrap/result';
-import { Piece, Square, Color, COLORS, ROLES } from './types';
+import { Piece, Square, Color, COLORS, ROLES, FILES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
-import { FILES, defined, squareFile, parseSquare, makeSquare, roleToChar, charToRole } from './util';
+import { defined, squareFile, parseSquare, makeSquare, roleToChar, charToRole } from './util';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' w KQkq -';

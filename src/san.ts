@@ -1,5 +1,5 @@
-import { isDrop, Move, CastlingSide } from './types';
-import { FILES, RANKS, charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util';
+import { FILES, RANKS, isDrop, Move, CastlingSide } from './types';
+import { charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './chess';
 import { attacks, kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks';
