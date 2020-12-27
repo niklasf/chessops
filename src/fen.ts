@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Piece, Square, Color, COLORS, ROLES, FILES } from './types';
+import { Piece, Square, Color, COLORS, ROLES, FILE_NAMES } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
@@ -277,7 +277,7 @@ export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: Fe
       } else if (!shredder && rook === candidates.last() && king < rook) {
         fen += color === 'white' ? 'K' : 'k';
       } else {
-        const file = FILES[squareFile(rook)];
+        const file = FILE_NAMES[squareFile(rook)];
         fen += color === 'white' ? file.toUpperCase() : file;
       }
     }

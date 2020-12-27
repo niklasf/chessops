@@ -1,6 +1,8 @@
 export {
-  FILES,
-  RANKS,
+  FILE_NAMES,
+  RANK_NAMES,
+  FileName,
+  RankName,
   Square,
   SquareName,
   BySquare,

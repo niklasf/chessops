@@ -1,4 +1,4 @@
-import { FILES, RANKS, isDrop, Move, CastlingSide } from './types';
+import { FILE_NAMES, RANK_NAMES, isDrop, Move, CastlingSide } from './types';
 import { charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './chess';
@@ -37,11 +37,11 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
             let column = others.intersects(SquareSet.fromRank(squareRank(move.from)));
             if (others.intersects(SquareSet.fromFile(squareFile(move.from)))) row = true;
             else column = true;
-            if (column) san += FILES[squareFile(move.from)];
-            if (row) san += RANKS[squareRank(move.from)];
+            if (column) san += FILE_NAMES[squareFile(move.from)];
+            if (row) san += RANK_NAMES[squareRank(move.from)];
           }
         }
-      } else if (capture) san = FILES[squareFile(move.from)];
+      } else if (capture) san = FILE_NAMES[squareFile(move.from)];
 
       if (capture) san += 'x';
       san += makeSquare(move.to);

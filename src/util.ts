@@ -1,4 +1,4 @@
-import { FILES, RANKS, Color, Square, Role, Move, isDrop, SquareName } from './types';
+import { FILE_NAMES, RANK_NAMES, Color, Square, Role, Move, isDrop, SquareName } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -52,7 +52,7 @@ export function parseSquare(str: string): Square | undefined {
 }
 
 export function makeSquare(square: Square): SquareName {
-  return FILES[squareFile(square)] + RANKS[squareRank(square)] as SquareName;
+  return FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)] as SquareName;
 }
 
 export function parseUci(str: string): Move | undefined {
