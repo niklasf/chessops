@@ -1,4 +1,5 @@
 import { SquareSet } from '../src/squareSet';
+import { parseUci } from '../src/util';
 import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
 import { Castles, Chess, IllegalSetup } from '../src/chess';
 import { perft } from '../src/debug';
@@ -20,6 +21,7 @@ const tricky: [string, string, number, number, number, number?, number?][] = [
   // Regression tests
   ['ep-evasion', '8/8/8/5k2/3p4/8/4P3/4K3 w - -', 6, 54, 343, 2810, 19228],
   ['prison', '2b5/kpPp4/1p1P4/1P6/6p1/4p1P1/4PpPK/5B2 w - -', 1, 1, 1],
+  ['king-walk', '8/8/8/B2p3Q/2qPp1P1/b7/2P2PkP/4K2R b K -', 26, 611, 14583, 366807],
   ['a1-check', '4k3/5p2/5p1p/8/rbR5/1N6/5PPP/5K2 b - - 1 29', 22, 580, 12309],
 
   // https://github.com/ornicar/lila/issues/4625
@@ -156,4 +158,13 @@ test('impossible checker alignment', () => {
   // En passant square aligned with checker and king.
   const r2 = Chess.fromSetup(parseFen('8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 0 1').unwrap());
   expect(r2.unwrap(_ => undefined, err => err.message)).toEqual(IllegalSetup.ImpossibleCheck);
+});
+
+test('king captures unmoved rook', () => {
+  const pos = Chess.fromSetup(parseFen('8/8/8/B2p3Q/2qPp1P1/b7/2P2PkP/4K2R b K - 0 1').unwrap()).unwrap();
+  const move = parseUci('g2h1')!;
+  expect(move).toEqual({from: 14, to: 7});
+  expect(pos.isLegal(move)).toBe(true);
+  pos.play(move);
+  expect(makeFen(pos.toSetup())).toBe('8/8/8/B2p3Q/2qPp1P1/b7/2P2P1P/4K2k w - - 0 2');
 });
