@@ -71,8 +71,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     let nodes = 0;
     for (const [from, dests] of pos.allDests(ctx)) {
       const promotions: Array<Role | undefined> =
-        (squareRank(from) === (pos.turn === 'white' ? 6 : 1) && pos.board.pawn.has(from)) ?
-          promotionRoles : [undefined];
+        squareRank(from) === (pos.turn === 'white' ? 6 : 1) && pos.board.pawn.has(from) ? promotionRoles : [undefined];
       for (const to of dests) {
         for (const promotion of promotions) {
           const child = pos.clone();
@@ -87,7 +86,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     if (pos.pockets) {
       for (const role of ROLES) {
         if (pos.pockets[pos.turn][role] > 0) {
-          for (const to of (role === 'pawn' ? dropDests.diff(SquareSet.backranks()) : dropDests)) {
+          for (const to of role === 'pawn' ? dropDests.diff(SquareSet.backranks()) : dropDests) {
             const child = pos.clone();
             const move = { role, to };
             child.play(move);

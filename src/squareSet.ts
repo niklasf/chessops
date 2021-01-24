@@ -3,12 +3,12 @@ import { Square, Color } from './types';
 function popcnt32(n: number): number {
   n = n - ((n >>> 1) & 0x5555_5555);
   n = (n & 0x3333_3333) + ((n >>> 2) & 0x3333_3333);
-  return Math.imul(n + (n >>> 4) & 0x0f0f_0f0f, 0x0101_0101) >> 24;
+  return Math.imul((n + (n >>> 4)) & 0x0f0f_0f0f, 0x0101_0101) >> 24;
 }
 
 function bswap32(n: number): number {
-  n = (n >>> 8) & 0x00ff_00ff | ((n & 0x00ff_00ff) << 8);
-  return (n >>> 16) & 0xffff | ((n & 0xffff) << 16);
+  n = ((n >>> 8) & 0x00ff_00ff) | ((n & 0x00ff_00ff) << 8);
+  return ((n >>> 16) & 0xffff) | ((n & 0xffff) << 16);
 }
 
 function rbit32(n: number): number {
@@ -25,9 +25,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   static fromSquare(square: Square): SquareSet {
-    return square >= 32 ?
-      new SquareSet(0, 1 << (square - 32)) :
-      new SquareSet(1 << square, 0);
+    return square >= 32 ? new SquareSet(0, 1 << (square - 32)) : new SquareSet(1 << square, 0);
   }
 
   static fromRank(rank: number): SquareSet {
@@ -159,21 +157,21 @@ export class SquareSet implements Iterable<Square> {
   }
 
   with(square: Square): SquareSet {
-    return square >= 32 ?
-      new SquareSet(this.lo, this.hi | (1 << (square - 32))) :
-      new SquareSet(this.lo | (1 << square), this.hi);
+    return square >= 32
+      ? new SquareSet(this.lo, this.hi | (1 << (square - 32)))
+      : new SquareSet(this.lo | (1 << square), this.hi);
   }
 
   without(square: Square): SquareSet {
-    return square >= 32 ?
-      new SquareSet(this.lo, this.hi & ~(1 << (square - 32))) :
-      new SquareSet(this.lo & ~(1 << square), this.hi);
+    return square >= 32
+      ? new SquareSet(this.lo, this.hi & ~(1 << (square - 32)))
+      : new SquareSet(this.lo & ~(1 << square), this.hi);
   }
 
   toggle(square: Square): SquareSet {
-    return square >= 32 ?
-      new SquareSet(this.lo, this.hi ^ (1 << (square - 32))) :
-      new SquareSet(this.lo ^ (1 << square), this.hi);
+    return square >= 32
+      ? new SquareSet(this.lo, this.hi ^ (1 << (square - 32)))
+      : new SquareSet(this.lo ^ (1 << square), this.hi);
   }
 
   last(): Square | undefined {

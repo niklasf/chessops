@@ -15,7 +15,7 @@ export class Board implements Iterable<[Square, Piece]> {
   queen: SquareSet;
   king: SquareSet;
 
-  private constructor() { }
+  private constructor() {}
 
   static default(): Board {
     const board = new Board();

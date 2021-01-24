@@ -59,7 +59,16 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
-export const RULES = ['chess', 'antichess', 'kingofthehill', '3check', 'atomic', 'horde', 'racingkings', 'crazyhouse'] as const;
+export const RULES = [
+  'chess',
+  'antichess',
+  'kingofthehill',
+  '3check',
+  'atomic',
+  'horde',
+  'racingkings',
+  'crazyhouse',
+] as const;
 export type Rules = typeof RULES[number];
 
 export interface Outcome {

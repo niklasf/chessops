@@ -47,7 +47,8 @@ export class Crazyhouse extends Chess {
     // No material can leave the game, but we can easily check this for
     // custom positions.
     if (!this.pockets) return super.hasInsufficientMaterial(color);
-    return this.board.occupied.size() + this.pockets.count() <= 3 &&
+    return (
+      this.board.occupied.size() + this.pockets.count() <= 3 &&
       this.board.pawn.isEmpty() &&
       this.board.promoted.isEmpty() &&
       this.board.rooksAndQueens().isEmpty() &&
@@ -56,14 +57,20 @@ export class Crazyhouse extends Chess {
       this.pockets.white.rook <= 0 &&
       this.pockets.black.rook <= 0 &&
       this.pockets.white.queen <= 0 &&
-      this.pockets.black.queen <= 0;
+      this.pockets.black.queen <= 0
+    );
   }
 
   dropDests(ctx?: Context): SquareSet {
-    const mask = this.board.occupied.complement().intersect(
-      this.pockets?.[this.turn].hasNonPawns() ? SquareSet.full() :
-        this.pockets?.[this.turn].hasPawns() ? SquareSet.backranks().complement() :
-          SquareSet.empty());
+    const mask = this.board.occupied
+      .complement()
+      .intersect(
+        this.pockets?.[this.turn].hasNonPawns()
+          ? SquareSet.full()
+          : this.pockets?.[this.turn].hasPawns()
+          ? SquareSet.backranks().complement()
+          : SquareSet.empty()
+      );
 
     ctx = ctx || this.ctx();
     if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
@@ -167,7 +174,11 @@ export class Atomic extends Chess {
       const after = this.clone();
       after.play({ from: square, to });
       const ourKing = after.board.kingOf(this.turn);
-      if (defined(ourKing) && (!defined(after.board.kingOf(after.turn)) || after.kingAttackers(ourKing, after.turn, after.board.occupied).isEmpty())) {
+      if (
+        defined(ourKing) &&
+        (!defined(after.board.kingOf(after.turn)) ||
+          after.kingAttackers(ourKing, after.turn, after.board.occupied).isEmpty())
+      ) {
         dests = dests.with(to);
       }
     }
@@ -209,8 +220,7 @@ export class Antichess extends Chess {
   }
 
   protected validate(): Result<undefined, PositionError> {
-    if (this.board.occupied.isEmpty())
-      return Result.err(new PositionError(IllegalSetup.Empty));
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
     return Result.ok(undefined);
@@ -445,10 +455,8 @@ export class Horde extends Chess {
   }
 
   protected validate(): Result<undefined, PositionError> {
-    if (this.board.occupied.isEmpty())
-      return Result.err(new PositionError(IllegalSetup.Empty));
-    if (!this.board.king.isSingleSquare())
-      return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (!this.board.king.isSingleSquare()) return Result.err(new PositionError(IllegalSetup.Kings));
     if (!this.board.king.diff(this.board.promoted).isSingleSquare())
       return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -485,26 +493,42 @@ export class Horde extends Chess {
 
 export function defaultPosition(rules: Rules): Position {
   switch (rules) {
-  case 'chess': return Chess.default();
-  case 'antichess': return Antichess.default();
-  case 'atomic': return Atomic.default();
-  case 'horde': return Horde.default();
-  case 'racingkings': return RacingKings.default();
-  case 'kingofthehill': return KingOfTheHill.default();
-  case '3check': return ThreeCheck.default();
-  case 'crazyhouse': return Crazyhouse.default();
+    case 'chess':
+      return Chess.default();
+    case 'antichess':
+      return Antichess.default();
+    case 'atomic':
+      return Atomic.default();
+    case 'horde':
+      return Horde.default();
+    case 'racingkings':
+      return RacingKings.default();
+    case 'kingofthehill':
+      return KingOfTheHill.default();
+    case '3check':
+      return ThreeCheck.default();
+    case 'crazyhouse':
+      return Crazyhouse.default();
   }
 }
 
 export function setupPosition(rules: Rules, setup: Setup): Result<Position, PositionError> {
   switch (rules) {
-  case 'chess': return Chess.fromSetup(setup);
-  case 'antichess': return Antichess.fromSetup(setup);
-  case 'atomic': return Atomic.fromSetup(setup);
-  case 'horde': return Horde.fromSetup(setup);
-  case 'racingkings': return RacingKings.fromSetup(setup);
-  case 'kingofthehill': return KingOfTheHill.fromSetup(setup);
-  case '3check': return ThreeCheck.fromSetup(setup);
-  case 'crazyhouse': return Crazyhouse.fromSetup(setup);
+    case 'chess':
+      return Chess.fromSetup(setup);
+    case 'antichess':
+      return Antichess.fromSetup(setup);
+    case 'atomic':
+      return Atomic.fromSetup(setup);
+    case 'horde':
+      return Horde.fromSetup(setup);
+    case 'racingkings':
+      return RacingKings.fromSetup(setup);
+    case 'kingofthehill':
+      return KingOfTheHill.fromSetup(setup);
+    case '3check':
+      return ThreeCheck.fromSetup(setup);
+    case 'crazyhouse':
+      return Crazyhouse.fromSetup(setup);
   }
 }

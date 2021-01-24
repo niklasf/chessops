@@ -2,22 +2,22 @@ name: Publish documentation
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup node.js
-      uses: actions/setup-node@v2
-    - name: npm install, compile, test, generate docs
-      run: |
-        npm install
-        npm run doc
-    - run: touch docs/.nojekyll
-    - name: GitHub pages deploy
-      uses: maxheld83/ghpages@d79d57aa5f407fd3e0b06ed5b36a8d4fd74b8c1c
-      env:
-        BUILD_DIR: "docs/"
-        GH_PAT: ${{ secrets.GH_PAT }}
+      - uses: actions/checkout@v2
+      - name: Setup node.js
+        uses: actions/setup-node@v2
+      - name: npm install, compile, test, generate docs
+        run: |
+          npm install
+          npm run doc
+      - run: touch docs/.nojekyll
+      - name: GitHub pages deploy
+        uses: maxheld83/ghpages@d79d57aa5f407fd3e0b06ed5b36a8d4fd74b8c1c
+        env:
+          BUILD_DIR: 'docs/'
+          GH_PAT: ${{ secrets.GH_PAT }}

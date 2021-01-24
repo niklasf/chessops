@@ -55,22 +55,9 @@ export {
 
 export { Board } from './board';
 
-export {
-  Material,
-  MaterialSide,
-  RemainingChecks,
-  Setup,
-  defaultSetup,
-} from './setup';
+export { Material, MaterialSide, RemainingChecks, Setup, defaultSetup } from './setup';
 
-export {
-  IllegalSetup,
-  Castles,
-  Chess,
-  Position,
-  PositionError,
-  Context
-} from './chess';
+export { IllegalSetup, Castles, Chess, Position, PositionError, Context } from './chess';
 
 export * as compat from './compat';
 

@@ -24,7 +24,7 @@ export enum InvalidFen {
   Fullmoves = 'ERR_FULLMOVES',
 }
 
-export class FenError extends Error { }
+export class FenError extends Error {}
 
 function nthIndexOf(haystack: string, needle: string, n: number): number {
   let index = haystack.indexOf(needle);
@@ -115,12 +115,14 @@ export function parseRemainingChecks(part: string): Result<RemainingChecks, FenE
   if (parts.length === 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]);
     const black = parseSmallUint(parts[2]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError(InvalidFen.RemainingChecks));
+    if (!defined(white) || white > 3 || !defined(black) || black > 3)
+      return Result.err(new FenError(InvalidFen.RemainingChecks));
     return Result.ok(new RemainingChecks(3 - white, 3 - black));
   } else if (parts.length === 2) {
     const white = parseSmallUint(parts[0]);
     const black = parseSmallUint(parts[1]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3) return Result.err(new FenError(InvalidFen.RemainingChecks));
+    if (!defined(white) || white > 3 || !defined(black) || black > 3)
+      return Result.err(new FenError(InvalidFen.RemainingChecks));
     return Result.ok(new RemainingChecks(white, black));
   } else return Result.err(new FenError(InvalidFen.RemainingChecks));
 }
@@ -130,7 +132,8 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   const boardPart = parts.shift()!;
 
   // Board and pockets
-  let board, pockets = Result.ok<Material | undefined, FenError>(undefined);
+  let board,
+    pockets = Result.ok<Material | undefined, FenError>(undefined);
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
     if (pocketStart === -1) return Result.err(new FenError(InvalidFen.Fen));
@@ -190,18 +193,22 @@ export function parseFen(fen: string): Result<Setup, FenError> {
 
     if (parts.length > 0) return Result.err(new FenError(InvalidFen.Fen));
 
-    return pockets.chain(pockets => unmovedRooks.chain(unmovedRooks => remainingChecks.map(remainingChecks => {
-      return {
-        board,
-        pockets,
-        turn,
-        unmovedRooks,
-        remainingChecks,
-        epSquare,
-        halfmoves,
-        fullmoves: Math.max(1, fullmoves)
-      };
-    })));
+    return pockets.chain(pockets =>
+      unmovedRooks.chain(unmovedRooks =>
+        remainingChecks.map(remainingChecks => {
+          return {
+            board,
+            pockets,
+            turn,
+            unmovedRooks,
+            remainingChecks,
+            epSquare,
+            halfmoves,
+            fullmoves: Math.max(1, fullmoves),
+          };
+        })
+      )
+    );
   });
 }
 
@@ -296,9 +303,6 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     makeCastlingFen(setup.board, setup.unmovedRooks, opts),
     defined(setup.epSquare) ? makeSquare(setup.epSquare) : '-',
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
-    ...(opts?.epd ? [] : [
-      Math.max(0, Math.min(setup.halfmoves, 9999)),
-      Math.max(1, Math.min(setup.fullmoves, 9999)),
-    ])
+    ...(opts?.epd ? [] : [Math.max(0, Math.min(setup.halfmoves, 9999)), Math.max(1, Math.min(setup.fullmoves, 9999))]),
   ].join(' ');
 }

@@ -1,9 +1,33 @@
 import { Result } from '@badrap/result';
-import { Rules, CastlingSide, CASTLING_SIDES, Color, COLORS, Square, ByColor, ByCastlingSide, Move, NormalMove, isDrop, Piece, Outcome } from './types';
+import {
+  Rules,
+  CastlingSide,
+  CASTLING_SIDES,
+  Color,
+  COLORS,
+  Square,
+  ByColor,
+  ByCastlingSide,
+  Move,
+  NormalMove,
+  isDrop,
+  Piece,
+  Outcome,
+} from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material, RemainingChecks } from './setup';
-import { attacks, bishopAttacks, rookAttacks, queenAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray } from './attacks';
+import {
+  attacks,
+  bishopAttacks,
+  rookAttacks,
+  queenAttacks,
+  knightAttacks,
+  kingAttacks,
+  pawnAttacks,
+  between,
+  ray,
+} from './attacks';
 import { opposite, defined, squareRank } from './util';
 
 export enum IllegalSetup {
@@ -15,23 +39,25 @@ export enum IllegalSetup {
   Variant = 'ERR_VARIANT',
 }
 
-export class PositionError extends Error { }
+export class PositionError extends Error {}
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
-    rookAttacks(square, occupied).intersect(board.rooksAndQueens())
+    rookAttacks(square, occupied)
+      .intersect(board.rooksAndQueens())
       .union(bishopAttacks(square, occupied).intersect(board.bishopsAndQueens()))
       .union(knightAttacks(square).intersect(board.knight))
       .union(kingAttacks(square).intersect(board.king))
-      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn)));
+      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn))
+  );
 }
 
 function kingCastlesTo(color: Color, side: CastlingSide): Square {
-  return color === 'white' ? (side === 'a' ? 2 : 6) : (side === 'a' ? 58 : 62);
+  return color === 'white' ? (side === 'a' ? 2 : 6) : side === 'a' ? 58 : 62;
 }
 
 function rookCastlesTo(color: Color, side: CastlingSide): Square {
-  return color === 'white' ? (side === 'a' ? 3 : 5) : (side === 'a' ? 59 : 61);
+  return color === 'white' ? (side === 'a' ? 3 : 5) : side === 'a' ? 59 : 61;
 }
 
 export class Castles {
@@ -39,14 +65,14 @@ export class Castles {
   rook: ByColor<ByCastlingSide<Square | undefined>>;
   path: ByColor<ByCastlingSide<SquareSet>>;
 
-  private constructor() { }
+  private constructor() {}
 
   static default(): Castles {
     const castles = new Castles();
     castles.unmovedRooks = SquareSet.corners();
     castles.rook = {
       white: { a: 0, h: 7 },
-      black: { a: 56 , h: 63 },
+      black: { a: 56, h: 63 },
     };
     castles.path = {
       white: { a: new SquareSet(0xe, 0), h: new SquareSet(0x60, 0) },
@@ -88,9 +114,11 @@ export class Castles {
     const rookTo = rookCastlesTo(color, side);
     this.unmovedRooks = this.unmovedRooks.with(rook);
     this.rook[color][side] = rook;
-    this.path[color][side] = between(rook, rookTo).with(rookTo)
+    this.path[color][side] = between(rook, rookTo)
+      .with(rookTo)
       .union(between(king, kingTo).with(kingTo))
-      .without(king).without(rook);
+      .without(king)
+      .without(rook);
   }
 
   static fromSetup(setup: Setup): Castles {
@@ -145,7 +173,7 @@ export abstract class Position {
   halfmoves: number;
   fullmoves: number;
 
-  protected constructor(readonly rules: Rules) { }
+  protected constructor(readonly rules: Rules) {}
 
   // When subclassing:
   // - static default()
@@ -174,8 +202,10 @@ export abstract class Position {
   ctx(): Context {
     const variantEnd = this.isVariantEnd();
     const king = this.board.kingOf(this.turn);
-    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
-    const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rooksAndQueens())
+    if (!defined(king))
+      return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
+    const snipers = rookAttacks(king, SquareSet.empty())
+      .intersect(this.board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
       .intersect(this.board[opposite(this.turn)]);
     let blockers = SquareSet.empty();
@@ -209,13 +239,16 @@ export abstract class Position {
   }
 
   equalsIgnoreMoves(other: Position): boolean {
-    return this.rules === other.rules &&
+    return (
+      this.rules === other.rules &&
       (this.pockets ? this.board.equals(other.board) : this.board.equalsIgnorePromoted(other.board)) &&
       ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
       this.turn === other.turn &&
       this.castles.unmovedRooks.equals(other.castles.unmovedRooks) &&
       this.legalEpSquare() === other.legalEpSquare() &&
-      ((other.remainingChecks && this.remainingChecks?.equals(other.remainingChecks)) || (!this.remainingChecks && !other.remainingChecks));
+      ((other.remainingChecks && this.remainingChecks?.equals(other.remainingChecks)) ||
+        (!this.remainingChecks && !other.remainingChecks))
+    );
   }
 
   toSetup(): Setup {
@@ -441,7 +474,8 @@ export class Chess extends Position {
       // En passant square aligned with checker and king.
       if (defined(this.epSquare)) {
         for (const checker of checkers) {
-          if (ray(checker, this.epSquare).has(ourKing)) return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+          if (ray(checker, this.epSquare).has(ourKing))
+            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
         }
       }
     }
@@ -483,7 +517,7 @@ export class Chess extends Position {
     if (!defined(this.epSquare)) return false;
     if (!pawnAttacks(this.turn, pawn).has(this.epSquare)) return false;
     if (!defined(ctx.king)) return true;
-    const captured = this.epSquare + ((this.turn === 'white') ? -8 : 8);
+    const captured = this.epSquare + (this.turn === 'white' ? -8 : 8);
     const occupied = this.board.occupied.toggle(pawn).toggle(this.epSquare).toggle(captured);
     return !this.kingAttackers(ctx.king, opposite(this.turn), occupied).intersects(occupied);
   }
@@ -502,7 +536,7 @@ export class Chess extends Position {
       const step = square + delta;
       if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
         pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn === 'white' ? (square < 16) : (square >= 64 - 16);
+        const canDoubleStep = this.turn === 'white' ? square < 16 : square >= 64 - 16;
         const doubleStep = step + delta;
         if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
           pseudo = pseudo.with(doubleStep);
@@ -529,7 +563,7 @@ export class Chess extends Position {
       const step = square + delta;
       if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
         pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn === 'white' ? (square < 16) : (square >= 64 - 16);
+        const canDoubleStep = this.turn === 'white' ? square < 16 : square >= 64 - 16;
         const doubleStep = step + delta;
         if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
           pseudo = pseudo.with(doubleStep);
@@ -541,8 +575,7 @@ export class Chess extends Position {
           legal = SquareSet.fromSquare(this.epSquare);
         }
       }
-    }
-    else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
+    } else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
     else if (piece.role === 'knight') pseudo = knightAttacks(square);
     else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
     else if (piece.role === 'queen') pseudo = queenAttacks(square, this.board.occupied);
@@ -583,8 +616,10 @@ export class Chess extends Position {
   hasInsufficientMaterial(color: Color): boolean {
     if (this.board[color].intersect(this.board.pawn.union(this.board.rooksAndQueens())).nonEmpty()) return false;
     if (this.board[color].intersects(this.board.knight)) {
-      return this.board[color].size() <= 2 &&
-        this.board[opposite(color)].diff(this.board.king).diff(this.board.queen).isEmpty();
+      return (
+        this.board[color].size() <= 2 &&
+        this.board[opposite(color)].diff(this.board.king).diff(this.board.queen).isEmpty()
+      );
     }
     if (this.board[color].intersects(this.board.bishop)) {
       const sameColor =

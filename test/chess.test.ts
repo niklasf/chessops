@@ -25,7 +25,13 @@ const tricky: [string, string, number, number, number, number?, number?][] = [
   ['a1-check', '4k3/5p2/5p1p/8/rbR5/1N6/5PPP/5K2 b - - 1 29', 22, 580, 12309],
 
   // https://github.com/ornicar/lila/issues/4625
-  ['hside-rook-blocks-aside-castling', '4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff -', 42, 1743, 71908],
+  [
+    'hside-rook-blocks-aside-castling',
+    '4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff -',
+    42,
+    1743,
+    71908,
+  ],
 ];
 
 const random: [string, string, number, number, number, number, number][] = [
@@ -75,20 +81,24 @@ test('play move', () => {
 
 test('castling moves', () => {
   let pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -').unwrap()).unwrap();
-  let move = {from: 3, to: 4};
+  let move = { from: 3, to: 4 };
   expect(pos.isLegal(move)).toBe(true);
   pos.play(move);
   expect(makeFen(pos.toSetup())).toBe('2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
 
-  pos = Chess.fromSetup(parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1').unwrap()).unwrap();
-  move = {from: 4, to: 0};
+  pos = Chess.fromSetup(
+    parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1').unwrap()
+  ).unwrap();
+  move = { from: 4, to: 0 };
   expect(pos.isLegal(move)).toBe(true);
   pos.play(move);
   expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
 
-  pos = Chess.fromSetup(parseFen('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/R3K2R w KQk - 0 20').unwrap()).unwrap();
+  pos = Chess.fromSetup(
+    parseFen('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/R3K2R w KQk - 0 20').unwrap()
+  ).unwrap();
   const queenSide = { from: 4, to: 0 };
-  const altQueenSide = { from: 4, to: 2 }
+  const altQueenSide = { from: 4, to: 2 };
   expect(pos.castlingSide(queenSide)).toBe('a');
   expect(pos.normalizeMove(queenSide)).toEqual(queenSide);
   expect(pos.isLegal(queenSide)).toBe(true);
@@ -101,7 +111,7 @@ test('castling moves', () => {
 
 test('test illegal promotion', () => {
   const pos = Chess.default();
-  expect(pos.isLegal({from: 12, to: 20, promotion: 'queen'})).toBe(false);
+  expect(pos.isLegal({ from: 12, to: 20, promotion: 'queen' })).toBe(false);
 });
 
 test('starting perft', () => {
@@ -150,20 +160,30 @@ test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black)
 test('impossible checker alignment', () => {
   // Multiple checkers aligned with king.
   const r1 = Chess.fromSetup(parseFen('3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - - 0 1').unwrap());
-  expect(r1.unwrap(_ => undefined, err => err.message)).toEqual(IllegalSetup.ImpossibleCheck);
+  expect(
+    r1.unwrap(
+      _ => undefined,
+      err => err.message
+    )
+  ).toEqual(IllegalSetup.ImpossibleCheck);
 
   // Checkers aligned with opponent king are fine.
   Chess.fromSetup(parseFen('8/8/5k2/p1q5/PP1rp1P1/3P1N2/2RK1r2/5nN1 w - - 0 3').unwrap()).unwrap();
 
   // En passant square aligned with checker and king.
   const r2 = Chess.fromSetup(parseFen('8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 0 1').unwrap());
-  expect(r2.unwrap(_ => undefined, err => err.message)).toEqual(IllegalSetup.ImpossibleCheck);
+  expect(
+    r2.unwrap(
+      _ => undefined,
+      err => err.message
+    )
+  ).toEqual(IllegalSetup.ImpossibleCheck);
 });
 
 test('king captures unmoved rook', () => {
   const pos = Chess.fromSetup(parseFen('8/8/8/B2p3Q/2qPp1P1/b7/2P2PkP/4K2R b K - 0 1').unwrap()).unwrap();
   const move = parseUci('g2h1')!;
-  expect(move).toEqual({from: 14, to: 7});
+  expect(move).toEqual({ from: 14, to: 7 });
   expect(pos.isLegal(move)).toBe(true);
   pos.play(move);
   expect(makeFen(pos.toSetup())).toBe('8/8/8/B2p3Q/2qPp1P1/b7/2P2P1P/4K2k w - - 0 2');

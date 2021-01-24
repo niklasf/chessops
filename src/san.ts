@@ -15,7 +15,8 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
     if (role === 'king' && (pos.board[pos.turn].has(move.to) || Math.abs(move.to - move.from) === 2)) {
       san = move.to > move.from ? 'O-O' : 'O-O-O';
     } else {
-      const capture = pos.board.occupied.has(move.to) || (role === 'pawn' && squareFile(move.from) !== squareFile(move.to));
+      const capture =
+        pos.board.occupied.has(move.to) || (role === 'pawn' && squareFile(move.from) !== squareFile(move.to));
       if (role !== 'pawn') {
         san = roleToChar(role).toUpperCase();
 
@@ -121,7 +122,9 @@ export function parseSan(pos: Position, san: string): Move | undefined {
 
   // Optimization: Reduce set of candidates
   const pawnAdvance = role === 'pawn' ? SquareSet.fromFile(squareFile(to)) : SquareSet.empty();
-  candidates = candidates.intersect(pawnAdvance.union(attacks({color: opposite(pos.turn), role}, to, pos.board.occupied)));
+  candidates = candidates.intersect(
+    pawnAdvance.union(attacks({ color: opposite(pos.turn), role }, to, pos.board.occupied))
+  );
 
   // Check uniqueness and legality
   let from;

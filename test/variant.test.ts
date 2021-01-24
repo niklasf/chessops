@@ -11,7 +11,14 @@ const variantPerfts: [Rules, string, string, number, number, number][] = [
 
   ['crazyhouse', 'zh-all-drop-types', '2k5/8/8/8/8/8/8/4K3[QRBNPqrbnp] w - -', 301, 75353, skip],
   ['crazyhouse', 'zh-drops', '2k5/8/8/8/8/8/8/4K3[Qn] w - -', 67, 3083, 88634],
-  ['crazyhouse', 'zh-middlegame', 'r1bqk2r/pppp1ppp/2n1p3/4P3/1b1Pn3/2NB1N2/PPP2PPP/R1BQK2R[] b KQkq -', 42, 1347, 58057],
+  [
+    'crazyhouse',
+    'zh-middlegame',
+    'r1bqk2r/pppp1ppp/2n1p3/4P3/1b1Pn3/2NB1N2/PPP2PPP/R1BQK2R[] b KQkq -',
+    42,
+    1347,
+    58057,
+  ],
 
   ['horde', 'horde-start', 'rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq -', 8, 128, 1274],
   ['horde', 'horde-open-flank', '4k3/pp4q1/3P2p1/8/P3PP2/PPP2r2/PPP5/PPPP4 b - -', 30, 241, 6633],
@@ -76,7 +83,10 @@ test.each(insufficientMaterial)('%s insufficient material: %s', (rules, fen, whi
 });
 
 test('king of the hill not over', () => {
-  const pos = setupPosition('kingofthehill', parseFen('rnbqkbnr/pppppppp/8/1Q6/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1').unwrap()).unwrap();
+  const pos = setupPosition(
+    'kingofthehill',
+    parseFen('rnbqkbnr/pppppppp/8/1Q6/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1').unwrap()
+  ).unwrap();
   expect(pos.isInsufficientMaterial()).toBe(false);
   expect(pos.isCheck()).toBe(false);
   expect(pos.isVariantEnd()).toBe(false);
@@ -87,14 +97,17 @@ test('king of the hill not over', () => {
 
 test('racing kings end', () => {
   // Both players reached the backrank.
-  const draw = setupPosition('racingkings', parseFen('kr3NK1/1q2R3/8/8/8/5n2/2N5/1rb2B1R w - - 11 14').unwrap()).unwrap();
+  const draw = setupPosition(
+    'racingkings',
+    parseFen('kr3NK1/1q2R3/8/8/8/5n2/2N5/1rb2B1R w - - 11 14').unwrap()
+  ).unwrap();
   expect(draw.isEnd()).toBe(true);
-  expect(draw.outcome()).toStrictEqual({winner: undefined});
+  expect(draw.outcome()).toStrictEqual({ winner: undefined });
 
   // White to move is lost because black reached the backrank.
   const black = setupPosition('racingkings', parseFen('1k6/6K1/8/8/8/8/8/8 w - - 0 1').unwrap()).unwrap();
   expect(black.isEnd()).toBe(true);
-  expect(black.outcome()).toStrictEqual({winner: 'black'});
+  expect(black.outcome()).toStrictEqual({ winner: 'black' });
 
   // Black is given a chance to catch up.
   const pos = setupPosition('racingkings', parseFen('1K6/7k/8/8/8/8/8/8 b - - 0 1').unwrap()).unwrap();
@@ -104,12 +117,15 @@ test('racing kings end', () => {
   // Black near backrank but cannot move there.
   const white = setupPosition('racingkings', parseFen('2KR4/k7/2Q5/4q3/8/8/8/2N5 b - - 0 1').unwrap()).unwrap();
   expect(white.isEnd()).toBe(true);
-  expect(white.outcome()).toStrictEqual({winner: 'white'});
+  expect(white.outcome()).toStrictEqual({ winner: 'white' });
 });
 
 test('atomic king exploded', () => {
-  const pos = setupPosition('atomic', parseFen('r4b1r/ppp1pppp/7n/8/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 3').unwrap()).unwrap();
+  const pos = setupPosition(
+    'atomic',
+    parseFen('r4b1r/ppp1pppp/7n/8/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 3').unwrap()
+  ).unwrap();
   expect(pos.isEnd()).toBe(true);
   expect(pos.isVariantEnd()).toBe(true);
-  expect(pos.outcome()).toStrictEqual({winner: 'white'});
+  expect(pos.outcome()).toStrictEqual({ winner: 'white' });
 });

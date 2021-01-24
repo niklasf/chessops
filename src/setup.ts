@@ -10,7 +10,7 @@ export class MaterialSide {
   queen: number;
   king: number;
 
-  private constructor() { }
+  private constructor() {}
 
   static empty(): MaterialSide {
     const m = new MaterialSide();
@@ -62,7 +62,7 @@ export class MaterialSide {
 }
 
 export class Material {
-  constructor(public white: MaterialSide, public black: MaterialSide) { }
+  constructor(public white: MaterialSide, public black: MaterialSide) {}
 
   static empty(): Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
@@ -106,7 +106,7 @@ export class Material {
 }
 
 export class RemainingChecks {
-  constructor(public white: number, public black: number) { }
+  constructor(public white: number, public black: number) {}
 
   static default(): RemainingChecks {
     return new RemainingChecks(3, 3);
