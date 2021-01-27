@@ -1,3 +1,17 @@
+/**
+ * Compute attacks and rays.
+ *
+ * These are low-level functions that can be used to implement chess rules.
+ *
+ * Implementation notes: Sliding attacks are computed using
+ * [hyperbola quintessence](https://www.chessprogramming.org/Hyperbola_Quintessence).
+ * Magic bitboards would deliver faster lookups, but also require
+ * initializing considerably larger attack tables. On the web, initialization
+ * time is important, so the chosen method may strike a better balance.
+ *
+ * @packageDocumentation
+ */
+
 import { squareFile, squareRank } from './util';
 import { Square, Piece, Color, BySquare } from './types';
 import { SquareSet } from './squareSet';
@@ -26,14 +40,24 @@ const PAWN_ATTACKS = {
   black: tabulate(sq => computeRange(sq, [-7, -9])),
 };
 
+/**
+ * Gets squares attacked or defended by a king on `square`.
+ */
 export function kingAttacks(square: Square): SquareSet {
   return KING_ATTACKS[square];
 }
 
+/**
+ * Gets squares attacked or defended by a knight on `square`.
+ */
 export function knightAttacks(square: Square): SquareSet {
   return KNIGHT_ATTACKS[square];
 }
 
+/**
+ * Gets squares attacked or defended by a pawn of the given `color`
+ * on `square`.
+ */
 export function pawnAttacks(color: Color, square: Square): SquareSet {
   return PAWN_ATTACKS[color][square];
 }
@@ -74,19 +98,35 @@ function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
   return forward.xor(reverse.rbit64()).intersect(range);
 }
 
+/**
+ * Gets squares attacked or defended by a bishop on `square`, given `occupied`
+ * squares.
+ */
 export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
   const bit = SquareSet.fromSquare(square);
   return hyperbola(bit, DIAG_RANGE[square], occupied).xor(hyperbola(bit, ANTI_DIAG_RANGE[square], occupied));
 }
 
+/**
+ * Gets squares attacked or defended by a rook on `square`, given `occupied`
+ * squares.
+ */
 export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
   return fileAttacks(square, occupied).xor(rankAttacks(square, occupied));
 }
 
+/**
+ * Gets squares attacked or defended by a queen on `square`, given `occupied`
+ * squares.
+ */
 export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
   return bishopAttacks(square, occupied).xor(rookAttacks(square, occupied));
 }
 
+/**
+ * Gets squares attacked or defended by a `piece` on `square`, given
+ * `occupied` squares.
+ */
 export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {
   switch (piece.role) {
     case 'pawn':
@@ -104,6 +144,10 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
   }
 }
 
+/**
+ * Gets all squares of the rank, file or diagonal with the two squares
+ * `a` and `b`, or an empty set if they are not aligned.
+ */
 export function ray(a: Square, b: Square): SquareSet {
   const other = SquareSet.fromSquare(b);
   if (RANK_RANGE[a].intersects(other)) return RANK_RANGE[a].with(a);
@@ -113,6 +157,10 @@ export function ray(a: Square, b: Square): SquareSet {
   return SquareSet.empty();
 }
 
+/**
+ * Gets all squares between `a` and `b` (bounds not included), or an empty set
+ * if they are not on the same rank, file or diagonal.
+ */
 export function between(a: Square, b: Square): SquareSet {
   return ray(a, b)
     .intersect(SquareSet.full().shl64(a).xor(SquareSet.full().shl64(b)))
