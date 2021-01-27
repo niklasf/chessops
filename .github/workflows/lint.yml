@@ -8,4 +8,4 @@ jobs:
       - uses: actions/setup-node@v2
       - run: npm install
       - run: npm run lint
-      - run: npx prettier --list-different
+      - run: npx prettier --list-different .
