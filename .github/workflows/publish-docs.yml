@@ -3,21 +3,15 @@ on:
   push:
     branches:
       - master
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup node.js
-        uses: actions/setup-node@v2
-      - name: npm install, compile, test, generate docs
-        run: |
-          npm install
-          npm run doc
-      - run: touch docs/.nojekyll
-      - name: GitHub pages deploy
-        uses: maxheld83/ghpages@d79d57aa5f407fd3e0b06ed5b36a8d4fd74b8c1c
+      - uses: actions/setup-node@v2
+      - run: npm install
+      - run: npm run doc && touch docs/.nojekyll
+      - uses: maxheld83/ghpages@v0.3.0
         env:
           BUILD_DIR: 'docs/'
           GH_PAT: ${{ secrets.GH_PAT }}
