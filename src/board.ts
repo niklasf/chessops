@@ -1,8 +1,29 @@
+/**
+ * Board representation.
+ *
+ * @packageDocumentation
+ */
+
 import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 
+/**
+ * Piece positions on a board.
+ *
+ * Properties are sets of squares, like `board.occupied` for all occupied
+ * squares, `board[color]` for all pieces of that color, and `board[role]`
+ * for all pieces of that role. When modifying the properties directly, take
+ * care to keep them consistent.
+ */
 export class Board implements Iterable<[Square, Piece]> {
+  /**
+   * All occupied squares.
+   */
   occupied: SquareSet;
+  /**
+   * All squares occupied by pieces known to be promoted. This information is
+   * relevant in chess variants like Crazyhouse.
+   */
   promoted: SquareSet;
 
   white: SquareSet;
@@ -53,6 +74,9 @@ export class Board implements Iterable<[Square, Piece]> {
     return board;
   }
 
+  /**
+   * Resets all pieces to the default starting position for standard chess.
+   */
   reset(): void {
     this.occupied = new SquareSet(0xffff, 0xffff_0000);
     this.promoted = SquareSet.empty();
@@ -118,6 +142,9 @@ export class Board implements Iterable<[Square, Piece]> {
     return { color, role, promoted };
   }
 
+  /**
+   * Removes and returns the piece from the given `square`, if any.
+   */
   take(square: Square): Piece | undefined {
     const piece = this.get(square);
     if (piece) {
@@ -129,6 +156,10 @@ export class Board implements Iterable<[Square, Piece]> {
     return piece;
   }
 
+  /**
+   * Put `piece` onto `square`, potentially replacing an existing piece.
+   * Returns the existing piece, if any.
+   */
   set(square: Square, piece: Piece): Piece | undefined {
     const old = this.take(square);
     this.occupied = this.occupied.with(square);
@@ -160,6 +191,9 @@ export class Board implements Iterable<[Square, Piece]> {
     return this.bishop.union(this.queen);
   }
 
+  /**
+   * Finds the unique unpromoted king of the given `color`, if any.
+   */
   kingOf(color: Color): Square | undefined {
     return this.king.intersect(this[color]).diff(this.promoted).singleSquare();
   }
