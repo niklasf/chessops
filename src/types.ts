@@ -1,7 +1,9 @@
 export const FILE_NAMES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
+
 export type FileName = typeof FILE_NAMES[number];
 
 export const RANK_NAMES = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
+
 export type RankName = typeof RANK_NAMES[number];
 
 export type Square = number;
@@ -19,6 +21,7 @@ export type ByColor<T> = {
 };
 
 export const ROLES = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'] as const;
+
 export type Role = typeof ROLES[number];
 
 export type ByRole<T> = {
@@ -26,6 +29,7 @@ export type ByRole<T> = {
 };
 
 export const CASTLING_SIDES = ['a', 'h'] as const;
+
 export type CastlingSide = typeof CASTLING_SIDES[number];
 
 export type ByCastlingSide<T> = {
@@ -69,6 +73,7 @@ export const RULES = [
   'racingkings',
   'crazyhouse',
 ] as const;
+
 export type Rules = typeof RULES[number];
 
 export interface Outcome {

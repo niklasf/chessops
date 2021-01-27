@@ -34,7 +34,7 @@
     "prepare": "tsc",
     "doc": "typedoc --excludeNotExported",
     "lint": "eslint src/*.ts",
-    "format": "prettier --write src test"
+    "format": "prettier --write ."
   },
   "files": [
     "attacks.js",
