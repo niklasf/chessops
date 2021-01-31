@@ -11,10 +11,10 @@ Chess and chess variant rules and operations in TypeScript.
 
 ## Features
 
-- [Read and write FEN](https://niklasf.github.io/chessops/modules/_fen_.html)
+- [Read and write FEN](https://niklasf.github.io/chessops/modules/fen.html)
 - Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Castles, Setup,
   Position)
-- [Variant rules](https://niklasf.github.io/chessops/modules/_variant_.html): Standard chess, Crazyhouse, King of the Hill, Three-check,
+- [Variant rules](https://niklasf.github.io/chessops/modules/variant.html): Standard chess, Crazyhouse, King of the Hill, Three-check,
   Antichess, Atomic, Horde, Racing Kings
   - Move making
   - Legal move and drop move generation
@@ -22,12 +22,12 @@ Chess and chess variant rules and operations in TypeScript.
   - Insufficient material
   - Setup validation
 - Supports Chess960
-- [Attacks and rays](https://niklasf.github.io/chessops/modules/_attacks_.html) using hyperbola quintessence
+- [Attacks and rays](https://niklasf.github.io/chessops/modules/attacks.html) using hyperbola quintessence
 - Read and write UCI move notation
-- [Read and write SAN](https://niklasf.github.io/chessops/modules/_san_.html)
-- [Position hashing](https://niklasf.github.io/chessops/modules/_hash_.html)
-- [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
-- [Compatibility](https://niklasf.github.io/chessops/modules/_compat_.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
+- [Read and write SAN](https://niklasf.github.io/chessops/modules/san.html)
+- [Position hashing](https://niklasf.github.io/chessops/modules/hash.html)
+- [Transformations](https://niklasf.github.io/chessops/modules/transform.html): Mirroring and rotating
+- [Compatibility](https://niklasf.github.io/chessops/modules/compat.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
 
 [File an issue](https://github.com/niklasf/chessops/issues/new) to request more.
 
