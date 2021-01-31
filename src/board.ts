@@ -1,10 +1,4 @@
-/**
- * Board representation.
- *
- * @packageDocumentation
- */
-
-import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
+import { Square, Color, Role, Piece, COLORS, ROLES, ByRole, ByColor } from './types';
 import { SquareSet } from './squareSet';
 
 /**
@@ -15,7 +9,7 @@ import { SquareSet } from './squareSet';
  * for all pieces of that role. When modifying the properties directly, take
  * care to keep them consistent.
  */
-export class Board implements Iterable<[Square, Piece]> {
+export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByColor<SquareSet> {
   /**
    * All occupied squares.
    */
