@@ -10,12 +10,18 @@ export type Square = number;
 
 export type SquareName = `${FileName}${RankName}`;
 
+/**
+ * Indexable by square indices.
+ */
 export type BySquare<T> = T[];
 
 export const COLORS = ['white', 'black'] as const;
 
 export type Color = typeof COLORS[number];
 
+/**
+ * Indexable by `white` and `black`.
+ */
 export type ByColor<T> = {
   [color in Color]: T;
 };
@@ -24,6 +30,9 @@ export const ROLES = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'] as co
 
 export type Role = typeof ROLES[number];
 
+/**
+ * Indexable by `pawn`, `knight`, `bishop`, `rook`, `queen`, and `king`.
+ */
 export type ByRole<T> = {
   [role in Role]: T;
 };
@@ -32,6 +41,9 @@ export const CASTLING_SIDES = ['a', 'h'] as const;
 
 export type CastlingSide = typeof CASTLING_SIDES[number];
 
+/**
+ * Indexable by `a` and `h`.
+ */
 export type ByCastlingSide<T> = {
   [side in CastlingSide]: T;
 };
