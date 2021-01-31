@@ -92,6 +92,10 @@ export function parseUci(str: string): Move | undefined {
   return;
 }
 
+/**
+ * Converts a move to UCI notation, like `g1f3` for a normal move,
+ * `a7a8q` for promotion to a queen, and `Q@f7` for a Crazyhouse drop.
+ */
 export function makeUci(move: Move): string {
   if (isDrop(move)) return `${roleToChar(move.role).toUpperCase()}@${makeSquare(move.to)}`;
   return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? roleToChar(move.promotion) : '');
