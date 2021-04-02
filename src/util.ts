@@ -1,4 +1,4 @@
-import { FILE_NAMES, RANK_NAMES, Color, Square, Role, Move, isDrop, SquareName } from './types';
+import { FILE_NAMES, RANK_NAMES, CastlingSide, Color, Square, Role, Move, isDrop, SquareName } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -99,4 +99,8 @@ export function parseUci(str: string): Move | undefined {
 export function makeUci(move: Move): string {
   if (isDrop(move)) return `${roleToChar(move.role).toUpperCase()}@${makeSquare(move.to)}`;
   return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? roleToChar(move.promotion) : '');
+}
+
+export function kingCastlesTo(color: Color, side: CastlingSide): Square {
+  return color === 'white' ? (side === 'a' ? 2 : 6) : side === 'a' ? 58 : 62;
 }
