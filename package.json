@@ -33,7 +33,7 @@
     "test": "jest",
     "compile": "tsc",
     "prepare": "tsc",
-    "doc": "typedoc src/types.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/hash.ts src/san.ts src/transform.ts src/variant.ts",
+    "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/hash.ts src/san.ts src/transform.ts src/variant.ts",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
