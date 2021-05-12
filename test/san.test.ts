@@ -22,9 +22,10 @@ test('make crazyhouse variation', () => {
 test('make stockfish line with many knight moves', () => {
   const setup = parseFen('2rq1rk1/pb1nbp1p/1pn3p1/3pP3/2pP4/1N3NPQ/PP3PBP/R1B1R1K1 w - - 0 16').unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
-  const variation = 'b3d2 c6b4 e1d1 f8e8 d2f1 b4d3 f3e1 d3e1 d1e1 d7f8 f2f4 f8e6 c1e3 h7h5 f4f5 e6g5 e3g5 e7g5 f5f6 d8c7'
-    .split(' ')
-    .map(uci => parseUci(uci)!);
+  const variation =
+    'b3d2 c6b4 e1d1 f8e8 d2f1 b4d3 f3e1 d3e1 d1e1 d7f8 f2f4 f8e6 c1e3 h7h5 f4f5 e6g5 e3g5 e7g5 f5f6 d8c7'
+      .split(' ')
+      .map(uci => parseUci(uci)!);
   expect(makeSanVariation(pos, variation)).toBe(
     '16. Nbd2 Nb4 17. Rd1 Re8 18. Nf1 Nd3 19. Ne1 Nxe1 20. Rxe1 Nf8 21. f4 Ne6 22. Be3 h5 23. f5 Ng5 24. Bxg5 Bxg5 25. f6 Qc7'
   );

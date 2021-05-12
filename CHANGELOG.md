@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.9.0
+
+- Now built as ES module (instead of CommonJS).
+- Made `kingCastlesTo` public.
+
 ## v0.8.1
 
 - Moved `FILES` and `RANKS` from `chessops/util` to `chessops/types`, renamed

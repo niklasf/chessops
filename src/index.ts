@@ -29,6 +29,7 @@ export {
 export {
   charToRole,
   defined,
+  kingCastlesTo,
   makeSquare,
   makeUci,
   opposite,
