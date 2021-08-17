@@ -45,7 +45,7 @@ export function scalachessCharPair(move: Move): string {
     );
 }
 
-export function lichessVariantRules(
+export function lichessRules(
   variant:
     | 'standard'
     | 'chess960'
@@ -71,5 +71,22 @@ export function lichessVariantRules(
       return 'racingkings';
     default:
       return variant;
+  }
+}
+
+export function lichessVariant(
+  rules: Rules
+): 'standard' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse' {
+  switch (rules) {
+    case 'chess':
+      return 'standard';
+    case '3check':
+      return 'threeCheck';
+    case 'kingofthehill':
+      return 'kingOfTheHill';
+    case 'racingkings':
+      return 'racingKings';
+    default:
+      return rules;
   }
 }
