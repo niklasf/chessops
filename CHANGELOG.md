@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.10.0
+
+- Renamed `lichessVariantRules` to `lichessRules`, added the inverse function
+  `lichessVariant`.
+
 ## v0.9.0
 
 - Now built as ES module (instead of CommonJS).
