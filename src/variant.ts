@@ -346,7 +346,7 @@ export class ThreeCheck extends Chess {
   }
 }
 
-class RacingKings extends Chess {
+export class RacingKings extends Chess {
   protected constructor() {
     super('racingkings');
   }
