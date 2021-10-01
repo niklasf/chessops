@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.10.1
+
+- Export `RacingKings` from `chessops/variant`.
+- Export `FenOpts` from `chessops/fen`.
+
 ## v0.10.0
 
 - Renamed `lichessVariantRules` to `lichessRules`, added the inverse function
