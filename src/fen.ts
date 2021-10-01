@@ -212,7 +212,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   });
 }
 
-interface FenOpts {
+export interface FenOpts {
   promoted?: boolean;
   shredder?: boolean;
   epd?: boolean;
