@@ -31,6 +31,7 @@ const variantPerfts: [Rules, string, string, number, number, number][] = [
   ['atomic', 'atomic960-castle-2', 'r3k1rR/5K2/8/8/8/8/8/8 b kq -', 25, 282, 6753],
   ['atomic', 'atomic960-castle-3', 'Rr2k1rR/3K4/3p4/8/8/8/7P/8 w kq -', 21, 465, 10631],
   ['atomic', 'shakmaty-bench', 'rn2kb1r/1pp1p2p/p2q1pp1/3P4/2P3b1/4PN2/PP3PPP/R2QKB1R b KQkq -', 40, 1238, 45237],
+  ['atomic', 'near-king-explosion', 'rnbqk2r/pp1p2pp/2p3Nn/5p2/1b2P1PP/8/PPP2P2/R1BQKB1R w KQkq -', 5, 132, 4973],
 
   ['antichess', 'antichess-start', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - -', 20, 400, 8067],
   ['antichess', 'a-pawn-vs-b-pawn', '8/1p6/8/8/8/8/P7/8 w - -', 2, 4, 4],
@@ -121,11 +122,19 @@ test('racing kings end', () => {
 });
 
 test('atomic king exploded', () => {
-  const pos = setupPosition(
+  const pos1 = setupPosition(
     'atomic',
     parseFen('r4b1r/ppp1pppp/7n/8/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 3').unwrap()
   ).unwrap();
-  expect(pos.isEnd()).toBe(true);
-  expect(pos.isVariantEnd()).toBe(true);
-  expect(pos.outcome()).toStrictEqual({ winner: 'white' });
+  expect(pos1.isEnd()).toBe(true);
+  expect(pos1.isVariantEnd()).toBe(true);
+  expect(pos1.outcome()).toStrictEqual({ winner: 'white' });
+
+  const pos2 = setupPosition(
+    'atomic',
+    parseFen('rn5r/pp4pp/2p3Nn/5p2/1b2P1PP/8/PPP2P2/R1B1KB1R b KQ - 0 9').unwrap()
+  ).unwrap();
+  expect(pos2.isEnd()).toBe(true);
+  expect(pos2.isVariantEnd()).toBe(true);
+  expect(pos2.outcome()).toStrictEqual({ winner: 'white' });
 });
