@@ -114,7 +114,8 @@ export class Atomic extends Chess {
   }
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    if (kingAttacks(square).intersects(this.board.pieces(attacker, 'king'))) {
+    const attackerKings = this.board.pieces(attacker, 'king');
+    if (attackerKings.isEmpty() || kingAttacks(square).intersects(attackerKings)) {
       return SquareSet.empty();
     }
     return super.kingAttackers(square, attacker, occupied);
