@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.10.2
+
+- Fix `Atomic` position validation, where the remaining king is attacked, but
+  the other king has exploded.
+
 ## v0.10.1
 
 - Export `RacingKings` from `chessops/variant`.
