@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "@types/jest": "^27",
-    "@typescript-eslint/eslint-plugin": "^4",
-    "@typescript-eslint/parser": "^4",
-    "eslint": "^7",
+    "@typescript-eslint/eslint-plugin": "^5",
+    "@typescript-eslint/parser": "^5",
+    "eslint": "^8",
     "jest": "^27",
     "prettier": "^2",
     "ts-jest": "^27",
