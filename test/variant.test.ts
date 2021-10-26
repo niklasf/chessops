@@ -1,7 +1,8 @@
 import { Rules } from '../src/types';
 import { perft } from '../src/debug';
 import { setupPosition } from '../src/variant';
-import { parseFen } from '../src/fen';
+import { parseFen, makeFen } from '../src/fen';
+import { parseUci } from '../src/util'
 
 const skip = 0;
 
@@ -137,4 +138,18 @@ test('atomic king exploded', () => {
   expect(pos2.isEnd()).toBe(true);
   expect(pos2.isVariantEnd()).toBe(true);
   expect(pos2.outcome()).toStrictEqual({ winner: 'white' });
+});
+
+test('3check check should change remaining checks', () => {
+  const pos = setupPosition(
+    '3check',
+    parseFen('rnbqkbnr/ppp1pppp/3p4/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 3+3 0 2').unwrap()
+  ).unwrap();
+
+  const bb5 = pos.clone()
+
+  bb5.play(parseUci('f1b5')!)
+
+  // remaining checks should change after Bb5+, they cannot stay 3+3
+  expect(makeFen(bb5.toSetup())).not.toBe('rnbqkbnr/ppp1pppp/3p4/1B6/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 3+3 1 2');
 });
