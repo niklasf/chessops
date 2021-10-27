@@ -1,5 +1,9 @@
 # Changelog for chessops
 
+## v0.10.3
+
+- Fix `ThreeCheck` not updating remaining checks.
+
 ## v0.10.2
 
 - Fix `Atomic` position validation, where the remaining king is attacked, but
