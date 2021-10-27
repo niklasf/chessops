@@ -387,11 +387,16 @@ export abstract class Position {
           }
         }
         this.castles.discardSide(turn);
-        if (castlingSide) return;
       }
 
-      const capture = this.board.set(move.to, piece) || epCapture;
-      if (capture) this.playCaptureAt(move.to, capture);
+      if (!castlingSide) {
+        const capture = this.board.set(move.to, piece) || epCapture;
+        if (capture) this.playCaptureAt(move.to, capture);
+      }
+    }
+
+    if (this.remainingChecks) {
+      if (this.isCheck()) this.remainingChecks[turn] = Math.max(this.remainingChecks[turn] - 1, 0);
     }
   }
 
