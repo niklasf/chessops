@@ -64,7 +64,6 @@ test('parse pawn capture', () => {
   expect(makeFen(pos.toSetup())).toBe('rnbqkb1r/ppp1pppp/5n2/3P4/2P5/8/PP1P1PPP/RNBQKBNR b KQkq - 0 3');
 
   pos = Chess.fromSetup(parseFen('r4br1/pp1Npkp1/2P4p/5P2/6P1/5KnP/PP6/R1B5 b - -').unwrap()).unwrap();
-  const bxc6 = parseSan(pos, 'bxc6');
   expect(parseSan(pos, 'bxc6')).toEqual({ from: 49, to: 42 });
 });
 
