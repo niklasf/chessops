@@ -1,5 +1,5 @@
-import { rookAttacks, ray, between } from '../src/attacks';
-import { SquareSet } from '../src/squareSet';
+import { rookAttacks, ray, between } from './attacks.js';
+import { SquareSet } from './squareSet.js';
 
 test('rook attacks', () => {
   const d6 = 43;

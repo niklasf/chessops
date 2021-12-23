@@ -1,7 +1,7 @@
-import { COLORS, ROLES } from './types';
-import { defined } from './util';
-import { Board } from './board';
-import { Setup, MaterialSide, Material, RemainingChecks } from './setup';
+import { COLORS, ROLES } from './types.js';
+import { defined } from './util.js';
+import { Board } from './board.js';
+import { Setup, MaterialSide, Material, RemainingChecks } from './setup.js';
 
 function rol32(n: number, left: number): number {
   return (n << left) | (n >>> (32 - left));

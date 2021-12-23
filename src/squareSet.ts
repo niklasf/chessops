@@ -1,4 +1,4 @@
-import { Square, Color } from './types';
+import { Square, Color } from './types.js';
 
 function popcnt32(n: number): number {
   n = n - ((n >>> 1) & 0x5555_5555);

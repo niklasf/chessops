@@ -1,11 +1,11 @@
 import { Result } from '@badrap/result';
-import { Square, Outcome, Color, COLORS, Piece, Rules } from './types';
-import { defined, opposite } from './util';
-import { between, kingAttacks } from './attacks';
-import { SquareSet } from './squareSet';
-import { Board } from './board';
-import { Setup, RemainingChecks, Material } from './setup';
-import { PositionError, Position, IllegalSetup, Context, Castles, Chess } from './chess';
+import { Square, Outcome, Color, COLORS, Piece, Rules } from './types.js';
+import { defined, opposite } from './util.js';
+import { between, kingAttacks } from './attacks.js';
+import { SquareSet } from './squareSet.js';
+import { Board } from './board.js';
+import { Setup, RemainingChecks, Material } from './setup.js';
+import { PositionError, Position, IllegalSetup, Context, Castles, Chess } from './chess.js';
 
 export { Position, PositionError, IllegalSetup, Context, Chess, Castles };
 

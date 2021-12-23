@@ -1,8 +1,8 @@
-import { SquareSet } from '../src/squareSet';
-import { parseUci } from '../src/util';
-import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
-import { Castles, Chess, IllegalSetup } from '../src/chess';
-import { perft } from '../src/debug';
+import { SquareSet } from './squareSet.js';
+import { parseUci } from './util.js';
+import { parseFen, makeFen, INITIAL_FEN } from './fen.js';
+import { Castles, Chess, IllegalSetup } from './chess.js';
+import { perft } from './debug.js';
 
 const tricky: [string, string, number, number, number, number?, number?][] = [
   ['pos-2', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -', 48, 2039, 97862], // Kiwipete by Peter McKenzie

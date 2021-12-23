@@ -1,8 +1,8 @@
-import { parseUci } from '../src/util';
-import { makeSan, makeSanVariation, parseSan } from '../src/san';
-import { Chess } from '../src/chess';
-import { parseFen, makeFen } from '../src/fen';
-import { Antichess, Crazyhouse } from '../src/variant';
+import { parseUci } from './util.js';
+import { makeSan, makeSanVariation, parseSan } from './san.js';
+import { Chess } from './chess.js';
+import { parseFen, makeFen } from './fen.js';
+import { Antichess, Crazyhouse } from './variant.js';
 
 test('make variation with king move', () => {
   const pos = Chess.default();

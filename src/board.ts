@@ -1,5 +1,5 @@
-import { Square, Color, Role, Piece, COLORS, ROLES, ByRole, ByColor } from './types';
-import { SquareSet } from './squareSet';
+import { Square, Color, Role, Piece, COLORS, ROLES, ByRole, ByColor } from './types.js';
+import { SquareSet } from './squareSet.js';
 
 /**
  * Piece positions on a board.

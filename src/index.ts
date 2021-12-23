@@ -24,7 +24,7 @@ export {
   Rules,
   RULES,
   Outcome,
-} from './types';
+} from './types.js';
 
 export {
   charToRole,
@@ -38,9 +38,9 @@ export {
   roleToChar,
   squareFile,
   squareRank,
-} from './util';
+} from './util.js';
 
-export { SquareSet } from './squareSet';
+export { SquareSet } from './squareSet.js';
 
 export {
   attacks,
@@ -52,24 +52,24 @@ export {
   queenAttacks,
   ray,
   rookAttacks,
-} from './attacks';
+} from './attacks.js';
 
-export { Board } from './board';
+export { Board } from './board.js';
 
-export { Material, MaterialSide, RemainingChecks, Setup, defaultSetup } from './setup';
+export { Material, MaterialSide, RemainingChecks, Setup, defaultSetup } from './setup.js';
 
-export { IllegalSetup, Castles, Chess, Position, PositionError, Context } from './chess';
+export { IllegalSetup, Castles, Chess, Position, PositionError, Context } from './chess.js';
 
-export * as compat from './compat';
+export * as compat from './compat.js';
 
-export * as debug from './debug';
+export * as debug from './debug.js';
 
-export * as fen from './fen';
+export * as fen from './fen.js';
 
-export * as hash from './hash';
+export * as hash from './hash.js';
 
-export * as san from './san';
+export * as san from './san.js';
 
-export * as transform from './transform';
+export * as transform from './transform.js';
 
-export * as variant from './variant';
+export * as variant from './variant.js';

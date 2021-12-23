@@ -1,8 +1,8 @@
-import { FILE_NAMES, RANK_NAMES, isDrop, Move, CastlingSide } from './types';
-import { charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util';
-import { SquareSet } from './squareSet';
-import { Position } from './chess';
-import { attacks, kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks';
+import { FILE_NAMES, RANK_NAMES, isDrop, Move, CastlingSide } from './types.js';
+import { charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util.js';
+import { SquareSet } from './squareSet.js';
+import { Position } from './chess.js';
+import { attacks, kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks.js';
 
 function makeSanWithoutSuffix(pos: Position, move: Move): string {
   let san = '';

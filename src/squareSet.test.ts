@@ -1,4 +1,4 @@
-import { SquareSet } from '../src/squareSet';
+import { SquareSet } from './squareSet.js';
 
 test('full set has all', () => {
   for (let square = 0; square < 64; square++) {

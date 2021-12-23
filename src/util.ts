@@ -1,4 +1,4 @@
-import { FILE_NAMES, RANK_NAMES, CastlingSide, Color, Square, Role, Move, isDrop, SquareName } from './types';
+import { FILE_NAMES, RANK_NAMES, CastlingSide, Color, Square, Role, Move, isDrop, SquareName } from './types.js';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;

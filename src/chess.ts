@@ -13,10 +13,10 @@ import {
   isDrop,
   Piece,
   Outcome,
-} from './types';
-import { SquareSet } from './squareSet';
-import { Board } from './board';
-import { Setup, Material, RemainingChecks } from './setup';
+} from './types.js';
+import { SquareSet } from './squareSet.js';
+import { Board } from './board.js';
+import { Setup, Material, RemainingChecks } from './setup.js';
 import {
   attacks,
   bishopAttacks,
@@ -27,8 +27,8 @@ import {
   pawnAttacks,
   between,
   ray,
-} from './attacks';
-import { kingCastlesTo, opposite, defined, squareRank } from './util';
+} from './attacks.js';
+import { kingCastlesTo, opposite, defined, squareRank } from './util.js';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',

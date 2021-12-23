@@ -1,4 +1,4 @@
-import { parseUci, makeUci } from '../src/util';
+import { parseUci, makeUci } from './util.js';
 
 test('parse uci', () => {
   expect(parseUci('a1a2')).toEqual({ from: 0, to: 8 });

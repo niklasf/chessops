@@ -1,8 +1,8 @@
-import { Rules } from '../src/types';
-import { perft } from '../src/debug';
-import { setupPosition } from '../src/variant';
-import { parseFen, makeFen } from '../src/fen';
-import { parseUci } from '../src/util';
+import { Rules } from './types.js';
+import { perft } from './debug.js';
+import { setupPosition } from './variant.js';
+import { parseFen, makeFen } from './fen.js';
+import { parseUci } from './util.js';
 
 const skip = 0;
 
