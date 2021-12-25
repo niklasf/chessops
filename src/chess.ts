@@ -41,6 +41,10 @@ export enum IllegalSetup {
 
 export class PositionError extends Error {}
 
+export interface FromSetupOpts {
+  ignoreImpossibleCheck?: boolean;
+}
+
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
     rookAttacks(square, occupied)
@@ -430,7 +434,7 @@ export class Chess extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup): Result<Chess, PositionError> {
+  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Chess, PositionError> {
     const pos = new this();
     pos.board = setup.board.clone();
     pos.pockets = undefined;
@@ -440,14 +444,14 @@ export class Chess extends Position {
     pos.remainingChecks = undefined;
     pos.halfmoves = setup.halfmoves;
     pos.fullmoves = setup.fullmoves;
-    return pos.validate().map(_ => pos);
+    return pos.validate(opts).map(_ => pos);
   }
 
   clone(): Chess {
     return super.clone() as Chess;
   }
 
-  protected validate(): Result<undefined, PositionError> {
+  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -461,7 +465,7 @@ export class Chess extends Position {
     if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
 
-    return this.validateCheckers();
+    return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
   }
 
   protected validateCheckers(): Result<undefined, PositionError> {
