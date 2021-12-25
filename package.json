@@ -28,13 +28,13 @@
     "eslint": "^8",
     "jest": "^27",
     "prettier": "^2",
+    "ts-jest": "^27",
     "typedoc": "^0.22",
     "typescript": "^4"
   },
   "scripts": {
     "prepare": "tsc",
-    "test": "$npm_execpath run prepare && $npm_execpath run jest",
-    "jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/hash.ts src/san.ts src/transform.ts src/variant.ts",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
@@ -103,6 +103,20 @@
     "src/index.ts"
   ],
   "jest": {
-    "testRegex": ".*\\.test\\.js"
+    "testRegex": ".*\\.test\\.ts$",
+    "transform": {
+      "\\.ts$": "ts-jest"
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    },
+    "moduleNameMapper": {
+      "^(.*)\\.js$": "$1"
+    }
   }
 }
