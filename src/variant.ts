@@ -387,7 +387,7 @@ export class RacingKings extends Chess {
     // Kings cannot give check.
     if (square === ctx.king) return super.dests(square, ctx);
 
-    // TODO: This could be optimized considerably.
+    // Do not allow giving check.
     let dests = SquareSet.empty();
     for (const to of super.dests(square, ctx)) {
       // Valid, because there are no promotions (or even pawns).
