@@ -98,7 +98,7 @@ export class Atomic extends Chess {
     return super.clone() as Atomic;
   }
 
-  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
+  protected validate(_opts?: FromSetupOpts): Result<undefined, PositionError> {
     // Like chess, but allow our king to be missing and any number of checkers.
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() > 2) return Result.err(new PositionError(IllegalSetup.Kings));
@@ -220,7 +220,7 @@ export class Antichess extends Chess {
     return super.clone() as Antichess;
   }
 
-  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
+  protected validate(_opts?: FromSetupOpts): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
