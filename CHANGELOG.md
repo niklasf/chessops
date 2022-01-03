@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.10.4
+
+- Add `.js` ending to relative imports (required for ES modules).
+- Introduce `FromSetupOpts` with `ignoreImpossibleCheck`.
+
 ## v0.10.3
 
 - Fix `ThreeCheck` not updating remaining checks.
