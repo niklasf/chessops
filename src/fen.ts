@@ -88,17 +88,18 @@ export function parsePockets(pocketPart: string): Result<Material, FenError> {
 export function parseCastlingFen(board: Board, castlingPart: string): Result<SquareSet, FenError> {
   let unmovedRooks = SquareSet.empty();
   if (castlingPart === '-') return Result.ok(unmovedRooks);
-  if (!/^[KQABCDEFGH]{0,2}[kqabcdefgh]{0,2}$/.test(castlingPart)) {
-    return Result.err(new FenError(InvalidFen.Castling));
-  }
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
     const color = c === lower ? 'black' : 'white';
     const backrank = SquareSet.backrank(color).intersect(board[color]);
+
     let candidates: Iterable<Square>;
     if (lower === 'q') candidates = backrank;
     else if (lower === 'k') candidates = backrank.reversed();
-    else candidates = SquareSet.fromSquare(lower.charCodeAt(0) - 'a'.charCodeAt(0)).intersect(backrank);
+    else if ('a' <= lower && lower <= 'h')
+      candidates = SquareSet.fromSquare(lower.charCodeAt(0) - 'a'.charCodeAt(0)).intersect(backrank);
+    else return Result.err(new FenError(InvalidFen.Castling));
+
     for (const square of candidates) {
       if (board.king.has(square) && !board.promoted.has(square)) break;
       if (board.rook.has(square)) {
@@ -107,6 +108,8 @@ export function parseCastlingFen(board: Board, castlingPart: string): Result<Squ
       }
     }
   }
+  if (COLORS.some(color => SquareSet.backrank(color).intersect(unmovedRooks).size() > 2))
+    return Result.err(new FenError(InvalidFen.Castling));
   return Result.ok(unmovedRooks);
 }
 
