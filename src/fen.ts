@@ -128,7 +128,7 @@ export function parseRemainingChecks(part: string): Result<RemainingChecks, FenE
 }
 
 export function parseFen(fen: string): Result<Setup, FenError> {
-  const parts = fen.split(' ');
+  const parts = fen.split(/[\s_]+/);
   const boardPart = parts.shift()!;
 
   // Board and pockets

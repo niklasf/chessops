@@ -38,6 +38,11 @@ test('partial fen', () => {
   expect(setup.fullmoves).toEqual(1);
 });
 
+test('invalid fen', () => {
+  expect(parseFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQQKBNR w cq - 0P1').isErr).toBe(true);
+  expect(parseFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w  - 0 1').isErr).toBe(true);
+});
+
 test.each([
   '8/8/8/8/8/8/8/8 w - - 1+2 12 42',
   '8/8/8/8/8/8/8/8[Q] b - - 0 1',
