@@ -10,9 +10,9 @@
     "uci",
     "typescript"
   ],
-  "repository": "https://github.com/lichess-org/chessops",
+  "repository": "https://github.com/niklasf/chessops",
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>",
-  "funding": "https://lichess.org/patron",
+  "funding": "https://github.com/sponsors/niklasf",
   "license": "GPL-3.0-or-later",
   "module": "index.js",
   "types": "index.d.ts",
