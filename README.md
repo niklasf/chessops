@@ -1,20 +1,20 @@
 # chessops
 
-[![Test](https://github.com/niklasf/chessops/workflows/Test/badge.svg)](https://github.com/niklasf/chessops/actions)
+[![Test](https://github.com/lichess-org/chessops/workflows/Test/badge.svg)](https://github.com/lichess-org/chessops/actions)
 [![npm](https://img.shields.io/npm/v/chessops)](https://www.npmjs.com/package/chessops)
 
 Chess and chess variant rules and operations in TypeScript.
 
 ## Documentation
 
-[View TypeDoc](https://niklasf.github.io/chessops/)
+[View TypeDoc](https://lichess-org.github.io/chessops/)
 
 ## Features
 
-- [Read and write FEN](https://niklasf.github.io/chessops/modules/fen.html)
+- [Read and write FEN](https://lichess-org.github.io/chessops/modules/fen.html)
 - Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Castles, Setup,
   Position)
-- [Variant rules](https://niklasf.github.io/chessops/modules/variant.html): Standard chess, Crazyhouse, King of the Hill, Three-check,
+- [Variant rules](https://lichess-org.github.io/chessops/modules/variant.html): Standard chess, Crazyhouse, King of the Hill, Three-check,
   Antichess, Atomic, Horde, Racing Kings
   - Move making
   - Legal move and drop move generation
@@ -22,14 +22,14 @@ Chess and chess variant rules and operations in TypeScript.
   - Insufficient material
   - Setup validation
 - Supports Chess960
-- [Attacks and rays](https://niklasf.github.io/chessops/modules/attacks.html) using hyperbola quintessence
+- [Attacks and rays](https://lichess-org.github.io/chessops/modules/attacks.html) using hyperbola quintessence
 - Read and write UCI move notation
-- [Read and write SAN](https://niklasf.github.io/chessops/modules/san.html)
-- [Position hashing](https://niklasf.github.io/chessops/modules/hash.html)
-- [Transformations](https://niklasf.github.io/chessops/modules/transform.html): Mirroring and rotating
-- [Compatibility](https://niklasf.github.io/chessops/modules/compat.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
+- [Read and write SAN](https://lichess-org.github.io/chessops/modules/san.html)
+- [Position hashing](https://lichess-org.github.io/chessops/modules/hash.html)
+- [Transformations](https://lichess-org.github.io/chessops/modules/transform.html): Mirroring and rotating
+- [Compatibility](https://lichess-org.github.io/chessops/modules/compat.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
 
-[File an issue](https://github.com/niklasf/chessops/issues/new) to request more.
+[File an issue](https://github.com/lichess-org/chessops/issues/new) to request more.
 
 ## Example
 
