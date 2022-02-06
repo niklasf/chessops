@@ -98,8 +98,8 @@ export class Atomic extends Chess {
     return super.clone() as Atomic;
   }
 
-  protected validate(_opts?: FromSetupOpts): Result<undefined, PositionError> {
-    // Like chess, but allow our king to be missing and any number of checkers.
+  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
+    // Like chess, but allow our king to be missing.
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() > 2) return Result.err(new PositionError(IllegalSetup.Kings));
     const otherKing = this.board.kingOf(opposite(this.turn));
@@ -110,7 +110,13 @@ export class Atomic extends Chess {
     if (SquareSet.backranks().intersects(this.board.pawn)) {
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
     }
-    return Result.ok(undefined);
+    return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
+  }
+
+  protected validateCheckers(): Result<undefined, PositionError> {
+    // Other king moving away can cause many checks to be given at the
+    // same time. Not checking details or even that the king is close enough.
+    return defined(this.epSquare) ? Result.ok(undefined) : super.validateCheckers();
   }
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {

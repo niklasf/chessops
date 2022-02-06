@@ -471,15 +471,26 @@ export class Chess extends Position {
   protected validateCheckers(): Result<undefined, PositionError> {
     const ourKing = this.board.kingOf(this.turn);
     if (defined(ourKing)) {
-      // Multiple sliding checkers aligned with king.
       const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
-      if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
-        return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-
-      // En passant square aligned with checker and king.
-      if (defined(this.epSquare)) {
-        for (const checker of checkers) {
-          if (ray(checker, this.epSquare).has(ourKing))
+      if (checkers.nonEmpty()) {
+        if (defined(this.epSquare)) {
+          // The pushed pawn must be the only checker, or it has uncovered
+          // check by a single sliding piece.
+          const pushedTo = this.epSquare ^ 8;
+          const pushedFrom = this.epSquare ^ 24;
+          if (
+            checkers.moreThanOne() ||
+            (checkers.first()! != pushedTo &&
+              this.kingAttackers(
+                ourKing,
+                opposite(this.turn),
+                this.board.occupied.without(pushedTo).with(pushedFrom)
+              ).nonEmpty())
+          )
+            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+        } else {
+          // Multiple sliding checkers aligned with king.
+          if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
             return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
         }
       }
