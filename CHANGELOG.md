@@ -1,5 +1,12 @@
 # Changelog for chessops
 
+## v0.10.5
+
+- Check that en passant square and checkers are not in conflict.
+- Accept castling flags in FEN in any order, duplicate flags, but no more
+  than two distinct castling rights per side.
+- Accept multiple spaces and underscores as FEN field seperators.
+
 ## v0.10.4
 
 - Add `.js` ending to relative imports (required for ES modules).
