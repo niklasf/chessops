@@ -480,7 +480,7 @@ export class Chess extends Position {
           const pushedFrom = this.epSquare ^ 24;
           if (
             checkers.moreThanOne() ||
-            (checkers.first()! != pushedTo &&
+            (checkers.first()! !== pushedTo &&
               this.kingAttackers(
                 ourKing,
                 opposite(this.turn),
