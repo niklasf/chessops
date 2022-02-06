@@ -23,6 +23,7 @@ const tricky: [string, string, number, number, number, number?, number?][] = [
   ['prison', '2b5/kpPp4/1p1P4/1P6/6p1/4p1P1/4PpPK/5B2 w - -', 1, 1, 1],
   ['king-walk', '8/8/8/B2p3Q/2qPp1P1/b7/2P2PkP/4K2R b K -', 26, 611, 14583, 366807],
   ['a1-check', '4k3/5p2/5p1p/8/rbR5/1N6/5PPP/5K2 b - - 1 29', 22, 580, 12309],
+  ['ep-unrelated-check', 'rnbqk1nr/bb3p1p/1q2r3/2pPp3/3P4/7P/1PP1NpPP/R1BQKBNR w KQkq c6', 2, 92, 2528],
 
   // https://github.com/ornicar/lila/issues/4625
   [
