@@ -140,14 +140,14 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
     if (pocketStart === -1) return Result.err(new FenError(InvalidFen.Fen));
-    board = parseBoardFen(boardPart.substr(0, pocketStart));
-    pockets = parsePockets(boardPart.substr(pocketStart + 1, boardPart.length - 1 - pocketStart - 1));
+    board = parseBoardFen(boardPart.slice(0, pocketStart));
+    pockets = parsePockets(boardPart.slice(pocketStart + 1, boardPart.length - 1));
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 7);
     if (pocketStart === -1) board = parseBoardFen(boardPart);
     else {
-      board = parseBoardFen(boardPart.substr(0, pocketStart));
-      pockets = parsePockets(boardPart.substr(pocketStart + 1));
+      board = parseBoardFen(boardPart.slice(0, pocketStart));
+      pockets = parsePockets(boardPart.slice(pocketStart + 1));
     }
   }
 
