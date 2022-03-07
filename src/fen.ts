@@ -141,7 +141,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
     const pocketStart = boardPart.indexOf('[');
     if (pocketStart === -1) return Result.err(new FenError(InvalidFen.Fen));
     board = parseBoardFen(boardPart.slice(0, pocketStart));
-    pockets = parsePockets(boardPart.slice(pocketStart + 1, boardPart.length - 1));
+    pockets = parsePockets(boardPart.slice(pocketStart + 1, -1));
   } else {
     const pocketStart = nthIndexOf(boardPart, '/', 7);
     if (pocketStart === -1) board = parseBoardFen(boardPart);
