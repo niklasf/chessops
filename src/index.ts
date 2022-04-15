@@ -73,3 +73,5 @@ export * as san from './san.js';
 export * as transform from './transform.js';
 
 export * as variant from './variant.js';
+
+export * as pgn from './pgn.js';

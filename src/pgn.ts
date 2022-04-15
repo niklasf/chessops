@@ -243,12 +243,12 @@ class LineParser {
 
   parse(data: string, options?: ParseOptions) {
     let idx = 0;
-    while (true) {
+    for (;;) {
       const nlIdx = data.indexOf('\n', idx);
-      if (nlIdx == -1) {
+      if (nlIdx === -1) {
         break;
       }
-      const crIdx = nlIdx > idx && data[nlIdx - 1] == '\r' ? nlIdx - 1 : nlIdx;
+      const crIdx = nlIdx > idx && data[nlIdx - 1] === '\r' ? nlIdx - 1 : nlIdx;
       this.lineBuf.push(data.slice(idx, crIdx));
       idx = nlIdx + 1;
       this.emit();
@@ -311,7 +311,7 @@ export class PgnParser {
 
   private handleLine(line: string) {
     let freshLine = true;
-    while (true) {
+    for (;;) {
       switch (this.state) {
         case 'bom':
           if (line.startsWith(bom)) line = line.slice(bom.length);
@@ -340,12 +340,12 @@ export class PgnParser {
             if (isWhitespace(line)) return this.emit();
           }
           const tokenRegex =
-            /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O|0-0|O-O-O|0-0-0)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[\?!]{1,2}|\(|\)|\*|1-0|0-1|1\/2-1\/2/g;
+            /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O|0-0|O-O-O|0-0-0)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[?!]{1,2}|\(|\)|\*|1-0|0-1|1\/2-1\/2/g;
           let match;
           while ((match = tokenRegex.exec(line))) {
             const frame = this.stack[this.stack.length - 1];
             let token = match[0];
-            if (token == ';') return;
+            if (token === ';') return;
             else if (token.startsWith('$')) this.handleNag(parseInt(token.slice(1), 10));
             else if (token === '!') this.handleNag(1);
             else if (token === '?') this.handleNag(2);
@@ -353,7 +353,7 @@ export class PgnParser {
             else if (token === '??') this.handleNag(4);
             else if (token === '!?') this.handleNag(5);
             else if (token === '?!') this.handleNag(6);
-            else if (token === '1-0' || token === '0-1' || token == '1/2-1/2' || token === '*') {
+            else if (token === '1-0' || token === '0-1' || token === '1/2-1/2' || token === '*') {
               if (this.stack.length === 1) this.game.headers.set('Result', token);
             } else if (token === '(') {
               this.consumeBudget(200);
@@ -362,7 +362,7 @@ export class PgnParser {
               if (this.stack.length > 1) this.stack.pop();
             } else if (token === '{') {
               const openIndex = tokenRegex.lastIndex;
-              const beginIndex = line[openIndex] == ' ' ? openIndex + 1 : openIndex;
+              const beginIndex = line[openIndex] === ' ' ? openIndex + 1 : openIndex;
               line = line.slice(beginIndex);
               this.state = 'comment';
               break;
@@ -383,19 +383,20 @@ export class PgnParser {
           }
           if (this.state !== 'comment') return; // fall through
         }
-        case 'comment':
+        case 'comment': {
           const closeIndex = line.indexOf('}');
-          if (closeIndex == -1) {
+          if (closeIndex === -1) {
             this.commentBuf.push(line);
             return;
           } else {
-            const endIndex = closeIndex > 0 && line[closeIndex - 1] == ' ' ? closeIndex - 1 : closeIndex;
+            const endIndex = closeIndex > 0 && line[closeIndex - 1] === ' ' ? closeIndex - 1 : closeIndex;
             this.commentBuf.push(line.slice(0, endIndex));
             this.handleComment();
             line = line.slice(closeIndex);
             this.state = 'moves';
             freshLine = false;
           }
+        }
       }
     }
   }
