@@ -12,10 +12,11 @@ export class Node<T> {
   children: ChildNode<T>[] = [];
 
   *mainline(): Iterable<T> {
-    let node = this.children[0];
-    while (node) {
-      yield node.data;
-      node = node.children[0];
+    let node: Node<T> = this;
+    while (node.children.length) {
+      const child = node.children[0];
+      yield child.data;
+      node = child;
     }
   }
 }
@@ -142,54 +143,57 @@ export function makePgn(game: Game<PgnNodeData>): string {
       forceMoveNumber = true;
     }
 
-    if (frame.state == 'pre') {
-      if (frame.node.data.startingComment) {
-        tokens.push('{', safeComment(frame.node.data.startingComment), '}');
-      }
-      if (forceMoveNumber || frame.ply % 2 == 0) {
-        tokens.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 == 0 ? '.' : '...'));
-        forceMoveNumber = false;
-      }
-      tokens.push(frame.node.data.san);
-      for (const nag of frame.node.data.nags || []) {
-        tokens.push('$' + nag);
-        forceMoveNumber = true;
-      }
-      if (frame.node.data.comment) {
-        tokens.push('{', safeComment(frame.node.data.comment), '}');
-        forceMoveNumber = true;
-      }
-      frame.state = 'sidelines';
-    } else if (frame.state == 'sidelines') {
-      const child = frame.sidelines.next();
-      if (child.done) {
-        if (frame.node.children.length) {
-          const variations = frame.node.children[Symbol.iterator]();
+    switch (frame.state) {
+      case 'pre':
+        if (frame.node.data.startingComment) {
+          tokens.push('{', safeComment(frame.node.data.startingComment), '}');
+        }
+        if (forceMoveNumber || frame.ply % 2 === 0) {
+          tokens.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 ? '...' : '.'));
+          forceMoveNumber = false;
+        }
+        tokens.push(frame.node.data.san);
+        for (const nag of frame.node.data.nags || []) {
+          tokens.push('$' + nag);
+          forceMoveNumber = true;
+        }
+        if (frame.node.data.comment) {
+          tokens.push('{', safeComment(frame.node.data.comment), '}');
+          forceMoveNumber = true;
+        }
+        frame.state = 'sidelines'; // fall through
+      case 'sidelines': {
+        const child = frame.sidelines.next();
+        if (child.done) {
+          if (frame.node.children.length) {
+            const variations = frame.node.children[Symbol.iterator]();
+            stack.push({
+              state: 'pre',
+              ply: frame.ply + 1,
+              node: variations.next().value,
+              sidelines: variations,
+              startsVariation: false,
+              inVariation: false,
+            });
+          }
+          frame.state = 'end';
+        } else {
+          tokens.push('(');
+          forceMoveNumber = true;
           stack.push({
             state: 'pre',
-            node: variations.next().value,
-            sidelines: variations,
+            ply: frame.ply,
+            node: child.value,
+            sidelines: [][Symbol.iterator](),
+            startsVariation: true,
             inVariation: false,
-            startsVariation: false,
-            ply: frame.ply + 1,
           });
+          frame.inVariation = true;
         }
-        frame.state = 'end';
-      } else {
-        tokens.push('(');
-        forceMoveNumber = true;
-        stack.push({
-          ply: frame.ply,
-          startsVariation: true,
-          node: child.value,
-          sidelines: [][Symbol.iterator](),
-          inVariation: false,
-          state: 'pre',
-        });
-        frame.inVariation = true;
+        break;
       }
-    } else if (frame.state == 'end') {
-      stack.pop();
+      case 'end':
+        stack.pop();
     }
   }
 
