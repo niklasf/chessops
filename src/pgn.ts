@@ -83,6 +83,15 @@ function escapeHeader(value: string): string {
   return value.replace('\\', '\\\\').replace('"', '\\"');
 }
 
+interface AppendPgnFrame {
+  ply: number;
+  state: 'pre' | 'variations' | 'end';
+  parent: Node<PgnNodeData>;
+  variation: number;
+  isVariation: boolean;
+  inVariation: boolean;
+}
+
 export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
   if (game.headers.size) {
     for (const [key, value] of game.headers.entries()) {
@@ -99,11 +108,14 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
       )
     : 0;
 
-  const stack = [
+  const stack: AppendPgnFrame[] = [
     {
       ply: initialPly,
-      node: game.moves,
-      i: 0,
+      parent: game.moves,
+      state: 'pre',
+      variation: 1,
+      isVariation: false,
+      inVariation: false,
     },
   ];
 
@@ -111,39 +123,44 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
     needsMoveNumber = true;
   while (stack.length) {
     const frame = stack[stack.length - 1];
-    if (frame.i < frame.node.children.length) {
-      const child = frame.node.children[frame.i];
+
+    if (frame.inVariation) {
+      frame.inVariation = false;
+      builder.push(' )');
+    }
+
+    if (frame.state == 'pre') {
+      const child = frame.parent.children[0];
       if (child.data.startingComment) {
         builder.push(' { ', child.data.startingComment.replace('}', ''), ' }');
       }
       if (needsMoveNumber || frame.ply % 2 == 0) {
         if (!first) builder.push(' ');
-        builder.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 ? '...' : '.'));
+        builder.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 == 0 ? '.' : '...'));
+        needsMoveNumber = false;
       }
       builder.push(' ', child.data.san);
-
-      stack.push({
-        ply: frame.ply + 1,
-        node: child,
-        i: 0,
-      });
-
-      if (child.data.nags) {
-        for (const nag of child.data.nags) {
-          builder.push(' $' + nag);
-        }
-        needsMoveNumber = true;
+      for (const nag of child.data.nags || []) {
+        builder.push(' $' + nag);
       }
       if (child.data.comment) {
-        builder.push(' { ', child.data.comment.replace('}', ''), ' }');
-        needsMoveNumber = true;
+        builder.push(' { ', child.data.comment.replace('{', ''), ' }');
       }
-      frame.i++;
-      first = false;
-    } else stack.pop();
+      frame.state = 'variations';
+    } else if (frame.state == 'variations') {
+      if (frame.variation < frame.parent.children.length) {
+        frame.variation++;
+      } else {
+        frame.state = 'end';
+      }
+    } else if (frame.state == 'end') {
+      stack.pop();
+    }
+
+    first = false;
   }
 
-  if (game.moves.children.length) builder.push(' ');
+  if (!first) builder.push(' ');
   builder.push(makeOutcome(parseOutcome(game.headers.get('Result'))));
 }
 
