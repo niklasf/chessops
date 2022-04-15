@@ -8,6 +8,7 @@ import {
   parsePgn,
   transform,
   startingPosition,
+  emptyHeaders,
 } from './pgn.js';
 import { parseSan } from './san.js';
 import { Position } from './chess.js';
@@ -42,7 +43,7 @@ test('make pgn', () => {
   const c4 = new ChildNode<PgnNodeData>({ san: 'c4' });
   e5.children.push(c4);
 
-  expect(makePgn({ headers: new Map(), moves: root })).toEqual(
+  expect(makePgn({ headers: emptyHeaders(), moves: root })).toEqual(
     '1. e4 $7 ( 1. e3 ) 1... e5 ( 1... e6 2. Nf3 { a comment } ) 2. c4 *'
   );
 });
@@ -67,7 +68,7 @@ test('parse pgn', () => {
   const callback = jest.fn((game: Game<PgnNodeData>) => {
     expect(makePgn(game)).toBe('[Result "1-0"]\n\n1. e4 e5 2. Nf3 { foo } 1-0');
   });
-  const parser = new PgnParser(callback, () => new Map());
+  const parser = new PgnParser(callback, emptyHeaders);
   parser.parse('1. e4 \ne5', { stream: true });
   parser.parse('\nNf3 {f', { stream: true });
   parser.parse('oo } 1-', { stream: true });
@@ -104,7 +105,7 @@ test('transform pgn', () => {
 
 test('pgn file', done => {
   const callback = jest.fn();
-  const parser = new PgnParser(callback, () => new Map());
+  const parser = new PgnParser(callback, emptyHeaders);
   createReadStream('./data/kasparov-deep-blue-1997.pgn', { encoding: 'utf-8' })
     .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
     .on('close', () => {

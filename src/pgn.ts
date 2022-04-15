@@ -218,6 +218,10 @@ export function defaultHeaders(): Map<string, string> {
   ]);
 }
 
+export function emptyHeaders(): Map<string, string> {
+  return new Map();
+}
+
 const bom = '\ufeff';
 
 function isWhitespace(line: string): boolean {
