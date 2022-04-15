@@ -4,6 +4,7 @@ import { parseFen } from './fen.js';
 
 export interface Game<T> {
   headers: Map<string, string>;
+  comment?: string;
   moves: Node<T>;
 }
 
@@ -83,6 +84,10 @@ function escapeHeader(value: string): string {
   return value.replace('\\', '\\\\').replace('"', '\\"');
 }
 
+function safeComment(comment: string): string {
+  return comment.replace('}', '');
+}
+
 interface AppendPgnFrame {
   ply: number;
   state: 'pre' | 'variations' | 'end';
@@ -103,6 +108,8 @@ export function makePgn(game: Game<PgnNodeData>): string {
     builder.push('\n');
   }
 
+  if (game.comment) tokens.push('{', safeComment(game.comment), '}');
+
   const fen = game.headers.get('FEN');
   const initialPly = fen
     ? parseFen(fen).unwrap(
@@ -122,7 +129,7 @@ export function makePgn(game: Game<PgnNodeData>): string {
     },
   ];
 
-  let needsMoveNumber = true;
+  let forceMoveNumber = true;
   while (stack.length) {
     const frame = stack[stack.length - 1];
 
@@ -134,18 +141,18 @@ export function makePgn(game: Game<PgnNodeData>): string {
     if (frame.state == 'pre') {
       const child = frame.parent.children[0];
       if (child.data.startingComment) {
-        tokens.push('{', child.data.startingComment.replace('}', ''), '}');
+        tokens.push('{', safeComment(child.data.startingComment), '}');
       }
-      if (needsMoveNumber || frame.ply % 2 == 0) {
+      if (forceMoveNumber || frame.ply % 2 == 0) {
         tokens.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 == 0 ? '.' : '...'));
-        needsMoveNumber = false;
+        forceMoveNumber = false;
       }
       tokens.push(child.data.san);
       for (const nag of child.data.nags || []) {
         tokens.push('$' + nag);
       }
       if (child.data.comment) {
-        tokens.push('{', child.data.comment.replace('{', ''), '}');
+        tokens.push('{', safeComment(child.data.comment), '}');
       }
       frame.state = 'variations';
     } else if (frame.state == 'variations') {
