@@ -89,11 +89,10 @@ function safeComment(comment: string): string {
 }
 
 interface AppendPgnFrame {
+  state: 'pre' | 'sidelines' | 'end';
   ply: number;
-  state: 'pre' | 'variations' | 'end';
   node: ChildNode<PgnNodeData>;
-  parent: Node<PgnNodeData>;
-  variation: number;
+  sidelines: Iterator<ChildNode<PgnNodeData>>;
   startsVariation: boolean;
   inVariation: boolean;
 }
@@ -121,16 +120,17 @@ export function makePgn(game: Game<PgnNodeData>): string {
 
   const stack: AppendPgnFrame[] = [];
 
-  if (game.moves.children.length)
+  if (game.moves.children.length) {
+    const variations = game.moves.children[Symbol.iterator]();
     stack.push({
       state: 'pre',
       ply: initialPly,
-      parent: game.moves,
-      node: game.moves.children[0],
-      variation: 1,
+      node: variations.next().value,
+      sidelines: variations,
       startsVariation: false,
       inVariation: false,
     });
+  }
 
   let forceMoveNumber = true;
   while (stack.length) {
@@ -159,35 +159,34 @@ export function makePgn(game: Game<PgnNodeData>): string {
         tokens.push('{', safeComment(frame.node.data.comment), '}');
         forceMoveNumber = true;
       }
-      frame.state = 'variations';
-    } else if (frame.state == 'variations') {
-      if (frame.variation < frame.parent.children.length) {
-        tokens.push('(');
-        forceMoveNumber = true;
-        stack.push({
-          ply: frame.ply,
-          startsVariation: true,
-          node: frame.parent.children[frame.variation],
-          parent: frame.node,
-          inVariation: false,
-          state: 'pre',
-          variation: frame.node.children.length,
-        });
-        frame.inVariation = true;
-        frame.variation++;
-      } else {
+      frame.state = 'sidelines';
+    } else if (frame.state == 'sidelines') {
+      const child = frame.sidelines.next();
+      if (child.done) {
         if (frame.node.children.length) {
+          const variations = frame.node.children[Symbol.iterator]();
           stack.push({
             state: 'pre',
-            node: frame.node.children[0],
-            parent: frame.node,
-            variation: 1,
+            node: variations.next().value,
+            sidelines: variations,
             inVariation: false,
             startsVariation: false,
             ply: frame.ply + 1,
           });
         }
         frame.state = 'end';
+      } else {
+        tokens.push('(');
+        forceMoveNumber = true;
+        stack.push({
+          ply: frame.ply,
+          startsVariation: true,
+          node: child.value,
+          sidelines: [][Symbol.iterator](),
+          inVariation: false,
+          state: 'pre',
+        });
+        frame.inVariation = true;
       }
     } else if (frame.state == 'end') {
       stack.pop();
