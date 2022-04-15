@@ -1,4 +1,5 @@
 import { defined } from './util.js';
+import { Outcome } from './types.js';
 
 export interface Game<T> {
   headers: Map<string, string>;
@@ -54,6 +55,20 @@ export interface PgnNodeData {
   startingComment?: string;
   comment?: string;
   nags?: number[];
+}
+
+export function makeOutcome(outcome: Outcome | undefined): string {
+  if (!outcome) return '*';
+  else if (outcome.winner === 'white') return '1-0';
+  else if (outcome.winner === 'black') return '0-1';
+  else return '1/2-1/2';
+}
+
+export function parseOutcome(s: string): Outcome | undefined {
+  if (s === '1-0') return { winner: 'white' };
+  else if (s === '0-1') return { winner: 'black' };
+  else if (s === '1/2-1/2') return { winner: undefined };
+  else return;
 }
 
 function escapeHeader(value: string): string {
