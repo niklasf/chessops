@@ -1,6 +1,9 @@
 import { defined } from './util.js';
-import { Outcome } from './types.js';
-import { parseFen } from './fen.js';
+import { Rules, Outcome } from './types.js';
+import { parseFen, FenError, makeFen } from './fen.js';
+import { Position, PositionError, FromSetupOpts, IllegalSetup } from './chess.js';
+import { defaultPosition, setupPosition } from './variant.js';
+import { Result } from '@badrap/result';
 
 export interface Game<T> {
   headers: Map<string, string>;
@@ -441,4 +444,71 @@ export function parsePgn(pgn: string, initHeaders: () => Map<string, string> = d
   const games: Game<PgnNodeData>[] = [];
   new PgnParser(game => games.push(game), initHeaders, NaN).parse(pgn);
   return games;
+}
+
+export function parseVariant(variant: string | undefined): Rules | undefined {
+  switch (variant) {
+    case 'Crazyhouse':
+      return 'crazyhouse';
+    case 'King of the Hill':
+      return 'kingofthehill';
+    case 'Three-check':
+      return '3check';
+    case 'Antichess':
+      return 'antichess';
+    case 'Atomic':
+      return 'atomic';
+    case 'Horde':
+      return 'horde';
+    case 'Racing Kings':
+      return 'racingkings';
+    case 'Standard':
+      return 'chess';
+    default:
+      return;
+  }
+}
+
+export function makeVariant(rules: Rules): string | undefined {
+  switch (rules) {
+    case 'chess':
+      return;
+    case 'crazyhouse':
+      return 'Crazyhouse';
+    case 'racingkings':
+      return 'Racing Kings';
+    case 'horde':
+      return 'Horde';
+    case 'atomic':
+      return 'Atomic';
+    case 'antichess':
+      return 'Antichess';
+    case '3check':
+      return 'Three-check';
+    case 'kingofthehill':
+      return 'King of the Hill';
+  }
+}
+
+export function startingPosition(
+  headers: Map<string, string>,
+  opts?: FromSetupOpts
+): Result<Position, FenError | PositionError> {
+  const rules = parseVariant(headers.get('Variant'));
+  if (!rules) return Result.err(new PositionError(IllegalSetup.Variant));
+  const fen = headers.get('FEN');
+  if (fen) return parseFen(fen).chain(setup => setupPosition(rules, setup, opts));
+  else return Result.ok(defaultPosition(rules));
+}
+
+export function setStartingPosition(headers: Map<string, string>, pos: Position) {
+  const variant = makeVariant(pos.rules);
+  if (variant) headers.set('Variant', variant);
+  else headers.delete('Variant');
+
+  const fenOpts = { promoted: pos.rules === 'crazyhouse' };
+  const fen = makeFen(pos.toSetup(), fenOpts);
+  const defaultFen = makeFen(defaultPosition(pos.rules).toSetup(), fenOpts);
+  if (fen !== defaultFen) headers.set('FEN', fen);
+  else headers.delete('FEN');
 }
