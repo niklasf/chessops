@@ -1,5 +1,6 @@
 import { defined } from './util.js';
 import { Outcome } from './types.js';
+import { parseFen } from './fen.js';
 
 export interface Game<T> {
   headers: Map<string, string>;
@@ -50,7 +51,6 @@ export function transform<T, U, C extends { clone(): C }>(
 }
 
 export interface PgnNodeData {
-  ply: number;
   san: string;
   startingComment?: string;
   comment?: string;
@@ -64,7 +64,7 @@ export function makeOutcome(outcome: Outcome | undefined): string {
   else return '1/2-1/2';
 }
 
-export function parseOutcome(s: string): Outcome | undefined {
+export function parseOutcome(s: string | undefined): Outcome | undefined {
   if (s === '1-0') return { winner: 'white' };
   else if (s === '0-1') return { winner: 'black' };
   else if (s === '1/2-1/2') return { winner: undefined };
@@ -72,7 +72,7 @@ export function parseOutcome(s: string): Outcome | undefined {
 }
 
 function escapeHeader(value: string): string {
-  return value; // TODO!
+  return value.replace('\\', '\\\\').replace('"', '\\"');
 }
 
 export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
@@ -82,10 +82,61 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
     }
     builder.push('\n');
   }
+
+  const fen = game.headers.get('FEN');
+  const initialPly = fen
+    ? parseFen(fen).unwrap(
+        setup => (setup.fullmoves - 1) * 2 + (setup.turn === 'white' ? 0 : 1),
+        _ => 0
+      )
+    : 0;
+
+  const stack = [
+    {
+      ply: initialPly,
+      node: game.moves,
+      i: 0,
+    },
+  ];
+
+  while (stack.length) {
+    const frame = stack[stack.length - 1];
+    if (frame.i < frame.node.children.length) {
+      const child = frame.node.children[frame.i];
+      if (child.data.startingComment) {
+        builder.push(' { ', child.data.startingComment.replace('}', ''), ' }');
+      }
+      builder.push(' ', child.data.san);
+      if (child.data.nags) {
+        for (const nag of child.data.nags) {
+          builder.push(' $' + nag);
+        }
+      }
+      if (child.data.comment) {
+        builder.push(' { ', child.data.comment.replace('}', ''), ' }');
+      }
+      frame.i++;
+    } else stack.pop();
+  }
+
+  if (game.moves.children.length) builder.push(' ');
+  builder.push(makeOutcome(parseOutcome(game.headers.get('Result'))));
 }
 
 export function makePgn(game: Game<PgnNodeData>): string {
   const builder: string[] = [];
   appendPgn(builder, game);
   return builder.join();
+}
+
+export function defaultHeaders(): Map<string, string> {
+  return new Map([
+    ['Event', '?'],
+    ['Site', '?'],
+    ['Date', '????.??.??'],
+    ['Round', '?'],
+    ['White', '?'],
+    ['Black', '?'],
+    ['Result', '*'],
+  ]);
 }
