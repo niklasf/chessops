@@ -92,7 +92,10 @@ interface AppendPgnFrame {
   inVariation: boolean;
 }
 
-export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
+export function makePgn(game: Game<PgnNodeData>): string {
+  const builder = [],
+    tokens = [];
+
   if (game.headers.size) {
     for (const [key, value] of game.headers.entries()) {
       builder.push('[', key, ' "', escapeHeader(value), '"]\n');
@@ -119,32 +122,30 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
     },
   ];
 
-  let first = true,
-    needsMoveNumber = true;
+  let needsMoveNumber = true;
   while (stack.length) {
     const frame = stack[stack.length - 1];
 
     if (frame.inVariation) {
       frame.inVariation = false;
-      builder.push(' )');
+      tokens.push(')');
     }
 
     if (frame.state == 'pre') {
       const child = frame.parent.children[0];
       if (child.data.startingComment) {
-        builder.push(' { ', child.data.startingComment.replace('}', ''), ' }');
+        tokens.push('{', child.data.startingComment.replace('}', ''), '}');
       }
       if (needsMoveNumber || frame.ply % 2 == 0) {
-        if (!first) builder.push(' ');
-        builder.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 == 0 ? '.' : '...'));
+        tokens.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 == 0 ? '.' : '...'));
         needsMoveNumber = false;
       }
-      builder.push(' ', child.data.san);
+      tokens.push(child.data.san);
       for (const nag of child.data.nags || []) {
-        builder.push(' $' + nag);
+        tokens.push('$' + nag);
       }
       if (child.data.comment) {
-        builder.push(' { ', child.data.comment.replace('{', ''), ' }');
+        tokens.push('{', child.data.comment.replace('{', ''), '}');
       }
       frame.state = 'variations';
     } else if (frame.state == 'variations') {
@@ -156,17 +157,11 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
     } else if (frame.state == 'end') {
       stack.pop();
     }
-
-    first = false;
   }
 
-  if (!first) builder.push(' ');
-  builder.push(makeOutcome(parseOutcome(game.headers.get('Result'))));
-}
+  tokens.push(makeOutcome(parseOutcome(game.headers.get('Result'))));
 
-export function makePgn(game: Game<PgnNodeData>): string {
-  const builder: string[] = [];
-  appendPgn(builder, game);
+  builder.push(tokens.join(' '));
   return builder.join('');
 }
 
