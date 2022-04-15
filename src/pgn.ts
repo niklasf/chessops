@@ -99,7 +99,8 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
     },
   ];
 
-  let first = true;
+  let first = true,
+    needsMoveNumber = true;
   while (stack.length) {
     const frame = stack[stack.length - 1];
     if (frame.i < frame.node.children.length) {
@@ -107,7 +108,7 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
       if (child.data.startingComment) {
         builder.push(' { ', child.data.startingComment.replace('}', ''), ' }');
       }
-      if (first || frame.ply % 2 == 0) {
+      if (needsMoveNumber || frame.ply % 2 == 0) {
         if (!first) builder.push(' ');
         builder.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 ? '...' : '.'));
       }
@@ -123,9 +124,11 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
         for (const nag of child.data.nags) {
           builder.push(' $' + nag);
         }
+        needsMoveNumber = true;
       }
       if (child.data.comment) {
         builder.push(' { ', child.data.comment.replace('}', ''), ' }');
+        needsMoveNumber = true;
       }
       frame.i++;
       first = false;
