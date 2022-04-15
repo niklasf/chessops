@@ -91,9 +91,10 @@ function safeComment(comment: string): string {
 interface AppendPgnFrame {
   ply: number;
   state: 'pre' | 'variations' | 'end';
+  node: ChildNode<PgnNodeData>;
   parent: Node<PgnNodeData>;
   variation: number;
-  isVariation: boolean;
+  startsVariation: boolean;
   inVariation: boolean;
 }
 
@@ -118,47 +119,74 @@ export function makePgn(game: Game<PgnNodeData>): string {
       )
     : 0;
 
-  const stack: AppendPgnFrame[] = [
-    {
+  const stack: AppendPgnFrame[] = [];
+
+  if (game.moves.children.length)
+    stack.push({
+      state: 'pre',
       ply: initialPly,
       parent: game.moves,
-      state: 'pre',
+      node: game.moves.children[0],
       variation: 1,
-      isVariation: false,
+      startsVariation: false,
       inVariation: false,
-    },
-  ];
+    });
 
   let forceMoveNumber = true;
   while (stack.length) {
     const frame = stack[stack.length - 1];
 
     if (frame.inVariation) {
-      frame.inVariation = false;
       tokens.push(')');
+      frame.inVariation = false;
+      forceMoveNumber = true;
     }
 
     if (frame.state == 'pre') {
-      const child = frame.parent.children[0];
-      if (child.data.startingComment) {
-        tokens.push('{', safeComment(child.data.startingComment), '}');
+      if (frame.node.data.startingComment) {
+        tokens.push('{', safeComment(frame.node.data.startingComment), '}');
       }
       if (forceMoveNumber || frame.ply % 2 == 0) {
         tokens.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 == 0 ? '.' : '...'));
         forceMoveNumber = false;
       }
-      tokens.push(child.data.san);
-      for (const nag of child.data.nags || []) {
+      tokens.push(frame.node.data.san);
+      for (const nag of frame.node.data.nags || []) {
         tokens.push('$' + nag);
+        forceMoveNumber = true;
       }
-      if (child.data.comment) {
-        tokens.push('{', safeComment(child.data.comment), '}');
+      if (frame.node.data.comment) {
+        tokens.push('{', safeComment(frame.node.data.comment), '}');
+        forceMoveNumber = true;
       }
       frame.state = 'variations';
     } else if (frame.state == 'variations') {
       if (frame.variation < frame.parent.children.length) {
+        tokens.push('(');
+        forceMoveNumber = true;
+        stack.push({
+          ply: frame.ply,
+          startsVariation: true,
+          node: frame.parent.children[frame.variation],
+          parent: frame.node,
+          inVariation: false,
+          state: 'pre',
+          variation: frame.node.children.length,
+        });
+        frame.inVariation = true;
         frame.variation++;
       } else {
+        if (frame.node.children.length) {
+          stack.push({
+            state: 'pre',
+            node: frame.node.children[0],
+            parent: frame.node,
+            variation: 1,
+            inVariation: false,
+            startsVariation: false,
+            ply: frame.ply + 1,
+          });
+        }
         frame.state = 'end';
       }
     } else if (frame.state == 'end') {
