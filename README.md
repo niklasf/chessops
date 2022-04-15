@@ -22,12 +22,12 @@ Chess and chess variant rules and operations in TypeScript.
   - Insufficient material
   - Setup validation
 - Supports Chess960
-- [Attacks and rays](https://niklasf.github.io/chessops/modules/attacks.html) using hyperbola quintessence
+- [Attacks and rays](https://niklasf.github.io/chessops/modules/attacks.html) using hyperbola quintessence (faster to initialize than magic bitboards)
 - Read and write UCI move notation
 - [Read and write SAN](https://niklasf.github.io/chessops/modules/san.html)
 - [Read and write PGN](https://niklasf.github.io/chessops/modules/pgn.html)
-  - Game tree
-  - Transform to add arbitrary user data to nodes
+  - Game tree model
+  - Transform to augment nodes with arbitrary user data
   - Streaming parser
 - [Transformations](https://niklasf.github.io/chessops/modules/transform.html): Mirroring and rotating
 - [Compatibility](https://niklasf.github.io/chessops/modules/compat.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
