@@ -9,6 +9,14 @@ export interface Game<T> {
 
 export class Node<T> {
   children: ChildNode<T>[] = [];
+
+  *mainline(): Iterable<T> {
+    let node = this.children[0];
+    while (node) {
+      yield node.data;
+      node = node.children[0];
+    }
+  }
 }
 
 export class ChildNode<T> extends Node<T> {
