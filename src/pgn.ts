@@ -231,6 +231,7 @@ export interface ParseOptions {
 
 interface ParserFrame {
   parent: Node<PgnNodeData>;
+  root: boolean;
   node?: ChildNode<PgnNodeData>;
   startingComments?: string[];
 }
@@ -293,7 +294,8 @@ export class PgnParser {
       moves: new Node(),
     };
     this.consecutiveEmptyLines = 0;
-    this.stack = [{ parent: this.game.moves }];
+    this.stack = [{ parent: this.game.moves, root: true }];
+    this.commentBuf = [];
   }
 
   private consumeBudget(cost: number) {
@@ -355,14 +357,13 @@ export class PgnParser {
               if (this.stack.length === 1) this.game.headers.set('Result', token);
             } else if (token === '(') {
               this.consumeBudget(200);
-              this.stack.push({ parent: frame.parent });
+              this.stack.push({ parent: frame.parent, root: false });
             } else if (token === ')') {
               if (this.stack.length > 1) this.stack.pop();
             } else if (token === '{') {
               const openIndex = tokenRegex.lastIndex;
               const beginIndex = line[openIndex] == ' ' ? openIndex + 1 : openIndex;
               line = line.slice(beginIndex);
-              this.commentBuf = [];
               this.state = 'comment';
               break;
             } else {
@@ -376,6 +377,7 @@ export class PgnParser {
                 startingComments: frame.startingComments,
               });
               frame.startingComments = undefined;
+              frame.root = false;
               frame.parent.children.push(frame.node);
             }
           }
@@ -410,12 +412,17 @@ export class PgnParser {
   private handleComment() {
     this.consumeBudget(100);
     const frame = this.stack[this.stack.length - 1];
+    const comment = this.commentBuf.join('\n');
+    this.commentBuf = [];
     if (frame.node) {
       frame.node.data.comments ||= [];
-      frame.node.data.comments.push(this.commentBuf.join('\n'));
+      frame.node.data.comments.push(comment);
+    } else if (frame.root) {
+      this.game.comments ||= [];
+      this.game.comments.push(comment);
     } else {
       frame.startingComments ||= [];
-      frame.startingComments.push(this.commentBuf.join('\n'));
+      frame.startingComments.push(comment);
     }
   }
 
@@ -433,4 +440,4 @@ new PgnParser(game => {
   console.log('---');
   console.log(game);
   console.log(makePgn(game));
-}).parse('1. e4 {hello}e5 (d5)');
+}).parse('1. e4 {hel\nlo}e5 (d5)\n\n{world}');
