@@ -13,6 +13,7 @@ import { parseSan } from './san.js';
 import { Position } from './chess.js';
 import { makeFen } from './fen.js';
 import { jest } from '@jest/globals';
+import { createReadStream } from 'fs';
 
 test('make pgn', () => {
   const root = new Node<PgnNodeData>();
@@ -99,4 +100,16 @@ test('transform pgn', () => {
   expect(res.children[0].children[0].data.fen).toBe('rnbqkbnr/1ppppppp/8/p7/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 2');
   expect(res.children[1].data.fen).toBe('rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq - 0 1');
   expect(res.children[1].children[0].data.fen).toBe('rnbqkbnr/p1pppppp/8/1p6/1P6/8/P1PPPPPP/RNBQKBNR w KQkq - 0 2');
+});
+
+test('pgn file', done => {
+  const callback = jest.fn();
+  const parser = new PgnParser(callback, () => new Map());
+  createReadStream('./data/kasparov-deep-blue-1997.pgn', { encoding: 'utf-8' })
+    .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
+    .on('close', () => {
+      parser.parse('');
+      expect(callback).toHaveBeenCalledTimes(6);
+      done();
+    });
 });
