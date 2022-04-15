@@ -35,7 +35,7 @@
   "scripts": {
     "prepare": "tsc",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/hash.ts src/san.ts src/transform.ts src/variant.ts src/pgn.ts",
+    "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/san.ts src/transform.ts src/variant.ts src/pgn.ts",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
@@ -54,7 +54,6 @@
     "debug.js",
     "fen.js",
     "san.js",
-    "hash.js",
     "pgn.js",
     "index.js",
     "attacks.d.ts",
@@ -70,7 +69,6 @@
     "debug.d.ts",
     "fen.d.ts",
     "san.d.ts",
-    "hash.d.ts",
     "pgn.d.ts",
     "index.d.ts",
     "attacks.js.map",
@@ -86,7 +84,6 @@
     "debug.js.map",
     "fen.js.map",
     "san.js.map",
-    "hash.js.map",
     "pgn.js.map",
     "index.js.map",
     "src/attacks.ts",
@@ -102,7 +99,6 @@
     "src/debug.ts",
     "src/fen.ts",
     "src/san.ts",
-    "src/hash.ts",
     "src/pgn.ts",
     "src/index.ts"
   ],

@@ -66,8 +66,6 @@ export * as debug from './debug.js';
 
 export * as fen from './fen.js';
 
-export * as hash from './hash.js';
-
 export * as san from './san.js';
 
 export * as transform from './transform.js';
