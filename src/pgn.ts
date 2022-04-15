@@ -278,8 +278,8 @@ export class PgnParser {
 
   constructor(
     private emitGame: (game: Game<PgnNodeData>) => void,
-    private maxBudget = 1_000_000,
-    private initHeaders: () => Map<string, string> = defaultHeaders
+    private initHeaders: () => Map<string, string> = defaultHeaders,
+    private maxBudget = 1_000_000
   ) {
     this.resetGame();
     this.state = 'bom';
@@ -434,10 +434,3 @@ export class PgnParser {
     this.resetGame();
   }
 }
-
-console.log('---');
-new PgnParser(game => {
-  console.log('---');
-  console.log(game);
-  console.log(makePgn(game));
-}).parse('1. e4 {hel\nlo}e5 (d5)\n\n{world}');
