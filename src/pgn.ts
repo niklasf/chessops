@@ -235,10 +235,37 @@ interface ParserFrame {
   startingComments?: string[];
 }
 
+class LineParser {
+  private lineBuf: string[] = [];
+
+  constructor(private emitLine: (line: string) => void) {}
+
+  parse(data: string, options?: ParseOptions) {
+    let idx = 0;
+    while (true) {
+      const nlIdx = data.indexOf('\n', idx);
+      if (nlIdx == -1) {
+        break;
+      }
+      const crIdx = nlIdx > idx && data[nlIdx - 1] == '\r' ? nlIdx - 1 : nlIdx;
+      this.lineBuf.push(data.slice(idx, crIdx));
+      idx = nlIdx + 1;
+      this.emit();
+    }
+    this.lineBuf.push(data.slice(idx));
+    if (!options?.stream) this.emit();
+  }
+
+  emit() {
+    this.emitLine(this.lineBuf.join(''));
+    this.lineBuf = [];
+  }
+}
+
 export class PgnError extends Error {}
 
 export class PgnParser {
-  private lineBuf = '';
+  private lineParser = new LineParser(line => this.handleLine(line));
 
   private budget: number;
   private found: boolean;
@@ -275,13 +302,9 @@ export class PgnParser {
   }
 
   parse(data: string, options?: ParseOptions): void {
-    const done = !options?.stream;
-    this.consumeBudget(this.lineBuf.length + data.length);
-    this.lineBuf += data;
-    const lines = this.lineBuf.split(/\r?\n/);
-    this.lineBuf = done ? '' : lines.pop()!;
-    for (const line of lines) this.handleLine(line);
-    if (done) this.emit();
+    this.consumeBudget(data.length);
+    this.lineParser.parse(data, options);
+    if (!options?.stream) this.emit();
   }
 
   private handleLine(line: string) {
@@ -356,6 +379,7 @@ export class PgnParser {
               frame.parent.children.push(frame.node);
             }
           }
+          return;
         }
         case 'comment':
           const closeIndex = line.indexOf('}');
@@ -396,7 +420,10 @@ export class PgnParser {
   }
 
   private emit() {
-    if (this.found) this.emitGame(this.game);
+    if (this.found) {
+      if (this.state === 'comment') this.handleComment();
+      this.emitGame(this.game);
+    }
     this.resetGame();
   }
 }
