@@ -122,12 +122,11 @@ export function makePgn(game: Game<PgnNodeData>): string {
   const stack: AppendPgnFrame[] = [];
 
   if (game.moves.children.length) {
-    const variations = game.moves.children[Symbol.iterator]();
     stack.push({
       state: 'pre',
       ply: initialPly,
-      node: variations.next().value,
-      sidelines: variations,
+      node: game.moves.children[0],
+      sidelines: [][Symbol.iterator](),
       startsVariation: false,
       inVariation: false,
     });
