@@ -364,7 +364,6 @@ export class PgnParser {
               line = line.slice(beginIndex);
               this.commentBuf = [];
               this.state = 'comment';
-              continue;
             } else {
               this.consumeBudget(200);
               if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
@@ -379,7 +378,7 @@ export class PgnParser {
               frame.parent.children.push(frame.node);
             }
           }
-          return;
+          if (this.state !== 'comment') return; // fall through
         }
         case 'comment':
           const closeIndex = line.indexOf('}');
@@ -431,5 +430,6 @@ export class PgnParser {
 console.log('---');
 new PgnParser(game => {
   console.log('---');
+  console.log(game);
   console.log(makePgn(game));
-}).parse('1. e4 e5');
+}).parse('1. e4 {hello}e5 (d5)');
