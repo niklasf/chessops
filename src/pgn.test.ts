@@ -13,5 +13,10 @@ test('make pgn', () => {
   });
   e4.children.push(e5);
 
-  expect(makePgn({ headers: new Map(), moves: root })).toEqual('1. e4 e5 *');
+  const c4 = new ChildNode({
+    san: 'c4',
+  });
+  e5.children.push(c4);
+
+  expect(makePgn({ headers: new Map(), moves: root })).toEqual('1. e4 e5 2. c4 *');
 });

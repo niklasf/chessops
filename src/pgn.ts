@@ -99,6 +99,7 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
     },
   ];
 
+  let first = true;
   while (stack.length) {
     const frame = stack[stack.length - 1];
     if (frame.i < frame.node.children.length) {
@@ -106,7 +107,18 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
       if (child.data.startingComment) {
         builder.push(' { ', child.data.startingComment.replace('}', ''), ' }');
       }
+      if (first || frame.ply % 2 == 0) {
+        if (!first) builder.push(' ');
+        builder.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 ? '...' : '.'));
+      }
       builder.push(' ', child.data.san);
+
+      stack.push({
+        ply: frame.ply + 1,
+        node: child,
+        i: 0,
+      });
+
       if (child.data.nags) {
         for (const nag of child.data.nags) {
           builder.push(' $' + nag);
@@ -116,6 +128,7 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
         builder.push(' { ', child.data.comment.replace('}', ''), ' }');
       }
       frame.i++;
+      first = false;
     } else stack.pop();
   }
 
@@ -126,7 +139,7 @@ export function appendPgn(builder: string[], game: Game<PgnNodeData>): void {
 export function makePgn(game: Game<PgnNodeData>): string {
   const builder: string[] = [];
   appendPgn(builder, game);
-  return builder.join();
+  return builder.join('');
 }
 
 export function defaultHeaders(): Map<string, string> {
