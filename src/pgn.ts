@@ -4,7 +4,7 @@ import { parseFen } from './fen.js';
 
 export interface Game<T> {
   headers: Map<string, string>;
-  comment?: string;
+  comments?: string[];
   moves: Node<T>;
 }
 
@@ -62,8 +62,8 @@ export function transform<T, U, C extends { clone(): C }>(
 
 export interface PgnNodeData {
   san: string;
-  startingComment?: string;
-  comment?: string;
+  startingComments?: string[];
+  comments?: string[];
   nags?: number[];
 }
 
@@ -109,7 +109,7 @@ export function makePgn(game: Game<PgnNodeData>): string {
     builder.push('\n');
   }
 
-  if (game.comment) tokens.push('{', safeComment(game.comment), '}');
+  for (const comment of game.comments || []) tokens.push('{', safeComment(comment), '}');
 
   const fen = game.headers.get('FEN');
   const initialPly = fen
@@ -145,8 +145,9 @@ export function makePgn(game: Game<PgnNodeData>): string {
 
     switch (frame.state) {
       case 'pre':
-        if (frame.node.data.startingComment) {
-          tokens.push('{', safeComment(frame.node.data.startingComment), '}');
+        for (const comment of frame.node.data.startingComments || []) {
+          tokens.push('{', safeComment(comment), '}');
+          forceMoveNumber = true;
         }
         if (forceMoveNumber || frame.ply % 2 === 0) {
           tokens.push(Math.floor(frame.ply / 2) + 1 + (frame.ply % 2 ? '...' : '.'));
@@ -157,9 +158,8 @@ export function makePgn(game: Game<PgnNodeData>): string {
           tokens.push('$' + nag);
           forceMoveNumber = true;
         }
-        if (frame.node.data.comment) {
-          tokens.push('{', safeComment(frame.node.data.comment), '}');
-          forceMoveNumber = true;
+        for (const comment of frame.node.data.comments || []) {
+          tokens.push('{', safeComment(comment), '}');
         }
         frame.state = 'sidelines'; // fall through
       case 'sidelines': {
@@ -215,13 +215,194 @@ export function defaultHeaders(): Map<string, string> {
   ]);
 }
 
-export function parsePgn(
-  lines: Iterator<string>,
-  initHeaders: () => Map<string, string> = defaultHeaders
-): Game<PgnNodeData> {
-  const game = {
-    headers: initHeaders(),
-    moves: new Node<PgnNodeData>(),
-  };
-  return game;
+const bom = '\ufeff';
+
+function isWhitespace(line: string): boolean {
+  return /^\s*$/.test(line);
 }
+
+function isCommentLine(line: string): boolean {
+  return line.startsWith('%');
+}
+
+export interface ParseOptions {
+  stream: boolean;
+}
+
+interface ParserFrame {
+  parent: Node<PgnNodeData>;
+  node?: ChildNode<PgnNodeData>;
+  startingComments?: string[];
+}
+
+export class PgnError extends Error {}
+
+export class PgnParser {
+  private lineBuf = '';
+
+  private budget: number;
+  private found: boolean;
+  private state: 'bom' | 'pre' | 'headers' | 'moves' | 'comment';
+  private game: Game<PgnNodeData>;
+  private consecutiveEmptyLines: number;
+  private stack: ParserFrame[];
+  private commentBuf: string[];
+
+  constructor(
+    private emitGame: (game: Game<PgnNodeData>) => void,
+    private maxBudget = 1_000_000,
+    private initHeaders: () => Map<string, string> = defaultHeaders
+  ) {
+    this.resetGame();
+    this.state = 'bom';
+  }
+
+  private resetGame() {
+    this.budget = this.maxBudget;
+    this.found = false;
+    this.state = 'pre';
+    this.game = {
+      headers: this.initHeaders(),
+      moves: new Node(),
+    };
+    this.consecutiveEmptyLines = 0;
+    this.stack = [{ parent: this.game.moves }];
+  }
+
+  private consumeBudget(cost: number) {
+    this.budget -= cost;
+    if (this.budget < 0) throw new PgnError('ERR_PGN_BUDGET');
+  }
+
+  parse(data: string, options?: ParseOptions): void {
+    const done = !options?.stream;
+    this.consumeBudget(this.lineBuf.length + data.length);
+    this.lineBuf += data;
+    const lines = this.lineBuf.split(/\r?\n/);
+    this.lineBuf = done ? '' : lines.pop()!;
+    for (const line of lines) this.handleLine(line);
+    if (done) this.emit();
+  }
+
+  private handleLine(line: string) {
+    let freshLine = true;
+    while (true) {
+      switch (this.state) {
+        case 'bom':
+          if (line.startsWith(bom)) line = line.slice(bom.length);
+          this.state = 'pre'; // fall through
+        case 'pre':
+          if (isWhitespace(line) || isCommentLine(line)) return;
+          this.state = 'headers'; // fall through
+        case 'headers':
+          if (isCommentLine(line)) return;
+          if (this.consecutiveEmptyLines < 1 && isWhitespace(line)) {
+            this.consecutiveEmptyLines++;
+            return;
+          }
+          this.found = true;
+          this.consecutiveEmptyLines = 0;
+          if (line.startsWith('[')) {
+            this.consumeBudget(200);
+            this.found = true;
+            this.game.headers.set(line, line); // TODO
+            return;
+          }
+          this.state = 'moves'; // fall through
+        case 'moves': {
+          if (freshLine) {
+            if (isCommentLine(line)) return;
+            if (isWhitespace(line)) return this.emit();
+          }
+          const tokenRegex =
+            /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O|0-0|O-O-O|0-0-0)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[\?!]{1,2}|\(|\)|\*|1-0|0-1|1\/2-1\/2/g;
+          let match;
+          while ((match = tokenRegex.exec(line))) {
+            const frame = this.stack[this.stack.length - 1];
+            let token = match[0];
+            if (token == ';') return;
+            else if (token.startsWith('$')) this.handleNag(parseInt(token.slice(1), 10));
+            else if (token === '!') this.handleNag(1);
+            else if (token === '?') this.handleNag(2);
+            else if (token === '!!') this.handleNag(3);
+            else if (token === '??') this.handleNag(4);
+            else if (token === '!?') this.handleNag(5);
+            else if (token === '?!') this.handleNag(6);
+            else if (token === '1-0' || token === '0-1' || token == '1/2-1/2' || token === '*') {
+              if (this.stack.length === 1) this.game.headers.set('Result', token);
+            } else if (token === '(') {
+              this.consumeBudget(200);
+              this.stack.push({ parent: frame.parent });
+            } else if (token === ')') {
+              if (this.stack.length > 1) this.stack.pop();
+            } else if (token === '{') {
+              const openIndex = tokenRegex.lastIndex;
+              const beginIndex = line[openIndex] == ' ' ? openIndex + 1 : openIndex;
+              line = line.slice(beginIndex);
+              this.commentBuf = [];
+              this.state = 'comment';
+              continue;
+            } else {
+              this.consumeBudget(200);
+              if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
+              else if (token.startsWith('0')) token = token.replace(/0/g, 'O');
+
+              if (frame.node) frame.parent = frame.node;
+              frame.node = new ChildNode({
+                san: token,
+                startingComments: frame.startingComments,
+              });
+              frame.startingComments = undefined;
+              frame.parent.children.push(frame.node);
+            }
+          }
+        }
+        case 'comment':
+          const closeIndex = line.indexOf('}');
+          if (closeIndex == -1) {
+            this.commentBuf.push(line);
+            return;
+          } else {
+            const endIndex = closeIndex > 0 && line[closeIndex - 1] == ' ' ? closeIndex - 1 : closeIndex;
+            this.commentBuf.push(line.slice(0, endIndex));
+            this.handleComment();
+            line = line.slice(closeIndex);
+            this.state = 'moves';
+            freshLine = false;
+          }
+      }
+    }
+  }
+
+  private handleNag(nag: number) {
+    this.consumeBudget(100);
+    const frame = this.stack[this.stack.length - 1];
+    if (frame.node) {
+      frame.node.data.nags ||= [];
+      frame.node.data.nags.push(nag);
+    }
+  }
+
+  private handleComment() {
+    this.consumeBudget(100);
+    const frame = this.stack[this.stack.length - 1];
+    if (frame.node) {
+      frame.node.data.comments ||= [];
+      frame.node.data.comments.push(this.commentBuf.join('\n'));
+    } else {
+      frame.startingComments ||= [];
+      frame.startingComments.push(this.commentBuf.join('\n'));
+    }
+  }
+
+  private emit() {
+    if (this.found) this.emitGame(this.game);
+    this.resetGame();
+  }
+}
+
+console.log('---');
+new PgnParser(game => {
+  console.log('---');
+  console.log(makePgn(game));
+}).parse('1. e4 e5');
