@@ -1,4 +1,4 @@
-import { makePgn, Node, ChildNode, PgnNodeData, PgnParser, Game } from './pgn.js';
+import { makePgn, Node, ChildNode, PgnNodeData, PgnParser, Game, parsePgn } from './pgn.js';
 import { jest } from '@jest/globals';
 
 test('make pgn', () => {
@@ -31,6 +31,22 @@ test('make pgn', () => {
   expect(makePgn({ headers: new Map(), moves: root })).toEqual(
     '1. e4 $7 ( 1. e3 ) 1... e5 ( 1... e6 2. Nf3 { a comment } ) 2. c4 *'
   );
+});
+
+test('parse headers', () => {
+  const games = parsePgn(
+    [
+      '[Black "black player"]',
+      '[White "white player"]',
+      '[Escaped "quote: \\", backslashes: \\\\\\\\, trailing text"]',
+    ].join('\r\n')
+  );
+  expect(games).toHaveLength(1);
+  expect(games[0].headers.get('Black')).toBe('black player');
+  expect(games[0].headers.get('White')).toBe('white player');
+  expect(games[0].headers.get('Escaped')).toBe('quote: ", backslashes: \\\\, trailing text');
+  expect(games[0].headers.get('Result')).toBe('*');
+  expect(games[0].headers.get('Event')).toBe('?');
 });
 
 test('parse pgn', () => {

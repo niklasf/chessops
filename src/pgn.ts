@@ -82,11 +82,11 @@ export function parseOutcome(s: string | undefined): Outcome | undefined {
 }
 
 function escapeHeader(value: string): string {
-  return value.replace('\\', '\\\\').replace('"', '\\"');
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 function safeComment(comment: string): string {
-  return comment.replace('}', '');
+  return comment.replace(/\}/g, '');
 }
 
 interface AppendPgnFrame {
@@ -329,8 +329,9 @@ export class PgnParser {
           this.consecutiveEmptyLines = 0;
           if (line.startsWith('[')) {
             this.consumeBudget(200);
-            this.found = true;
-            this.game.headers.set(line, line); // TODO
+            const matches = line.match(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*$/);
+            console.log(line, matches);
+            if (matches) this.game.headers.set(matches[1], matches[2].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
             return;
           }
           this.state = 'moves'; // fall through
@@ -434,4 +435,10 @@ export class PgnParser {
     }
     this.resetGame();
   }
+}
+
+export function parsePgn(pgn: string, initHeaders: () => Map<string, string> = defaultHeaders): Game<PgnNodeData>[] {
+  const games: Game<PgnNodeData>[] = [];
+  new PgnParser(game => games.push(game), initHeaders, NaN).parse(pgn);
+  return games;
 }
