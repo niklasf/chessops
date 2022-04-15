@@ -214,3 +214,14 @@ export function defaultHeaders(): Map<string, string> {
     ['Result', '*'],
   ]);
 }
+
+export function parsePgn(
+  lines: Iterator<string>,
+  initHeaders: () => Map<string, string> = defaultHeaders
+): Game<PgnNodeData> {
+  const game = {
+    headers: initHeaders(),
+    moves: new Node<PgnNodeData>(),
+  };
+  return game;
+}
