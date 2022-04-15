@@ -463,6 +463,7 @@ export function parseVariant(variant: string | undefined): Rules | undefined {
     case 'Racing Kings':
       return 'racingkings';
     case 'Standard':
+    case undefined:
       return 'chess';
     default:
       return;

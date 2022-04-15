@@ -1,4 +1,17 @@
-import { makePgn, Node, ChildNode, PgnNodeData, PgnParser, Game, parsePgn } from './pgn.js';
+import {
+  makePgn,
+  Node,
+  ChildNode,
+  PgnNodeData,
+  PgnParser,
+  Game,
+  parsePgn,
+  transform,
+  startingPosition,
+} from './pgn.js';
+import { parseSan } from './san.js';
+import { Position } from './chess.js';
+import { makeFen } from './fen.js';
 import { jest } from '@jest/globals';
 
 test('make pgn', () => {
@@ -61,4 +74,29 @@ test('parse pgn', () => {
   parser.parse('0', { stream: true });
   parser.parse('');
   expect(callback).toHaveBeenCalledTimes(1);
+});
+
+interface TransformResult extends PgnNodeData {
+  fen: string;
+}
+
+test('transform pgn', () => {
+  const game = parsePgn('1. a4 ( 1. b4 b5 -- ) 1... a5')[0];
+  const res = transform<PgnNodeData, TransformResult, Position>(
+    game.moves,
+    startingPosition(game.headers).unwrap(),
+    (pos, data) => {
+      const move = parseSan(pos, data.san);
+      if (!move) return;
+      pos.play(move);
+      return {
+        fen: makeFen(pos.toSetup()),
+        ...data,
+      };
+    }
+  );
+  expect(res.children[0].data.fen).toBe('rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq - 0 1');
+  expect(res.children[0].children[0].data.fen).toBe('rnbqkbnr/1ppppppp/8/p7/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 2');
+  expect(res.children[1].data.fen).toBe('rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq - 0 1');
+  expect(res.children[1].children[0].data.fen).toBe('rnbqkbnr/p1pppppp/8/1p6/1P6/8/P1PPPPPP/RNBQKBNR w KQkq - 0 2');
 });
