@@ -299,8 +299,9 @@ export class PgnParser {
   }
 
   private consumeBudget(cost: number) {
-    this.budget -= cost;
-    if (this.budget < 0) throw new PgnError('ERR_PGN_BUDGET');
+    // NaN disables budget
+    this.budget = Math.max(this.budget - cost, 0);
+    if (this.budget <= 0) throw new PgnError('ERR_PGN_BUDGET');
   }
 
   parse(data: string, options?: ParseOptions): void {
@@ -330,7 +331,6 @@ export class PgnParser {
           if (line.startsWith('[')) {
             this.consumeBudget(200);
             const matches = line.match(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*$/);
-            console.log(line, matches);
             if (matches) this.game.headers.set(matches[1], matches[2].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
             return;
           }
