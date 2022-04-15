@@ -122,11 +122,12 @@ export function makePgn(game: Game<PgnNodeData>): string {
   const stack: AppendPgnFrame[] = [];
 
   if (game.moves.children.length) {
+    const variations = game.moves.children[Symbol.iterator]();
     stack.push({
       state: 'pre',
       ply: initialPly,
-      node: game.moves.children[0],
-      sidelines: [][Symbol.iterator](),
+      node: variations.next().value,
+      sidelines: variations,
       startsVariation: false,
       inVariation: false,
     });
@@ -363,6 +364,7 @@ export class PgnParser {
               line = line.slice(beginIndex);
               this.commentBuf = [];
               this.state = 'comment';
+              break;
             } else {
               this.consumeBudget(200);
               if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
