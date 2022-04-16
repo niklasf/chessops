@@ -4,6 +4,7 @@ import {
   ChildNode,
   PgnNodeData,
   PgnParser,
+  PgnError,
   Game,
   parsePgn,
   transform,
@@ -104,9 +105,12 @@ test('transform pgn', () => {
 });
 
 test('pgn file', done => {
-  const callback = jest.fn();
+  const stream = createReadStream('./data/kasparov-deep-blue-1997.pgn', { encoding: 'utf-8' });
+  const callback = jest.fn((_game: Game<PgnNodeData>, err: PgnError | undefined) => {
+    if (err) stream.destroy(err);
+  });
   const parser = new PgnParser(callback, emptyHeaders);
-  createReadStream('./data/kasparov-deep-blue-1997.pgn', { encoding: 'utf-8' })
+  stream
     .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
     .on('close', () => {
       parser.parse('');

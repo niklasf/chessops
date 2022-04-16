@@ -284,7 +284,7 @@ export class PgnParser {
   private commentBuf: string[];
 
   constructor(
-    private emitGame: (game: Game<PgnNodeData>) => void,
+    private emitGame: (game: Game<PgnNodeData>, err: PgnError | undefined) => void,
     private initHeaders: () => Map<string, string> = defaultHeaders,
     private maxBudget = 1_000_000
   ) {
@@ -306,15 +306,19 @@ export class PgnParser {
   }
 
   private consumeBudget(cost: number) {
-    // NaN disables budget
-    this.budget = Math.max(this.budget - cost, 0);
-    if (this.budget <= 0) throw new PgnError('ERR_PGN_BUDGET');
+    this.budget -= cost;
+    if (this.budget < 0) throw new PgnError('ERR_PGN_BUDGET');
   }
 
   parse(data: string, options?: ParseOptions): void {
-    this.consumeBudget(data.length);
-    this.lineParser.parse(data, options);
-    if (!options?.stream) this.emit();
+    if (this.budget < 0) return;
+    try {
+      this.consumeBudget(data.length);
+      this.lineParser.parse(data, options);
+      if (!options?.stream) this.emit(undefined);
+    } catch (err: unknown) {
+      this.emit(err as PgnError);
+    }
   }
 
   private handleLine(line: string) {
@@ -345,7 +349,7 @@ export class PgnParser {
         case 'moves': {
           if (freshLine) {
             if (isCommentLine(line)) return;
-            if (isWhitespace(line)) return this.emit();
+            if (isWhitespace(line)) return this.emit(undefined);
           }
           const tokenRegex =
             /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O|0-0|O-O-O|0-0-0)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[?!]{1,2}|\(|\)|\*|1-0|0-1|1\/2-1\/2/g;
@@ -435,11 +439,10 @@ export class PgnParser {
     }
   }
 
-  private emit() {
-    if (this.found) {
-      if (this.state === 'comment') this.handleComment();
-      this.emitGame(this.game);
-    }
+  private emit(err: PgnError | undefined) {
+    if (this.state === 'comment') this.handleComment();
+    if (err) return this.emitGame(this.game, err);
+    if (this.found) this.emitGame(this.game, undefined);
     this.resetGame();
   }
 }
