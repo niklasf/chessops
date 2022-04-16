@@ -262,33 +262,6 @@ interface ParserFrame {
   startingComments?: string[];
 }
 
-class LineParser {
-  private lineBuf: string[] = [];
-
-  constructor(private emitLine: (line: string) => void) {}
-
-  parse(data: string, options?: ParseOptions) {
-    let idx = 0;
-    for (;;) {
-      const nlIdx = data.indexOf('\n', idx);
-      if (nlIdx === -1) {
-        break;
-      }
-      const crIdx = nlIdx > idx && data[nlIdx - 1] === '\r' ? nlIdx - 1 : nlIdx;
-      this.lineBuf.push(data.slice(idx, crIdx));
-      idx = nlIdx + 1;
-      this.emit();
-    }
-    this.lineBuf.push(data.slice(idx));
-    if (!options?.stream) this.emit();
-  }
-
-  emit() {
-    this.emitLine(this.lineBuf.join(''));
-    this.lineBuf = [];
-  }
-}
-
 const enum ParserState {
   Bom = 0,
   Pre = 1,
@@ -300,7 +273,7 @@ const enum ParserState {
 export class PgnError extends Error {}
 
 export class PgnParser {
-  private lineParser = new LineParser(line => this.handleLine(line));
+  private lineBuf: string[] = [];
 
   private budget: number;
   private found: boolean;
@@ -340,17 +313,35 @@ export class PgnParser {
   parse(data: string, options?: ParseOptions): void {
     if (this.budget < 0) return;
     try {
-      // TODO: limit line buffer somehow
-      this.consumeBudget(data.length);
-      this.lineParser.parse(data, options);
-      if (!options?.stream) this.emit(undefined);
+      let idx = 0;
+      for (;;) {
+        const nlIdx = data.indexOf('\n', idx);
+        if (nlIdx === -1) {
+          break;
+        }
+        const crIdx = nlIdx > idx && data[nlIdx - 1] === '\r' ? nlIdx - 1 : nlIdx;
+        this.consumeBudget(nlIdx - idx);
+        this.lineBuf.push(data.slice(idx, crIdx));
+        idx = nlIdx + 1;
+        this.handleLine();
+      }
+      this.consumeBudget(data.length - idx);
+      this.lineBuf.push(data.slice(idx));
+
+      if (!options?.stream) {
+        this.handleLine();
+        this.emit(undefined);
+      }
     } catch (err: unknown) {
       this.emit(err as PgnError);
     }
   }
 
-  private handleLine(line: string) {
+  private handleLine() {
     let freshLine = true;
+    let line = this.lineBuf.join('');
+    this.lineBuf = [];
+
     for (;;) {
       switch (this.state) {
         case ParserState.Bom:
