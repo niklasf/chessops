@@ -313,6 +313,7 @@ export class PgnParser {
   parse(data: string, options?: ParseOptions): void {
     if (this.budget < 0) return;
     try {
+      // TODO: limit line buffer somehow
       this.consumeBudget(data.length);
       this.lineParser.parse(data, options);
       if (!options?.stream) this.emit(undefined);
@@ -368,7 +369,7 @@ export class PgnParser {
             else if (token === '1-0' || token === '0-1' || token === '1/2-1/2' || token === '*') {
               if (this.stack.length === 1 && token !== '*') this.game.headers.set('Result', token);
             } else if (token === '(') {
-              this.consumeBudget(200);
+              this.consumeBudget(100);
               this.stack.push({ parent: frame.parent, root: false });
             } else if (token === ')') {
               if (this.stack.length > 1) this.stack.pop();
@@ -379,7 +380,7 @@ export class PgnParser {
               this.state = 'comment';
               break;
             } else {
-              this.consumeBudget(200);
+              this.consumeBudget(100);
               if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
               else if (token.startsWith('0')) token = token.replace(/0/g, 'O');
 
@@ -414,7 +415,7 @@ export class PgnParser {
   }
 
   private handleNag(nag: number) {
-    this.consumeBudget(100);
+    this.consumeBudget(50);
     const frame = this.stack[this.stack.length - 1];
     if (frame.node) {
       frame.node.data.nags ||= [];
