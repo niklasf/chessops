@@ -105,8 +105,14 @@ function safeComment(comment: string): string {
   return comment.replace(/\}/g, '');
 }
 
-interface AppendPgnFrame {
-  state: 'pre' | 'sidelines' | 'end';
+const enum MakePgnState {
+  Pre = 0,
+  Sidelines = 1,
+  End = 2,
+}
+
+interface MakePgnFrame {
+  state: MakePgnState;
   ply: number;
   node: ChildNode<PgnNodeData>;
   sidelines: Iterator<ChildNode<PgnNodeData>>;
@@ -135,12 +141,12 @@ export function makePgn(game: Game<PgnNodeData>): string {
       )
     : 0;
 
-  const stack: AppendPgnFrame[] = [];
+  const stack: MakePgnFrame[] = [];
 
   if (game.moves.children.length) {
     const variations = game.moves.children[Symbol.iterator]();
     stack.push({
-      state: 'pre',
+      state: MakePgnState.Pre,
       ply: initialPly,
       node: variations.next().value,
       sidelines: variations,
@@ -160,7 +166,7 @@ export function makePgn(game: Game<PgnNodeData>): string {
     }
 
     switch (frame.state) {
-      case 'pre':
+      case MakePgnState.Pre:
         for (const comment of frame.node.data.startingComments || []) {
           tokens.push('{', safeComment(comment), '}');
           forceMoveNumber = true;
@@ -177,14 +183,14 @@ export function makePgn(game: Game<PgnNodeData>): string {
         for (const comment of frame.node.data.comments || []) {
           tokens.push('{', safeComment(comment), '}');
         }
-        frame.state = 'sidelines'; // fall through
-      case 'sidelines': {
+        frame.state = MakePgnState.Sidelines; // fall through
+      case MakePgnState.Sidelines: {
         const child = frame.sidelines.next();
         if (child.done) {
           if (frame.node.children.length) {
             const variations = frame.node.children[Symbol.iterator]();
             stack.push({
-              state: 'pre',
+              state: MakePgnState.Pre,
               ply: frame.ply + 1,
               node: variations.next().value,
               sidelines: variations,
@@ -192,12 +198,12 @@ export function makePgn(game: Game<PgnNodeData>): string {
               inVariation: false,
             });
           }
-          frame.state = 'end';
+          frame.state = MakePgnState.End;
         } else {
           tokens.push('(');
           forceMoveNumber = true;
           stack.push({
-            state: 'pre',
+            state: MakePgnState.Pre,
             ply: frame.ply,
             node: child.value,
             sidelines: [][Symbol.iterator](),
@@ -208,7 +214,7 @@ export function makePgn(game: Game<PgnNodeData>): string {
         }
         break;
       }
-      case 'end':
+      case MakePgnState.End:
         stack.pop();
     }
   }
