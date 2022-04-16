@@ -366,7 +366,7 @@ export class PgnParser {
             else if (token === '!?') this.handleNag(5);
             else if (token === '?!') this.handleNag(6);
             else if (token === '1-0' || token === '0-1' || token === '1/2-1/2' || token === '*') {
-              if (this.stack.length === 1) this.game.headers.set('Result', token);
+              if (this.stack.length === 1 && token !== '*') this.game.headers.set('Result', token);
             } else if (token === '(') {
               this.consumeBudget(200);
               this.stack.push({ parent: frame.parent, root: false });
