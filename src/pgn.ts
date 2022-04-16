@@ -241,7 +241,7 @@ export function emptyHeaders(): Map<string, string> {
   return new Map();
 }
 
-const bom = '\ufeff';
+const BOM = '\ufeff';
 
 function isWhitespace(line: string): boolean {
   return /^\s*$/.test(line);
@@ -354,7 +354,7 @@ export class PgnParser {
     for (;;) {
       switch (this.state) {
         case ParserState.Bom:
-          if (line.startsWith(bom)) line = line.slice(bom.length);
+          if (line.startsWith(BOM)) line = line.slice(BOM.length);
           this.state = ParserState.Pre; // fall through
         case ParserState.Pre:
           if (isWhitespace(line) || isCommentLine(line)) return;
