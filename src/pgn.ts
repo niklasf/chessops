@@ -63,6 +63,19 @@ export function transform<T, U, C extends { clone(): C }>(
   return root;
 }
 
+export function walk<T, C extends { clone(): C }>(node: Node<T>, ctx: C, f: (ctx: C, data: T, i: number) => void) {
+  const stack = [{ node, ctx }];
+  let frame;
+  while ((frame = stack.pop())) {
+    for (let i = 0; i < frame.node.children.length; i++) {
+      const ctx = i < frame.node.children.length - 1 ? frame.ctx.clone() : frame.ctx;
+      const child = frame.node.children[i];
+      f(ctx, child.data, i);
+      stack.push({ node: child, ctx });
+    }
+  }
+}
+
 export interface PgnNodeData {
   san: string;
   startingComments?: string[];

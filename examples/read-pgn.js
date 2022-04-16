@@ -1,6 +1,6 @@
 import { createReadStream } from 'fs';
 import { parseSan } from '../san.js';
-import { PgnParser, transform, startingPosition } from '../pgn.js';
+import { PgnParser, walk, startingPosition } from '../pgn.js';
 
 const validate = true;
 
@@ -15,7 +15,7 @@ function status() {
 const parser = new PgnParser((game, err) => {
     if (err) console.error('parser error:', err);
 
-    if (validate) transform(game.moves, startingPosition(game.headers).unwrap(), (pos, node) => {
+    if (validate) walk(game.moves, startingPosition(game.headers).unwrap(), (pos, node) => {
         const move = parseSan(pos, node.san);
         if (!move) {
             errors += 1;
@@ -24,8 +24,6 @@ const parser = new PgnParser((game, err) => {
 
         pos.play(move);
         moves++;
-
-        return node;
     });
 
     count++;
