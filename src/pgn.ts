@@ -283,6 +283,14 @@ class LineParser {
   }
 }
 
+const enum ParserState {
+  Bom = 0,
+  Pre = 1,
+  Headers = 2,
+  Moves = 3,
+  Comment = 4,
+}
+
 export class PgnError extends Error {}
 
 export class PgnParser {
@@ -290,7 +298,7 @@ export class PgnParser {
 
   private budget: number;
   private found: boolean;
-  private state: 'bom' | 'pre' | 'headers' | 'moves' | 'comment';
+  private state: ParserState;
   private game: Game<PgnNodeData>;
   private consecutiveEmptyLines: number;
   private stack: ParserFrame[];
@@ -302,13 +310,13 @@ export class PgnParser {
     private maxBudget = 1_000_000
   ) {
     this.resetGame();
-    this.state = 'bom';
+    this.state = ParserState.Bom;
   }
 
   private resetGame() {
     this.budget = this.maxBudget;
     this.found = false;
-    this.state = 'pre';
+    this.state = ParserState.Pre;
     this.game = {
       headers: this.initHeaders(),
       moves: new Node(),
@@ -339,13 +347,13 @@ export class PgnParser {
     let freshLine = true;
     for (;;) {
       switch (this.state) {
-        case 'bom':
+        case ParserState.Bom:
           if (line.startsWith(bom)) line = line.slice(bom.length);
-          this.state = 'pre'; // fall through
-        case 'pre':
+          this.state = ParserState.Pre; // fall through
+        case ParserState.Pre:
           if (isWhitespace(line) || isCommentLine(line)) return;
-          this.state = 'headers'; // fall through
-        case 'headers':
+          this.state = ParserState.Headers; // fall through
+        case ParserState.Headers:
           if (isCommentLine(line)) return;
           if (this.consecutiveEmptyLines < 1 && isWhitespace(line)) {
             this.consecutiveEmptyLines++;
@@ -359,8 +367,8 @@ export class PgnParser {
             if (matches) this.game.headers.set(matches[1], matches[2].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
             return;
           }
-          this.state = 'moves'; // fall through
-        case 'moves': {
+          this.state = ParserState.Moves; // fall through
+        case ParserState.Moves: {
           if (freshLine) {
             if (isCommentLine(line)) return;
             if (isWhitespace(line)) return this.emit(undefined);
@@ -390,7 +398,7 @@ export class PgnParser {
               const openIndex = tokenRegex.lastIndex;
               const beginIndex = line[openIndex] === ' ' ? openIndex + 1 : openIndex;
               line = line.slice(beginIndex);
-              this.state = 'comment';
+              this.state = ParserState.Comment;
               break;
             } else {
               this.consumeBudget(100);
@@ -407,9 +415,9 @@ export class PgnParser {
               frame.parent.children.push(frame.node);
             }
           }
-          if (this.state !== 'comment') return; // fall through
+          if (this.state !== ParserState.Comment) return; // fall through
         }
-        case 'comment': {
+        case ParserState.Comment: {
           const closeIndex = line.indexOf('}');
           if (closeIndex === -1) {
             this.commentBuf.push(line);
@@ -419,7 +427,7 @@ export class PgnParser {
             this.commentBuf.push(line.slice(0, endIndex));
             this.handleComment();
             line = line.slice(closeIndex);
-            this.state = 'moves';
+            this.state = ParserState.Moves;
             freshLine = false;
           }
         }
@@ -454,7 +462,7 @@ export class PgnParser {
   }
 
   private emit(err: PgnError | undefined) {
-    if (this.state === 'comment') this.handleComment();
+    if (this.state === ParserState.Comment) this.handleComment();
     if (err) return this.emitGame(this.game, err);
     if (this.found) this.emitGame(this.game, undefined);
     this.resetGame();
