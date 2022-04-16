@@ -79,11 +79,11 @@ test('parse pgn', () => {
   expect(callback).toHaveBeenCalledTimes(1);
 });
 
-interface TransformResult extends PgnNodeData {
-  fen: string;
-}
-
 test('transform pgn', () => {
+  interface TransformResult extends PgnNodeData {
+    fen: string;
+  }
+
   const game = parsePgn('1. a4 ( 1. b4 b5 -- ) 1... a5')[0];
   const res = transform<PgnNodeData, TransformResult, Position>(
     game.moves,
@@ -117,4 +117,12 @@ test('pgn file', done => {
       expect(callback).toHaveBeenCalledTimes(6);
       done();
     });
+});
+
+test('tricky tokens', () => {
+  const steps = Array.from(parsePgn('O-O-O !! 0-0-0# ??')[0].moves.mainline());
+  expect(steps[0].san).toBe('O-O-O');
+  expect(steps[0].nags).toEqual([3]);
+  expect(steps[1].san).toBe('O-O-O#');
+  expect(steps[1].nags).toEqual([4]);
 });
