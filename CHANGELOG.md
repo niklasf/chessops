@@ -1,5 +1,19 @@
 # Changelog for chessops
 
+## v0.11.0
+
+- Introduce `chessops/pgn` module.
+- Remove `chessops/hash` module.
+- Fix capturing promoted Crazyhouse pieces.
+- Rename `Material.count()` and `MaterialSide.count()` to `size()`.
+  Add `Material.count(role)`.
+- Add `Position.isStandardMaterial()`.
+- Remove `FenOpts.shredder`.
+- Track promoted pieces only in Crazyhouse. Remove `FenOpts.promoted`.
+- Let `parseSan()` require the original file for pawn captures
+  (good: `exd5`, bad: `d5` if capturing).
+- Target ES2018.
+
 ## v0.10.5
 
 - Check that en passant square and checkers are not in conflict.
