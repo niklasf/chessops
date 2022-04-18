@@ -22,6 +22,10 @@ export class Crazyhouse extends Chess {
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Crazyhouse, PositionError> {
     return super.fromSetup(setup, opts).map(pos => {
+      pos.board.promoted = setup.board.promoted
+        .intersect(setup.board.occupied)
+        .diff(setup.board.king)
+        .diff(setup.board.pawn);
       pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
       return pos as Crazyhouse;
     });
@@ -50,7 +54,7 @@ export class Crazyhouse extends Chess {
     return (
       this.board.occupied.size() + this.pockets.size() <= 3 &&
       this.board.pawn.isEmpty() &&
-      this.board.promoted.intersect(this.board.occupied).diff(this.board.king).isEmpty() &&
+      this.board.promoted.isEmpty() &&
       this.board.rooksAndQueens().isEmpty() &&
       this.pockets.count('pawn') <= 0 &&
       this.pockets.count('rook') <= 0 &&
@@ -59,7 +63,7 @@ export class Crazyhouse extends Chess {
   }
 
   isStandardMaterial(): boolean {
-    const promoted = this.board.promoted.intersect(this.board.occupied).diff(this.board.pawn).diff(this.board.king);
+    const promoted = this.board.promoted;
     return (
       promoted.size() + this.board.pawn.size() + (this.pockets?.count('pawn') || 0) <= 16 &&
       this.board.knight.diff(promoted).size() + (this.pockets?.count('knight') || 0) <= 4 &&
@@ -471,8 +475,6 @@ export class Horde extends Chess {
   protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (!this.board.king.isSingleSquare()) return Result.err(new PositionError(IllegalSetup.Kings));
-    if (!this.board.king.diff(this.board.promoted).isSingleSquare())
-      return Result.err(new PositionError(IllegalSetup.Kings));
 
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())

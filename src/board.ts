@@ -186,9 +186,9 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
   }
 
   /**
-   * Finds the unique unpromoted king of the given `color`, if any.
+   * Finds the unique king of the given `color`, if any.
    */
   kingOf(color: Color): Square | undefined {
-    return this.king.intersect(this[color]).diff(this.promoted).singleSquare();
+    return this[color].intersect(this.king).singleSquare();
   }
 }

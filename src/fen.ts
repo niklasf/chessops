@@ -101,7 +101,7 @@ export function parseCastlingFen(board: Board, castlingPart: string): Result<Squ
     else return Result.err(new FenError(InvalidFen.Castling));
 
     for (const square of candidates) {
-      if (board.king.has(square) && !board.promoted.has(square)) break;
+      if (board.king.has(square)) break;
       if (board.rook.has(square)) {
         unmovedRooks = unmovedRooks.with(square);
         break;

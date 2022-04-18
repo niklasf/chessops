@@ -242,7 +242,7 @@ export abstract class Position {
   equalsIgnoreMoves(other: Position): boolean {
     return (
       this.rules === other.rules &&
-      (this.pockets ? this.board.equals(other.board) : this.board.equalsIgnorePromoted(other.board)) &&
+      this.board.equals(other.board) &&
       ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
       this.turn === other.turn &&
       this.castles.unmovedRooks.equals(other.castles.unmovedRooks) &&
@@ -378,7 +378,7 @@ export abstract class Position {
         }
         if (move.promotion) {
           piece.role = move.promotion;
-          piece.promoted = true;
+          piece.promoted = !!this.pockets;
         }
       } else if (piece.role === 'rook') {
         this.castles.discardRook(move.from);
@@ -438,6 +438,7 @@ export class Chess extends Position {
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Chess, PositionError> {
     const pos = new this();
     pos.board = setup.board.clone();
+    pos.board.promoted = SquareSet.empty();
     pos.pockets = undefined;
     pos.turn = setup.turn;
     pos.castles = Castles.fromSetup(setup);
