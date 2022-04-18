@@ -20,6 +20,7 @@ const variantPerfts: [Rules, string, string, number, number, number][] = [
     1347,
     58057,
   ],
+  ['crazyhouse', 'zh-promoted', '4k3/1Q~6/8/8/4b3/8/Kpp5/8/ b - -', 20, 360, 5445],
 
   ['horde', 'horde-start', 'rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq -', 8, 128, 1274],
   ['horde', 'horde-open-flank', '4k3/pp4q1/3P2p1/8/P3PP2/PPP2r2/PPP5/PPPP4 b - -', 30, 241, 6633],

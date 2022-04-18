@@ -197,7 +197,7 @@ export abstract class Position {
   protected playCaptureAt(square: Square, captured: Piece): void {
     this.halfmoves = 0;
     if (captured.role === 'rook') this.castles.discardRook(square);
-    if (this.pockets) this.pockets[opposite(captured.color)][captured.role]++;
+    if (this.pockets) this.pockets[opposite(captured.color)][captured.promoted ? 'pawn' : captured.role]++;
   }
 
   ctx(): Context {
