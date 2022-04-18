@@ -342,7 +342,7 @@ export class PgnParser {
     let line = this.lineBuf.join('');
     this.lineBuf = [];
 
-    for (;;) {
+    continuedLine: for (;;) {
       switch (this.state) {
         case ParserState.Bom:
           if (line.startsWith(BOM)) line = line.slice(BOM.length);
@@ -396,7 +396,7 @@ export class PgnParser {
               const beginIndex = line[openIndex] === ' ' ? openIndex + 1 : openIndex;
               line = line.slice(beginIndex);
               this.state = ParserState.Comment;
-              break;
+              continue continuedLine;
             } else {
               this.consumeBudget(100);
               if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
@@ -412,7 +412,7 @@ export class PgnParser {
               frame.parent.children.push(frame.node);
             }
           }
-          if (this.state !== ParserState.Comment) return; // fall through
+          return;
         }
         case ParserState.Comment: {
           const closeIndex = line.indexOf('}');
