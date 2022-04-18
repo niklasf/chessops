@@ -4,29 +4,28 @@ import { PgnParser, walk, startingPosition } from '../pgn.js';
 
 const validate = true;
 
-let count = 0;
-let errors = 0;
+let games = 0;
 let moves = 0;
 
 function status() {
-  console.log({ count, errors, moves });
+  console.log({ games, moves });
 }
 
 const parser = new PgnParser((game, err) => {
-  if (err) console.error('parser error:', err);
+  if (err) throw err;
 
   if (validate)
     walk(game.moves, startingPosition(game.headers).unwrap(), (pos, node) => {
       const move = parseSan(pos, node.san);
-      if (!move) errors++;
+      if (!move) throw Error('illegal move');
       else {
         pos.play(move);
         moves++;
       }
     });
 
-  count++;
-  if (count % 1024 == 0) status();
+  games++;
+  if (games % 1024 == 0) status();
 });
 
 const stream = createReadStream(process.argv[2], { encoding: 'utf-8' });
