@@ -112,6 +112,8 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   const role = charToRole(match[1]) || 'pawn';
   const to = parseSquare(match[4])!;
 
+  if (role === 'pawn' && !match[2] && pos.board.has(to)) return;
+
   const promotion = charToRole(match[5]);
   if (!!promotion !== (role === 'pawn' && SquareSet.backranks().has(to))) return;
   if (promotion === 'king' && pos.rules !== 'antichess') return;
