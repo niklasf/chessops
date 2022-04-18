@@ -1,4 +1,4 @@
-import { FILE_NAMES, RANK_NAMES, isDrop, Move, CastlingSide } from './types.js';
+import { FILE_NAMES, RANK_NAMES, isDrop, Move, CastlingSide, SquareName } from './types.js';
 import { charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util.js';
 import { SquareSet } from './squareSet.js';
 import { Position } from './chess.js';
@@ -85,7 +85,16 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   const ctx = pos.ctx();
 
   // Normal move
-  const match = san.match(/^([NBRQK])?([a-h])?([1-8])?[-x]?([a-h][1-8])(?:=?([nbrqkNBRQK]))?[+#]?$/);
+  const match = san.match(/^([NBRQK])?([a-h])?([1-8])?[-x]?([a-h][1-8])(?:=?([nbrqkNBRQK]))?[+#]?$/) as
+    | [
+        string,
+        'N' | 'B' | 'R' | 'Q' | 'K' | undefined,
+        string | undefined,
+        string | undefined,
+        SquareName,
+        'n' | 'b' | 'r' | 'q' | 'k' | 'N' | 'B' | 'R' | 'Q' | 'K' | undefined
+      ]
+    | null;
   if (!match) {
     // Castling
     let castlingSide: CastlingSide | undefined;
@@ -101,20 +110,22 @@ export function parseSan(pos: Position, san: string): Move | undefined {
     }
 
     // Drop
-    const match = san.match(/^([pnbrqkPNBRQK])?@([a-h][1-8])[+#]?$/);
+    const match = san.match(/^([pnbrqkPNBRQK])?@([a-h][1-8])[+#]?$/) as
+      | [string, 'p' | 'n' | 'b' | 'r' | 'q' | 'k' | 'P' | 'N' | 'B' | 'R' | 'Q' | 'K' | undefined, SquareName]
+      | null;
     if (!match) return;
     const move = {
-      role: charToRole(match[1]) || 'pawn',
-      to: parseSquare(match[2])!,
+      role: match[1] ? charToRole(match[1]) : 'pawn',
+      to: parseSquare(match[2]),
     };
     return pos.isLegal(move, ctx) ? move : undefined;
   }
-  const role = charToRole(match[1]) || 'pawn';
-  const to = parseSquare(match[4])!;
+  const role = match[1] ? charToRole(match[1]) : 'pawn';
+  const to = parseSquare(match[4]);
 
   if (role === 'pawn' && !match[2] && pos.board.has(to)) return;
 
-  const promotion = charToRole(match[5]);
+  const promotion = match[5] ? charToRole(match[5]) : undefined;
   if (!!promotion !== (role === 'pawn' && SquareSet.backranks().has(to))) return;
   if (promotion === 'king' && pos.rules !== 'antichess') return;
 
