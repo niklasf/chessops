@@ -470,7 +470,10 @@ export class Horde extends Chess {
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
     for (const color of COLORS) {
-      if (this.board.pieces(color, 'pawn').intersects(SquareSet.backrank(opposite(color)))) {
+      const backranks = this.board.pieces(color, 'king').isEmpty()
+        ? SquareSet.backrank(opposite(color))
+        : SquareSet.backranks();
+      if (this.board.pieces(color, 'pawn').intersects(backranks)) {
         return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
       }
     }
