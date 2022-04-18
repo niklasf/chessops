@@ -533,9 +533,8 @@ export function setStartingPosition(headers: Map<string, string>, pos: Position)
   if (variant) headers.set('Variant', variant);
   else headers.delete('Variant');
 
-  const fenOpts = { promoted: pos.rules === 'crazyhouse' };
-  const fen = makeFen(pos.toSetup(), fenOpts);
-  const defaultFen = makeFen(defaultPosition(pos.rules).toSetup(), fenOpts);
+  const fen = makeFen(pos.toSetup());
+  const defaultFen = makeFen(defaultPosition(pos.rules).toSetup());
   if (fen !== defaultFen) headers.set('FEN', fen);
   else headers.delete('FEN');
 }

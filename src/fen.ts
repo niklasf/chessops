@@ -216,8 +216,6 @@ export function parseFen(fen: string): Result<Setup, FenError> {
 }
 
 export interface FenOpts {
-  promoted?: boolean;
-  shredder?: boolean;
   epd?: boolean;
 }
 
@@ -230,14 +228,14 @@ export function parsePiece(str: string): Piece | undefined {
   return piece;
 }
 
-export function makePiece(piece: Piece, opts?: FenOpts): string {
+export function makePiece(piece: Piece): string {
   let r = roleToChar(piece.role);
   if (piece.color === 'white') r = r.toUpperCase();
-  if (opts?.promoted && piece.promoted) r += '~';
+  if (piece.promoted) r += '~';
   return r;
 }
 
-export function makeBoardFen(board: Board, opts?: FenOpts): string {
+export function makeBoardFen(board: Board): string {
   let fen = '';
   let empty = 0;
   for (let rank = 7; rank >= 0; rank--) {
@@ -250,7 +248,7 @@ export function makeBoardFen(board: Board, opts?: FenOpts): string {
           fen += empty;
           empty = 0;
         }
-        fen += makePiece(piece, opts);
+        fen += makePiece(piece);
       }
 
       if (file === 7) {
@@ -273,8 +271,7 @@ export function makePockets(pocket: Material): string {
   return makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
 }
 
-export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: FenOpts): string {
-  const shredder = opts?.shredder;
+export function makeCastlingFen(board: Board, unmovedRooks: SquareSet): string {
   let fen = '';
   for (const color of COLORS) {
     const backrank = SquareSet.backrank(color);
@@ -282,9 +279,9 @@ export function makeCastlingFen(board: Board, unmovedRooks: SquareSet, opts?: Fe
     if (!defined(king) || !backrank.has(king)) continue;
     const candidates = board.pieces(color, 'rook').intersect(backrank);
     for (const rook of unmovedRooks.intersect(candidates).reversed()) {
-      if (!shredder && rook === candidates.first() && rook < king) {
+      if (rook === candidates.first() && rook < king) {
         fen += color === 'white' ? 'Q' : 'q';
-      } else if (!shredder && rook === candidates.last() && king < rook) {
+      } else if (rook === candidates.last() && king < rook) {
         fen += color === 'white' ? 'K' : 'k';
       } else {
         const file = FILE_NAMES[squareFile(rook)];
@@ -301,9 +298,9 @@ export function makeRemainingChecks(checks: RemainingChecks): string {
 
 export function makeFen(setup: Setup, opts?: FenOpts): string {
   return [
-    makeBoardFen(setup.board, opts) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
+    makeBoardFen(setup.board) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
     setup.turn[0],
-    makeCastlingFen(setup.board, setup.unmovedRooks, opts),
+    makeCastlingFen(setup.board, setup.unmovedRooks),
     defined(setup.epSquare) ? makeSquare(setup.epSquare) : '-',
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
     ...(opts?.epd ? [] : [Math.max(0, Math.min(setup.halfmoves, 9999)), Math.max(1, Math.min(setup.fullmoves, 9999))]),

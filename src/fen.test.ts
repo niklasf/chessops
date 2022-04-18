@@ -54,5 +54,5 @@ test.each([
   '5b1r/1p5p/4ppp1/4Bn2/1PPP1PP1/4P2P/3k4/4K2R w K - 1 1',
 ])('parse and make fen', fen => {
   const setup = parseFen(fen).unwrap();
-  expect(makeFen(setup, { promoted: true })).toEqual(fen);
+  expect(makeFen(setup)).toEqual(fen);
 });
