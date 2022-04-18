@@ -65,6 +65,9 @@ test('parse pawn capture', () => {
 
   pos = Chess.fromSetup(parseFen('r4br1/pp1Npkp1/2P4p/5P2/6P1/5KnP/PP6/R1B5 b - -').unwrap()).unwrap();
   expect(parseSan(pos, 'bxc6')).toEqual({ from: 49, to: 42 });
+
+  pos = Chess.fromSetup(parseFen('2rq1rk1/pb2bppp/1p2p3/n1ppPn2/2PP4/PP3N2/1B1NQPPP/RB3RK1 b - -').unwrap()).unwrap();
+  expect(parseSan(pos, 'c4')).toBeUndefined(); // missing file
 });
 
 test('parse antichess', () => {
