@@ -221,7 +221,7 @@ export function makePgn(game: Game<PgnNodeData>): string {
 
   tokens.push(makeOutcome(parseOutcome(game.headers.get('Result'))));
 
-  builder.push(tokens.join(' '));
+  builder.push(tokens.join(' '), '\n');
   return builder.join('');
 }
 
