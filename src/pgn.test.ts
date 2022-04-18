@@ -45,7 +45,7 @@ test('make pgn', () => {
   e5.children.push(c4);
 
   expect(makePgn({ headers: emptyHeaders(), moves: root })).toEqual(
-    '1. e4 $7 ( 1. e3 ) 1... e5 ( 1... e6 2. Nf3 { a comment } ) 2. c4 *'
+    '1. e4 $7 ( 1. e3 ) 1... e5 ( 1... e6 2. Nf3 { a comment } ) 2. c4 *\n'
   );
 });
 
