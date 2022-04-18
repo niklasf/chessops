@@ -36,23 +36,17 @@ export function roleToChar(role: Role): string {
 export function charToRole(ch: 'p' | 'n' | 'b' | 'r' | 'q' | 'k' | 'P' | 'N' | 'B' | 'R' | 'Q' | 'K'): Role;
 export function charToRole(ch: string): Role | undefined;
 export function charToRole(ch: string): Role | undefined {
-  switch (ch) {
-    case 'P':
+  switch (ch.toLowerCase()) {
     case 'p':
       return 'pawn';
-    case 'N':
     case 'n':
       return 'knight';
-    case 'B':
     case 'b':
       return 'bishop';
-    case 'R':
     case 'r':
       return 'rook';
-    case 'Q':
     case 'q':
       return 'queen';
-    case 'K':
     case 'k':
       return 'king';
     default:
