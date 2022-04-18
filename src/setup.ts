@@ -89,7 +89,7 @@ export class Material {
   }
 
   size(): number {
-    return this.white.count() + this.black.count();
+    return this.white.size() + this.black.size();
   }
 
   isEmpty(): boolean {

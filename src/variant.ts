@@ -29,10 +29,10 @@ export class Crazyhouse extends Chess {
 
   protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
     return super.validate(opts).chain(_ => {
-      if (this.pockets && (this.pockets.white.king > 0 || this.pockets.black.king > 0)) {
+      if (this.pockets?.count('king')) {
         return Result.err(new PositionError(IllegalSetup.Kings));
       }
-      if ((this.pockets ? this.pockets.count() : 0) + this.board.occupied.size() > 64) {
+      if ((this.pockets?.size() || 0) + this.board.occupied.size() > 64) {
         return Result.err(new PositionError(IllegalSetup.Variant));
       }
       return Result.ok(undefined);
@@ -48,16 +48,24 @@ export class Crazyhouse extends Chess {
     // custom positions.
     if (!this.pockets) return super.hasInsufficientMaterial(color);
     return (
-      this.board.occupied.size() + this.pockets.count() <= 3 &&
+      this.board.occupied.size() + this.pockets.size() <= 3 &&
       this.board.pawn.isEmpty() &&
-      this.board.promoted.isEmpty() &&
+      this.board.promoted.intersect(this.board.occupied).diff(this.board.king).isEmpty() &&
       this.board.rooksAndQueens().isEmpty() &&
-      this.pockets.white.pawn <= 0 &&
-      this.pockets.black.pawn <= 0 &&
-      this.pockets.white.rook <= 0 &&
-      this.pockets.black.rook <= 0 &&
-      this.pockets.white.queen <= 0 &&
-      this.pockets.black.queen <= 0
+      this.pockets.count('pawn') <= 0 &&
+      this.pockets.count('rook') <= 0 &&
+      this.pockets.count('queen') <= 0
+    );
+  }
+
+  isStandardMaterial(): boolean {
+    const promoted = this.board.promoted.intersect(this.board.occupied).diff(this.board.pawn).diff(this.board.king);
+    return (
+      promoted.size() + this.board.pawn.size() + (this.pockets?.count('pawn') || 0) <= 16 &&
+      this.board.knight.diff(promoted).size() + (this.pockets?.count('knight') || 0) <= 4 &&
+      this.board.bishop.diff(promoted).size() + (this.pockets?.count('bishop') || 0) <= 4 &&
+      this.board.rook.diff(promoted).size() + (this.pockets?.count('rook') || 0) <= 4 &&
+      this.board.queen.diff(promoted).size() + (this.pockets?.count('queen') || 0) <= 2
     );
   }
 
@@ -497,6 +505,12 @@ export class Horde extends Chess {
     if (this.board.white.isEmpty()) return { winner: 'black' };
     if (this.board.black.isEmpty()) return { winner: 'white' };
     return;
+  }
+
+  isStandardMaterial(): boolean {
+    return COLORS.every(color =>
+      this.board.pieces(color, 'king').nonEmpty() ? this.isStandardMaterialSide(color) : this.board[color].size() <= 36
+    );
   }
 }
 

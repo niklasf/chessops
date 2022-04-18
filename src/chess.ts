@@ -184,6 +184,7 @@ export abstract class Position {
   abstract isVariantEnd(): boolean;
   abstract variantOutcome(ctx?: Context): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
+  abstract isStandardMaterial(): boolean;
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
@@ -644,5 +645,19 @@ export class Chess extends Position {
       return sameColor && this.board.pawn.isEmpty() && this.board.knight.isEmpty();
     }
     return true;
+  }
+
+  protected isStandardMaterialSide(color: Color): boolean {
+    const promoted =
+      Math.max(this.board.pieces(color, 'queen').size() - 1, 0) +
+      Math.max(this.board.pieces(color, 'rook').size() - 2, 0) +
+      Math.max(this.board.pieces(color, 'knight').size() - 2, 0) +
+      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0) +
+      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
+    return this.board.pieces(color, 'pawn').size() + promoted <= 8;
+  }
+
+  isStandardMaterial(): boolean {
+    return COLORS.every(color => this.isStandardMaterialSide(color));
   }
 }

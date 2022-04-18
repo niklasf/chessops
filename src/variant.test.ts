@@ -1,6 +1,6 @@
-import { Rules } from './types.js';
+import { Rules, RULES } from './types.js';
 import { perft } from './debug.js';
-import { setupPosition } from './variant.js';
+import { defaultPosition, setupPosition } from './variant.js';
 import { parseFen, makeFen } from './fen.js';
 import { parseUci } from './util.js';
 
@@ -150,4 +150,8 @@ test('3check remaining checks', () => {
   ).unwrap();
   pos.play(parseUci('f1b5')!);
   expect(makeFen(pos.toSetup())).toBe('rnbqkbnr/ppp1pppp/3p4/1B6/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 2+3 1 2');
+});
+
+test.each(RULES)('%s standard material', rules => {
+  expect(defaultPosition(rules).isStandardMaterial()).toBe(true);
 });
