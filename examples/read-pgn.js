@@ -2,7 +2,7 @@ import { createReadStream } from 'fs';
 import { parseSan } from '../san.js';
 import { PgnParser, walk, startingPosition } from '../pgn.js';
 
-const validate = false;
+const validate = true;
 
 let count = 0;
 let errors = 0;
