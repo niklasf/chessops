@@ -84,22 +84,22 @@ export function makeSan(pos: Position, move: Move): string {
 export function parseSan(pos: Position, san: string): Move | undefined {
   const ctx = pos.ctx();
 
-  // Castling
-  let castlingSide: CastlingSide | undefined;
-  if (san === 'O-O' || san === 'O-O+' || san === 'O-O#') castlingSide = 'h';
-  else if (san === 'O-O-O' || san === 'O-O-O+' || san === 'O-O-O#') castlingSide = 'a';
-  if (castlingSide) {
-    const rook = pos.castles.rook[pos.turn][castlingSide];
-    if (!defined(ctx.king) || !defined(rook) || !pos.dests(ctx.king, ctx).has(rook)) return;
-    return {
-      from: ctx.king,
-      to: rook,
-    };
-  }
-
   // Normal move
   const match = san.match(/^([NBRQK])?([a-h])?([1-8])?[-x]?([a-h][1-8])(?:=?([nbrqkNBRQK]))?[+#]?$/);
   if (!match) {
+    // Castling
+    let castlingSide: CastlingSide | undefined;
+    if (san === 'O-O' || san === 'O-O+' || san === 'O-O#') castlingSide = 'h';
+    else if (san === 'O-O-O' || san === 'O-O-O+' || san === 'O-O-O#') castlingSide = 'a';
+    if (castlingSide) {
+      const rook = pos.castles.rook[pos.turn][castlingSide];
+      if (!defined(ctx.king) || !defined(rook) || !pos.dests(ctx.king, ctx).has(rook)) return;
+      return {
+        from: ctx.king,
+        to: rook,
+      };
+    }
+
     // Drop
     const match = san.match(/^([pnbrqkPNBRQK])?@([a-h][1-8])[+#]?$/);
     if (!match) return;
