@@ -123,14 +123,13 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   const role = match[1] ? charToRole(match[1]) : 'pawn';
   const to = parseSquare(match[4]);
 
-  if (role === 'pawn' && !match[2] && pos.board.has(to)) return;
-
   const promotion = match[5] ? charToRole(match[5]) : undefined;
   if (!!promotion !== (role === 'pawn' && SquareSet.backranks().has(to))) return;
   if (promotion === 'king' && pos.rules !== 'antichess') return;
 
   let candidates = pos.board.pieces(pos.turn, role);
-  if (match[2]) candidates = candidates.intersect(SquareSet.fromFile(match[2].charCodeAt(0) - 'a'.charCodeAt(0)));
+  if (role === 'pawn' && !match[2]) candidates = candidates.intersect(SquareSet.fromFile(squareFile(to)));
+  else if (match[2]) candidates = candidates.intersect(SquareSet.fromFile(match[2].charCodeAt(0) - 'a'.charCodeAt(0)));
   if (match[3]) candidates = candidates.intersect(SquareSet.fromRank(match[3].charCodeAt(0) - '1'.charCodeAt(0)));
 
   // Optimization: Reduce set of candidates
