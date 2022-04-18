@@ -1,4 +1,4 @@
-import { Color, ROLES, Square } from './types.js';
+import { Color, Role, ROLES, Square } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 
@@ -56,7 +56,7 @@ export class MaterialSide {
     return this.knight > 0 || this.bishop > 0 || this.rook > 0 || this.queen > 0 || this.king > 0;
   }
 
-  count(): number {
+  size(): number {
     return this.pawn + this.knight + this.bishop + this.rook + this.queen + this.king;
   }
 }
@@ -84,7 +84,11 @@ export class Material {
     return new Material(this.white.add(other.white), this.black.add(other.black));
   }
 
-  count(): number {
+  count(role: Role): number {
+    return this.white[role] + this.black[role];
+  }
+
+  size(): number {
     return this.white.count() + this.black.count();
   }
 
