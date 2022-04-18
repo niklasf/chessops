@@ -15,14 +15,15 @@ function status() {
 const parser = new PgnParser((game, err) => {
   if (err) console.error('parser error:', err);
 
-  if (validate) walk(game.moves, startingPosition(game.headers).unwrap(), (pos, node) => {
-    const move = parseSan(pos, node.san);
-    if (!move) errors++;
-    else {
-      pos.play(move);
-      moves++;
-    }
-  });
+  if (validate)
+    walk(game.moves, startingPosition(game.headers).unwrap(), (pos, node) => {
+      const move = parseSan(pos, node.san);
+      if (!move) errors++;
+      else {
+        pos.play(move);
+        moves++;
+      }
+    });
 
   count++;
   if (count % 1024 == 0) status();
