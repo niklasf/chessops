@@ -239,19 +239,6 @@ export abstract class Position {
     return pos;
   }
 
-  equalsIgnoreMoves(other: Position): boolean {
-    return (
-      this.rules === other.rules &&
-      this.board.equals(other.board) &&
-      ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
-      this.turn === other.turn &&
-      this.castles.unmovedRooks.equals(other.castles.unmovedRooks) &&
-      legalEpSquare(this) === legalEpSquare(other) &&
-      ((other.remainingChecks && this.remainingChecks?.equals(other.remainingChecks)) ||
-        (!this.remainingChecks && !other.remainingChecks))
-    );
-  }
-
   toSetup(): Setup {
     return {
       board: this.board.clone(),
@@ -661,4 +648,17 @@ function legalEpSquare(pos: Position): Square | undefined {
     if (pos.dests(candidate, ctx).has(pos.epSquare)) return pos.epSquare;
   }
   return;
+}
+
+export function equalsIgnoreMoves(left: Position, right: Position): boolean {
+  return (
+    left.rules === right.rules &&
+    left.board.equals(right.board) &&
+    ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
+    left.turn === right.turn &&
+    left.castles.unmovedRooks.equals(right.castles.unmovedRooks) &&
+    legalEpSquare(left) === legalEpSquare(right) &&
+    ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
+      (!left.remainingChecks && !right.remainingChecks))
+  );
 }
