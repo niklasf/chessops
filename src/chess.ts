@@ -246,7 +246,7 @@ export abstract class Position {
       ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
       this.turn === other.turn &&
       this.castles.unmovedRooks.equals(other.castles.unmovedRooks) &&
-      this.legalEpSquare() === other.legalEpSquare() &&
+      legalEpSquare(this) === legalEpSquare(other) &&
       ((other.remainingChecks && this.remainingChecks?.equals(other.remainingChecks)) ||
         (!this.remainingChecks && !other.remainingChecks))
     );
@@ -258,7 +258,7 @@ export abstract class Position {
       pockets: this.pockets?.clone(),
       turn: this.turn,
       unmovedRooks: this.castles.unmovedRooks,
-      epSquare: this.legalEpSquare(),
+      epSquare: legalEpSquare(this),
       remainingChecks: this.remainingChecks?.clone(),
       halfmoves: Math.min(this.halfmoves, 150),
       fullmoves: Math.min(Math.max(this.fullmoves, 1), 9999),
@@ -403,17 +403,6 @@ export abstract class Position {
     if (this.remainingChecks) {
       if (this.isCheck()) this.remainingChecks[turn] = Math.max(this.remainingChecks[turn] - 1, 0);
     }
-  }
-
-  private legalEpSquare(ctx?: Context): Square | undefined {
-    if (!defined(this.epSquare)) return;
-    ctx = ctx || this.ctx();
-    const ourPawns = this.board.pieces(this.turn, 'pawn');
-    const candidates = ourPawns.intersect(pawnAttacks(opposite(this.turn), this.epSquare));
-    for (const candidate of candidates) {
-      if (this.dests(candidate, ctx).has(this.epSquare)) return this.epSquare;
-    }
-    return;
   }
 }
 
@@ -661,4 +650,15 @@ export class Chess extends Position {
   isStandardMaterial(): boolean {
     return COLORS.every(color => this.isStandardMaterialSide(color));
   }
+}
+
+function legalEpSquare(pos: Position): Square | undefined {
+  if (!defined(pos.epSquare)) return;
+  const ctx = pos.ctx();
+  const ourPawns = pos.board.pieces(pos.turn, 'pawn');
+  const candidates = ourPawns.intersect(pawnAttacks(opposite(pos.turn), pos.epSquare));
+  for (const candidate of candidates) {
+    if (pos.dests(candidate, ctx).has(pos.epSquare)) return pos.epSquare;
+  }
+  return;
 }
