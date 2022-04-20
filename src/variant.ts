@@ -365,6 +365,21 @@ export class ThreeCheck extends Chess {
   }
 }
 
+function racingKingsBoard(): Board {
+  const board = Board.empty();
+  board.occupied = new SquareSet(0xffff, 0);
+  board.promoted = SquareSet.empty();
+  board.white = new SquareSet(0xf0f0, 0);
+  board.black = new SquareSet(0x0f0f, 0);
+  board.pawn = SquareSet.empty();
+  board.knight = new SquareSet(0x1818, 0);
+  board.bishop = new SquareSet(0x2424, 0);
+  board.rook = new SquareSet(0x4242, 0);
+  board.queen = new SquareSet(0x0081, 0);
+  board.king = new SquareSet(0x8100, 0);
+  return board;
+}
+
 export class RacingKings extends Chess {
   protected constructor() {
     super('racingkings');
@@ -372,7 +387,7 @@ export class RacingKings extends Chess {
 
   static default(): RacingKings {
     const pos = new this();
-    pos.board = Board.racingKings();
+    pos.board = racingKingsBoard();
     pos.pockets = undefined;
     pos.turn = 'white';
     pos.castles = Castles.empty();
@@ -449,6 +464,21 @@ export class RacingKings extends Chess {
   }
 }
 
+function hordeBoard(): Board {
+  const board = Board.empty();
+  board.occupied = new SquareSet(0xffff_ffff, 0xffff_0066);
+  board.promoted = SquareSet.empty();
+  board.white = new SquareSet(0xffff_ffff, 0x0000_0066);
+  board.black = new SquareSet(0, 0xffff_0000);
+  board.pawn = new SquareSet(0xffff_ffff, 0x00ff_0066);
+  board.knight = new SquareSet(0, 0x4200_0000);
+  board.bishop = new SquareSet(0, 0x2400_0000);
+  board.rook = new SquareSet(0, 0x8100_0000);
+  board.queen = new SquareSet(0, 0x0800_0000);
+  board.king = new SquareSet(0, 0x1000_0000);
+  return board;
+}
+
 export class Horde extends Chess {
   protected constructor() {
     super('horde');
@@ -456,7 +486,7 @@ export class Horde extends Chess {
 
   static default(): Horde {
     const pos = new this();
-    pos.board = Board.horde();
+    pos.board = hordeBoard();
     pos.pockets = undefined;
     pos.turn = 'white';
     pos.castles = Castles.default();
