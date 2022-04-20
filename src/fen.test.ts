@@ -6,8 +6,6 @@ import { defaultSetup } from './setup.js';
 test('make board fen', () => {
   expect(makeBoardFen(Board.default())).toEqual(INITIAL_BOARD_FEN);
   expect(makeBoardFen(Board.empty())).toEqual(EMPTY_BOARD_FEN);
-  expect(makeBoardFen(Board.racingKings())).toEqual('8/8/8/8/8/8/krbnNBRK/qrbnNBRQ');
-  expect(makeBoardFen(Board.horde())).toEqual('rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP');
 });
 
 test('make initial fen', () => {
