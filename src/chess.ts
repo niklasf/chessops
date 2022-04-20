@@ -186,22 +186,32 @@ export abstract class Position {
     this.fullmoves = 1;
   }
 
-  // When subclassing:
+  protected setupUnchecked(setup: Setup) {
+    this.board = setup.board.clone();
+    this.board.promoted = SquareSet.empty();
+    this.pockets = undefined;
+    this.turn = setup.turn;
+    this.castles = Castles.fromSetup(setup);
+    this.epSquare = validEpSquare(this, setup.epSquare);
+    this.remainingChecks = undefined;
+    this.halfmoves = setup.halfmoves;
+    this.fullmoves = setup.fullmoves;
+  }
+
+  // When subclassing overwrite at least:
+  //
   // - static default()
   // - static fromSetup()
-  // - Proper signature for clone()
-  // - dests
-  // - isVariantEnd
-  // - variantOutcome
-  // - hasInsufficientMaterial
-  // - isStandardMaterial
+  // - static clone()
+  //
+  // - dests()
+  // - isVariantEnd()
+  // - variantOutcome()
+  // - hasInsufficientMaterial()
+  // - isStandardMaterial()
 
   kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
-  }
-
-  dropDests(_ctx?: Context): SquareSet {
-    return SquareSet.empty();
   }
 
   protected playCaptureAt(square: Square, captured: Piece): void {
@@ -234,8 +244,6 @@ export abstract class Position {
     };
   }
 
-  // The following should be identical in all subclasses
-
   clone(): Position {
     const pos = new (this as any).constructor();
     pos.board = this.board.clone();
@@ -248,6 +256,181 @@ export abstract class Position {
     pos.fullmoves = this.fullmoves;
     return pos;
   }
+
+  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
+
+    if (!defined(this.board.kingOf(this.turn))) return Result.err(new PositionError(IllegalSetup.Kings));
+
+    const otherKing = this.board.kingOf(opposite(this.turn));
+    if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
+      return Result.err(new PositionError(IllegalSetup.OppositeCheck));
+
+    if (SquareSet.backranks().intersects(this.board.pawn))
+      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
+
+    return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
+  }
+
+  protected validateCheckers(): Result<undefined, PositionError> {
+    const ourKing = this.board.kingOf(this.turn);
+    if (defined(ourKing)) {
+      const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
+      if (checkers.nonEmpty()) {
+        if (defined(this.epSquare)) {
+          // The pushed pawn must be the only checker, or it has uncovered
+          // check by a single sliding piece.
+          const pushedTo = this.epSquare ^ 8;
+          const pushedFrom = this.epSquare ^ 24;
+          if (
+            checkers.moreThanOne() ||
+            (checkers.first()! !== pushedTo &&
+              this.kingAttackers(
+                ourKing,
+                opposite(this.turn),
+                this.board.occupied.without(pushedTo).with(pushedFrom)
+              ).nonEmpty())
+          )
+            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+        } else {
+          // Multiple sliding checkers aligned with king.
+          if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
+            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+        }
+      }
+    }
+    return Result.ok(undefined);
+  }
+
+  protected pseudoDests(square: Square, ctx: Context): SquareSet {
+    if (ctx.variantEnd) return SquareSet.empty();
+    const piece = this.board.get(square);
+    if (!piece || piece.color !== this.turn) return SquareSet.empty();
+
+    let pseudo = attacks(piece, square, this.board.occupied);
+    if (piece.role === 'pawn') {
+      let captureTargets = this.board[opposite(this.turn)];
+      if (defined(this.epSquare)) captureTargets = captureTargets.with(this.epSquare);
+      pseudo = pseudo.intersect(captureTargets);
+      const delta = this.turn === 'white' ? 8 : -8;
+      const step = square + delta;
+      if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
+        pseudo = pseudo.with(step);
+        const canDoubleStep = this.turn === 'white' ? square < 16 : square >= 64 - 16;
+        const doubleStep = step + delta;
+        if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
+          pseudo = pseudo.with(doubleStep);
+        }
+      }
+      return pseudo;
+    } else {
+      pseudo = pseudo.diff(this.board[this.turn]);
+    }
+    if (square === ctx.king) return pseudo.union(castlingDest(this, 'a', ctx)).union(castlingDest(this, 'h', ctx));
+    else return pseudo;
+  }
+
+  dropDests(_ctx?: Context): SquareSet {
+    return SquareSet.empty();
+  }
+
+  dests(square: Square, ctx?: Context): SquareSet {
+    ctx = ctx || this.ctx();
+    if (ctx.variantEnd) return SquareSet.empty();
+    const piece = this.board.get(square);
+    if (!piece || piece.color !== this.turn) return SquareSet.empty();
+
+    let pseudo, legal;
+    if (piece.role === 'pawn') {
+      pseudo = pawnAttacks(this.turn, square).intersect(this.board[opposite(this.turn)]);
+      const delta = this.turn === 'white' ? 8 : -8;
+      const step = square + delta;
+      if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
+        pseudo = pseudo.with(step);
+        const canDoubleStep = this.turn === 'white' ? square < 16 : square >= 64 - 16;
+        const doubleStep = step + delta;
+        if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
+          pseudo = pseudo.with(doubleStep);
+        }
+      }
+      if (defined(this.epSquare) && canCaptureEp(this, square, ctx)) {
+        const pawn = this.epSquare - delta;
+        if (ctx.checkers.isEmpty() || ctx.checkers.singleSquare() === pawn) {
+          legal = SquareSet.fromSquare(this.epSquare);
+        }
+      }
+    } else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
+    else if (piece.role === 'knight') pseudo = knightAttacks(square);
+    else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
+    else if (piece.role === 'queen') pseudo = queenAttacks(square, this.board.occupied);
+    else pseudo = kingAttacks(square);
+
+    pseudo = pseudo.diff(this.board[this.turn]);
+
+    if (defined(ctx.king)) {
+      if (piece.role === 'king') {
+        const occ = this.board.occupied.without(square);
+        for (const to of pseudo) {
+          if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
+        }
+        return pseudo.union(castlingDest(this, 'a', ctx)).union(castlingDest(this, 'h', ctx));
+      }
+
+      if (ctx.checkers.nonEmpty()) {
+        const checker = ctx.checkers.singleSquare();
+        if (!defined(checker)) return SquareSet.empty();
+        pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
+      }
+
+      if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
+    }
+
+    if (legal) pseudo = pseudo.union(legal);
+    return pseudo;
+  }
+
+  isVariantEnd(): boolean {
+    return false;
+  }
+
+  variantOutcome(_ctx?: Context): Outcome | undefined {
+    return;
+  }
+
+  hasInsufficientMaterial(color: Color): boolean {
+    if (this.board[color].intersect(this.board.pawn.union(this.board.rooksAndQueens())).nonEmpty()) return false;
+    if (this.board[color].intersects(this.board.knight)) {
+      return (
+        this.board[color].size() <= 2 &&
+        this.board[opposite(color)].diff(this.board.king).diff(this.board.queen).isEmpty()
+      );
+    }
+    if (this.board[color].intersects(this.board.bishop)) {
+      const sameColor =
+        !this.board.bishop.intersects(SquareSet.darkSquares()) ||
+        !this.board.bishop.intersects(SquareSet.lightSquares());
+      return sameColor && this.board.pawn.isEmpty() && this.board.knight.isEmpty();
+    }
+    return true;
+  }
+
+  protected isStandardMaterialSide(color: Color): boolean {
+    const promoted =
+      Math.max(this.board.pieces(color, 'queen').size() - 1, 0) +
+      Math.max(this.board.pieces(color, 'rook').size() - 2, 0) +
+      Math.max(this.board.pieces(color, 'knight').size() - 2, 0) +
+      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0) +
+      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
+    return this.board.pieces(color, 'pawn').size() + promoted <= 8;
+  }
+
+  isStandardMaterial(): boolean {
+    return COLORS.every(color => this.isStandardMaterialSide(color));
+  }
+
+  // The following should be identical in all subclasses
 
   toSetup(): Setup {
     return {
@@ -400,189 +583,6 @@ export abstract class Position {
     if (this.remainingChecks) {
       if (this.isCheck()) this.remainingChecks[turn] = Math.max(this.remainingChecks[turn] - 1, 0);
     }
-  }
-
-  // moved from Chess
-
-  protected setupUnchecked(setup: Setup) {
-    this.board = setup.board.clone();
-    this.board.promoted = SquareSet.empty();
-    this.pockets = undefined;
-    this.turn = setup.turn;
-    this.castles = Castles.fromSetup(setup);
-    this.epSquare = validEpSquare(this, setup.epSquare);
-    this.remainingChecks = undefined;
-    this.halfmoves = setup.halfmoves;
-    this.fullmoves = setup.fullmoves;
-  }
-
-  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
-    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
-
-    if (!defined(this.board.kingOf(this.turn))) return Result.err(new PositionError(IllegalSetup.Kings));
-
-    const otherKing = this.board.kingOf(opposite(this.turn));
-    if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
-    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
-      return Result.err(new PositionError(IllegalSetup.OppositeCheck));
-
-    if (SquareSet.backranks().intersects(this.board.pawn))
-      return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
-
-    return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
-  }
-
-  protected validateCheckers(): Result<undefined, PositionError> {
-    const ourKing = this.board.kingOf(this.turn);
-    if (defined(ourKing)) {
-      const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
-      if (checkers.nonEmpty()) {
-        if (defined(this.epSquare)) {
-          // The pushed pawn must be the only checker, or it has uncovered
-          // check by a single sliding piece.
-          const pushedTo = this.epSquare ^ 8;
-          const pushedFrom = this.epSquare ^ 24;
-          if (
-            checkers.moreThanOne() ||
-            (checkers.first()! !== pushedTo &&
-              this.kingAttackers(
-                ourKing,
-                opposite(this.turn),
-                this.board.occupied.without(pushedTo).with(pushedFrom)
-              ).nonEmpty())
-          )
-            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-        } else {
-          // Multiple sliding checkers aligned with king.
-          if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
-            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-        }
-      }
-    }
-    return Result.ok(undefined);
-  }
-
-  protected pseudoDests(square: Square, ctx: Context): SquareSet {
-    if (ctx.variantEnd) return SquareSet.empty();
-    const piece = this.board.get(square);
-    if (!piece || piece.color !== this.turn) return SquareSet.empty();
-
-    let pseudo = attacks(piece, square, this.board.occupied);
-    if (piece.role === 'pawn') {
-      let captureTargets = this.board[opposite(this.turn)];
-      if (defined(this.epSquare)) captureTargets = captureTargets.with(this.epSquare);
-      pseudo = pseudo.intersect(captureTargets);
-      const delta = this.turn === 'white' ? 8 : -8;
-      const step = square + delta;
-      if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
-        pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn === 'white' ? square < 16 : square >= 64 - 16;
-        const doubleStep = step + delta;
-        if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
-          pseudo = pseudo.with(doubleStep);
-        }
-      }
-      return pseudo;
-    } else {
-      pseudo = pseudo.diff(this.board[this.turn]);
-    }
-    if (square === ctx.king) return pseudo.union(castlingDest(this, 'a', ctx)).union(castlingDest(this, 'h', ctx));
-    else return pseudo;
-  }
-
-  dests(square: Square, ctx?: Context): SquareSet {
-    ctx = ctx || this.ctx();
-    if (ctx.variantEnd) return SquareSet.empty();
-    const piece = this.board.get(square);
-    if (!piece || piece.color !== this.turn) return SquareSet.empty();
-
-    let pseudo, legal;
-    if (piece.role === 'pawn') {
-      pseudo = pawnAttacks(this.turn, square).intersect(this.board[opposite(this.turn)]);
-      const delta = this.turn === 'white' ? 8 : -8;
-      const step = square + delta;
-      if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
-        pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn === 'white' ? square < 16 : square >= 64 - 16;
-        const doubleStep = step + delta;
-        if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
-          pseudo = pseudo.with(doubleStep);
-        }
-      }
-      if (defined(this.epSquare) && canCaptureEp(this, square, ctx)) {
-        const pawn = this.epSquare - delta;
-        if (ctx.checkers.isEmpty() || ctx.checkers.singleSquare() === pawn) {
-          legal = SquareSet.fromSquare(this.epSquare);
-        }
-      }
-    } else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
-    else if (piece.role === 'knight') pseudo = knightAttacks(square);
-    else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
-    else if (piece.role === 'queen') pseudo = queenAttacks(square, this.board.occupied);
-    else pseudo = kingAttacks(square);
-
-    pseudo = pseudo.diff(this.board[this.turn]);
-
-    if (defined(ctx.king)) {
-      if (piece.role === 'king') {
-        const occ = this.board.occupied.without(square);
-        for (const to of pseudo) {
-          if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
-        }
-        return pseudo.union(castlingDest(this, 'a', ctx)).union(castlingDest(this, 'h', ctx));
-      }
-
-      if (ctx.checkers.nonEmpty()) {
-        const checker = ctx.checkers.singleSquare();
-        if (!defined(checker)) return SquareSet.empty();
-        pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
-      }
-
-      if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
-    }
-
-    if (legal) pseudo = pseudo.union(legal);
-    return pseudo;
-  }
-
-  isVariantEnd(): boolean {
-    return false;
-  }
-
-  variantOutcome(_ctx?: Context): Outcome | undefined {
-    return;
-  }
-
-  hasInsufficientMaterial(color: Color): boolean {
-    if (this.board[color].intersect(this.board.pawn.union(this.board.rooksAndQueens())).nonEmpty()) return false;
-    if (this.board[color].intersects(this.board.knight)) {
-      return (
-        this.board[color].size() <= 2 &&
-        this.board[opposite(color)].diff(this.board.king).diff(this.board.queen).isEmpty()
-      );
-    }
-    if (this.board[color].intersects(this.board.bishop)) {
-      const sameColor =
-        !this.board.bishop.intersects(SquareSet.darkSquares()) ||
-        !this.board.bishop.intersects(SquareSet.lightSquares());
-      return sameColor && this.board.pawn.isEmpty() && this.board.knight.isEmpty();
-    }
-    return true;
-  }
-
-  protected isStandardMaterialSide(color: Color): boolean {
-    const promoted =
-      Math.max(this.board.pieces(color, 'queen').size() - 1, 0) +
-      Math.max(this.board.pieces(color, 'rook').size() - 2, 0) +
-      Math.max(this.board.pieces(color, 'knight').size() - 2, 0) +
-      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0) +
-      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
-    return this.board.pieces(color, 'pawn').size() + promoted <= 8;
-  }
-
-  isStandardMaterial(): boolean {
-    return COLORS.every(color => this.isStandardMaterialSide(color));
   }
 }
 
