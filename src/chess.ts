@@ -179,12 +179,11 @@ export abstract class Position {
   // - static default()
   // - static fromSetup()
   // - Proper signature for clone()
-
-  abstract dests(square: Square, ctx?: Context): SquareSet;
-  abstract isVariantEnd(): boolean;
-  abstract variantOutcome(ctx?: Context): Outcome | undefined;
-  abstract hasInsufficientMaterial(color: Color): boolean;
-  abstract isStandardMaterial(): boolean;
+  // - dests
+  // - isVariantEnd
+  // - variantOutcome
+  // - hasInsufficientMaterial
+  // - isStandardMaterial
 
   kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
@@ -391,43 +390,8 @@ export abstract class Position {
       if (this.isCheck()) this.remainingChecks[turn] = Math.max(this.remainingChecks[turn] - 1, 0);
     }
   }
-}
 
-export class Chess extends Position {
-  protected constructor(rules?: Rules) {
-    super(rules || 'chess');
-  }
-
-  static default(): Chess {
-    const pos = new this();
-    pos.board = Board.default();
-    pos.pockets = undefined;
-    pos.turn = 'white';
-    pos.castles = Castles.default();
-    pos.epSquare = undefined;
-    pos.remainingChecks = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
-    return pos;
-  }
-
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Chess, PositionError> {
-    const pos = new this();
-    pos.board = setup.board.clone();
-    pos.board.promoted = SquareSet.empty();
-    pos.pockets = undefined;
-    pos.turn = setup.turn;
-    pos.castles = Castles.fromSetup(setup);
-    pos.epSquare = validEpSquare(pos, setup.epSquare);
-    pos.remainingChecks = undefined;
-    pos.halfmoves = setup.halfmoves;
-    pos.fullmoves = setup.fullmoves;
-    return pos.validate(opts).map(_ => pos);
-  }
-
-  clone(): Chess {
-    return super.clone() as Chess;
-  }
+  // moved from Chess
 
   protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
@@ -596,6 +560,43 @@ export class Chess extends Position {
 
   isStandardMaterial(): boolean {
     return COLORS.every(color => this.isStandardMaterialSide(color));
+  }
+}
+
+export class Chess extends Position {
+  protected constructor(rules?: Rules) {
+    super(rules || 'chess');
+  }
+
+  static default(): Chess {
+    const pos = new this();
+    pos.board = Board.default();
+    pos.pockets = undefined;
+    pos.turn = 'white';
+    pos.castles = Castles.default();
+    pos.epSquare = undefined;
+    pos.remainingChecks = undefined;
+    pos.halfmoves = 0;
+    pos.fullmoves = 1;
+    return pos;
+  }
+
+  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Chess, PositionError> {
+    const pos = new this();
+    pos.board = setup.board.clone();
+    pos.board.promoted = SquareSet.empty();
+    pos.pockets = undefined;
+    pos.turn = setup.turn;
+    pos.castles = Castles.fromSetup(setup);
+    pos.epSquare = validEpSquare(pos, setup.epSquare);
+    pos.remainingChecks = undefined;
+    pos.halfmoves = setup.halfmoves;
+    pos.fullmoves = setup.fullmoves;
+    return pos.validate(opts).map(_ => pos);
+  }
+
+  clone(): Chess {
+    return super.clone() as Chess;
   }
 }
 
