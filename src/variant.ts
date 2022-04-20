@@ -200,7 +200,7 @@ export class Atomic extends Position {
     if (this.board.queen.nonEmpty() || this.board.pawn.nonEmpty()) return false;
 
     // Single knight, bishop or rook cannot mate against bare king.
-    if (this.board.knight.union(this.board.bishop).union(this.board.rook).isSingleSquare()) return true;
+    if (this.board.knight.union(this.board.bishop).union(this.board.rook).size() === 1) return true;
 
     // If only knights, more than two are required to mate bare king.
     if (this.board.occupied.equals(this.board.knight.union(this.board.king))) {
@@ -568,7 +568,7 @@ export class Horde extends Position {
 
   protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (!this.board.king.isSingleSquare()) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.king.size() != 1) return Result.err(new PositionError(IllegalSetup.Kings));
 
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())

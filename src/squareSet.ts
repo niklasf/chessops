@@ -199,10 +199,6 @@ export class SquareSet implements Iterable<Square> {
     return this.moreThanOne() ? undefined : this.last();
   }
 
-  isSingleSquare(): boolean {
-    return this.nonEmpty() && !this.moreThanOne();
-  }
-
   *[Symbol.iterator](): Iterator<Square> {
     let lo = this.lo;
     let hi = this.hi;
