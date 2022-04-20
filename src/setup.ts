@@ -149,7 +149,7 @@ export function defaultSetup(): Setup {
   };
 }
 
-export function cloneSetup(setup: Setup): Setup {
+export function setupClone(setup: Setup): Setup {
   return {
     board: setup.board.clone(),
     pockets: setup.pockets?.clone(),
