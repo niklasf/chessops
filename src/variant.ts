@@ -5,33 +5,46 @@ import { between, kingAttacks } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Setup, RemainingChecks, Material } from './setup.js';
-import { PositionError, Position, IllegalSetup, Context, Castles, Chess, FromSetupOpts } from './chess.js';
+import { PositionError, Position, IllegalSetup, Context, Chess, Castles, FromSetupOpts } from './chess.js';
 
 export { Position, PositionError, IllegalSetup, Context, Chess, Castles };
 
-export class Crazyhouse extends Chess {
-  protected constructor() {
+export class Crazyhouse extends Position {
+  private constructor() {
     super('crazyhouse');
   }
 
+  reset() {
+    super.reset();
+    this.pockets = Material.empty();
+  }
+
+  protected setupUnchecked(setup: Setup) {
+    super.setupUnchecked(setup);
+    this.board.promoted = setup.board.promoted
+      .intersect(setup.board.occupied)
+      .diff(setup.board.king)
+      .diff(setup.board.pawn);
+    this.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
+  }
+
   static default(): Crazyhouse {
-    const pos = super.default();
-    pos.pockets = Material.empty();
-    return pos as Crazyhouse;
+    const pos = new this();
+    pos.reset();
+    return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Crazyhouse, PositionError> {
-    return super.fromSetup(setup, opts).map(pos => {
-      pos.board.promoted = setup.board.promoted
-        .intersect(setup.board.occupied)
-        .diff(setup.board.king)
-        .diff(setup.board.pawn);
-      pos.pockets = setup.pockets ? setup.pockets.clone() : Material.empty();
-      return pos as Crazyhouse;
-    });
+    const pos = new this();
+    pos.setupUnchecked(setup);
+    return pos.validate(opts).map(_ => pos);
   }
 
-  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
+  clone(): Crazyhouse {
+    return super.clone() as Crazyhouse;
+  }
+
+  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
     return super.validate(opts).chain(_ => {
       if (this.pockets?.count('king')) {
         return Result.err(new PositionError(IllegalSetup.Kings));
@@ -41,10 +54,6 @@ export class Crazyhouse extends Chess {
       }
       return Result.ok(undefined);
     });
-  }
-
-  clone(): Crazyhouse {
-    return super.clone() as Crazyhouse;
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -93,24 +102,28 @@ export class Crazyhouse extends Chess {
   }
 }
 
-export class Atomic extends Chess {
-  protected constructor() {
+export class Atomic extends Position {
+  private constructor() {
     super('atomic');
   }
 
   static default(): Atomic {
-    return super.default() as Atomic;
+    const pos = new this();
+    pos.reset();
+    return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Atomic, PositionError> {
-    return super.fromSetup(setup, opts) as Result<Atomic, PositionError>;
+    const pos = new this();
+    pos.setupUnchecked(setup);
+    return pos.validate(opts).map(_ => pos);
   }
 
   clone(): Atomic {
     return super.clone() as Atomic;
   }
 
-  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
+  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
     // Like chess, but allow our king to be missing.
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() > 2) return Result.err(new PositionError(IllegalSetup.Kings));
@@ -216,29 +229,38 @@ export class Atomic extends Chess {
   }
 }
 
-export class Antichess extends Chess {
-  protected constructor() {
+export class Antichess extends Position {
+  private constructor() {
     super('antichess');
   }
 
+  reset() {
+    super.reset();
+    this.castles = Castles.empty();
+  }
+
+  protected setupUnchecked(setup: Setup) {
+    super.setupUnchecked(setup);
+    this.castles = Castles.empty();
+  }
+
   static default(): Antichess {
-    const pos = super.default();
-    pos.castles = Castles.empty();
-    return pos as Antichess;
+    const pos = new this();
+    pos.reset();
+    return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Antichess, PositionError> {
-    return super.fromSetup(setup, opts).map(pos => {
-      pos.castles = Castles.empty();
-      return pos as Antichess;
-    });
+    const pos = new this();
+    pos.setupUnchecked(setup);
+    return pos.validate(opts).map(_ => pos);
   }
 
   clone(): Antichess {
     return super.clone() as Antichess;
   }
 
-  protected validate(_opts?: FromSetupOpts): Result<undefined, PositionError> {
+  protected validate(_opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
@@ -292,17 +314,21 @@ export class Antichess extends Chess {
   }
 }
 
-export class KingOfTheHill extends Chess {
-  protected constructor() {
+export class KingOfTheHill extends Position {
+  private constructor() {
     super('kingofthehill');
   }
 
   static default(): KingOfTheHill {
-    return super.default();
+    const pos = new this();
+    pos.reset();
+    return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<KingOfTheHill, PositionError> {
-    return super.fromSetup(setup, opts);
+    const pos = new this();
+    pos.setupUnchecked(setup);
+    return pos.validate(opts).map(_ => pos);
   }
 
   clone(): KingOfTheHill {
@@ -325,22 +351,31 @@ export class KingOfTheHill extends Chess {
   }
 }
 
-export class ThreeCheck extends Chess {
-  protected constructor() {
+export class ThreeCheck extends Position {
+  private constructor() {
     super('3check');
   }
 
+  reset() {
+    super.reset();
+    this.remainingChecks = RemainingChecks.default();
+  }
+
+  protected setupUnchecked(setup: Setup) {
+    super.setupUnchecked(setup);
+    this.remainingChecks = setup.remainingChecks?.clone() || RemainingChecks.default();
+  }
+
   static default(): ThreeCheck {
-    const pos = super.default();
-    pos.remainingChecks = RemainingChecks.default();
+    const pos = new this();
+    pos.reset();
     return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<ThreeCheck, PositionError> {
-    return super.fromSetup(setup, opts).map(pos => {
-      pos.remainingChecks = setup.remainingChecks ? setup.remainingChecks.clone() : RemainingChecks.default();
-      return pos;
-    });
+    const pos = new this();
+    pos.setupUnchecked(setup);
+    return pos.validate(opts).map(_ => pos);
   }
 
   clone(): ThreeCheck {
@@ -380,38 +415,46 @@ function racingKingsBoard(): Board {
   return board;
 }
 
-export class RacingKings extends Chess {
-  protected constructor() {
+export class RacingKings extends Position {
+  private constructor() {
     super('racingkings');
+  }
+
+  reset() {
+    this.board = racingKingsBoard();
+    this.pockets = undefined;
+    this.turn = 'white';
+    this.castles = Castles.empty();
+    this.epSquare = undefined;
+    this.remainingChecks = undefined;
+    this.halfmoves = 0;
+    this.fullmoves = 1;
+  }
+
+  setupUnchecked(setup: Setup) {
+    super.setupUnchecked(setup);
+    this.castles = Castles.empty();
   }
 
   static default(): RacingKings {
     const pos = new this();
-    pos.board = racingKingsBoard();
-    pos.pockets = undefined;
-    pos.turn = 'white';
-    pos.castles = Castles.empty();
-    pos.epSquare = undefined;
-    pos.remainingChecks = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
+    pos.reset();
     return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<RacingKings, PositionError> {
-    return super.fromSetup(setup, opts).map(pos => {
-      pos.castles = Castles.empty();
-      return pos as RacingKings;
-    });
-  }
-
-  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
-    if (this.isCheck() || this.board.pawn.nonEmpty()) return Result.err(new PositionError(IllegalSetup.Variant));
-    return super.validate(opts);
+    const pos = new this();
+    pos.setupUnchecked(setup);
+    return pos.validate(opts).map(_ => pos);
   }
 
   clone(): RacingKings {
     return super.clone() as RacingKings;
+  }
+
+  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+    if (this.isCheck() || this.board.pawn.nonEmpty()) return Result.err(new PositionError(IllegalSetup.Variant));
+    return super.validate(opts);
   }
 
   dests(square: Square, ctx?: Context): SquareSet {
@@ -479,30 +522,40 @@ function hordeBoard(): Board {
   return board;
 }
 
-export class Horde extends Chess {
-  protected constructor() {
+export class Horde extends Position {
+  private constructor() {
     super('horde');
+  }
+
+  reset() {
+    this.board = hordeBoard();
+    this.pockets = undefined;
+    this.turn = 'white';
+    this.castles = Castles.default();
+    this.castles.discardColor('white');
+    this.epSquare = undefined;
+    this.remainingChecks = undefined;
+    this.halfmoves = 0;
+    this.fullmoves = 1;
   }
 
   static default(): Horde {
     const pos = new this();
-    pos.board = hordeBoard();
-    pos.pockets = undefined;
-    pos.turn = 'white';
-    pos.castles = Castles.default();
-    pos.castles.discardColor('white');
-    pos.epSquare = undefined;
-    pos.remainingChecks = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
+    pos.reset();
     return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Horde, PositionError> {
-    return super.fromSetup(setup, opts) as Result<Horde, PositionError>;
+    const pos = new this();
+    pos.setupUnchecked(setup);
+    return pos.validate(opts).map(_ => pos);
   }
 
-  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
+  clone(): Horde {
+    return super.clone() as Horde;
+  }
+
+  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (!this.board.king.isSingleSquare()) return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -518,10 +571,6 @@ export class Horde extends Chess {
       }
     }
     return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
-  }
-
-  clone(): Horde {
-    return super.clone() as Horde;
   }
 
   hasInsufficientMaterial(_color: Color): boolean {

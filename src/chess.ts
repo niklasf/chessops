@@ -175,6 +175,17 @@ export abstract class Position {
 
   protected constructor(readonly rules: Rules) {}
 
+  reset() {
+    this.board = Board.default();
+    this.pockets = undefined;
+    this.turn = 'white';
+    this.castles = Castles.default();
+    this.epSquare = undefined;
+    this.remainingChecks = undefined;
+    this.halfmoves = 0;
+    this.fullmoves = 1;
+  }
+
   // When subclassing:
   // - static default()
   // - static fromSetup()
@@ -393,7 +404,19 @@ export abstract class Position {
 
   // moved from Chess
 
-  protected validate(opts?: FromSetupOpts): Result<undefined, PositionError> {
+  protected setupUnchecked(setup: Setup) {
+    this.board = setup.board.clone();
+    this.board.promoted = SquareSet.empty();
+    this.pockets = undefined;
+    this.turn = setup.turn;
+    this.castles = Castles.fromSetup(setup);
+    this.epSquare = validEpSquare(this, setup.epSquare);
+    this.remainingChecks = undefined;
+    this.halfmoves = setup.halfmoves;
+    this.fullmoves = setup.fullmoves;
+  }
+
+  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -564,34 +587,19 @@ export abstract class Position {
 }
 
 export class Chess extends Position {
-  protected constructor(rules?: Rules) {
-    super(rules || 'chess');
+  private constructor() {
+    super('chess');
   }
 
   static default(): Chess {
     const pos = new this();
-    pos.board = Board.default();
-    pos.pockets = undefined;
-    pos.turn = 'white';
-    pos.castles = Castles.default();
-    pos.epSquare = undefined;
-    pos.remainingChecks = undefined;
-    pos.halfmoves = 0;
-    pos.fullmoves = 1;
+    pos.reset();
     return pos;
   }
 
   static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Chess, PositionError> {
     const pos = new this();
-    pos.board = setup.board.clone();
-    pos.board.promoted = SquareSet.empty();
-    pos.pockets = undefined;
-    pos.turn = setup.turn;
-    pos.castles = Castles.fromSetup(setup);
-    pos.epSquare = validEpSquare(pos, setup.epSquare);
-    pos.remainingChecks = undefined;
-    pos.halfmoves = setup.halfmoves;
-    pos.fullmoves = setup.fullmoves;
+    pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
   }
 
