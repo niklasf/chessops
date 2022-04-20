@@ -15,7 +15,7 @@ import {
   Outcome,
 } from './types.js';
 import { SquareSet } from './squareSet.js';
-import { Board } from './board.js';
+import { Board, boardEquals } from './board.js';
 import { Setup, Material, RemainingChecks } from './setup.js';
 import {
   attacks,
@@ -630,7 +630,7 @@ function castlingDest(pos: Position, side: CastlingSide, ctx: Context): SquareSe
 export function equalsIgnoreMoves(left: Position, right: Position): boolean {
   return (
     left.rules === right.rules &&
-    left.board.equals(right.board) &&
+    boardEquals(left.board, right.board) &&
     ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
     left.turn === right.turn &&
     left.castles.unmovedRooks.equals(right.castles.unmovedRooks) &&

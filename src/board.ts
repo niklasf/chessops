@@ -76,15 +76,6 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
     return board;
   }
 
-  equalsIgnorePromoted(other: Board): boolean {
-    if (!this.white.equals(other.white)) return false;
-    return ROLES.every(role => this[role].equals(other[role]));
-  }
-
-  equals(other: Board): boolean {
-    return this.equalsIgnorePromoted(other) && this.promoted.equals(other.promoted);
-  }
-
   getColor(square: Square): Color | undefined {
     if (this.white.has(square)) return 'white';
     if (this.black.has(square)) return 'black';
@@ -161,4 +152,12 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
   kingOf(color: Color): Square | undefined {
     return this.pieces(color, 'king').singleSquare();
   }
+}
+
+export function boardEquals(left: Board, right: Board) {
+  return (
+    left.white.equals(right.white) &&
+    left.promoted.equals(right.promoted) &&
+    ROLES.every(role => left[role].equals(right[role]))
+  );
 }
