@@ -131,7 +131,7 @@ export class Atomic extends Chess {
     return defined(this.epSquare) ? Result.ok(undefined) : super.validateCheckers();
   }
 
-  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
+  kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const attackerKings = this.board.pieces(attacker, 'king');
     if (attackerKings.isEmpty() || kingAttacks(square).intersects(attackerKings)) {
       return SquareSet.empty();
@@ -245,7 +245,7 @@ export class Antichess extends Chess {
     return Result.ok(undefined);
   }
 
-  protected kingAttackers(_square: Square, _attacker: Color, _occupied: SquareSet): SquareSet {
+  kingAttackers(_square: Square, _attacker: Color, _occupied: SquareSet): SquareSet {
     return SquareSet.empty();
   }
 

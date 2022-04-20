@@ -186,7 +186,7 @@ export abstract class Position {
   abstract hasInsufficientMaterial(color: Color): boolean;
   abstract isStandardMaterial(): boolean;
 
-  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
+  kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
@@ -418,7 +418,7 @@ export class Chess extends Position {
     pos.pockets = undefined;
     pos.turn = setup.turn;
     pos.castles = Castles.fromSetup(setup);
-    pos.epSquare = pos.validEpSquare(setup.epSquare);
+    pos.epSquare = validEpSquare(pos, setup.epSquare);
     pos.remainingChecks = undefined;
     pos.halfmoves = setup.halfmoves;
     pos.fullmoves = setup.fullmoves;
@@ -476,46 +476,6 @@ export class Chess extends Position {
     return Result.ok(undefined);
   }
 
-  private validEpSquare(square: Square | undefined): Square | undefined {
-    if (!defined(square)) return;
-    const epRank = this.turn === 'white' ? 5 : 2;
-    const forward = this.turn === 'white' ? 8 : -8;
-    if (squareRank(square) !== epRank) return;
-    if (this.board.occupied.has(square + forward)) return;
-    const pawn = square - forward;
-    if (!this.board.pawn.has(pawn) || !this.board[opposite(this.turn)].has(pawn)) return;
-    return square;
-  }
-
-  private castlingDest(side: CastlingSide, ctx: Context): SquareSet {
-    if (!defined(ctx.king) || ctx.checkers.nonEmpty()) return SquareSet.empty();
-    const rook = this.castles.rook[this.turn][side];
-    if (!defined(rook)) return SquareSet.empty();
-    if (this.castles.path[this.turn][side].intersects(this.board.occupied)) return SquareSet.empty();
-
-    const kingTo = kingCastlesTo(this.turn, side);
-    const kingPath = between(ctx.king, kingTo);
-    const occ = this.board.occupied.without(ctx.king);
-    for (const sq of kingPath) {
-      if (this.kingAttackers(sq, opposite(this.turn), occ).nonEmpty()) return SquareSet.empty();
-    }
-
-    const rookTo = rookCastlesTo(this.turn, side);
-    const after = this.board.occupied.toggle(ctx.king).toggle(rook).toggle(rookTo);
-    if (this.kingAttackers(kingTo, opposite(this.turn), after).nonEmpty()) return SquareSet.empty();
-
-    return SquareSet.fromSquare(rook);
-  }
-
-  private canCaptureEp(pawn: Square, ctx: Context): boolean {
-    if (!defined(this.epSquare)) return false;
-    if (!pawnAttacks(this.turn, pawn).has(this.epSquare)) return false;
-    if (!defined(ctx.king)) return true;
-    const captured = this.epSquare + (this.turn === 'white' ? -8 : 8);
-    const occupied = this.board.occupied.toggle(pawn).toggle(this.epSquare).toggle(captured);
-    return !this.kingAttackers(ctx.king, opposite(this.turn), occupied).intersects(occupied);
-  }
-
   protected pseudoDests(square: Square, ctx: Context): SquareSet {
     if (ctx.variantEnd) return SquareSet.empty();
     const piece = this.board.get(square);
@@ -540,7 +500,7 @@ export class Chess extends Position {
     } else {
       pseudo = pseudo.diff(this.board[this.turn]);
     }
-    if (square === ctx.king) return pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
+    if (square === ctx.king) return pseudo.union(castlingDest(this, 'a', ctx)).union(castlingDest(this, 'h', ctx));
     else return pseudo;
   }
 
@@ -563,7 +523,7 @@ export class Chess extends Position {
           pseudo = pseudo.with(doubleStep);
         }
       }
-      if (defined(this.epSquare) && this.canCaptureEp(square, ctx)) {
+      if (defined(this.epSquare) && canCaptureEp(this, square, ctx)) {
         const pawn = this.epSquare - delta;
         if (ctx.checkers.isEmpty() || ctx.checkers.singleSquare() === pawn) {
           legal = SquareSet.fromSquare(this.epSquare);
@@ -583,7 +543,7 @@ export class Chess extends Position {
         for (const to of pseudo) {
           if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
         }
-        return pseudo.union(this.castlingDest('a', ctx)).union(this.castlingDest('h', ctx));
+        return pseudo.union(castlingDest(this, 'a', ctx)).union(castlingDest(this, 'h', ctx));
       }
 
       if (ctx.checkers.nonEmpty()) {
@@ -639,6 +599,17 @@ export class Chess extends Position {
   }
 }
 
+function validEpSquare(pos: Position, square: Square | undefined): Square | undefined {
+  if (!defined(square)) return;
+  const epRank = pos.turn === 'white' ? 5 : 2;
+  const forward = pos.turn === 'white' ? 8 : -8;
+  if (squareRank(square) !== epRank) return;
+  if (pos.board.occupied.has(square + forward)) return;
+  const pawn = square - forward;
+  if (!pos.board.pawn.has(pawn) || !pos.board[opposite(pos.turn)].has(pawn)) return;
+  return square;
+}
+
 function legalEpSquare(pos: Position): Square | undefined {
   if (!defined(pos.epSquare)) return;
   const ctx = pos.ctx();
@@ -648,6 +619,35 @@ function legalEpSquare(pos: Position): Square | undefined {
     if (pos.dests(candidate, ctx).has(pos.epSquare)) return pos.epSquare;
   }
   return;
+}
+
+function canCaptureEp(pos: Position, pawn: Square, ctx: Context): boolean {
+  if (!defined(pos.epSquare)) return false;
+  if (!pawnAttacks(pos.turn, pawn).has(pos.epSquare)) return false;
+  if (!defined(ctx.king)) return true;
+  const captured = pos.epSquare + (pos.turn === 'white' ? -8 : 8);
+  const occupied = pos.board.occupied.toggle(pawn).toggle(pos.epSquare).toggle(captured);
+  return !pos.kingAttackers(ctx.king, opposite(pos.turn), occupied).intersects(occupied);
+}
+
+function castlingDest(pos: Position, side: CastlingSide, ctx: Context): SquareSet {
+  if (!defined(ctx.king) || ctx.checkers.nonEmpty()) return SquareSet.empty();
+  const rook = pos.castles.rook[pos.turn][side];
+  if (!defined(rook)) return SquareSet.empty();
+  if (pos.castles.path[pos.turn][side].intersects(pos.board.occupied)) return SquareSet.empty();
+
+  const kingTo = kingCastlesTo(pos.turn, side);
+  const kingPath = between(ctx.king, kingTo);
+  const occ = pos.board.occupied.without(ctx.king);
+  for (const sq of kingPath) {
+    if (pos.kingAttackers(sq, opposite(pos.turn), occ).nonEmpty()) return SquareSet.empty();
+  }
+
+  const rookTo = rookCastlesTo(pos.turn, side);
+  const after = pos.board.occupied.toggle(ctx.king).toggle(rook).toggle(rookTo);
+  if (pos.kingAttackers(kingTo, opposite(pos.turn), after).nonEmpty()) return SquareSet.empty();
+
+  return SquareSet.fromSquare(rook);
 }
 
 export function equalsIgnoreMoves(left: Position, right: Position): boolean {
