@@ -5,7 +5,16 @@ import { between, kingAttacks } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Setup, RemainingChecks, Material } from './setup.js';
-import { PositionError, Position, IllegalSetup, Context, Chess, Castles, FromSetupOpts } from './chess.js';
+import {
+  PositionError,
+  Position,
+  IllegalSetup,
+  Context,
+  Chess,
+  Castles,
+  FromSetupOpts,
+  isStandardMaterialSide,
+} from './chess.js';
 
 export { Position, PositionError, IllegalSetup, Context, Chess, Castles };
 
@@ -68,17 +77,6 @@ export class Crazyhouse extends Position {
       this.pockets.count('pawn') <= 0 &&
       this.pockets.count('rook') <= 0 &&
       this.pockets.count('queen') <= 0
-    );
-  }
-
-  isStandardMaterial(): boolean {
-    const promoted = this.board.promoted;
-    return (
-      promoted.size() + this.board.pawn.size() + (this.pockets?.count('pawn') || 0) <= 16 &&
-      this.board.knight.diff(promoted).size() + (this.pockets?.count('knight') || 0) <= 4 &&
-      this.board.bishop.diff(promoted).size() + (this.pockets?.count('bishop') || 0) <= 4 &&
-      this.board.rook.diff(promoted).size() + (this.pockets?.count('rook') || 0) <= 4 &&
-      this.board.queen.diff(promoted).size() + (this.pockets?.count('queen') || 0) <= 2
     );
   }
 
@@ -587,12 +585,6 @@ export class Horde extends Position {
     if (this.board.black.isEmpty()) return { winner: 'white' };
     return;
   }
-
-  isStandardMaterial(): boolean {
-    return COLORS.every(color =>
-      this.board.pieces(color, 'king').nonEmpty() ? this.isStandardMaterialSide(color) : this.board[color].size() <= 36
-    );
-  }
 }
 
 export function defaultPosition(rules: Rules): Position {
@@ -634,5 +626,40 @@ export function setupPosition(rules: Rules, setup: Setup, opts?: FromSetupOpts):
       return ThreeCheck.fromSetup(setup, opts);
     case 'crazyhouse':
       return Crazyhouse.fromSetup(setup, opts);
+  }
+}
+
+export function isStandardMaterial(pos: Position): boolean {
+  switch (pos.rules) {
+    case 'chess':
+    case 'antichess':
+    case 'atomic':
+    case 'kingofthehill':
+    case '3check':
+      return COLORS.every(color => isStandardMaterialSide(pos.board, color));
+    case 'crazyhouse': {
+      const promoted = pos.board.promoted;
+      return (
+        promoted.size() + pos.board.pawn.size() + (pos.pockets?.count('pawn') || 0) <= 16 &&
+        pos.board.knight.diff(promoted).size() + (pos.pockets?.count('knight') || 0) <= 4 &&
+        pos.board.bishop.diff(promoted).size() + (pos.pockets?.count('bishop') || 0) <= 4 &&
+        pos.board.rook.diff(promoted).size() + (pos.pockets?.count('rook') || 0) <= 4 &&
+        pos.board.queen.diff(promoted).size() + (pos.pockets?.count('queen') || 0) <= 2
+      );
+    }
+    case 'horde':
+      return COLORS.every(color =>
+        pos.board.pieces(color, 'king').nonEmpty()
+          ? isStandardMaterialSide(pos.board, color)
+          : pos.board[color].size() <= 36
+      );
+    case 'racingkings':
+      return COLORS.every(
+        color =>
+          pos.board.pieces(color, 'knight').size() <= 2 &&
+          pos.board.pieces(color, 'bishop').size() <= 2 &&
+          pos.board.pieces(color, 'rook').size() <= 2 &&
+          pos.board.pieces(color, 'queen').size() <= 1
+      );
   }
 }

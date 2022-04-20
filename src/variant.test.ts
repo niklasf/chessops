@@ -1,6 +1,6 @@
 import { Rules, RULES } from './types.js';
 import { perft } from './debug.js';
-import { defaultPosition, setupPosition } from './variant.js';
+import { defaultPosition, setupPosition, isStandardMaterial } from './variant.js';
 import { parseFen, makeFen } from './fen.js';
 import { parseUci } from './util.js';
 
@@ -154,5 +154,5 @@ test('3check remaining checks', () => {
 });
 
 test.each(RULES)('%s standard material', rules => {
-  expect(defaultPosition(rules).isStandardMaterial()).toBe(true);
+  expect(isStandardMaterial(defaultPosition(rules))).toBe(true);
 });

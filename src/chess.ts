@@ -416,20 +416,6 @@ export abstract class Position {
     return true;
   }
 
-  protected isStandardMaterialSide(color: Color): boolean {
-    const promoted =
-      Math.max(this.board.pieces(color, 'queen').size() - 1, 0) +
-      Math.max(this.board.pieces(color, 'rook').size() - 2, 0) +
-      Math.max(this.board.pieces(color, 'knight').size() - 2, 0) +
-      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0) +
-      Math.max(this.board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
-    return this.board.pieces(color, 'pawn').size() + promoted <= 8;
-  }
-
-  isStandardMaterial(): boolean {
-    return COLORS.every(color => this.isStandardMaterialSide(color));
-  }
-
   // The following should be identical in all subclasses
 
   toSetup(): Setup {
@@ -670,4 +656,18 @@ export function equalsIgnoreMoves(left: Position, right: Position): boolean {
     ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
       (!left.remainingChecks && !right.remainingChecks))
   );
+}
+
+export function isStandardMaterialSide(board: Board, color: Color): boolean {
+  const promoted =
+    Math.max(board.pieces(color, 'queen').size() - 1, 0) +
+    Math.max(board.pieces(color, 'rook').size() - 2, 0) +
+    Math.max(board.pieces(color, 'knight').size() - 2, 0) +
+    Math.max(board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0) +
+    Math.max(board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
+  return board.pieces(color, 'pawn').size() + promoted <= 8;
+}
+
+export function isStandardMaterial(pos: Chess): boolean {
+  return COLORS.every(color => isStandardMaterialSide(pos.board, color));
 }
