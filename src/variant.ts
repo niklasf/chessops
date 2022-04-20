@@ -13,10 +13,23 @@ import {
   Chess,
   Castles,
   FromSetupOpts,
+  castlingSide,
+  equalsIgnoreMoves,
+  normalizeMove,
   isStandardMaterialSide,
 } from './chess.js';
 
-export { Position, PositionError, IllegalSetup, Context, Chess, Castles };
+export {
+  Position,
+  PositionError,
+  IllegalSetup,
+  Context,
+  Chess,
+  Castles,
+  equalsIgnoreMoves,
+  castlingSide,
+  normalizeMove,
+};
 
 export class Crazyhouse extends Position {
   private constructor() {

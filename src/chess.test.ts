@@ -1,7 +1,7 @@
 import { SquareSet } from './squareSet.js';
 import { parseUci } from './util.js';
 import { parseFen, makeFen, INITIAL_FEN } from './fen.js';
-import { Castles, Chess, IllegalSetup } from './chess.js';
+import { Castles, Chess, IllegalSetup, castlingSide, normalizeMove } from './chess.js';
 import { perft } from './debug.js';
 
 const tricky: [string, string, number, number, number, number?, number?][] = [
@@ -99,11 +99,11 @@ test('castling moves', () => {
   ).unwrap();
   const queenSide = { from: 4, to: 0 };
   const altQueenSide = { from: 4, to: 2 };
-  expect(pos.castlingSide(queenSide)).toBe('a');
-  expect(pos.normalizeMove(queenSide)).toEqual(queenSide);
+  expect(castlingSide(pos, queenSide)).toBe('a');
+  expect(normalizeMove(pos, queenSide)).toEqual(queenSide);
   expect(pos.isLegal(queenSide)).toBe(true);
-  expect(pos.castlingSide(altQueenSide)).toBe('a');
-  expect(pos.normalizeMove(altQueenSide)).toEqual(queenSide);
+  expect(castlingSide(pos, altQueenSide)).toBe('a');
+  expect(normalizeMove(pos, altQueenSide)).toEqual(queenSide);
   expect(pos.isLegal(altQueenSide)).toBe(true);
   pos.play(altQueenSide);
   expect(makeFen(pos.toSetup())).toBe('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/2KR3R b k - 1 20');

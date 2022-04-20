@@ -453,7 +453,7 @@ export abstract class Position {
       if (move.promotion === 'king' && this.rules !== 'antichess') return false;
       if (!!move.promotion !== (this.board.pawn.has(move.from) && SquareSet.backranks().has(move.to))) return false;
       const dests = this.dests(move.from, ctx);
-      return dests.has(move.to) || dests.has(this.normalizeMove(move).to);
+      return dests.has(move.to) || dests.has(normalizeMove(this, move).to);
     }
   }
 
@@ -496,28 +496,10 @@ export abstract class Position {
     return d;
   }
 
-  castlingSide(move: Move): CastlingSide | undefined {
-    if (isDrop(move)) return;
-    const delta = move.to - move.from;
-    if (Math.abs(delta) !== 2 && !this.board[this.turn].has(move.to)) return;
-    if (!this.board.king.has(move.from)) return;
-    return delta > 0 ? 'h' : 'a';
-  }
-
-  normalizeMove(move: Move): Move {
-    const castlingSide = this.castlingSide(move);
-    if (!castlingSide) return move;
-    const rookFrom = this.castles.rook[this.turn][castlingSide];
-    return {
-      from: (move as NormalMove).from,
-      to: defined(rookFrom) ? rookFrom : move.to,
-    };
-  }
-
   play(move: Move): void {
     const turn = this.turn;
     const epSquare = this.epSquare;
-    const castlingSide = this.castlingSide(move);
+    const castling = castlingSide(this, move);
 
     this.epSquare = undefined;
     this.halfmoves += 1;
@@ -549,18 +531,18 @@ export abstract class Position {
       } else if (piece.role === 'rook') {
         this.castles.discardRook(move.from);
       } else if (piece.role === 'king') {
-        if (castlingSide) {
-          const rookFrom = this.castles.rook[turn][castlingSide];
+        if (castling) {
+          const rookFrom = this.castles.rook[turn][castling];
           if (defined(rookFrom)) {
             const rook = this.board.take(rookFrom);
-            this.board.set(kingCastlesTo(turn, castlingSide), piece);
-            if (rook) this.board.set(rookCastlesTo(turn, castlingSide), rook);
+            this.board.set(kingCastlesTo(turn, castling), piece);
+            if (rook) this.board.set(rookCastlesTo(turn, castling), rook);
           }
         }
         this.castles.discardColor(turn);
       }
 
-      if (!castlingSide) {
+      if (!castling) {
         const capture = this.board.set(move.to, piece) || epCapture;
         if (capture) this.playCaptureAt(move.to, capture);
       }
@@ -656,6 +638,24 @@ export function equalsIgnoreMoves(left: Position, right: Position): boolean {
     ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
       (!left.remainingChecks && !right.remainingChecks))
   );
+}
+
+export function castlingSide(pos: Position, move: Move): CastlingSide | undefined {
+  if (isDrop(move)) return;
+  const delta = move.to - move.from;
+  if (Math.abs(delta) !== 2 && !pos.board[pos.turn].has(move.to)) return;
+  if (!pos.board.king.has(move.from)) return;
+  return delta > 0 ? 'h' : 'a';
+}
+
+export function normalizeMove(pos: Position, move: Move): Move {
+  const side = castlingSide(pos, move);
+  if (!side) return move;
+  const rookFrom = pos.castles.rook[pos.turn][side];
+  return {
+    from: (move as NormalMove).from,
+    to: defined(rookFrom) ? rookFrom : move.to,
+  };
 }
 
 export function isStandardMaterialSide(board: Board, color: Color): boolean {
