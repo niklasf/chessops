@@ -148,3 +148,16 @@ export function defaultSetup(): Setup {
     fullmoves: 1,
   };
 }
+
+export function cloneSetup(setup: Setup): Setup {
+  return {
+    board: setup.board.clone(),
+    pockets: setup.pockets?.clone(),
+    turn: setup.turn,
+    unmovedRooks: setup.unmovedRooks,
+    epSquare: setup.epSquare,
+    remainingChecks: setup.remainingChecks?.clone(),
+    halfmoves: setup.halfmoves,
+    fullmoves: setup.fullmoves,
+  };
+}
