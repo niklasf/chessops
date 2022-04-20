@@ -148,7 +148,7 @@ export class Castles {
     }
   }
 
-  discardSide(color: Color): void {
+  discardColor(color: Color): void {
     this.unmovedRooks = this.unmovedRooks.diff(SquareSet.backrank(color));
     this.rook[color].a = undefined;
     this.rook[color].h = undefined;
@@ -391,7 +391,7 @@ export abstract class Position {
             if (rook) this.board.set(rookCastlesTo(turn, castlingSide), rook);
           }
         }
-        this.castles.discardSide(turn);
+        this.castles.discardColor(turn);
       }
 
       if (!castlingSide) {

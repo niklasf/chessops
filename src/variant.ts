@@ -145,7 +145,7 @@ export class Atomic extends Chess {
     for (const explode of kingAttacks(square).intersect(this.board.occupied).diff(this.board.pawn)) {
       const piece = this.board.take(explode);
       if (piece && piece.role === 'rook') this.castles.discardRook(explode);
-      if (piece && piece.role === 'king') this.castles.discardSide(piece.color);
+      if (piece && piece.role === 'king') this.castles.discardColor(piece.color);
     }
   }
 
@@ -490,7 +490,7 @@ export class Horde extends Chess {
     pos.pockets = undefined;
     pos.turn = 'white';
     pos.castles = Castles.default();
-    pos.castles.discardSide('white');
+    pos.castles.discardColor('white');
     pos.epSquare = undefined;
     pos.remainingChecks = undefined;
     pos.halfmoves = 0;
