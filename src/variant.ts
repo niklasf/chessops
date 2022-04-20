@@ -144,8 +144,8 @@ export class Atomic extends Chess {
     this.board.take(square);
     for (const explode of kingAttacks(square).intersect(this.board.occupied).diff(this.board.pawn)) {
       const piece = this.board.take(explode);
-      if (piece && piece.role === 'rook') this.castles.discardRook(explode);
-      if (piece && piece.role === 'king') this.castles.discardColor(piece.color);
+      if (piece?.role === 'rook') this.castles.discardRook(explode);
+      if (piece?.role === 'king') this.castles.discardColor(piece.color);
     }
   }
 
