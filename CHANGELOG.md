@@ -1,5 +1,15 @@
 # Changelog for chessops
 
+## v0.12.0
+
+- Major performance optimizations (e.g. 40% speedup in read-pgn example).
+- Refactor with tree-shaking in mind, for major code size improvements
+  depending on the application. Do not find a method? It might now be
+  a free-standing function.
+- Chess variants directly extend `Position` instead of `Chess`.
+- Remove `Board.horde()` and `Board.racingKings()`.
+- Rename `Castles.discardSize()` to `discardColor()`.
+
 ## v0.11.0
 
 - Introduce `chessops/pgn` module.
