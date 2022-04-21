@@ -136,28 +136,24 @@ export interface Setup {
   fullmoves: number;
 }
 
-export function defaultSetup(): Setup {
-  return {
-    board: Board.default(),
-    pockets: undefined,
-    turn: 'white',
-    unmovedRooks: SquareSet.corners(),
-    epSquare: undefined,
-    remainingChecks: undefined,
-    halfmoves: 0,
-    fullmoves: 1,
-  };
-}
+export const defaultSetup = (): Setup => ({
+  board: Board.default(),
+  pockets: undefined,
+  turn: 'white',
+  unmovedRooks: SquareSet.corners(),
+  epSquare: undefined,
+  remainingChecks: undefined,
+  halfmoves: 0,
+  fullmoves: 1,
+});
 
-export function setupClone(setup: Setup): Setup {
-  return {
-    board: setup.board.clone(),
-    pockets: setup.pockets?.clone(),
-    turn: setup.turn,
-    unmovedRooks: setup.unmovedRooks,
-    epSquare: setup.epSquare,
-    remainingChecks: setup.remainingChecks?.clone(),
-    halfmoves: setup.halfmoves,
-    fullmoves: setup.fullmoves,
-  };
-}
+export const setupClone = (setup: Setup): Setup => ({
+  board: setup.board.clone(),
+  pockets: setup.pockets?.clone(),
+  turn: setup.turn,
+  unmovedRooks: setup.unmovedRooks,
+  epSquare: setup.epSquare,
+  remainingChecks: setup.remainingChecks?.clone(),
+  halfmoves: setup.halfmoves,
+  fullmoves: setup.fullmoves,
+});

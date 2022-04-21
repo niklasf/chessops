@@ -67,13 +67,9 @@ export interface DropMove {
 
 export type Move = NormalMove | DropMove;
 
-export function isDrop(v: Move): v is DropMove {
-  return 'role' in v;
-}
+export const isDrop = (v: Move): v is DropMove => 'role' in v;
 
-export function isNormal(v: Move): v is NormalMove {
-  return 'from' in v;
-}
+export const isNormal = (v: Move): v is NormalMove => 'from' in v;
 
 export const RULES = [
   'chess',

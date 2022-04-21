@@ -6,7 +6,7 @@ export interface ChessgroundDestsOpts {
   chess960?: boolean;
 }
 
-export function chessgroundDests(pos: Position, opts?: ChessgroundDestsOpts): Map<SquareName, SquareName[]> {
+export const chessgroundDests = (pos: Position, opts?: ChessgroundDestsOpts): Map<SquareName, SquareName[]> => {
   const result = new Map();
   const ctx = pos.ctx();
   for (const [from, squares] of pos.allDests(ctx)) {
@@ -24,28 +24,25 @@ export function chessgroundDests(pos: Position, opts?: ChessgroundDestsOpts): Ma
     }
   }
   return result;
-}
+};
 
-export function chessgroundMove(move: Move): SquareName[] {
-  return isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
-}
+export const chessgroundMove = (move: Move): SquareName[] =>
+  isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
 
-export function scalachessCharPair(move: Move): string {
-  if (isDrop(move))
-    return String.fromCharCode(
-      35 + move.to,
-      35 + 64 + 8 * 5 + ['queen', 'rook', 'bishop', 'knight', 'pawn'].indexOf(move.role)
-    );
-  else
-    return String.fromCharCode(
-      35 + move.from,
-      move.promotion
-        ? 35 + 64 + 8 * ['queen', 'rook', 'bishop', 'knight', 'king'].indexOf(move.promotion) + squareFile(move.to)
-        : 35 + move.to
-    );
-}
+export const scalachessCharPair = (move: Move): string =>
+  isDrop(move)
+    ? String.fromCharCode(
+        35 + move.to,
+        35 + 64 + 8 * 5 + ['queen', 'rook', 'bishop', 'knight', 'pawn'].indexOf(move.role)
+      )
+    : String.fromCharCode(
+        35 + move.from,
+        move.promotion
+          ? 35 + 64 + 8 * ['queen', 'rook', 'bishop', 'knight', 'king'].indexOf(move.promotion) + squareFile(move.to)
+          : 35 + move.to
+      );
 
-export function lichessRules(
+export const lichessRules = (
   variant:
     | 'standard'
     | 'chess960'
@@ -57,7 +54,7 @@ export function lichessRules(
     | 'horde'
     | 'racingKings'
     | 'crazyhouse'
-): Rules {
+): Rules => {
   switch (variant) {
     case 'standard':
     case 'chess960':
@@ -72,11 +69,11 @@ export function lichessRules(
     default:
       return variant;
   }
-}
+};
 
-export function lichessVariant(
+export const lichessVariant = (
   rules: Rules
-): 'standard' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse' {
+): 'standard' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse' => {
   switch (rules) {
     case 'chess':
       return 'standard';
@@ -89,4 +86,4 @@ export function lichessVariant(
     default:
       return rules;
   }
-}
+};

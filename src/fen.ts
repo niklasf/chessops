@@ -26,25 +26,23 @@ export enum InvalidFen {
 
 export class FenError extends Error {}
 
-function nthIndexOf(haystack: string, needle: string, n: number): number {
+const nthIndexOf = (haystack: string, needle: string, n: number): number => {
   let index = haystack.indexOf(needle);
   while (n-- > 0) {
     if (index === -1) break;
     index = haystack.indexOf(needle, index + needle.length);
   }
   return index;
-}
+};
 
-function parseSmallUint(str: string): number | undefined {
-  return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
-}
+const parseSmallUint = (str: string): number | undefined => (/^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined);
 
-function charToPiece(ch: string): Piece | undefined {
+const charToPiece = (ch: string): Piece | undefined => {
   const role = charToRole(ch);
   return role && { role, color: ch.toLowerCase() === ch ? 'black' : 'white' };
-}
+};
 
-export function parseBoardFen(boardPart: string): Result<Board, FenError> {
+export const parseBoardFen = (boardPart: string): Result<Board, FenError> => {
   const board = Board.empty();
   let rank = 7;
   let file = 0;
@@ -72,9 +70,9 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
   }
   if (rank !== 0 || file !== 8) return Result.err(new FenError(InvalidFen.Board));
   return Result.ok(board);
-}
+};
 
-export function parsePockets(pocketPart: string): Result<Material, FenError> {
+export const parsePockets = (pocketPart: string): Result<Material, FenError> => {
   if (pocketPart.length > 64) return Result.err(new FenError(InvalidFen.Pockets));
   const pockets = Material.empty();
   for (const c of pocketPart) {
@@ -83,9 +81,9 @@ export function parsePockets(pocketPart: string): Result<Material, FenError> {
     pockets[piece.color][piece.role]++;
   }
   return Result.ok(pockets);
-}
+};
 
-export function parseCastlingFen(board: Board, castlingPart: string): Result<SquareSet, FenError> {
+export const parseCastlingFen = (board: Board, castlingPart: string): Result<SquareSet, FenError> => {
   let unmovedRooks = SquareSet.empty();
   if (castlingPart === '-') return Result.ok(unmovedRooks);
   for (const c of castlingPart) {
@@ -111,9 +109,9 @@ export function parseCastlingFen(board: Board, castlingPart: string): Result<Squ
   if (COLORS.some(color => SquareSet.backrank(color).intersect(unmovedRooks).size() > 2))
     return Result.err(new FenError(InvalidFen.Castling));
   return Result.ok(unmovedRooks);
-}
+};
 
-export function parseRemainingChecks(part: string): Result<RemainingChecks, FenError> {
+export const parseRemainingChecks = (part: string): Result<RemainingChecks, FenError> => {
   const parts = part.split('+');
   if (parts.length === 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]);
@@ -128,9 +126,9 @@ export function parseRemainingChecks(part: string): Result<RemainingChecks, FenE
       return Result.err(new FenError(InvalidFen.RemainingChecks));
     return Result.ok(new RemainingChecks(white, black));
   } else return Result.err(new FenError(InvalidFen.RemainingChecks));
-}
+};
 
-export function parseFen(fen: string): Result<Setup, FenError> {
+export const parseFen = (fen: string): Result<Setup, FenError> => {
   const parts = fen.split(/[\s_]+/);
   const boardPart = parts.shift()!;
 
@@ -213,29 +211,29 @@ export function parseFen(fen: string): Result<Setup, FenError> {
       )
     );
   });
-}
+};
 
 export interface FenOpts {
   epd?: boolean;
 }
 
-export function parsePiece(str: string): Piece | undefined {
+export const parsePiece = (str: string): Piece | undefined => {
   if (!str) return;
   const piece = charToPiece(str[0]);
   if (!piece) return;
   if (str.length === 2 && str[1] === '~') piece.promoted = true;
   else if (str.length > 1) return;
   return piece;
-}
+};
 
-export function makePiece(piece: Piece): string {
+export const makePiece = (piece: Piece): string => {
   let r = roleToChar(piece.role);
   if (piece.color === 'white') r = r.toUpperCase();
   if (piece.promoted) r += '~';
   return r;
-}
+};
 
-export function makeBoardFen(board: Board): string {
+export const makeBoardFen = (board: Board): string => {
   let fen = '';
   let empty = 0;
   for (let rank = 7; rank >= 0; rank--) {
@@ -261,17 +259,15 @@ export function makeBoardFen(board: Board): string {
     }
   }
   return fen;
-}
+};
 
-export function makePocket(material: MaterialSide): string {
-  return ROLES.map(role => roleToChar(role).repeat(material[role])).join('');
-}
+export const makePocket = (material: MaterialSide): string =>
+  ROLES.map(role => roleToChar(role).repeat(material[role])).join('');
 
-export function makePockets(pocket: Material): string {
-  return makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
-}
+export const makePockets = (pocket: Material): string =>
+  makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
 
-export function makeCastlingFen(board: Board, unmovedRooks: SquareSet): string {
+export const makeCastlingFen = (board: Board, unmovedRooks: SquareSet): string => {
   let fen = '';
   for (const color of COLORS) {
     const backrank = SquareSet.backrank(color);
@@ -290,14 +286,12 @@ export function makeCastlingFen(board: Board, unmovedRooks: SquareSet): string {
     }
   }
   return fen || '-';
-}
+};
 
-export function makeRemainingChecks(checks: RemainingChecks): string {
-  return `${checks.white}+${checks.black}`;
-}
+export const makeRemainingChecks = (checks: RemainingChecks): string => `${checks.white}+${checks.black}`;
 
-export function makeFen(setup: Setup, opts?: FenOpts): string {
-  return [
+export const makeFen = (setup: Setup, opts?: FenOpts): string =>
+  [
     makeBoardFen(setup.board) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
     setup.turn[0],
     makeCastlingFen(setup.board, setup.unmovedRooks),
@@ -305,4 +299,3 @@ export function makeFen(setup: Setup, opts?: FenOpts): string {
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
     ...(opts?.epd ? [] : [Math.max(0, Math.min(setup.halfmoves, 9999)), Math.max(1, Math.min(setup.fullmoves, 9999))]),
   ].join(' ');
-}

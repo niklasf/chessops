@@ -154,10 +154,7 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
   }
 }
 
-export function boardEquals(left: Board, right: Board) {
-  return (
-    left.white.equals(right.white) &&
-    left.promoted.equals(right.promoted) &&
-    ROLES.every(role => left[role].equals(right[role]))
-  );
-}
+export const boardEquals = (left: Board, right: Board): boolean =>
+  left.white.equals(right.white) &&
+  left.promoted.equals(right.promoted) &&
+  ROLES.every(role => left[role].equals(right[role]));

@@ -411,7 +411,7 @@ export class ThreeCheck extends Position {
   }
 }
 
-function racingKingsBoard(): Board {
+const racingKingsBoard = (): Board => {
   const board = Board.empty();
   board.occupied = new SquareSet(0xffff, 0);
   board.promoted = SquareSet.empty();
@@ -424,7 +424,7 @@ function racingKingsBoard(): Board {
   board.queen = new SquareSet(0x0081, 0);
   board.king = new SquareSet(0x8100, 0);
   return board;
-}
+};
 
 export class RacingKings extends Position {
   private constructor() {
@@ -518,7 +518,7 @@ export class RacingKings extends Position {
   }
 }
 
-function hordeBoard(): Board {
+const hordeBoard = (): Board => {
   const board = Board.empty();
   board.occupied = new SquareSet(0xffff_ffff, 0xffff_0066);
   board.promoted = SquareSet.empty();
@@ -531,7 +531,7 @@ function hordeBoard(): Board {
   board.queen = new SquareSet(0, 0x0800_0000);
   board.king = new SquareSet(0, 0x1000_0000);
   return board;
-}
+};
 
 export class Horde extends Position {
   private constructor() {
@@ -600,7 +600,7 @@ export class Horde extends Position {
   }
 }
 
-export function defaultPosition(rules: Rules): Position {
+export const defaultPosition = (rules: Rules): Position => {
   switch (rules) {
     case 'chess':
       return Chess.default();
@@ -619,9 +619,9 @@ export function defaultPosition(rules: Rules): Position {
     case 'crazyhouse':
       return Crazyhouse.default();
   }
-}
+};
 
-export function setupPosition(rules: Rules, setup: Setup, opts?: FromSetupOpts): Result<Position, PositionError> {
+export const setupPosition = (rules: Rules, setup: Setup, opts?: FromSetupOpts): Result<Position, PositionError> => {
   switch (rules) {
     case 'chess':
       return Chess.fromSetup(setup, opts);
@@ -640,9 +640,9 @@ export function setupPosition(rules: Rules, setup: Setup, opts?: FromSetupOpts):
     case 'crazyhouse':
       return Crazyhouse.fromSetup(setup, opts);
   }
-}
+};
 
-export function isStandardMaterial(pos: Position): boolean {
+export const isStandardMaterial = (pos: Position): boolean => {
   switch (pos.rules) {
     case 'chess':
     case 'antichess':
@@ -675,4 +675,4 @@ export function isStandardMaterial(pos: Position): boolean {
           pos.board.pieces(color, 'queen').size() <= 1
       );
   }
-}
+};

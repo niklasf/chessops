@@ -45,8 +45,8 @@ export interface FromSetupOpts {
   ignoreImpossibleCheck?: boolean;
 }
 
-function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
-  return board[attacker].intersect(
+const attacksTo = (square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet =>
+  board[attacker].intersect(
     rookAttacks(square, occupied)
       .intersect(board.rooksAndQueens())
       .union(bishopAttacks(square, occupied).intersect(board.bishopsAndQueens()))
@@ -54,11 +54,9 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
       .union(kingAttacks(square).intersect(board.king))
       .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn))
   );
-}
 
-function rookCastlesTo(color: Color, side: CastlingSide): Square {
-  return color === 'white' ? (side === 'a' ? 3 : 5) : side === 'a' ? 59 : 61;
-}
+const rookCastlesTo = (color: Color, side: CastlingSide): Square =>
+  color === 'white' ? (side === 'a' ? 3 : 5) : side === 'a' ? 59 : 61;
 
 export class Castles {
   unmovedRooks: SquareSet;
@@ -576,7 +574,7 @@ export class Chess extends Position {
   }
 }
 
-function validEpSquare(pos: Position, square: Square | undefined): Square | undefined {
+const validEpSquare = (pos: Position, square: Square | undefined): Square | undefined => {
   if (!defined(square)) return;
   const epRank = pos.turn === 'white' ? 5 : 2;
   const forward = pos.turn === 'white' ? 8 : -8;
@@ -585,9 +583,9 @@ function validEpSquare(pos: Position, square: Square | undefined): Square | unde
   const pawn = square - forward;
   if (!pos.board.pawn.has(pawn) || !pos.board[opposite(pos.turn)].has(pawn)) return;
   return square;
-}
+};
 
-function legalEpSquare(pos: Position): Square | undefined {
+const legalEpSquare = (pos: Position): Square | undefined => {
   if (!defined(pos.epSquare)) return;
   const ctx = pos.ctx();
   const ourPawns = pos.board.pieces(pos.turn, 'pawn');
@@ -596,18 +594,18 @@ function legalEpSquare(pos: Position): Square | undefined {
     if (pos.dests(candidate, ctx).has(pos.epSquare)) return pos.epSquare;
   }
   return;
-}
+};
 
-function canCaptureEp(pos: Position, pawn: Square, ctx: Context): boolean {
+const canCaptureEp = (pos: Position, pawn: Square, ctx: Context): boolean => {
   if (!defined(pos.epSquare)) return false;
   if (!pawnAttacks(pos.turn, pawn).has(pos.epSquare)) return false;
   if (!defined(ctx.king)) return true;
   const captured = pos.epSquare + (pos.turn === 'white' ? -8 : 8);
   const occupied = pos.board.occupied.toggle(pawn).toggle(pos.epSquare).toggle(captured);
   return !pos.kingAttackers(ctx.king, opposite(pos.turn), occupied).intersects(occupied);
-}
+};
 
-function castlingDest(pos: Position, side: CastlingSide, ctx: Context): SquareSet {
+const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSet => {
   if (!defined(ctx.king) || ctx.checkers.nonEmpty()) return SquareSet.empty();
   const rook = pos.castles.rook[pos.turn][side];
   if (!defined(rook)) return SquareSet.empty();
@@ -625,30 +623,27 @@ function castlingDest(pos: Position, side: CastlingSide, ctx: Context): SquareSe
   if (pos.kingAttackers(kingTo, opposite(pos.turn), after).nonEmpty()) return SquareSet.empty();
 
   return SquareSet.fromSquare(rook);
-}
+};
 
-export function equalsIgnoreMoves(left: Position, right: Position): boolean {
-  return (
-    left.rules === right.rules &&
-    boardEquals(left.board, right.board) &&
-    ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
-    left.turn === right.turn &&
-    left.castles.unmovedRooks.equals(right.castles.unmovedRooks) &&
-    legalEpSquare(left) === legalEpSquare(right) &&
-    ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
-      (!left.remainingChecks && !right.remainingChecks))
-  );
-}
+export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
+  left.rules === right.rules &&
+  boardEquals(left.board, right.board) &&
+  ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
+  left.turn === right.turn &&
+  left.castles.unmovedRooks.equals(right.castles.unmovedRooks) &&
+  legalEpSquare(left) === legalEpSquare(right) &&
+  ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
+    (!left.remainingChecks && !right.remainingChecks));
 
-export function castlingSide(pos: Position, move: Move): CastlingSide | undefined {
+export const castlingSide = (pos: Position, move: Move): CastlingSide | undefined => {
   if (isDrop(move)) return;
   const delta = move.to - move.from;
   if (Math.abs(delta) !== 2 && !pos.board[pos.turn].has(move.to)) return;
   if (!pos.board.king.has(move.from)) return;
   return delta > 0 ? 'h' : 'a';
-}
+};
 
-export function normalizeMove(pos: Position, move: Move): Move {
+export const normalizeMove = (pos: Position, move: Move): Move => {
   const side = castlingSide(pos, move);
   if (!side) return move;
   const rookFrom = pos.castles.rook[pos.turn][side];
@@ -656,9 +651,9 @@ export function normalizeMove(pos: Position, move: Move): Move {
     from: (move as NormalMove).from,
     to: defined(rookFrom) ? rookFrom : move.to,
   };
-}
+};
 
-export function isStandardMaterialSide(board: Board, color: Color): boolean {
+export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
   const promoted =
     Math.max(board.pieces(color, 'queen').size() - 1, 0) +
     Math.max(board.pieces(color, 'rook').size() - 2, 0) +
@@ -666,8 +661,7 @@ export function isStandardMaterialSide(board: Board, color: Color): boolean {
     Math.max(board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0) +
     Math.max(board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
   return board.pieces(color, 'pawn').size() + promoted <= 8;
-}
+};
 
-export function isStandardMaterial(pos: Chess): boolean {
-  return COLORS.every(color => isStandardMaterialSide(pos.board, color));
-}
+export const isStandardMaterial = (pos: Chess): boolean =>
+  COLORS.every(color => isStandardMaterialSide(pos.board, color));

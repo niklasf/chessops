@@ -4,7 +4,7 @@ import { SquareSet } from './squareSet.js';
 import { Position } from './chess.js';
 import { attacks, kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks.js';
 
-function makeSanWithoutSuffix(pos: Position, move: Move): string {
+const makeSanWithoutSuffix = (pos: Position, move: Move): string => {
   let san = '';
   if (isDrop(move)) {
     if (move.role !== 'pawn') san = roleToChar(move.role).toUpperCase();
@@ -50,17 +50,17 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
     }
   }
   return san;
-}
+};
 
-export function makeSanAndPlay(pos: Position, move: Move): string {
+export const makeSanAndPlay = (pos: Position, move: Move): string => {
   const san = makeSanWithoutSuffix(pos, move);
   pos.play(move);
   if (pos.outcome()?.winner) return san + '#';
   if (pos.isCheck()) return san + '+';
   return san;
-}
+};
 
-export function makeSanVariation(pos: Position, variation: Move[]): string {
+export const makeSanVariation = (pos: Position, variation: Move[]): string => {
   pos = pos.clone();
   const line = [];
   for (let i = 0; i < variation.length; i++) {
@@ -75,13 +75,11 @@ export function makeSanVariation(pos: Position, variation: Move[]): string {
     else if (pos.isCheck()) line.push('+');
   }
   return line.join('');
-}
+};
 
-export function makeSan(pos: Position, move: Move): string {
-  return makeSanAndPlay(pos.clone(), move);
-}
+export const makeSan = (pos: Position, move: Move): string => makeSanAndPlay(pos.clone(), move);
 
-export function parseSan(pos: Position, san: string): Move | undefined {
+export const parseSan = (pos: Position, san: string): Move | undefined => {
   const ctx = pos.ctx();
 
   // Normal move
@@ -153,4 +151,4 @@ export function parseSan(pos: Position, san: string): Move | undefined {
     to,
     promotion,
   };
-}
+};

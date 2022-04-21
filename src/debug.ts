@@ -5,7 +5,7 @@ import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Position } from './chess.js';
 
-export function squareSet(squares: SquareSet): string {
+export const squareSet = (squares: SquareSet): string => {
   const r = [];
   for (let y = 7; y >= 0; y--) {
     for (let x = 0; x < 8; x++) {
@@ -15,13 +15,11 @@ export function squareSet(squares: SquareSet): string {
     }
   }
   return r.join('');
-}
+};
 
-export function piece(piece: Piece): string {
-  return makePiece(piece);
-}
+export const piece = (piece: Piece): string => makePiece(piece);
 
-export function board(board: Board): string {
+export const board = (board: Board): string => {
   const r = [];
   for (let y = 7; y >= 0; y--) {
     for (let x = 0; x < 8; x++) {
@@ -33,21 +31,19 @@ export function board(board: Board): string {
     }
   }
   return r.join('');
-}
+};
 
-export function square(sq: Square): string {
-  return makeSquare(sq);
-}
+export const square = (sq: Square): string => makeSquare(sq);
 
-export function dests(dests: Map<Square, SquareSet>): string {
+export const dests = (dests: Map<Square, SquareSet>): string => {
   const lines = [];
   for (const [from, to] of dests) {
     lines.push(`${makeSquare(from)}: ${Array.from(to, square).join(' ')}`);
   }
   return lines.join('\n');
-}
+};
 
-export function perft(pos: Position, depth: number, log = false): number {
+export const perft = (pos: Position, depth: number, log = false): number => {
   if (depth < 1) return 1;
 
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
@@ -99,4 +95,4 @@ export function perft(pos: Position, depth: number, log = false): number {
     }
     return nodes;
   }
-}
+};

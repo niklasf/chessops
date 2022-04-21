@@ -30,11 +30,11 @@ export class ChildNode<T> extends Node<T> {
   }
 }
 
-export function transform<T, U, C extends { clone(): C }>(
+export const transform = <T, U, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
   f: (ctx: C, data: T, i: number) => U | undefined
-): Node<U> {
+): Node<U> => {
   const root = new Node<U>();
   const stack = [
     {
@@ -61,13 +61,13 @@ export function transform<T, U, C extends { clone(): C }>(
     }
   }
   return root;
-}
+};
 
-export function walk<T, C extends { clone(): C }>(
+export const walk = <T, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
   f: (ctx: C, data: T, i: number) => boolean | undefined
-) {
+) => {
   const stack = [{ node, ctx }];
   let frame;
   while ((frame = stack.pop())) {
@@ -77,7 +77,7 @@ export function walk<T, C extends { clone(): C }>(
       if (f(ctx, child.data, i) !== false) stack.push({ node: child, ctx });
     }
   }
-}
+};
 
 export interface PgnNodeData {
   san: string;
@@ -86,27 +86,23 @@ export interface PgnNodeData {
   nags?: number[];
 }
 
-export function makeOutcome(outcome: Outcome | undefined): string {
+export const makeOutcome = (outcome: Outcome | undefined): string => {
   if (!outcome) return '*';
   else if (outcome.winner === 'white') return '1-0';
   else if (outcome.winner === 'black') return '0-1';
   else return '1/2-1/2';
-}
+};
 
-export function parseOutcome(s: string | undefined): Outcome | undefined {
+export const parseOutcome = (s: string | undefined): Outcome | undefined => {
   if (s === '1-0') return { winner: 'white' };
   else if (s === '0-1') return { winner: 'black' };
   else if (s === '1/2-1/2') return { winner: undefined };
   else return;
-}
+};
 
-function escapeHeader(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-}
+const escapeHeader = (value: string): string => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
-function safeComment(comment: string): string {
-  return comment.replace(/\}/g, '');
-}
+const safeComment = (comment: string): string => comment.replace(/\}/g, '');
 
 const enum MakePgnState {
   Pre = 0,
@@ -123,7 +119,7 @@ interface MakePgnFrame {
   inVariation: boolean;
 }
 
-export function makePgn(game: Game<PgnNodeData>): string {
+export const makePgn = (game: Game<PgnNodeData>): string => {
   const builder = [],
     tokens = [];
 
@@ -226,10 +222,10 @@ export function makePgn(game: Game<PgnNodeData>): string {
 
   builder.push(tokens.join(' '), '\n');
   return builder.join('');
-}
+};
 
-export function defaultHeaders(): Map<string, string> {
-  return new Map([
+export const defaultHeaders = (): Map<string, string> =>
+  new Map([
     ['Event', '?'],
     ['Site', '?'],
     ['Date', '????.??.??'],
@@ -238,21 +234,14 @@ export function defaultHeaders(): Map<string, string> {
     ['Black', '?'],
     ['Result', '*'],
   ]);
-}
 
-export function emptyHeaders(): Map<string, string> {
-  return new Map();
-}
+export const emptyHeaders = (): Map<string, string> => new Map();
 
 const BOM = '\ufeff';
 
-function isWhitespace(line: string): boolean {
-  return /^\s*$/.test(line);
-}
+const isWhitespace = (line: string): boolean => /^\s*$/.test(line);
 
-function isCommentLine(line: string): boolean {
-  return line.startsWith('%');
-}
+const isCommentLine = (line: string): boolean => line.startsWith('%');
 
 export interface ParseOptions {
   stream: boolean;
@@ -469,13 +458,13 @@ export class PgnParser {
   }
 }
 
-export function parsePgn(pgn: string, initHeaders: () => Map<string, string> = defaultHeaders): Game<PgnNodeData>[] {
+export const parsePgn = (pgn: string, initHeaders: () => Map<string, string> = defaultHeaders): Game<PgnNodeData>[] => {
   const games: Game<PgnNodeData>[] = [];
   new PgnParser(game => games.push(game), initHeaders, NaN).parse(pgn);
   return games;
-}
+};
 
-export function parseVariant(variant: string | undefined): Rules | undefined {
+export const parseVariant = (variant: string | undefined): Rules | undefined => {
   switch (variant) {
     case 'Crazyhouse':
       return 'crazyhouse';
@@ -497,9 +486,9 @@ export function parseVariant(variant: string | undefined): Rules | undefined {
     default:
       return;
   }
-}
+};
 
-export function makeVariant(rules: Rules): string | undefined {
+export const makeVariant = (rules: Rules): string | undefined => {
   switch (rules) {
     case 'chess':
       return;
@@ -518,20 +507,20 @@ export function makeVariant(rules: Rules): string | undefined {
     case 'kingofthehill':
       return 'King of the Hill';
   }
-}
+};
 
-export function startingPosition(
+export const startingPosition = (
   headers: Map<string, string>,
   opts?: FromSetupOpts
-): Result<Position, FenError | PositionError> {
+): Result<Position, FenError | PositionError> => {
   const rules = parseVariant(headers.get('Variant'));
   if (!rules) return Result.err(new PositionError(IllegalSetup.Variant));
   const fen = headers.get('FEN');
   if (fen) return parseFen(fen).chain(setup => setupPosition(rules, setup, opts));
   else return Result.ok(defaultPosition(rules));
-}
+};
 
-export function setStartingPosition(headers: Map<string, string>, pos: Position) {
+export const setStartingPosition = (headers: Map<string, string>, pos: Position) => {
   const variant = makeVariant(pos.rules);
   if (variant) headers.set('Variant', variant);
   else headers.delete('Variant');
@@ -540,4 +529,4 @@ export function setStartingPosition(headers: Map<string, string>, pos: Position)
   const defaultFen = makeFen(defaultPosition(pos.rules).toSetup());
   if (fen !== defaultFen) headers.set('FEN', fen);
   else headers.delete('FEN');
-}
+};
