@@ -302,34 +302,6 @@ export abstract class Position {
     return Result.ok(undefined);
   }
 
-  protected pseudoDests(square: Square, ctx: Context): SquareSet {
-    if (ctx.variantEnd) return SquareSet.empty();
-    const piece = this.board.get(square);
-    if (!piece || piece.color !== this.turn) return SquareSet.empty();
-
-    let pseudo = attacks(piece, square, this.board.occupied);
-    if (piece.role === 'pawn') {
-      let captureTargets = this.board[opposite(this.turn)];
-      if (defined(this.epSquare)) captureTargets = captureTargets.with(this.epSquare);
-      pseudo = pseudo.intersect(captureTargets);
-      const delta = this.turn === 'white' ? 8 : -8;
-      const step = square + delta;
-      if (0 <= step && step < 64 && !this.board.occupied.has(step)) {
-        pseudo = pseudo.with(step);
-        const canDoubleStep = this.turn === 'white' ? square < 16 : square >= 64 - 16;
-        const doubleStep = step + delta;
-        if (canDoubleStep && !this.board.occupied.has(doubleStep)) {
-          pseudo = pseudo.with(doubleStep);
-        }
-      }
-      return pseudo;
-    } else {
-      pseudo = pseudo.diff(this.board[this.turn]);
-    }
-    if (square === ctx.king) return pseudo.union(castlingDest(this, 'a', ctx)).union(castlingDest(this, 'h', ctx));
-    else return pseudo;
-  }
-
   dropDests(_ctx?: Context): SquareSet {
     return SquareSet.empty();
   }
@@ -623,6 +595,34 @@ const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSe
   if (pos.kingAttackers(kingTo, opposite(pos.turn), after).nonEmpty()) return SquareSet.empty();
 
   return SquareSet.fromSquare(rook);
+};
+
+export const pseudoDests = (pos: Position, square: Square, ctx: Context): SquareSet => {
+  if (ctx.variantEnd) return SquareSet.empty();
+  const piece = pos.board.get(square);
+  if (!piece || piece.color !== pos.turn) return SquareSet.empty();
+
+  let pseudo = attacks(piece, square, pos.board.occupied);
+  if (piece.role === 'pawn') {
+    let captureTargets = pos.board[opposite(pos.turn)];
+    if (defined(pos.epSquare)) captureTargets = captureTargets.with(pos.epSquare);
+    pseudo = pseudo.intersect(captureTargets);
+    const delta = pos.turn === 'white' ? 8 : -8;
+    const step = square + delta;
+    if (0 <= step && step < 64 && !pos.board.occupied.has(step)) {
+      pseudo = pseudo.with(step);
+      const canDoubleStep = pos.turn === 'white' ? square < 16 : square >= 64 - 16;
+      const doubleStep = step + delta;
+      if (canDoubleStep && !pos.board.occupied.has(doubleStep)) {
+        pseudo = pseudo.with(doubleStep);
+      }
+    }
+    return pseudo;
+  } else {
+    pseudo = pseudo.diff(pos.board[pos.turn]);
+  }
+  if (square === ctx.king) return pseudo.union(castlingDest(pos, 'a', ctx)).union(castlingDest(pos, 'h', ctx));
+  else return pseudo;
 };
 
 export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>

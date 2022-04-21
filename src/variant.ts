@@ -17,6 +17,7 @@ import {
   equalsIgnoreMoves,
   normalizeMove,
   isStandardMaterialSide,
+  pseudoDests,
 } from './chess.js';
 
 export {
@@ -213,7 +214,7 @@ export class Atomic extends Position {
   dests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
     let dests = SquareSet.empty();
-    for (const to of this.pseudoDests(square, ctx)) {
+    for (const to of pseudoDests(this, square, ctx)) {
       const after = this.clone();
       after.play({ from: square, to });
       const ourKing = after.board.kingOf(this.turn);
@@ -286,7 +287,7 @@ export class Antichess extends Position {
     const ctx = super.ctx();
     const enemy = this.board[opposite(this.turn)];
     for (const from of this.board[this.turn]) {
-      if (this.pseudoDests(from, ctx).intersects(enemy)) {
+      if (pseudoDests(this, from, ctx).intersects(enemy)) {
         ctx.mustCapture = true;
         break;
       }
@@ -296,7 +297,7 @@ export class Antichess extends Position {
 
   dests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
-    const dests = this.pseudoDests(square, ctx);
+    const dests = pseudoDests(this, square, ctx);
     if (!ctx.mustCapture) return dests;
     return dests.intersect(this.board[opposite(this.turn)]);
   }
