@@ -1,22 +1,22 @@
 import { Square, Color } from './types.js';
 
-function popcnt32(n: number): number {
+const popcnt32 = (n: number): number => {
   n = n - ((n >>> 1) & 0x5555_5555);
   n = (n & 0x3333_3333) + ((n >>> 2) & 0x3333_3333);
   return Math.imul((n + (n >>> 4)) & 0x0f0f_0f0f, 0x0101_0101) >> 24;
-}
+};
 
-function bswap32(n: number): number {
+const bswap32 = (n: number): number => {
   n = ((n >>> 8) & 0x00ff_00ff) | ((n & 0x00ff_00ff) << 8);
   return ((n >>> 16) & 0xffff) | ((n & 0xffff) << 16);
-}
+};
 
-function rbit32(n: number): number {
+const rbit32 = (n: number): number => {
   n = ((n >>> 1) & 0x5555_5555) | ((n & 0x5555_5555) << 1);
   n = ((n >>> 2) & 0x3333_3333) | ((n & 0x3333_3333) << 2);
   n = ((n >>> 4) & 0x0f0f_0f0f) | ((n & 0x0f0f_0f0f) << 4);
   return bswap32(n);
-}
+};
 
 export class SquareSet implements Iterable<Square> {
   readonly lo: number;
