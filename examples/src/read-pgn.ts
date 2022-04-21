@@ -1,6 +1,6 @@
 import { createReadStream } from 'fs';
-import { parseSan } from '../san.js';
-import { PgnParser, walk, startingPosition } from '../pgn.js';
+import { parseSan } from 'chessops/san';
+import { PgnParser, walk, startingPosition } from 'chessops/pgn';
 
 const validate = true;
 
@@ -32,12 +32,13 @@ const parser = new PgnParser((game, err) => {
         pos.play(move);
         moves++;
       }
+      return true;
     });
 
   if (games % 1024 == 0) status();
 });
 
-stream.on('data', chunk => parser.parse(chunk, { stream: true }));
+stream.on('data', (chunk: string) => parser.parse(chunk, { stream: true }));
 stream.on('close', () => {
   parser.parse('');
   status();

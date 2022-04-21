@@ -1,0 +1,17 @@
+{
+  "name": "chessops-examples",
+  "private": true,
+  "dependencies": {
+    "chessops": "file:.."
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^8",
+    "@rollup/plugin-node-resolve": "^13",
+    "rollup": "^2",
+    "rollup-plugin-terser": "^7",
+    "typescript": "^4"
+  },
+  "scripts": {
+    "prepare": "rollup --config && du --bytes dist/*"
+  }
+}
