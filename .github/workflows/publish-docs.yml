@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-node@v3
       - run: npm install
       - run: npm run doc && touch docs/.nojekyll
-      - uses: maxheld83/ghpages@v0.3.0
+      - uses: niklasf/ghpages@initial-branch
         env:
           BUILD_DIR: 'docs/'
           GH_PAT: ${{ secrets.GH_PAT }}
