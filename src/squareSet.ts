@@ -19,7 +19,10 @@ function rbit32(n: number): number {
 }
 
 export class SquareSet implements Iterable<Square> {
-  constructor(readonly lo: number, readonly hi: number) {
+  readonly lo: number;
+  readonly hi: number;
+
+  constructor(lo: number, hi: number) {
     this.lo = lo | 0;
     this.hi = hi | 0;
   }
