@@ -6,7 +6,7 @@ export default {
   input: ['src/parse-fen.ts', 'src/read-pgn.ts'],
   output: {
     dir: 'dist',
-    manualChunks: {},
+    extname: 'mjs',
   },
   plugins: [resolve(), terser({ output: { comments: false } }), typescript()],
 };

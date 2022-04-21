@@ -1,6 +1,7 @@
 {
   "name": "chessops-examples",
   "private": true,
+  "type": "module",
   "dependencies": {
     "chessops": "file:.."
   },
@@ -12,6 +13,7 @@
     "typescript": "^4"
   },
   "scripts": {
-    "prepare": "rollup --config && du --bytes dist/*"
+    "prepare": "rollup --config && du --bytes dist/*",
+    "read-pgn": "time node --experimental-vm-modules dist/read-pgn.js"
   }
 }
