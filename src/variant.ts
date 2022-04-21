@@ -568,7 +568,7 @@ export class Horde extends Position {
 
   protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.king.size() != 1) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.king.size() !== 1) return Result.err(new PositionError(IllegalSetup.Kings));
 
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
