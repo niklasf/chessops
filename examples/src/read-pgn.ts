@@ -1,5 +1,6 @@
 import { createReadStream } from 'fs';
 import { parseSan } from 'chessops/san';
+import { makeFen } from 'chessops/fen';
 import { PgnParser, walk, startingPosition } from 'chessops/pgn';
 
 const status = {
@@ -17,6 +18,7 @@ for (const arg of process.argv.slice(2)) {
     status.games++;
 
     if (err) {
+      console.error(err);
       status.errors++;
       stream.destroy(err);
     }
@@ -26,6 +28,7 @@ for (const arg of process.argv.slice(2)) {
         walk(game.moves, pos, (pos, node) => {
           const move = parseSan(pos, node.san);
           if (!move) {
+            console.error(node, game.headers, makeFen(pos.toSetup()));
             status.errors++;
             return false;
           } else {
@@ -34,7 +37,10 @@ for (const arg of process.argv.slice(2)) {
           }
           return true;
         }),
-      _ => status.errors++
+      err => {
+        console.error(err, game.headers);
+        status.errors++;
+      }
     );
 
     if (status.games % 1024 == 0) console.log(status);
