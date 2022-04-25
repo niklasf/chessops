@@ -465,24 +465,25 @@ export const parsePgn = (pgn: string, initHeaders: () => Map<string, string> = d
 };
 
 export const parseVariant = (variant: string | undefined): Rules | undefined => {
-  switch (variant) {
-    case 'Crazyhouse':
-      return 'crazyhouse';
-    case 'King of the Hill':
-      return 'kingofthehill';
-    case 'Three-check':
-      return '3check';
-    case 'Antichess':
-      return 'antichess';
-    case 'Atomic':
-      return 'atomic';
-    case 'Horde':
-      return 'horde';
-    case 'Racing Kings':
-      return 'racingkings';
-    case 'Standard':
-    case undefined:
+  switch ((variant || 'chess').toLowerCase()) {
+    case 'chess':
+    case 'chess 960':
+    case 'standard':
       return 'chess';
+    case 'crazyhouse':
+      return 'crazyhouse';
+    case 'king of the hill':
+      return 'kingofthehill';
+    case 'three-check':
+      return '3check';
+    case 'antichess':
+      return 'antichess';
+    case 'atomic':
+      return 'atomic';
+    case 'horde':
+      return 'horde';
+    case 'racing kings':
+      return 'racingkings';
     default:
       return;
   }
