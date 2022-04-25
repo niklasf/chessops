@@ -2,44 +2,42 @@ import { createReadStream } from 'fs';
 import { parseSan } from 'chessops/san';
 import { PgnParser, walk, startingPosition } from 'chessops/pgn';
 
-const validate = true;
+const status = {
+  games: 0,
+  errors: 0,
+  moves: 0,
+};
 
-let games = 0;
-let errors = 0;
-let moves = 0;
+for (const arg of process.argv.slice(2)) {
+  const stream = createReadStream(arg, { encoding: 'utf-8' });
 
-function status() {
-  console.log({ games, moves, errors });
-}
+  const parser = new PgnParser((game, err) => {
+    status.games++;
 
-const stream = createReadStream(process.argv[2], { encoding: 'utf-8' });
+    if (err) {
+      status.errors++;
+      stream.destroy(err);
+    }
 
-const parser = new PgnParser((game, err) => {
-  games++;
-
-  if (err) {
-    errors++;
-    stream.destroy(err);
-  }
-
-  if (validate)
     walk(game.moves, startingPosition(game.headers).unwrap(), (pos, node) => {
       const move = parseSan(pos, node.san);
       if (!move) {
-        errors++;
+        status.errors++;
         return false;
       } else {
         pos.play(move);
-        moves++;
+        status.moves++;
       }
       return true;
     });
 
-  if (games % 1024 == 0) status();
-});
+    if (status.games % 1024 == 0) console.log(status);
+  });
 
-stream.on('data', (chunk: string) => parser.parse(chunk, { stream: true }));
-stream.on('close', () => {
-  parser.parse('');
-  status();
-});
+  stream
+    .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
+    .on('close', () => {
+      parser.parse('');
+      console.log(status);
+    });
+}
