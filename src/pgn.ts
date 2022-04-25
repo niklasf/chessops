@@ -467,8 +467,10 @@ export const parsePgn = (pgn: string, initHeaders: () => Map<string, string> = d
 export const parseVariant = (variant: string | undefined): Rules | undefined => {
   switch ((variant || 'chess').toLowerCase()) {
     case 'chess':
+    case 'chess960':
     case 'chess 960':
     case 'standard':
+    case 'from position':
       return 'chess';
     case 'crazyhouse':
       return 'crazyhouse';
