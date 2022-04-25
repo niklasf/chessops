@@ -471,20 +471,54 @@ export const parseVariant = (variant: string | undefined): Rules | undefined => 
     case 'chess 960':
     case 'standard':
     case 'from position':
+    case 'classical':
+    case 'normal':
+    case 'fischerandom': // Cute Chess
+    case 'fischerrandom':
+    case 'fischer random':
+    case 'wild/0':
+    case 'wild/1':
+    case 'wild/2':
+    case 'wild/3':
+    case 'wild/4':
+    case 'wild/5':
+    case 'wild/6':
+    case 'wild/7':
+    case 'wild/8':
+    case 'wild/8a':
       return 'chess';
     case 'crazyhouse':
+    case 'crazy house':
+    case 'house':
+    case 'zh':
       return 'crazyhouse';
     case 'king of the hill':
+    case 'koth':
+    case 'kingofthehill':
       return 'kingofthehill';
     case 'three-check':
+    case 'three check':
+    case 'threecheck':
+    case 'three check chess':
+    case '3-check':
+    case '3 check':
+    case '3check':
       return '3check';
     case 'antichess':
+    case 'anti chess':
+    case 'anti':
       return 'antichess';
     case 'atomic':
+    case 'atom':
+    case 'atomic chess':
       return 'atomic';
     case 'horde':
+    case 'horde chess':
       return 'horde';
     case 'racing kings':
+    case 'racingkings':
+    case 'racing':
+    case 'race':
       return 'racingkings';
     default:
       return;
