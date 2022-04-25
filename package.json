@@ -10,7 +10,7 @@
     "uci",
     "typescript"
   ],
-  "repository": "niklasf/chessops",
+  "repository": "github:niklasf/chessops",
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>",
   "funding": "https://github.com/sponsors/niklasf",
   "license": "GPL-3.0-or-later",
