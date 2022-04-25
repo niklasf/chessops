@@ -3,6 +3,7 @@ import { perft } from './debug.js';
 import { defaultPosition, setupPosition, isStandardMaterial } from './variant.js';
 import { parseFen, makeFen } from './fen.js';
 import { parseUci } from './util.js';
+import { parseSan } from './san.js';
 
 const skip = 0;
 
@@ -151,6 +152,17 @@ test('3check remaining checks', () => {
   ).unwrap();
   pos.play(parseUci('f1b5')!);
   expect(makeFen(pos.toSetup())).toBe('rnbqkbnr/ppp1pppp/3p4/1B6/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 2+3 1 2');
+});
+
+test('antichess en passant', () => {
+  const pos = setupPosition(
+    'antichess',
+    parseFen('r1bqkbn1/p1ppp3/2n4p/6p1/1Pp5/4P3/P2P1PP1/R1B1K3 b - b3 0 11').unwrap()
+  ).unwrap();
+  const move = parseUci('c4b3')!;
+  expect(pos.isLegal(move)).toBe(true);
+  const san = parseSan(pos, 'cxb3');
+  expect(move).toEqual(san);
 });
 
 test.each(RULES)('%s standard material', rules => {

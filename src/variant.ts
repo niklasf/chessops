@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
 import { Square, Outcome, Color, COLORS, Piece, Rules } from './types.js';
 import { defined, opposite } from './util.js';
-import { between, kingAttacks } from './attacks.js';
+import { between, pawnAttacks, kingAttacks } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Setup, RemainingChecks, Material } from './setup.js';
@@ -285,11 +285,18 @@ export class Antichess extends Position {
 
   ctx(): Context {
     const ctx = super.ctx();
+    if (
+      defined(this.epSquare) &&
+      pawnAttacks(opposite(this.turn), this.epSquare).intersects(this.board.pieces(this.turn, 'pawn'))
+    ) {
+      ctx.mustCapture = true;
+      return ctx;
+    }
     const enemy = this.board[opposite(this.turn)];
     for (const from of this.board[this.turn]) {
       if (pseudoDests(this, from, ctx).intersects(enemy)) {
         ctx.mustCapture = true;
-        break;
+        return ctx;
       }
     }
     return ctx;
@@ -298,8 +305,14 @@ export class Antichess extends Position {
   dests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
     const dests = pseudoDests(this, square, ctx);
-    if (!ctx.mustCapture) return dests;
-    return dests.intersect(this.board[opposite(this.turn)]);
+    const enemy = this.board[opposite(this.turn)];
+    return dests.intersect(
+      ctx.mustCapture
+        ? defined(this.epSquare) && this.board.getRole(square) === 'pawn'
+          ? enemy.with(this.epSquare)
+          : enemy
+        : SquareSet.full()
+    );
   }
 
   hasInsufficientMaterial(color: Color): boolean {
