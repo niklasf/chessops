@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.12.1
+
+- Add more aliases for PGN `Variant` headers.
+- Fix en passant in Antichess.
+
 ## v0.12.0
 
 - Major performance optimizations (e.g. 40% speedup in read-pgn example).
