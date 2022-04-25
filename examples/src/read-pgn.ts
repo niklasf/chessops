@@ -7,6 +7,7 @@ const status = {
   games: 0,
   errors: 0,
   moves: 0,
+  skipped: 0,
 };
 
 for (const arg of process.argv.slice(2)) {
@@ -23,25 +24,27 @@ for (const arg of process.argv.slice(2)) {
       stream.destroy(err);
     }
 
-    startingPosition(game.headers).unwrap(
-      pos =>
-        walk(game.moves, pos, (pos, node) => {
-          const move = parseSan(pos, node.san);
-          if (!move) {
-            console.error(node, game.headers, makeFen(pos.toSetup()));
-            status.errors++;
-            return false;
-          } else {
-            pos.play(move);
-            status.moves++;
-          }
-          return true;
-        }),
-      err => {
-        console.error(err, game.headers);
-        status.errors++;
-      }
-    );
+    if (game.headers.get('FEN') === '?') status.skipped++;
+    else
+      startingPosition(game.headers).unwrap(
+        pos =>
+          walk(game.moves, pos, (pos, node) => {
+            const move = parseSan(pos, node.san);
+            if (!move) {
+              console.error(node, game.headers, makeFen(pos.toSetup()));
+              status.errors++;
+              return false;
+            } else {
+              pos.play(move);
+              status.moves++;
+            }
+            return true;
+          }),
+        err => {
+          console.error(err, game.headers);
+          status.errors++;
+        }
+      );
 
     if (status.games % 1024 == 0) console.log(status);
   });
