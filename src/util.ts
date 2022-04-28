@@ -50,7 +50,8 @@ export function parseSquare(str: SquareName): Square;
 export function parseSquare(str: string): Square | undefined;
 export function parseSquare(str: string): Square | undefined {
   if (str.length !== 2) return;
-  const file = str.charCodeAt(0) - 'a'.charCodeAt(0);
+  const firstChar = str.charCodeAt(0);
+  const file = firstChar - 'a'.charCodeAt(0) >= 0 ? firstChar - 'a'.charCodeAt(0) : firstChar - '1'.charCodeAt(0);
   const rank = str.charCodeAt(1) - '1'.charCodeAt(0);
   if (file < 0 || file >= 8 || rank < 0 || rank >= 8) return;
   return file + 8 * rank;

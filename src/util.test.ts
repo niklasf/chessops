@@ -4,6 +4,11 @@ test('parse uci', () => {
   expect(parseUci('a1a2')).toEqual({ from: 0, to: 8 });
   expect(parseUci('h7h8k')).toEqual({ from: 55, to: 63, promotion: 'king' });
   expect(parseUci('P@h1')).toEqual({ role: 'pawn', to: 7 });
+  expect(parseUci('11a2')).toEqual({ from: 0, to: 8 });
+  expect(parseUci('1112')).toEqual({ from: 0, to: 8 });
+  expect(parseUci('a112')).toEqual({ from: 0, to: 8 });
+  expect(parseUci('a112')).toEqual({ from: 0, to: 8 });
+  expect(parseUci('7888')).toEqual({ from: 62, to: 63 });
 });
 
 test('make uci', () => {
