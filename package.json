@@ -26,9 +26,9 @@
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
     "eslint": "^8",
-    "jest": "^27",
+    "jest": "^28",
     "prettier": "^2",
-    "ts-jest": "^27",
+    "ts-jest": "^28",
     "typedoc": "^0.22",
     "typescript": "^4"
   },
