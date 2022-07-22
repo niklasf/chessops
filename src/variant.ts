@@ -316,12 +316,21 @@ export class Antichess extends Position {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
+    if (this.board[color].isEmpty()) return false;
+    if (this.board[opposite(color)].isEmpty()) return true;
     if (this.board.occupied.equals(this.board.bishop)) {
       const weSomeOnLight = this.board[color].intersects(SquareSet.lightSquares());
       const weSomeOnDark = this.board[color].intersects(SquareSet.darkSquares());
       const theyAllOnDark = this.board[opposite(color)].isDisjoint(SquareSet.lightSquares());
       const theyAllOnLight = this.board[opposite(color)].isDisjoint(SquareSet.darkSquares());
       return (weSomeOnLight && theyAllOnDark) || (weSomeOnDark && theyAllOnLight);
+    }
+    if (this.board.occupied.equals(this.board.knight) && this.board.occupied.size() === 2) {
+      return (
+        (this.board.white.intersects(SquareSet.lightSquares()) !==
+          this.board.black.intersects(SquareSet.darkSquares())) !==
+        (this.turn === color)
+      );
     }
     return false;
   }

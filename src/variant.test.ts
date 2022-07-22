@@ -69,6 +69,11 @@ const insufficientMaterial: [Rules, string, boolean, boolean][] = [
   ['antichess', '8/8/8/6b1/8/3B4/4B3/5B2 w - -', true, true],
   ['antichess', '8/8/5b2/8/8/3B4/3B4/8 w - -', true, false],
   ['antichess', '8/5p2/5P2/8/3B4/1bB5/8/8 b - -', falseNegative, falseNegative],
+  ['antichess', '8/8/8/1n2N3/8/8/8/8 w - - 0 32', true, false],
+  ['antichess', '8/3N4/8/1n6/8/8/8/8 b - - 1 32', true, false],
+  ['antichess', '6n1/8/8/4N3/8/8/8/8 b - - 0 27', false, true],
+  ['antichess', '8/8/5n2/4N3/8/8/8/8 w - - 1 28', false, true],
+  ['antichess', '8/3n4/8/8/8/8/8/8 w - - 0 29', false, true],
 
   ['kingofthehill', '8/5k2/8/8/8/8/3K4/8 w - -', false, false],
 
