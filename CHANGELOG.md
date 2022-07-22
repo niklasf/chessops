@@ -1,5 +1,9 @@
 # Changelog for chessops
 
+## v0.12.2
+
+- Detect Antichess insufficient material with two knights.
+
 ## v0.12.1
 
 - Add more aliases for PGN `Variant` headers.
