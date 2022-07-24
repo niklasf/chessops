@@ -1,4 +1,4 @@
-import { defined } from './util.js';
+import { defined, makeSquare } from './util.js';
 import { Rules, Outcome, Square } from './types.js';
 import { parseFen, FenError, makeFen } from './fen.js';
 import { Position, PositionError, FromSetupOpts, IllegalSetup } from './chess.js';
@@ -570,10 +570,12 @@ export const setStartingPosition = (headers: Map<string, string>, pos: Position)
   else headers.delete('FEN');
 };
 
+export type CommentShapeColor = 'green' | 'red' | 'yellow' | 'blue';
+
 export interface CommentShape {
   from: Square;
   to: Square;
-  color: 'green' | 'red' | 'yellow' | 'blue';
+  color: CommentShapeColor;
 }
 
 export interface Comment {
@@ -585,16 +587,43 @@ export interface Comment {
 
 // export const parseComment = (comment: string): Comment =>
 
-const makeEmt = (seconds: number): string => {
+const makeClk = (seconds: number): string => {
   seconds = Math.max(0, seconds);
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   seconds = (seconds % 3600) % 60;
-  return `[%emt ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toLocaleString('en', {
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toLocaleString('en', {
     minimumIntegerDigits: 2,
     maximumFractionDigits: 3,
-  })}]`;
+  })}`;
 };
 
-export const makeComment = (comment: Partial<Comment>): string =>
-  [...(defined(comment.emt) ? [makeEmt(comment.emt)] : [])].join(' ');
+const makeColor = (color: CommentShapeColor): 'G' | 'R' | 'Y' | 'B' => {
+  switch (color) {
+    case 'green':
+      return 'G';
+    case 'red':
+      return 'R';
+    case 'yellow':
+      return 'Y';
+    case 'blue':
+      return 'B';
+  }
+};
+
+const makeShape = (shape: CommentShape): string =>
+  shape.to === shape.from
+    ? `${makeColor(shape.color)}${makeSquare(shape.to)}`
+    : `${makeColor(shape.color)}${makeSquare(shape.from)}${makeSquare(shape.to)}`;
+
+export const makeComment = (comment: Partial<Comment>): string => {
+  const builder = [];
+  const circles = (comment.shapes || []).filter(shape => shape.to === shape.from).map(makeShape);
+  const arrows = (comment.shapes || []).filter(shape => shape.to !== shape.from).map(makeShape);
+  if (circles.length) builder.push(`[%csl ${circles.join(',')}]`);
+  if (arrows.length) builder.push(`[%cal ${arrows.join(',')}]`);
+  if (defined(comment.emt)) builder.push(`[%emt ${makeClk(comment.emt)}]`);
+  if (defined(comment.clock)) builder.push(`[%emt ${makeClk(comment.clock)}]`);
+  if (defined(comment.text)) builder.push(comment.text);
+  return builder.join(' ');
+};
