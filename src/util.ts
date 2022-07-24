@@ -1,4 +1,15 @@
-import { FILE_NAMES, RANK_NAMES, CastlingSide, Color, Square, Role, Move, isDrop, SquareName } from './types.js';
+import {
+  FILE_NAMES,
+  RANK_NAMES,
+  CastlingSide,
+  Color,
+  Square,
+  Role,
+  Move,
+  isDrop,
+  isNormal,
+  SquareName,
+} from './types.js';
 
 export const defined = <A>(v: A | undefined): v is A => v !== undefined;
 
@@ -75,6 +86,12 @@ export const parseUci = (str: string): Move | undefined => {
     if (defined(from) && defined(to)) return { from, to, promotion };
   }
   return;
+};
+
+export const moveEquals = (left: Move, right: Move): boolean => {
+  if (left.to !== right.to) return false;
+  if (isDrop(left)) return isDrop(right) && left.role === right.role;
+  else return isNormal(right) && left.from === right.from && left.promotion === right.promotion;
 };
 
 /**
