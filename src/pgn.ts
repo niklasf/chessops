@@ -633,7 +633,7 @@ export const parseComment = (comment: string): Comment => {
   const shapes: CommentShape[] = [];
   const text = comment
     .replace(
-      /(\s?)\[%(emt|clk)\s(\d+):(\d+):(\d+(?:\.\d*)?)\](\s?)/g,
+      /(\s?)\[%(emt|clk)\s(\d{1,5}):(\d{1,2}):(\d{1,2}(?:\.\d{0,5})?)\](\s?)/g,
       (_, prefix, annotation, hours, minutes, seconds, suffix) => {
         const value = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseFloat(seconds);
         if (annotation == 'emt') emt = value;
