@@ -585,8 +585,6 @@ export interface Comment {
   emt?: number;
 }
 
-// export const parseComment = (comment: string): Comment =>
-
 const makeClk = (seconds: number): string => {
   seconds = Math.max(0, seconds);
   const hours = Math.floor(seconds / 3600);
@@ -598,7 +596,7 @@ const makeClk = (seconds: number): string => {
   })}`;
 };
 
-const makeColor = (color: CommentShapeColor): 'G' | 'R' | 'Y' | 'B' => {
+const makeCommentShapeColor = (color: CommentShapeColor): 'G' | 'R' | 'Y' | 'B' => {
   switch (color) {
     case 'green':
       return 'G';
@@ -611,17 +609,44 @@ const makeColor = (color: CommentShapeColor): 'G' | 'R' | 'Y' | 'B' => {
   }
 };
 
-const makeShape = (shape: CommentShape): string =>
+function parseCommentShapeColor(str: 'G' | 'R' | 'Y' | 'B'): CommentShapeColor;
+function parseCommentShapeColor(str: string): CommentShapeColor | undefined;
+function parseCommentShapeColor(str: string): CommentShapeColor | undefined {
+  switch (str) {
+    case 'G':
+      return 'green';
+    case 'R':
+      return 'red';
+    case 'Y':
+      return 'yellow';
+    case 'B':
+      return 'blue';
+    default:
+      return;
+  }
+}
+
+const makeCommentShape = (shape: CommentShape): string =>
   shape.to === shape.from
-    ? `${makeColor(shape.color)}${makeSquare(shape.to)}`
-    : `${makeColor(shape.color)}${makeSquare(shape.from)}${makeSquare(shape.to)}`;
+    ? `${makeCommentShapeColor(shape.color)}${makeSquare(shape.to)}`
+    : `${makeCommentShapeColor(shape.color)}${makeSquare(shape.from)}${makeSquare(shape.to)}`;
+
+const parseCommentShape = (str: string): CommentShape | undefined => {
+  const color = parseCommentShapeColor(str.slice(0, 1));
+  const from = parseSquare(str.slice(1, 3));
+  const to = parseSquare(str.slice(3, 5));
+  if (!color || !defined(from)) return;
+  if (str.length === 3) return { color, from, to: from };
+  if (str.length === 5 && defined(to)) return { color, from, to };
+  return;
+};
 
 export const makeComment = (comment: Partial<Comment>): string => {
   const builder = [];
   if (defined(comment.text)) builder.push(comment.text);
-  const circles = (comment.shapes || []).filter(shape => shape.to === shape.from).map(makeShape);
+  const circles = (comment.shapes || []).filter(shape => shape.to === shape.from).map(makeCommentShape);
   if (circles.length) builder.push(`[%csl ${circles.join(',')}]`);
-  const arrows = (comment.shapes || []).filter(shape => shape.to !== shape.from).map(makeShape);
+  const arrows = (comment.shapes || []).filter(shape => shape.to !== shape.from).map(makeCommentShape);
   if (arrows.length) builder.push(`[%cal ${arrows.join(',')}]`);
   if (defined(comment.emt)) builder.push(`[%emt ${makeClk(comment.emt)}]`);
   if (defined(comment.clock)) builder.push(`[%clk ${makeClk(comment.clock)}]`);
@@ -645,12 +670,7 @@ export const parseComment = (comment: string): Comment => {
       /(\s?)\[%(?:csl|cal)\s([RGYB][a-h][1-8](?:[a-h][1-8])?(?:,[RGYB][a-h][1-8](?:[a-h][1-8])?)*)\](\s?)/g,
       (_, prefix, arrows, suffix) => {
         for (const arrow of arrows.split(',')) {
-          const from = parseSquare(arrow.slice(1, 3))!;
-          shapes.push({
-            color: arrow[0] === 'R' ? 'red' : arrow[0] === 'G' ? 'green' : arrow[0] === 'Y' ? 'yellow' : 'blue',
-            from,
-            to: arrow.length === 5 ? parseSquare(arrow.slice(3, 5))! : from,
-          });
+          shapes.push(parseCommentShape(arrow)!);
         }
         return prefix && suffix;
       }
