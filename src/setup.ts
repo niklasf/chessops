@@ -1,6 +1,6 @@
 import { Color, Role, ROLES, Square } from './types.js';
 import { SquareSet } from './squareSet.js';
-import { Board } from './board.js';
+import { Board, boardEquals } from './board.js';
 
 export class MaterialSide {
   pawn: number;
@@ -157,3 +157,14 @@ export const setupClone = (setup: Setup): Setup => ({
   halfmoves: setup.halfmoves,
   fullmoves: setup.fullmoves,
 });
+
+export const setupEquals = (left: Setup, right: Setup): boolean =>
+  boardEquals(left.board, right.board) &&
+  ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
+  left.turn === right.turn &&
+  left.unmovedRooks.equals(right.unmovedRooks) &&
+  left.epSquare === right.epSquare &&
+  ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
+    (!left.remainingChecks && !right.remainingChecks)) &&
+  left.halfmoves === right.halfmoves &&
+  left.fullmoves === right.fullmoves;
