@@ -636,8 +636,8 @@ export const parseComment = (comment: string): Comment => {
       /(\s?)\[%(emt|clk)\s(\d{1,5}):(\d{1,2}):(\d{1,2}(?:\.\d{0,5})?)\](\s?)/g,
       (_, prefix, annotation, hours, minutes, seconds, suffix) => {
         const value = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseFloat(seconds);
-        if (annotation == 'emt') emt = value;
-        else if (annotation == 'clk') clock = value;
+        if (annotation === 'emt') emt = value;
+        else if (annotation === 'clk') clock = value;
         return prefix && suffix;
       }
     )
@@ -647,9 +647,9 @@ export const parseComment = (comment: string): Comment => {
         for (const arrow of arrows.split(',')) {
           const from = parseSquare(arrow.slice(1, 3))!;
           shapes.push({
-            color: arrow[0] == 'R' ? 'red' : arrow[0] == 'G' ? 'green' : arrow[0] == 'Y' ? 'yellow' : 'blue',
+            color: arrow[0] === 'R' ? 'red' : arrow[0] === 'G' ? 'green' : arrow[0] === 'Y' ? 'yellow' : 'blue',
             from,
-            to: arrow.length == 5 ? parseSquare(arrow.slice(3, 5))! : from,
+            to: arrow.length === 5 ? parseSquare(arrow.slice(3, 5))! : from,
           });
         }
         return prefix && suffix;
