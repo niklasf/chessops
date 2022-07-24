@@ -11,6 +11,7 @@ import {
   startingPosition,
   emptyHeaders,
   parseComment,
+  makeComment,
 } from './pgn.js';
 import { parseSan } from './san.js';
 import { Position } from './chess.js';
@@ -143,4 +144,19 @@ test('parse pgn comment', () => {
       { color: 'green', from: 63, to: 63 },
     ],
   });
+});
+
+test('make pgn comment', () => {
+  expect(
+    makeComment({
+      text: 'text',
+      emt: 3723.4,
+      clock: 1,
+      shapes: [
+        { color: 'yellow', from: 0, to: 0 },
+        { color: 'red', from: 0, to: 1 },
+        { color: 'red', from: 0, to: 2 },
+      ],
+    })
+  ).toBe('text [%csl Ya1] [%cal Ra1b1,Ra1c1] [%emt 1:02:03.4] [%clk 0:00:01]');
 });
