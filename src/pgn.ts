@@ -583,5 +583,18 @@ export interface Comment {
   emt?: number;
 }
 
-// export const parseComment = (comment: str): Comment => {}
-// export const makeComment = (comment: Comment): string => {}
+// export const parseComment = (comment: string): Comment =>
+
+const makeEmt = (seconds: number): string => {
+  seconds = Math.max(0, seconds);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  seconds = (seconds % 3600) % 60;
+  return `[%emt ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toLocaleString('en', {
+    minimumIntegerDigits: 2,
+    maximumFractionDigits: 3,
+  })}]`;
+};
+
+export const makeComment = (comment: Partial<Comment>): string =>
+  [...(defined(comment.emt) ? [makeEmt(comment.emt)] : [])].join(' ');
