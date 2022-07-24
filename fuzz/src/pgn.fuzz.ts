@@ -1,5 +1,8 @@
-import { parsePgn } from 'chessops/pgn';
+import { PgnParser, emptyHeaders } from 'chessops/pgn';
+import { writeFileSync } from 'fs';
 
 export const fuzz = (data: Buffer): void => {
-  parsePgn(data.toString(), () => new Map());
+  //console.log(data.length);
+  //writeFileSync('/tmp/fuzz', data);
+  new PgnParser(() => {}, emptyHeaders).parse(data.toString());
 };
