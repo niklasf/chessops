@@ -12,6 +12,7 @@ import {
   emptyHeaders,
   parseComment,
   makeComment,
+  isChildNode,
 } from './pgn.js';
 import { parseSan } from './san.js';
 import { Position } from './chess.js';
@@ -21,11 +22,13 @@ import { createReadStream } from 'fs';
 
 test('make pgn', () => {
   const root = new Node<PgnNodeData>();
+  expect(isChildNode(root)).toBe(false);
 
   const e4 = new ChildNode<PgnNodeData>({
     san: 'e4',
     nags: [7],
   });
+  expect(isChildNode(e4)).toBe(true);
   const e3 = new ChildNode<PgnNodeData>({ san: 'e3' });
   root.children.push(e4);
   root.children.push(e3);

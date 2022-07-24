@@ -35,6 +35,10 @@ export class ChildNode<T> extends Node<T> {
   }
 }
 
+export function isChildNode<T>(node: Node<T>): node is ChildNode<T> {
+  return node instanceof ChildNode<T>;
+}
+
 export const transform = <T, U, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
