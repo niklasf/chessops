@@ -13,6 +13,8 @@
     "typescript": "^4"
   },
   "scripts": {
-    "fuzz-fen": "rollup --config && node node_modules/@gitlab-org/jsfuzz dist/fen.fuzz.js corpus/fen"
+    "compile": "rollup --config",
+    "fuzz-uci": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/uci.fuzz.js corpus/uci",
+    "fuzz-fen": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/fen.fuzz.js corpus/fen"
   }
 }
