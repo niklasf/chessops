@@ -95,7 +95,7 @@ export const parseCastlingFen = (board: Board, castlingPart: string): Result<Squ
     if (lower === 'q') candidates = backrank;
     else if (lower === 'k') candidates = backrank.reversed();
     else if ('a' <= lower && lower <= 'h')
-      candidates = SquareSet.fromSquare(lower.charCodeAt(0) - 'a'.charCodeAt(0)).intersect(backrank);
+      candidates = SquareSet.fromFile(lower.charCodeAt(0) - 'a'.charCodeAt(0)).intersect(backrank);
     else return Result.err(new FenError(InvalidFen.Castling));
 
     for (const square of candidates) {
@@ -271,13 +271,13 @@ export const makeCastlingFen = (board: Board, unmovedRooks: SquareSet): string =
   let fen = '';
   for (const color of COLORS) {
     const backrank = SquareSet.backrank(color);
-    const king = board.kingOf(color);
-    if (!defined(king) || !backrank.has(king)) continue;
+    let king = board.kingOf(color);
+    if (defined(king) && !backrank.has(king)) king = undefined;
     const candidates = board.pieces(color, 'rook').intersect(backrank);
     for (const rook of unmovedRooks.intersect(candidates).reversed()) {
-      if (rook === candidates.first() && rook < king) {
+      if (rook === candidates.first() && defined(king) && rook < king) {
         fen += color === 'white' ? 'Q' : 'q';
-      } else if (rook === candidates.last() && king < rook) {
+      } else if (rook === candidates.last() && defined(king) && king < rook) {
         fen += color === 'white' ? 'K' : 'k';
       } else {
         const file = FILE_NAMES[squareFile(rook)];
