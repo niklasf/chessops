@@ -13,6 +13,6 @@
     "typescript": "^4"
   },
   "scripts": {
-    "fuzz-fen": "rollup --config && node node_modules/@gitlab-org/jsfuzz dist/fen.fuzz.js"
+    "fuzz-fen": "rollup --config && node node_modules/@gitlab-org/jsfuzz dist/fen.fuzz.js corpus/fen"
   }
 }
