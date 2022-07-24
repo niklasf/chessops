@@ -42,7 +42,7 @@ export function isChildNode<T>(node: Node<T>): node is ChildNode<T> {
 export const transform = <T, U, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
-  f: (ctx: C, data: T, i: number) => U | undefined
+  f: (ctx: C, data: T, childIndex: number) => U | undefined
 ): Node<U> => {
   const root = new Node<U>();
   const stack = [
@@ -54,10 +54,10 @@ export const transform = <T, U, C extends { clone(): C }>(
   ];
   let frame;
   while ((frame = stack.pop())) {
-    for (let i = 0; i < frame.before.children.length; i++) {
-      const ctx = i < frame.before.children.length - 1 ? frame.ctx.clone() : frame.ctx;
-      const childBefore = frame.before.children[i];
-      const data = f(ctx, childBefore.data, i);
+    for (let childIndex = 0; childIndex < frame.before.children.length; childIndex++) {
+      const ctx = childIndex < frame.before.children.length - 1 ? frame.ctx.clone() : frame.ctx;
+      const childBefore = frame.before.children[childIndex];
+      const data = f(ctx, childBefore.data, childIndex);
       if (defined(data)) {
         const childAfter = new ChildNode(data);
         frame.after.children.push(childAfter);
@@ -75,15 +75,15 @@ export const transform = <T, U, C extends { clone(): C }>(
 export const walk = <T, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
-  f: (ctx: C, data: T, i: number) => boolean | undefined
+  f: (ctx: C, data: T, childIndex: number) => boolean | undefined
 ) => {
   const stack = [{ node, ctx }];
   let frame;
   while ((frame = stack.pop())) {
-    for (let i = 0; i < frame.node.children.length; i++) {
-      const ctx = i < frame.node.children.length - 1 ? frame.ctx.clone() : frame.ctx;
-      const child = frame.node.children[i];
-      if (f(ctx, child.data, i) !== false) stack.push({ node: child, ctx });
+    for (let childIndex = 0; childIndex < frame.node.children.length; childIndex++) {
+      const ctx = childIndex < frame.node.children.length - 1 ? frame.ctx.clone() : frame.ctx;
+      const child = frame.node.children[childIndex];
+      if (f(ctx, child.data, childIndex) !== false) stack.push({ node: child, ctx });
     }
   }
 };
