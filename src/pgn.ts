@@ -627,3 +627,19 @@ export const makeComment = (comment: Partial<Comment>): string => {
   if (defined(comment.text)) builder.push(comment.text);
   return builder.join(' ');
 };
+
+export const parseComment = (comment: string): Comment => {
+  let emt;
+  comment = comment.replace(
+    /(\s?)\[%emt\s(\d+):(\d+):(\d+(?:\.\d*)?)\](\s?)/g,
+    (_, prefix, hours, minutes, seconds, suffix) => {
+      emt = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseFloat(seconds);
+      return prefix && suffix;
+    }
+  );
+  return {
+    text: comment,
+    shapes: [],
+    emt,
+  };
+};

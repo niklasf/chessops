@@ -10,6 +10,7 @@ import {
   transform,
   startingPosition,
   emptyHeaders,
+  parseComment,
 } from './pgn.js';
 import { parseSan } from './san.js';
 import { Position } from './chess.js';
@@ -125,4 +126,12 @@ test('tricky tokens', () => {
   expect(steps[0].nags).toEqual([3]);
   expect(steps[1].san).toBe('O-O-O#');
   expect(steps[1].nags).toEqual([4]);
+});
+
+test('parse pgn comment', () => {
+  expect(parseComment('prefix [%emt 1:02:03.4] suffix')).toEqual({
+    text: 'prefix suffix',
+    emt: 3723.4,
+    shapes: [],
+  });
 });
