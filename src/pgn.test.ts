@@ -134,4 +134,13 @@ test('parse pgn comment', () => {
     emt: 3723.4,
     shapes: [],
   });
+  expect(parseComment('[%csl Ya1][%cal Ra1a1,Be1e2]commentary  [%csl Gh8]')).toEqual({
+    text: 'commentary ',
+    shapes: [
+      { color: 'yellow', from: 0, to: 0 },
+      { color: 'red', from: 0, to: 0 },
+      { color: 'blue', from: 4, to: 12 },
+      { color: 'green', from: 63, to: 63 },
+    ],
+  });
 });

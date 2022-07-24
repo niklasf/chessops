@@ -1,4 +1,4 @@
-import { defined, makeSquare } from './util.js';
+import { defined, makeSquare, parseSquare } from './util.js';
 import { Rules, Outcome, Square } from './types.js';
 import { parseFen, FenError, makeFen } from './fen.js';
 import { Position, PositionError, FromSetupOpts, IllegalSetup } from './chess.js';
@@ -573,9 +573,9 @@ export const setStartingPosition = (headers: Map<string, string>, pos: Position)
 export type CommentShapeColor = 'green' | 'red' | 'yellow' | 'blue';
 
 export interface CommentShape {
+  color: CommentShapeColor;
   from: Square;
   to: Square;
-  color: CommentShapeColor;
 }
 
 export interface Comment {
@@ -618,28 +618,47 @@ const makeShape = (shape: CommentShape): string =>
 
 export const makeComment = (comment: Partial<Comment>): string => {
   const builder = [];
+  if (defined(comment.text)) builder.push(comment.text);
   const circles = (comment.shapes || []).filter(shape => shape.to === shape.from).map(makeShape);
-  const arrows = (comment.shapes || []).filter(shape => shape.to !== shape.from).map(makeShape);
   if (circles.length) builder.push(`[%csl ${circles.join(',')}]`);
+  const arrows = (comment.shapes || []).filter(shape => shape.to !== shape.from).map(makeShape);
   if (arrows.length) builder.push(`[%cal ${arrows.join(',')}]`);
   if (defined(comment.emt)) builder.push(`[%emt ${makeClk(comment.emt)}]`);
-  if (defined(comment.clock)) builder.push(`[%emt ${makeClk(comment.clock)}]`);
-  if (defined(comment.text)) builder.push(comment.text);
+  if (defined(comment.clock)) builder.push(`[%clk ${makeClk(comment.clock)}]`);
   return builder.join(' ');
 };
 
 export const parseComment = (comment: string): Comment => {
-  let emt;
-  comment = comment.replace(
-    /(\s?)\[%emt\s(\d+):(\d+):(\d+(?:\.\d*)?)\](\s?)/g,
-    (_, prefix, hours, minutes, seconds, suffix) => {
-      emt = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseFloat(seconds);
-      return prefix && suffix;
-    }
-  );
+  let emt, clock;
+  const shapes: CommentShape[] = [];
+  const text = comment
+    .replace(
+      /(\s?)\[%(emt|clk)\s(\d+):(\d+):(\d+(?:\.\d*)?)\](\s?)/g,
+      (_, prefix, annotation, hours, minutes, seconds, suffix) => {
+        const value = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseFloat(seconds);
+        if (annotation == 'emt') emt = value;
+        else if (annotation == 'clk') clock = value;
+        return prefix && suffix;
+      }
+    )
+    .replace(
+      /(\s?)\[%(?:csl|cal)\s([RGYB][a-h][1-8](?:[a-h][1-8])?(?:,[RGYB][a-h][1-8](?:[a-h][1-8])?)*)\](\s?)/g,
+      (_, prefix, arrows, suffix) => {
+        for (const arrow of arrows.split(',')) {
+          const from = parseSquare(arrow.slice(1, 3))!;
+          shapes.push({
+            color: arrow[0] == 'R' ? 'red' : arrow[0] == 'G' ? 'green' : arrow[0] == 'Y' ? 'yellow' : 'blue',
+            from,
+            to: arrow.length == 5 ? parseSquare(arrow.slice(3, 5))! : from,
+          });
+        }
+        return prefix && suffix;
+      }
+    );
   return {
-    text: comment,
-    shapes: [],
+    text,
+    shapes,
     emt,
+    clock,
   };
 };
