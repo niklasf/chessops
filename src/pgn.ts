@@ -39,6 +39,14 @@ export function isChildNode<T>(node: Node<T>): node is ChildNode<T> {
   return node instanceof ChildNode<T>;
 }
 
+export class Box<T> {
+  constructor(public value: T) {}
+
+  clone(): Box<T> {
+    return new Box(this.value);
+  }
+}
+
 export const transform = <T, U, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
@@ -75,7 +83,7 @@ export const transform = <T, U, C extends { clone(): C }>(
 export const walk = <T, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
-  f: (ctx: C, data: T, childIndex: number) => boolean | undefined
+  f: (ctx: C, data: T, childIndex: number) => boolean | void
 ) => {
   const stack = [{ node, ctx }];
   let frame;
