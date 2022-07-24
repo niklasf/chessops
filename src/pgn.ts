@@ -11,6 +11,11 @@ export interface Game<T> {
   moves: Node<T>;
 }
 
+export const defaultGame = <T>(initHeaders: () => Map<string, string> = defaultHeaders): Game<T> => ({
+  headers: initHeaders(),
+  moves: new Node(),
+});
+
 export class Node<T> {
   children: ChildNode<T>[] = [];
 
@@ -288,10 +293,7 @@ export class PgnParser {
     this.budget = this.maxBudget;
     this.found = false;
     this.state = ParserState.Pre;
-    this.game = {
-      headers: this.initHeaders(),
-      moves: new Node(),
-    };
+    this.game = defaultGame(this.initHeaders);
     this.consecutiveEmptyLines = 0;
     this.stack = [{ parent: this.game.moves, root: true }];
     this.commentBuf = [];
