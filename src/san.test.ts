@@ -195,3 +195,8 @@ test('parse crazyhouse', () => {
   for (const san of line) pos.play(parseSan(pos, san)!);
   expect(makeFen(pos.toSetup())).toBe('r4rk1/ppp1nppp/6b1/8/2B1pP2/4Pq2/PPP4P/R1BqK3[PPNNNBRp] w - - 1 25');
 });
+
+test('lax pawn move', () => {
+  const pos = Chess.default();
+  expect(parseSan(pos, '2e4')).toEqual({ from: 12, to: 28 });
+});

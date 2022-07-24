@@ -132,7 +132,7 @@ test('tricky tokens', () => {
   expect(steps[1].nags).toEqual([4]);
 });
 
-test('parse pgn comment', () => {
+test('parse comment', () => {
   expect(parseComment('prefix [%emt 1:02:03.4] suffix')).toEqual({
     text: 'prefix suffix',
     emt: 3723.4,
@@ -149,7 +149,7 @@ test('parse pgn comment', () => {
   });
 });
 
-test('make pgn comment', () => {
+test('make comment', () => {
   expect(
     makeComment({
       text: 'text',
