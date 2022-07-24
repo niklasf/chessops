@@ -1,5 +1,5 @@
 import { defined } from './util.js';
-import { Rules, Outcome } from './types.js';
+import { Rules, Outcome, Square } from './types.js';
 import { parseFen, FenError, makeFen } from './fen.js';
 import { Position, PositionError, FromSetupOpts, IllegalSetup } from './chess.js';
 import { defaultPosition, setupPosition } from './variant.js';
@@ -567,3 +567,19 @@ export const setStartingPosition = (headers: Map<string, string>, pos: Position)
   if (fen !== defaultFen) headers.set('FEN', fen);
   else headers.delete('FEN');
 };
+
+export interface CommentShape {
+  from: Square;
+  to: Square;
+  color: 'green' | 'red' | 'yellow' | 'blue';
+}
+
+export interface Comment {
+  text: string;
+  shapes: CommentShape[];
+  clock?: number;
+  emt?: number;
+}
+
+// export const parseComment = (comment: str): Comment => {}
+// export const makeComment = (comment: Comment): string => {}
