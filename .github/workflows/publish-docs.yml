@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npm install
+      - run: npm ci
       - run: npm run doc
       - run: |
           cd docs &&
