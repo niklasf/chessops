@@ -169,6 +169,7 @@ test('make comment', () => {
     makeComment({
       text: 'text',
       emt: 3723.4,
+      evaluation: { pawns: 10 },
       clock: 1,
       shapes: [
         { color: 'yellow', from: 0, to: 0 },
@@ -176,5 +177,5 @@ test('make comment', () => {
         { color: 'red', from: 0, to: 2 },
       ],
     })
-  ).toBe('text [%csl Ya1] [%cal Ra1b1,Ra1c1] [%emt 1:02:03.4] [%clk 0:00:01]');
+  ).toBe('text [%csl Ya1] [%cal Ra1b1,Ra1c1] [%eval 10.00] [%emt 1:02:03.4] [%clk 0:00:01]');
 });

@@ -668,6 +668,12 @@ export const makeComment = (comment: Partial<Comment>): string => {
   if (circles.length) builder.push(`[%csl ${circles.join(',')}]`);
   const arrows = (comment.shapes || []).filter(shape => shape.to !== shape.from).map(makeCommentShape);
   if (arrows.length) builder.push(`[%cal ${arrows.join(',')}]`);
+  if (comment.evaluation)
+    builder.push(
+      isMate(comment.evaluation)
+        ? `[%eval #${comment.evaluation.mate}]`
+        : `[%eval ${comment.evaluation.pawns.toFixed(2)}]`
+    );
   if (defined(comment.emt)) builder.push(`[%emt ${makeClk(comment.emt)}]`);
   if (defined(comment.clock)) builder.push(`[%clk ${makeClk(comment.clock)}]`);
   return builder.join(' ');
