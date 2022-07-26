@@ -1,5 +1,15 @@
 # Changelog for chessops
 
+## v0.12.3
+
+- Fix parsing X-FEN with file notation for black castling rights. Bug
+  discovered using new fuzz-testing suite.
+- Improvements for `chessops/pgn`:
+  - Add `defaultGame()`.
+  - Add `isChildNode()`.
+  - Add `parseComment` and `makeComment`.
+  - Add `Box` for wrapping immutable context in transformations.
+
 ## v0.12.2
 
 - Detect Antichess insufficient material with two knights.
