@@ -152,9 +152,9 @@ test('parse comment', () => {
     evaluation: { pawns: -0.42 },
     shapes: [],
   });
-  expect(parseComment('prefix [%eval 99] suffix')).toEqual({
+  expect(parseComment('prefix [%eval .99] suffix')).toEqual({
     text: 'prefix suffix',
-    evaluation: { pawns: 99 },
+    evaluation: { pawns: 0.99 },
     shapes: [],
   });
   expect(parseComment('prefix [%eval #-3] suffix')).toEqual({

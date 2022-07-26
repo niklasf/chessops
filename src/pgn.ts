@@ -695,10 +695,13 @@ export const parseComment = (comment: string): Comment => {
         return prefix && suffix;
       }
     )
-    .replace(/(\s?)\[%eval\s(?:#(-?\d+)|(-?[\d\.]+))\](\s?)/g, (_, prefix, mate, pawns, suffix) => {
-      evaluation = mate ? { mate: parseInt(mate) } : { pawns: parseFloat(pawns) };
-      return prefix && suffix;
-    });
+    .replace(
+      /(\s?)\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}\.?\d{0,5}|\.\d{1,5})))\](\s?)/g,
+      (_, prefix, mate, pawns, suffix) => {
+        evaluation = mate ? { mate: parseInt(mate) } : { pawns: parseFloat(pawns) };
+        return prefix && suffix;
+      }
+    );
   return {
     text,
     shapes,
