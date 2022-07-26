@@ -162,6 +162,10 @@ test('parse comment', () => {
     evaluation: { mate: -3 },
     shapes: [],
   });
+  expect(parseComment('[%csl Ga1]foo')).toEqual({
+    text: 'foo',
+    shapes: [{ from: 0, to: 0, color: 'green' }],
+  });
   expect(parseComment('foo [%bar] [%csl Ga1] [%cal Ra1h1,Gb1b8] [%clk 3:25:45]').text).toBe('foo [%bar]');
 });
 
