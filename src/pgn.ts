@@ -590,11 +590,19 @@ export interface CommentShape {
   to: Square;
 }
 
+export type EvaluationPawns = { pawns: number };
+export type EvaluationMate = { mate: number };
+export type Evaluation = EvaluationPawns | EvaluationMate;
+
+export const isPawns = (ev: Evaluation): ev is EvaluationPawns => 'pawns' in ev;
+export const isMate = (ev: Evaluation): ev is EvaluationMate => 'mate' in ev;
+
 export interface Comment {
   text: string;
   shapes: CommentShape[];
   clock?: number;
   emt?: number;
+  evaluation?: Evaluation;
 }
 
 const makeClk = (seconds: number): string => {
@@ -666,7 +674,7 @@ export const makeComment = (comment: Partial<Comment>): string => {
 };
 
 export const parseComment = (comment: string): Comment => {
-  let emt, clock;
+  let emt, clock, evaluation;
   const shapes: CommentShape[] = [];
   const text = comment
     .replace(
@@ -686,11 +694,16 @@ export const parseComment = (comment: string): Comment => {
         }
         return prefix && suffix;
       }
-    );
+    )
+    .replace(/(\s?)\[%eval\s(?:#(-?\d+)|(-?[\d\.]+))\](\s?)/g, (_, prefix, mate, pawns, suffix) => {
+      evaluation = mate ? { mate: parseInt(mate) } : { pawns: parseFloat(pawns) };
+      return prefix && suffix;
+    });
   return {
     text,
     shapes,
     emt,
     clock,
+    evaluation,
   };
 };

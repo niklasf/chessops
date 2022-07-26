@@ -147,6 +147,21 @@ test('parse comment', () => {
       { color: 'green', from: 63, to: 63 },
     ],
   });
+  expect(parseComment('prefix [%eval -0.42] suffix')).toEqual({
+    text: 'prefix suffix',
+    evaluation: { pawns: -0.42 },
+    shapes: [],
+  });
+  expect(parseComment('prefix [%eval 99] suffix')).toEqual({
+    text: 'prefix suffix',
+    evaluation: { pawns: 99 },
+    shapes: [],
+  });
+  expect(parseComment('prefix [%eval #-3] suffix')).toEqual({
+    text: 'prefix suffix',
+    evaluation: { mate: -3 },
+    shapes: [],
+  });
 });
 
 test('make comment', () => {
