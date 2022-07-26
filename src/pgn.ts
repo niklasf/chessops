@@ -684,7 +684,7 @@ export const parseComment = (comment: string): Comment => {
   const shapes: CommentShape[] = [];
   const text = comment
     .replace(
-      /(\s?)\[%(emt|clk)\s(\d{1,5}):(\d{1,2}):(\d{1,2}(?:\.\d{0,5})?)\](\s?)/g,
+      /(\s?)\[%(emt|clk)\s(\d{1,5}):(\d{1,2}):(\d{1,2}(?:\.\d{0,5})?)\]((?=\s?))/g,
       (_, prefix, annotation, hours, minutes, seconds, suffix) => {
         const value = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseFloat(seconds);
         if (annotation === 'emt') emt = value;
@@ -693,7 +693,7 @@ export const parseComment = (comment: string): Comment => {
       }
     )
     .replace(
-      /(\s?)\[%(?:csl|cal)\s([RGYB][a-h][1-8](?:[a-h][1-8])?(?:,[RGYB][a-h][1-8](?:[a-h][1-8])?)*)\](\s?)/g,
+      /(\s?)\[%(?:csl|cal)\s([RGYB][a-h][1-8](?:[a-h][1-8])?(?:,[RGYB][a-h][1-8](?:[a-h][1-8])?)*)\]((?=\s?))/g,
       (_, prefix, arrows, suffix) => {
         for (const arrow of arrows.split(',')) {
           shapes.push(parseCommentShape(arrow)!);
@@ -702,7 +702,7 @@ export const parseComment = (comment: string): Comment => {
       }
     )
     .replace(
-      /(\s?)\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}\.?\d{0,5}|\.\d{1,5})))\](\s?)/g,
+      /(\s?)\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}\.?\d{0,5}|\.\d{1,5})))\]((?=\s?))/g,
       (_, prefix, mate, pawns, suffix) => {
         evaluation = mate ? { mate: parseInt(mate) } : { pawns: parseFloat(pawns) };
         return prefix && suffix;

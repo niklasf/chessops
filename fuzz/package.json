@@ -17,6 +17,7 @@
     "fuzz-uci": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/uci.fuzz.js corpus/uci",
     "fuzz-san": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/san.fuzz.js corpus/san",
     "fuzz-fen": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/fen.fuzz.js corpus/fen",
-    "fuzz-pgn": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/pgn.fuzz.js corpus/pgn"
+    "fuzz-pgn": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/pgn.fuzz.js corpus/pgn",
+    "fuzz-pgn-comment": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/pgn-comment.fuzz.js corpus/pgn-comment"
   }
 }
