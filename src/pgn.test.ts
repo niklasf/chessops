@@ -133,13 +133,13 @@ test('tricky tokens', () => {
 });
 
 test('parse comment', () => {
-  expect(parseComment('prefix [%emt 1:02:03.4] suffix')).toEqual({
-    text: 'prefix suffix',
+  expect(parseComment('prefix [%emt 1:02:03.4]')).toEqual({
+    text: 'prefix',
     emt: 3723.4,
     shapes: [],
   });
-  expect(parseComment('[%csl Ya1][%cal Ra1a1,Be1e2]commentary  [%csl Gh8]')).toEqual({
-    text: 'commentary ',
+  expect(parseComment('[%csl Ya1][%cal Ra1a1,Be1e2]commentary [%csl Gh8]')).toEqual({
+    text: 'commentary',
     shapes: [
       { color: 'yellow', from: 0, to: 0 },
       { color: 'red', from: 0, to: 0 },
@@ -147,18 +147,18 @@ test('parse comment', () => {
       { color: 'green', from: 63, to: 63 },
     ],
   });
-  expect(parseComment('prefix [%eval -0.42] suffix')).toEqual({
-    text: 'prefix suffix',
+  expect(parseComment('[%eval -0.42] suffix')).toEqual({
+    text: 'suffix',
     evaluation: { pawns: -0.42 },
     shapes: [],
   });
-  expect(parseComment('prefix [%eval .99] suffix')).toEqual({
-    text: 'prefix suffix',
+  expect(parseComment('prefix [%eval .99]')).toEqual({
+    text: 'prefix',
     evaluation: { pawns: 0.99 },
     shapes: [],
   });
-  expect(parseComment('prefix [%eval #-3] suffix')).toEqual({
-    text: 'prefix suffix',
+  expect(parseComment('[%eval #-3] suffix')).toEqual({
+    text: 'suffix',
     evaluation: { mate: -3 },
     shapes: [],
   });
@@ -183,4 +183,10 @@ test('make comment', () => {
       ],
     })
   ).toBe('text [%csl Ya1] [%cal Ra1b1,Ra1c1] [%eval 10.00] [%emt 1:02:03.4] [%clk 0:00:01]');
+});
+
+test('roundtrip comment', () => {
+  const comment = parseComment('[%csl[%eval 0.2] Ga1]');
+  const rountripped = parseComment(makeComment(comment));
+  expect(comment).toEqual(rountripped);
 });
