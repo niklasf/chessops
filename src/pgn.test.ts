@@ -152,9 +152,9 @@ test('parse comment', () => {
     evaluation: { pawns: -0.42 },
     shapes: [],
   });
-  expect(parseComment('prefix [%eval .99]')).toEqual({
+  expect(parseComment('prefix [%eval .99,23]')).toEqual({
     text: 'prefix',
-    evaluation: { pawns: 0.99 },
+    evaluation: { pawns: 0.99, depth: 23 },
     shapes: [],
   });
   expect(parseComment('[%eval #-3] suffix')).toEqual({
@@ -183,6 +183,12 @@ test('make comment', () => {
       ],
     })
   ).toBe('text [%csl Ya1] [%cal Ra1b1,Ra1c1] [%eval 10.00] [%emt 1:02:03.4] [%clk 0:00:01]');
+
+  expect(
+    makeComment({
+      evaluation: { mate: -4, depth: 5 },
+    })
+  ).toBe('[%eval #-4,5]');
 });
 
 test('roundtrip comment', () => {

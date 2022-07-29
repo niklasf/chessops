@@ -590,8 +590,8 @@ export interface CommentShape {
   to: Square;
 }
 
-export type EvaluationPawns = { pawns: number };
-export type EvaluationMate = { mate: number };
+export type EvaluationPawns = { pawns: number; depth?: number };
+export type EvaluationMate = { mate: number; depth?: number };
 export type Evaluation = EvaluationPawns | EvaluationMate;
 
 export const isPawns = (ev: Evaluation): ev is EvaluationPawns => 'pawns' in ev;
@@ -661,6 +661,11 @@ const parseCommentShape = (str: string): CommentShape | undefined => {
   return;
 };
 
+const makeEval = (ev: Evaluation): string => {
+  const str = isMate(ev) ? '#' + ev.mate : ev.pawns.toFixed(2);
+  return defined(ev.depth) ? str + ',' + ev.depth : str;
+};
+
 export const makeComment = (comment: Partial<Comment>): string => {
   const builder = [];
   if (defined(comment.text)) builder.push(comment.text);
@@ -668,12 +673,7 @@ export const makeComment = (comment: Partial<Comment>): string => {
   if (circles.length) builder.push(`[%csl ${circles.join(',')}]`);
   const arrows = (comment.shapes || []).filter(shape => shape.to !== shape.from).map(makeCommentShape);
   if (arrows.length) builder.push(`[%cal ${arrows.join(',')}]`);
-  if (comment.evaluation)
-    builder.push(
-      isMate(comment.evaluation)
-        ? `[%eval #${comment.evaluation.mate}]`
-        : `[%eval ${comment.evaluation.pawns.toFixed(2)}]`
-    );
+  if (comment.evaluation) builder.push(`[%eval ${makeEval(comment.evaluation)}]`);
   if (defined(comment.emt)) builder.push(`[%emt ${makeClk(comment.emt)}]`);
   if (defined(comment.clock)) builder.push(`[%clk ${makeClk(comment.clock)}]`);
   return builder.join(' ');
@@ -701,10 +701,14 @@ export const parseComment = (comment: string): Comment => {
         return ' ';
       }
     )
-    .replace(/\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}\.?\d{0,5}|\.\d{1,5})))\]/g, (_, mate, pawns) => {
-      evaluation = mate ? { mate: parseInt(mate) } : { pawns: parseFloat(pawns) };
-      return ' ';
-    })
+    .replace(
+      /\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}\.?\d{0,5}|\.\d{1,5})))(?:,(\d{1,5}))?\]/g,
+      (_, mate, pawns, d) => {
+        const depth = d && parseInt(d, 10);
+        evaluation = mate ? { mate: parseInt(mate, 10), depth } : { pawns: parseFloat(pawns), depth };
+        return ' ';
+      }
+    )
     .trim();
   return {
     text,
