@@ -684,29 +684,29 @@ export const parseComment = (comment: string): Comment => {
   const shapes: CommentShape[] = [];
   const text = comment
     .replace(
-      /\[%(emt|clk)\s(\d{1,5}):(\d{1,2}):(\d{1,2}(?:\.\d{0,5})?)\]/g,
+      /\s?\[%(emt|clk)\s(\d{1,5}):(\d{1,2}):(\d{1,2}(?:\.\d{0,5})?)\]\s?/g,
       (_, annotation, hours, minutes, seconds) => {
         const value = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseFloat(seconds);
         if (annotation === 'emt') emt = value;
         else if (annotation === 'clk') clock = value;
-        return ' ';
+        return '  ';
       }
     )
     .replace(
-      /\[%(?:csl|cal)\s([RGYB][a-h][1-8](?:[a-h][1-8])?(?:,[RGYB][a-h][1-8](?:[a-h][1-8])?)*)\]/g,
+      /\s?\[%(?:csl|cal)\s([RGYB][a-h][1-8](?:[a-h][1-8])?(?:,[RGYB][a-h][1-8](?:[a-h][1-8])?)*)\]\s?/g,
       (_, arrows) => {
         for (const arrow of arrows.split(',')) {
           shapes.push(parseCommentShape(arrow)!);
         }
-        return ' ';
+        return '  ';
       }
     )
     .replace(
-      /\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}\.?\d{0,5}|\.\d{1,5})))(?:,(\d{1,5}))?\]/g,
+      /\s?\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}\.?\d{0,5}|\.\d{1,5})))(?:,(\d{1,5}))?\]\s?/g,
       (_, mate, pawns, d) => {
         const depth = d && parseInt(d, 10);
         evaluation = mate ? { mate: parseInt(mate, 10), depth } : { pawns: parseFloat(pawns), depth };
-        return ' ';
+        return '  ';
       }
     )
     .trim();
