@@ -35,9 +35,7 @@ export class ChildNode<T> extends Node<T> {
   }
 }
 
-export function isChildNode<T>(node: Node<T>): node is ChildNode<T> {
-  return node instanceof ChildNode<T>;
-}
+export const isChildNode = <T>(node: Node<T>): node is ChildNode<T> => node instanceof ChildNode<T>;
 
 export class Box<T> {
   constructor(public value: T) {}
