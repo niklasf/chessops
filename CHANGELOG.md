@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.12.4
+
+- Support eval PGN comment annotations.
+- Fix PGN comment roundtrip by leaving additional spaces in the text.
+
 ## v0.12.3
 
 - Fix parsing X-FEN with file notation for black castling rights. Bug
