@@ -36,9 +36,10 @@ Chess and chess variant rules and operations in TypeScript.
 - Read and write UCI move notation
 - [Read and write SAN](https://niklasf.github.io/chessops/modules/san.html)
 - [Read and write PGN](https://niklasf.github.io/chessops/modules/pgn.html)
+  - Parser supports asynchronous streaming
   - Game tree model
-  - Transform to augment nodes with arbitrary user data
-  - Streaming parser
+  - Transform game tree to augment nodes with arbitrary user data
+  - Parse comments with evaluations, clocks and shapes
 - [Transformations](https://niklasf.github.io/chessops/modules/transform.html): Mirroring and rotating
 - [Compatibility](https://niklasf.github.io/chessops/modules/compat.html):
   [chessground](https://github.com/ornicar/chessground) and
