@@ -191,11 +191,12 @@ test('make comment', () => {
   ).toBe('[%eval #-4,5]');
 });
 
-test.each(['[%csl[%eval 0.2] Ga1]', '[%c[%csl [%csl Ga1[%csl Ga1][%[%csl Ga1][%cal[%csl Ga1]Ra1]'])(
-  'roundtrip comment',
-  str => {
-    const comment = parseComment(str);
-    const rountripped = parseComment(makeComment(comment));
-    expect(comment).toEqual(rountripped);
-  }
-);
+test.each([
+  '[%csl[%eval 0.2] Ga1]',
+  '[%c[%csl [%csl Ga1[%csl Ga1][%[%csl Ga1][%cal[%csl Ga1]Ra1]',
+  '[%csl Ga1][%cal Ra1h1,Gb1b8] foo [%clk 3:ê5: [%eval 450752] [%evaÿTæ<92>ÿÿ^?,7]',
+])('roundtrip comment', str => {
+  const comment = parseComment(str);
+  const rountripped = parseComment(makeComment(comment));
+  expect(comment).toEqual(rountripped);
+});
