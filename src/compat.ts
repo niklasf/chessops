@@ -1,3 +1,13 @@
+/**
+ * Compatibility with other libraries.
+ *
+ * Convert between the formats used by chessops,
+ * [chessground](https://github.com/lichess-org/chessground),
+ * and [scalachess](https://github.com/lichess-org/scalachess).
+ *
+ * @packageDocumentation
+ */
+
 import { Rules, SquareName, Move, isDrop } from './types.js';
 import { makeSquare, squareFile } from './util.js';
 import { Position } from './chess.js';
@@ -6,6 +16,13 @@ export interface ChessgroundDestsOpts {
   chess960?: boolean;
 }
 
+/**
+ * Computes the legal move destinations in the format used by chessground.
+ *
+ * Includes both possible representations of castling moves (unless
+ * `chess960` mode is enabled), so that the `rookCastles` option will work
+ * correctly.
+ */
 export const chessgroundDests = (pos: Position, opts?: ChessgroundDestsOpts): Map<SquareName, SquareName[]> => {
   const result = new Map();
   const ctx = pos.ctx();

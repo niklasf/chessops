@@ -5,7 +5,7 @@
  *
  * Implementation notes: Sliding attacks are computed using
  * [hyperbola quintessence](https://www.chessprogramming.org/Hyperbola_Quintessence).
- * Magic bitboards would deliver faster lookups, but also require
+ * Magic bitboards would deliver slightly faster lookups, but also require
  * initializing considerably larger attack tables. On the web, initialization
  * time is important, so the chosen method may strike a better balance.
  *
