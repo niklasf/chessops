@@ -12,12 +12,14 @@
  * import { parseSan } from 'chessops/san';
  *
  * const pgn = '1. d4 d5 *';
- * const game = parsePgn(pgn);
- * const pos = startingPosition(game.headers);
- * for (const node of game.mainline()) {
- *   const move = parseSan(pos, node.san);
- *   if (!move) break; // Illegal move
- *   pos.play(move);
+ * const games = parsePgn(pgn);
+ * for (const game of games) {
+ *   const pos = startingPosition(game.headers);
+ *   for (const node of game.mainline()) {
+ *     const move = parseSan(pos, node.san);
+ *     if (!move) break; // Illegal move
+ *     pos.play(move);
+ *   }
  * }
  * ```
  *
@@ -25,7 +27,7 @@
  *
  * The module also provides a denial-of-service resistant streaming parser.
  * It can be configured with a budget for reasonable complexity of a single
- * game, fed with chunks of texts, and will yield parsed games as they are
+ * game, fed with chunks of text, and will yield parsed games as they are
  * completed.
  *
  * ```ts
@@ -52,6 +54,48 @@
  *       resolve();
  *     })
  * );
+ * ```
+ *
+ * ## Augmenting the game tree
+ *
+ * You can use `walk` to visit all nodes in the game tree, or `transform`
+ * to augment it with user data.
+ *
+ * Both allow you to provide context. You update the context inside the
+ * callback, and it is automatically `clone()`-ed at each fork.
+ * In the example below, the current position `pos` is provided as context.
+ *
+ * ```ts
+ * import { transform } from 'chessops/pgn';
+ * import { makeFen } from 'chessops/fen';
+ * import { parseSan, makeSanAndPlay } from 'chessops/san';
+ *
+ * const pos = startingPosition(game.headers).unwrap();
+ * game.moves = transform(game.moves, pos, (pos, node) => {
+ *   const move = parseSan(pos, node.san);
+ *   if (!move) {
+ *     // Illegal move. Returning undefined cuts of the tree here.
+ *     return;
+ *   }
+ *
+ *   const san = makeSanAndPlay(pos, move); // Mutating pos!
+ *
+ *   return {
+ *     ...node, // Keep comments and annotation glyphs
+ *     san, // Normalized SAN
+ *     fen: makeFen(pos.toSetup()), // Add arbitrary user data to node
+ *   };
+ * });
+ * ```
+ *
+ * ## Writing
+ *
+ * Requires each node to at least have a `san` property.
+ *
+ * ```
+ * import { makePgn } from 'chessops/pgn';
+ *
+ * const rewrittenPgn = makePgn(game);
  * ```
  *
  * @packageDocumentation
