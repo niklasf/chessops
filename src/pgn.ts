@@ -1,3 +1,61 @@
+/**
+ * Parse, transform and write PGN.
+ *
+ * ## Parser
+ *
+ * The parser will interpret any input as a PGN, creating a tree of
+ * syntactically valid (but not necessarily legal) moves, skipping any invalid
+ * tokens.
+ *
+ * ```ts
+ * import { parsePgn, startingPosition } from 'chessops/pgn';
+ * import { parseSan } from 'chessops/san';
+ *
+ * const pgn = '1. d4 d5 *';
+ * const game = parsePgn(pgn);
+ * const pos = startingPosition(game.headers);
+ * for (const node of game.mainline()) {
+ *   const move = parseSan(pos, node.san);
+ *   if (!move) break; // Illegal move
+ *   pos.play(move);
+ * }
+ * ```
+ *
+ * ## Streaming parser
+ *
+ * The module also provides a denial-of-service resistant streaming parser.
+ * It can be configured with a budget for reasonable complexity of a single
+ * game, fed with chunks of texts, and will yield parsed games as they are
+ * completed.
+ *
+ * ```ts
+ *
+ * import { createReadStream } from 'fs';
+ * import { PgnParser } from 'chessops/pgn';
+ *
+ * const stream = createReadStream('games.pgn', { encoding: 'utf-8' });
+ *
+ * const parser = new PgnParser((game, err) => {
+ *   if (err) {
+ *     // Budget exceeded.
+ *     stream.destroy(err);
+ *   }
+ *
+ *   // Use game ...
+ * });
+ *
+ * await new Promise<void>(resolve =>
+ *   stream
+ *     .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
+ *     .on('close', () => {
+ *       parser.parse('');
+ *       resolve();
+ *     })
+ * );
+ * ```
+ *
+ * @packageDocumentation
+ */
 import { defined, makeSquare, parseSquare } from './util.js';
 import { Rules, Outcome, Square } from './types.js';
 import { parseFen, FenError, makeFen } from './fen.js';
