@@ -18,6 +18,9 @@ const rbit32 = (n: number): number => {
   return bswap32(n);
 };
 
+/**
+ * An immutable set of squares, implemented as a bitboard.
+ */
 export class SquareSet implements Iterable<Square> {
   readonly lo: number;
   readonly hi: number;

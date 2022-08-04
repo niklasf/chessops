@@ -125,6 +125,9 @@ export class RemainingChecks {
   }
 }
 
+/**
+ * A not necessarily legal chess or chess variant position.
+ */
 export interface Setup {
   board: Board;
   pockets: Material | undefined;
