@@ -1,0 +1,11 @@
+    [Variant "Standard"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 { Leading whitespace, header followed, blank line, move sequence }
+
+    [Variant "Standard"] 1. e4 e5 2. Nf3 Nc6 3. Bb5 { leading whitespace, header, move sequence }
+
+    [Variant "Standard"]
+1. e4 e5 2. Nf3 Nc6 3. Bb5 { leading whitespace, header, new line, move sequence }
+
+
+    1. e4 e5 2. Nf3 Nc6 3. Bb5 { leading whitespace, no header, move sequence }
