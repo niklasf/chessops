@@ -466,9 +466,11 @@ export class PgnParser {
           this.consecutiveEmptyLines = 0;
           if (line.startsWith('[')) {
             this.consumeBudget(200);
-            const matches = line.match(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*$/);
-            if (matches) this.game.headers.set(matches[1], matches[2].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
-            return;
+            line = line.replace(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*/, (_match, headerName, headerValue) => {
+              this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+              return '';
+            });
+            if (line === '') return;
           }
           this.state = ParserState.Moves; // fall through
         case ParserState.Moves: {
