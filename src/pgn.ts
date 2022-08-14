@@ -445,7 +445,7 @@ export class PgnParser {
 
   private handleLine() {
     let freshLine = true;
-    let line = this.lineBuf.join('');
+    let line = this.lineBuf.join('').replace(/^\s+/, '');
     this.lineBuf = [];
 
     continuedLine: for (;;) {
