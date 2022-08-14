@@ -150,11 +150,16 @@ testPgnFile(
     expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e3', 'e6', 'b4', 'Bxb4', 'Qg4']);
   }
 );
-testPgnFile({
-  fileName: 'leading-whitespace',
-  numberOfGames: 5,
-  allValid: true,
-});
+testPgnFile(
+  {
+    fileName: 'leading-whitespace',
+    numberOfGames: 4,
+    allValid: true,
+  },
+  game => {
+    expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e4', 'e5', 'Nf3', 'Nc6', 'Bb5']);
+  }
+);
 
 test('tricky tokens', () => {
   const steps = Array.from(parsePgn('O-O-O !! 0-0-0# ??')[0].moves.mainline());
