@@ -85,12 +85,15 @@ test('parse headers', () => {
       '[Black "black player"]',
       '[White " white  player   "]',
       '[Escaped "quote: \\", backslashes: \\\\\\\\, trailing text"]',
+      '[Multiple "on"] [the "same line"]',
     ].join('\r\n')
   );
   expect(games).toHaveLength(1);
   expect(games[0].headers.get('Black')).toBe('black player');
   expect(games[0].headers.get('White')).toBe(' white  player   ');
   expect(games[0].headers.get('Escaped')).toBe('quote: ", backslashes: \\\\, trailing text');
+  expect(games[0].headers.get('Multiple')).toBe('on');
+  expect(games[0].headers.get('the')).toBe('same line');
   expect(games[0].headers.get('Result')).toBe('*');
   expect(games[0].headers.get('Event')).toBe('?');
 });
