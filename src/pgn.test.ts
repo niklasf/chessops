@@ -155,6 +155,23 @@ testPgnFile(
 );
 testPgnFile(
   {
+    fileName: 'pathological-headers',
+    numberOfGames: 1,
+    allValid: true,
+  },
+  game => {
+    expect(game.headers.get('A')).toBe('b"');
+    expect(game.headers.get('B')).toBe('b"');
+    expect(game.headers.get('C')).toBe('A]]');
+    expect(game.headers.get('D')).toBe('A]][');
+    expect(game.headers.get('E')).toBe('"A]]["');
+    expect(game.headers.get('F')).toBe('"A]]["\\');
+    expect(game.headers.get('G')).toBe('"]');
+  }
+);
+
+testPgnFile(
+  {
     fileName: 'leading-whitespace',
     numberOfGames: 4,
     allValid: true,
