@@ -456,7 +456,7 @@ export class PgnParser {
         case ParserState.Pre:
           if (isWhitespace(line) || isCommentLine(line)) return;
           this.state = ParserState.Headers; // fall through
-        case ParserState.Headers:
+        case ParserState.Headers: {
           if (isCommentLine(line)) return;
           if (this.consecutiveEmptyLines < 1 && isWhitespace(line)) {
             this.consecutiveEmptyLines++;
@@ -467,13 +467,18 @@ export class PgnParser {
           const trimmedLine = line.replace(/^\s+/, '');
           if (trimmedLine.startsWith('[')) {
             this.consumeBudget(200);
-            line = trimmedLine.replace(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*/, (_match, headerName, headerValue) => {
-              this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
-              return '';
-            });
+            line = trimmedLine.replace(
+              /^\[([A-Za-z0-9_]+)\s+"((?:[^"]|\\"|\\\\)*)"\]\s*/,
+              (_match, headerName, headerValue) => {
+                this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+                return '';
+              }
+            );
             if (line === '') return;
+            continue;
           }
           this.state = ParserState.Moves; // fall through
+        }
         case ParserState.Moves: {
           if (freshLine) {
             if (isCommentLine(line)) return;
