@@ -86,6 +86,7 @@ test('parse headers', () => {
       '[White " white  player   "]',
       '[Escaped "quote: \\", backslashes: \\\\\\\\, trailing text"]',
       '[Multiple "on"] [the "same line"]',
+      '[Incomplete',
     ].join('\r\n')
   );
   expect(games).toHaveLength(1);
