@@ -465,7 +465,7 @@ export class PgnParser {
           this.found = true;
           this.consecutiveEmptyLines = 0;
           const trimmedLine = line.replace(/^\s+/, '');
-          if (trimmedLine.replace(/^\s+/, '').startsWith('[')) {
+          if (trimmedLine.startsWith('[')) {
             this.consumeBudget(200);
             line = trimmedLine.replace(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*/, (_match, headerName, headerValue) => {
               this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
