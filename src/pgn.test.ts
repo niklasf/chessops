@@ -58,13 +58,13 @@ test('parse headers', () => {
   const games = parsePgn(
     [
       '[Black "black player"]',
-      '[White "white player"]',
+      '[White " white  player   "]',
       '[Escaped "quote: \\", backslashes: \\\\\\\\, trailing text"]',
     ].join('\r\n')
   );
   expect(games).toHaveLength(1);
   expect(games[0].headers.get('Black')).toBe('black player');
-  expect(games[0].headers.get('White')).toBe('white player');
+  expect(games[0].headers.get('White')).toBe(' white  player   ');
   expect(games[0].headers.get('Escaped')).toBe('quote: ", backslashes: \\\\, trailing text');
   expect(games[0].headers.get('Result')).toBe('*');
   expect(games[0].headers.get('Event')).toBe('?');
@@ -72,12 +72,12 @@ test('parse headers', () => {
 
 test('parse pgn', () => {
   const callback = jest.fn((game: Game<PgnNodeData>) => {
-    expect(makePgn(game)).toBe('[Result "1-0"]\n\n1. e4 e5 2. Nf3 { foo } 1-0\n');
+    expect(makePgn(game)).toBe('[Result "1-0"]\n\n1. e4 e5 2. Nf3 { foo  bar } 1-0\n');
   });
   const parser = new PgnParser(callback, emptyHeaders);
   parser.parse('1. e4 \ne5', { stream: true });
   parser.parse('\nNf3 {f', { stream: true });
-  parser.parse('oo } 1-', { stream: true });
+  parser.parse('oo  bar} 1-', { stream: true });
   parser.parse('', { stream: true });
   parser.parse('0', { stream: true });
   parser.parse('');
