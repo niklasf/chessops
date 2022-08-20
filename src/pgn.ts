@@ -445,7 +445,7 @@ export class PgnParser {
 
   private handleLine() {
     let freshLine = true;
-    let line = this.lineBuf.join('').replace(/^\s+/, '');
+    let line = this.lineBuf.join('');
     this.lineBuf = [];
 
     continuedLine: for (;;) {
@@ -464,9 +464,10 @@ export class PgnParser {
           }
           this.found = true;
           this.consecutiveEmptyLines = 0;
-          if (line.startsWith('[')) {
+          const trimmedLine = line.replace(/^\s+/, '');
+          if (trimmedLine.replace(/^\s+/, '').startsWith('[')) {
             this.consumeBudget(200);
-            line = line.replace(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*/, (_match, headerName, headerValue) => {
+            line = trimmedLine.replace(/^\[([A-Za-z0-9_]+)\s+"(.*)"\]\s*/, (_match, headerName, headerValue) => {
               this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
               return '';
             });
