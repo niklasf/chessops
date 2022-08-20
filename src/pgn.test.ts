@@ -72,12 +72,12 @@ test('parse headers', () => {
 
 test('parse pgn', () => {
   const callback = jest.fn((game: Game<PgnNodeData>) => {
-    expect(makePgn(game)).toBe('[Result "1-0"]\n\n1. e4 e5 2. Nf3 { foo  bar } 1-0\n');
+    expect(makePgn(game)).toBe('[Result "1-0"]\n\n1. e4 e5 2. Nf3 { foo\n  bar baz } 1-0\n');
   });
   const parser = new PgnParser(callback, emptyHeaders);
   parser.parse('1. e4 \ne5', { stream: true });
-  parser.parse('\nNf3 {f', { stream: true });
-  parser.parse('oo  bar} 1-', { stream: true });
+  parser.parse('\nNf3 {foo\n', { stream: true });
+  parser.parse('  bar baz } 1-', { stream: true });
   parser.parse('', { stream: true });
   parser.parse('0', { stream: true });
   parser.parse('');
