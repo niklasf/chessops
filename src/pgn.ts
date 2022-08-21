@@ -457,22 +457,24 @@ export class PgnParser {
           if (isWhitespace(line) || isCommentLine(line)) return;
           this.state = ParserState.Headers; // fall through
         case ParserState.Headers: {
+          this.found = true;
           if (isCommentLine(line)) return;
+
           if (this.consecutiveEmptyLines < 1 && isWhitespace(line)) {
             this.consecutiveEmptyLines++;
             return;
           }
-          this.found = true;
           this.consecutiveEmptyLines = 0;
-          let match = true;
-          while (match) {
-            match = false;
+
+          let moreHeaders = true;
+          while (moreHeaders) {
+            moreHeaders = false;
             line = line.replace(
               /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\"|\\\\)*)"\]\s*/,
               (_match, headerName, headerValue) => {
                 this.consumeBudget(200);
                 this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
-                match = true;
+                moreHeaders = true;
                 freshLine = false;
                 return '';
               }
