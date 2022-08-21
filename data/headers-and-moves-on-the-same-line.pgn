@@ -1,0 +1,8 @@
+[Variant "Antichess"] 1.e3 e6 2.b4 Bxb4 3.Qg4 { Header on the same line as moves }
+
+[Variant "Antichess"]
+1.e3 e6 2.b4 Bxb4 3.Qg4 { Header followed by a separate line containing a sequence of moves}
+
+[Variant "Antichess"]
+
+1.e3 e6 2.b4 Bxb4 3.Qg4 { Header followed by a blank line and a line containing a sequence of moves }

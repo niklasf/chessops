@@ -20,6 +20,31 @@ import { makeFen } from './fen.js';
 import { jest } from '@jest/globals';
 import { createReadStream } from 'fs';
 
+interface GameCallback {
+  (game: Game<PgnNodeData>, err: PgnError | undefined): Error | void;
+}
+
+function testPgnFile({ fileName = '', numberOfGames = 1, allValid = true } = {}, ...callbacks: GameCallback[]) {
+  test(`pgn file - ${fileName}`, done => {
+    const stream = createReadStream(`./data/${fileName}.pgn`, { encoding: 'utf-8' });
+    const gameCallback = jest.fn((game: Game<PgnNodeData>, err: PgnError | undefined) => {
+      if (err) stream.destroy(err);
+      if (allValid) expect(err).toBe(undefined);
+      callbacks.forEach(callback => {
+        expect(callback(game, err)).toBe(undefined);
+      });
+    });
+    const parser = new PgnParser(gameCallback, emptyHeaders);
+    stream
+      .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
+      .on('close', () => {
+        parser.parse('');
+        expect(gameCallback).toHaveBeenCalledTimes(numberOfGames);
+        done();
+      });
+  });
+}
+
 test('make pgn', () => {
   const root = new Node<PgnNodeData>();
   expect(isChildNode(root)).toBe(false);
@@ -60,12 +85,16 @@ test('parse headers', () => {
       '[Black "black player"]',
       '[White " white  player   "]',
       '[Escaped "quote: \\", backslashes: \\\\\\\\, trailing text"]',
+      '[Multiple "on"] [the "same line"]',
+      '[Incomplete',
     ].join('\r\n')
   );
   expect(games).toHaveLength(1);
   expect(games[0].headers.get('Black')).toBe('black player');
   expect(games[0].headers.get('White')).toBe(' white  player   ');
   expect(games[0].headers.get('Escaped')).toBe('quote: ", backslashes: \\\\, trailing text');
+  expect(games[0].headers.get('Multiple')).toBe('on');
+  expect(games[0].headers.get('the')).toBe('same line');
   expect(games[0].headers.get('Result')).toBe('*');
   expect(games[0].headers.get('Event')).toBe('?');
 });
@@ -109,20 +138,49 @@ test('transform pgn', () => {
   expect(res.children[1].children[0].data.fen).toBe('rnbqkbnr/p1pppppp/8/1p6/1P6/8/P1PPPPPP/RNBQKBNR w KQkq - 0 2');
 });
 
-test('pgn file', done => {
-  const stream = createReadStream('./data/kasparov-deep-blue-1997.pgn', { encoding: 'utf-8' });
-  const callback = jest.fn((_game: Game<PgnNodeData>, err: PgnError | undefined) => {
-    if (err) stream.destroy(err);
-  });
-  const parser = new PgnParser(callback, emptyHeaders);
-  stream
-    .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
-    .on('close', () => {
-      parser.parse('');
-      expect(callback).toHaveBeenCalledTimes(6);
-      done();
-    });
+testPgnFile({
+  fileName: 'kasparov-deep-blue-1997',
+  numberOfGames: 6,
+  allValid: true,
 });
+testPgnFile(
+  {
+    fileName: 'headers-and-moves-on-the-same-line',
+    numberOfGames: 3,
+    allValid: true,
+  },
+  game => {
+    expect(game.headers.get('Variant')).toBe('Antichess');
+    expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e3', 'e6', 'b4', 'Bxb4', 'Qg4']);
+  }
+);
+testPgnFile(
+  {
+    fileName: 'pathological-headers',
+    numberOfGames: 1,
+    allValid: true,
+  },
+  game => {
+    expect(game.headers.get('A')).toBe('b"');
+    expect(game.headers.get('B')).toBe('b"');
+    expect(game.headers.get('C')).toBe('A]]');
+    expect(game.headers.get('D')).toBe('A]][');
+    expect(game.headers.get('E')).toBe('"A]]["');
+    expect(game.headers.get('F')).toBe('"A]]["\\');
+    expect(game.headers.get('G')).toBe('"]');
+  }
+);
+
+testPgnFile(
+  {
+    fileName: 'leading-whitespace',
+    numberOfGames: 4,
+    allValid: true,
+  },
+  game => {
+    expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e4', 'e5', 'Nf3', 'Nc6', 'Bb5']);
+  }
+);
 
 test('tricky tokens', () => {
   const steps = Array.from(parsePgn('O-O-O !! 0-0-0# ??')[0].moves.mainline());
