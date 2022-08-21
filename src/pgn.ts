@@ -468,7 +468,7 @@ export class PgnParser {
           while (match) {
             match = false;
             line = line.replace(
-              /^\s*\[([A-Za-z0-9_]+)\s+"((?:[^"\\]|\\"|\\\\)*)"\]\s*/,
+              /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\"|\\\\)*)"\]\s*/,
               (_match, headerName, headerValue) => {
                 this.consumeBudget(200);
                 this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
