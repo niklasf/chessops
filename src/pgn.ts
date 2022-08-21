@@ -464,21 +464,21 @@ export class PgnParser {
           }
           this.found = true;
           this.consecutiveEmptyLines = 0;
-          const trimmedLine = line.replace(/^\s+/, '');
-          let match = false;
-          if (trimmedLine.startsWith('[')) {
-            this.consumeBudget(200);
-            line = trimmedLine.replace(
-              /^\[([A-Za-z0-9_]+)\s+"((?:[^"\\]|\\"|\\\\)*)"\]\s*/,
+          let match = true;
+          while (match) {
+            match = false;
+            line = line.replace(
+              /^\s*\[([A-Za-z0-9_]+)\s+"((?:[^"\\]|\\"|\\\\)*)"\]\s*/,
               (_match, headerName, headerValue) => {
+                this.consumeBudget(200);
                 this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
                 match = true;
+                freshLine = false;
                 return '';
               }
             );
-            if (line === "") return;
-            if (match) continue;
           }
+          if (line === '') return;
           this.state = ParserState.Moves; // fall through
         }
         case ParserState.Moves: {
