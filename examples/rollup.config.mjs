@@ -6,7 +6,6 @@ export default {
   input: ['src/read-pgn.ts'],
   output: {
     dir: 'dist',
-    extname: 'mjs',
   },
   plugins: [resolve(), terser({ output: { comments: false } }), typescript()],
 };

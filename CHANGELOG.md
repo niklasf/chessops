@@ -1,5 +1,12 @@
 # Changelog for chessops
 
+## v0.12.5
+
+- Changes to `chessops/pgn`:
+  - Support multiple PGN headers and move text all on the same line.
+  - Reject `%eval` with more than 2 decimals or more than 5 digits.
+  - Reject `%clk` and `%emt` with more than 3 decimals.
+
 ## v0.12.4
 
 - Support eval PGN comment annotations.
