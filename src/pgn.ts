@@ -388,7 +388,6 @@ export class PgnParser {
   private found: boolean;
   private state: ParserState;
   private game: Game<PgnNodeData>;
-  private consecutiveEmptyLines: number;
   private stack: ParserFrame[];
   private commentBuf: string[];
 
@@ -406,7 +405,6 @@ export class PgnParser {
     this.found = false;
     this.state = ParserState.Pre;
     this.game = defaultGame(this.initHeaders);
-    this.consecutiveEmptyLines = 0;
     this.stack = [{ parent: this.game.moves, root: true }];
     this.commentBuf = [];
   }
@@ -455,22 +453,15 @@ export class PgnParser {
           this.state = ParserState.Pre; // fall through
         case ParserState.Pre:
           if (isWhitespace(line) || isCommentLine(line)) return;
+          this.found = true;
           this.state = ParserState.Headers; // fall through
         case ParserState.Headers: {
-          this.found = true;
           if (isCommentLine(line)) return;
-
-          if (this.consecutiveEmptyLines < 1 && isWhitespace(line)) {
-            this.consecutiveEmptyLines++;
-            return;
-          }
-          this.consecutiveEmptyLines = 0;
-
           let moreHeaders = true;
           while (moreHeaders) {
             moreHeaders = false;
             line = line.replace(
-              /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\"|\\\\)*)"\]\s*/,
+              /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\"|\\\\)*)"\]/,
               (_match, headerName, headerValue) => {
                 this.consumeBudget(200);
                 this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
@@ -480,7 +471,7 @@ export class PgnParser {
               }
             );
           }
-          if (line === '') return;
+          if (isWhitespace(line)) return;
           this.state = ParserState.Moves; // fall through
         }
         case ParserState.Moves: {
