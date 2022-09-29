@@ -14,8 +14,8 @@
  * const pgn = '1. d4 d5 *';
  * const games = parsePgn(pgn);
  * for (const game of games) {
- *   const pos = startingPosition(game.headers);
- *   for (const node of game.mainline()) {
+ *   const pos = startingPosition(game.headers).unwrap();
+ *   for (const node of game.moves.mainline()) {
  *     const move = parseSan(pos, node.san);
  *     if (!move) break; // Illegal move
  *     pos.play(move);
