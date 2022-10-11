@@ -114,6 +114,14 @@ test('test illegal promotion', () => {
   expect(pos.isLegal({ from: 12, to: 20, promotion: 'queen' })).toBe(false);
 });
 
+test('default promotion to queen', () => {
+  const pos = Chess.fromSetup(parseFen('4k3/7P/8/8/8/8/8/4K3 w - - 0 1').unwrap()).unwrap();
+  const move = { from: 55, to: 63 };
+  expect(pos.isLegal(move)).toBe(true);
+  pos.play(move);
+  expect(makeFen(pos.toSetup())).toBe('4k2Q/8/8/8/8/8/8/4K3 b - - 0 1');
+});
+
 test('starting perft', () => {
   const pos = Chess.default();
   expect(perft(pos, 0, false)).toBe(1);
