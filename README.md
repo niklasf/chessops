@@ -45,8 +45,6 @@ Chess and chess variant rules and operations in TypeScript.
   [chessground](https://github.com/ornicar/chessground) and
   [scalachess](https://github.com/ornicar/scalachess)
 
-[File an issue](https://github.com/niklasf/chessops/issues/new) to request more.
-
 ## Example
 
 ```javascript
