@@ -133,8 +133,8 @@ export const parseFen = (fen: string): Result<Setup, FenError> => {
   const boardPart = parts.shift()!;
 
   // Board and pockets
-  let board,
-    pockets = Result.ok<Material | undefined, FenError>(undefined);
+  let board: Result<Board, FenError>;
+  let pockets = Result.ok<Material | undefined, FenError>(undefined);
   if (boardPart.endsWith(']')) {
     const pocketStart = boardPart.indexOf('[');
     if (pocketStart === -1) return Result.err(new FenError(InvalidFen.Fen));
