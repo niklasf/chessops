@@ -8,7 +8,7 @@
   "devDependencies": {
     "@gitlab-org/jsfuzz": "^1",
     "@rollup/plugin-node-resolve": "^15",
-    "@rollup/plugin-typescript": "^10",
+    "@rollup/plugin-typescript": "^11",
     "rollup": "^3",
     "typescript": "^4"
   },

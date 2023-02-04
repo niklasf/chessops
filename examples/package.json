@@ -7,8 +7,8 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15",
-    "@rollup/plugin-terser": "^0.1",
-    "@rollup/plugin-typescript": "^10",
+    "@rollup/plugin-terser": "^0.4",
+    "@rollup/plugin-typescript": "^11",
     "rollup": "^3",
     "typescript": "^4"
   },
