@@ -28,7 +28,7 @@ import {
   between,
   ray,
 } from './attacks.js';
-import { kingCastlesTo, opposite, defined, squareRank } from './util.js';
+import { kingCastlesTo, rookCastlesTo, opposite, defined, squareRank } from './util.js';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
@@ -54,9 +54,6 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
       .union(kingAttacks(square).intersect(board.king))
       .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn))
   );
-
-const rookCastlesTo = (color: Color, side: CastlingSide): Square =>
-  color === 'white' ? (side === 'a' ? 3 : 5) : side === 'a' ? 59 : 61;
 
 export class Castles {
   unmovedRooks: SquareSet;
