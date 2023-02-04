@@ -1,5 +1,9 @@
 # Changelog for chessops
 
+## v0.12.6
+
+- Added `rookCastlesTo` to `chessops/util`.
+
 ## v0.12.5
 
 - Changes to `chessops/pgn`:
