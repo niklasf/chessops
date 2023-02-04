@@ -105,3 +105,6 @@ export const makeUci = (move: Move): string =>
 
 export const kingCastlesTo = (color: Color, side: CastlingSide): Square =>
   color === 'white' ? (side === 'a' ? 2 : 6) : side === 'a' ? 58 : 62;
+
+export const rookCastlesTo = (color: Color, side: CastlingSide): Square =>
+  color === 'white' ? (side === 'a' ? 3 : 5) : side === 'a' ? 59 : 61;
