@@ -9,11 +9,15 @@ import {
   isDrop,
   isNormal,
   SquareName,
+  SquareColor,
 } from './types.js';
 
 export const defined = <A>(v: A | undefined): v is A => v !== undefined;
 
 export const opposite = (color: Color): Color => (color === 'white' ? 'black' : 'white');
+
+export const oppositeSquareColor = (squareColor: SquareColor): SquareColor =>
+  squareColor === 'light' ? 'dark' : 'light';
 
 export const squareRank = (square: Square): number => square >> 3;
 

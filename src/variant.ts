@@ -1,10 +1,10 @@
 import { Result } from '@badrap/result';
-import { Square, Outcome, Color, COLORS, Piece, Rules } from './types.js';
-import { defined, opposite } from './util.js';
+import { Square, Outcome, Color, Piece, COLORS, SquareColor, Rules } from './types.js';
+import { defined, opposite, oppositeSquareColor } from './util.js';
 import { between, pawnAttacks, kingAttacks } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
-import { Setup, RemainingChecks, Material } from './setup.js';
+import { Setup, RemainingChecks, MaterialSide, Material } from './setup.js';
 import {
   PositionError,
   Position,
@@ -607,9 +607,203 @@ export class Horde extends Position {
     return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
   }
 
-  hasInsufficientMaterial(_color: Color): boolean {
-    // TODO: Could detect cases where the horde cannot mate.
-    return false;
+  hasInsufficientMaterial(color: Color): boolean {
+    // The side with the king can always win by capturing the horde.
+    if (this.board.pieces(color, 'king').nonEmpty()) return false;
+
+    // By this point: color is the horde.
+    const horde = MaterialSide.fromBoard(this.board, color);
+    const hordeDarkB = SquareSet.darkSquares().intersect(this.board.pieces(color, 'bishop')).size();
+    const hordeLightB = SquareSet.lightSquares().intersect(this.board.pieces(color, 'bishop')).size();
+    const hordeBishopCo: SquareColor = hordeLightB >= 1 ? 'light' : 'dark';
+
+    // Two same color bishops suffice to cover all the light and dark squares
+    // around the enemy king.
+    const hordeNum =
+      horde.pawn + horde.knight + horde.rook + horde.queen + Math.min(hordeDarkB, 2) + Math.min(hordeLightB, 2);
+
+    const pieces = MaterialSide.fromBoard(this.board, opposite(color));
+    const piecesB = (squareColor: SquareColor) =>
+      SquareSet.coloredSquares(squareColor)
+        .intersect(this.board.pieces(opposite(color), 'bishop'))
+        .size();
+    const piecesNum = pieces.size();
+    const piecesOfRoleNot = (piece: number) => piecesNum - piece;
+    const hasBishopPair = (side: Color) =>
+      side === color ? hordeLightB >= 1 && hordeDarkB >= 1 : piecesB('light') >= 1 && piecesB('dark') >= 1;
+
+    if (hordeNum === 0) return true;
+    if (hordeNum >= 4) {
+      // Four or more pieces can always deliver mate.
+      return false;
+    }
+    if ((horde.pawn >= 1 || horde.queen >= 1) && hordeNum >= 2) {
+      // Pawns/queens are never insufficient material when paired with any other
+      // piece (a pawn promotes to a queen and delivers mate).
+      return false;
+    }
+    if (horde.rook >= 1 && hordeNum >= 2) {
+      // A rook is insufficient material only when it is paired with a bishop
+      // against a lone king. The horde can mate in any other case.
+      // A rook on A1 and a bishop on C3 mate a king on B1 when there is a
+      // friendly pawn/opposite-color-bishop/rook/queen on C2.
+      // A rook on B8 and a bishop C3 mate a king on A1 when there is a friendly
+      // knight on A2.
+      if (!(hordeNum === 2 && horde.rook === 1 && horde.bishop === 1 && piecesOfRoleNot(piecesB(hordeBishopCo)) === 1))
+        return false;
+    }
+
+    if (hordeNum === 1) {
+      if (piecesNum === 1) {
+        // A lone piece cannot mate a lone king.
+        return true;
+      } else if (horde.queen === 1) {
+        // The horde has a lone queen.
+        // A lone queen mates a king on A1 bounded by:
+        //  -- a pawn/rook on A2
+        //  -- two same color bishops on A2, B1
+        // We ignore every other mating case, since it can be reduced to
+        // the two previous cases (e.g. a black pawn on A2 and a black
+        // bishop on B1).
+        return !(pieces.pawn >= 1 || pieces.rook >= 1 || piecesB('light') >= 2 || piecesB('dark') >= 2);
+      } else if (horde.pawn === 1) {
+        // Promote the pawn to a queen or a knight and check whether white
+        // can mate.
+        const pawnSquare = this.board.pieces(color, 'pawn').last()!;
+        const promoteToQueen = this.clone();
+        promoteToQueen.board.set(pawnSquare, { color, role: 'queen' });
+        const promoteToKnight = this.clone();
+        promoteToKnight.board.set(pawnSquare, { color, role: 'knight' });
+        return promoteToQueen.hasInsufficientMaterial(color) && promoteToKnight.hasInsufficientMaterial(color);
+      } else if (horde.rook === 1) {
+        // A lone rook mates a king on A8 bounded by a pawn/rook on A7 and a
+        // pawn/knight on B7. We ignore every other case, since it can be
+        // reduced to the two previous cases.
+        // (e.g. three pawns on A7, B7, C7)
+        return !(
+          pieces.pawn >= 2 ||
+          (pieces.rook >= 1 && pieces.pawn >= 1) ||
+          (pieces.rook >= 1 && pieces.knight >= 1) ||
+          (pieces.pawn >= 1 && pieces.knight >= 1)
+        );
+      } else if (horde.bishop === 1) {
+        // The horde has a lone bishop.
+        return !(
+          // The king can be mated on A1 if there is a pawn/opposite-color-bishop
+          // on A2 and an opposite-color-bishop on B1.
+          // If black has two or more pawns, white gets the benefit of the doubt;
+          // there is an outside chance that white promotes its pawns to
+          // opposite-color-bishops and selfmates theirself.
+          // Every other case that the king is mated by the bishop requires that
+          // black has two pawns or two opposite-color-bishop or a pawn and an
+          // opposite-color-bishop.
+          // For example a king on A3 can be mated if there is
+          // a pawn/opposite-color-bishop on A4, a pawn/opposite-color-bishop on
+          // B3, a pawn/bishop/rook/queen on A2 and any other piece on B2.
+          (
+            piecesB(oppositeSquareColor(hordeBishopCo)) >= 2 ||
+            (piecesB(oppositeSquareColor(hordeBishopCo)) >= 1 && pieces.pawn >= 1) ||
+            pieces.pawn >= 2
+          )
+        );
+      } else if (horde.knight === 1) {
+        // The horde has a lone knight.
+        return !(
+          // The king on A1 can be smother mated by a knight on C2 if there is
+          // a pawn/knight/bishop on B2, a knight/rook on B1 and any other piece
+          // on A2.
+          // Moreover, when black has four or more pieces and two of them are
+          // pawns, black can promote their pawns and selfmate theirself.
+          (
+            piecesNum >= 4 &&
+            (pieces.knight >= 2 ||
+              pieces.pawn >= 2 ||
+              (pieces.rook >= 1 && pieces.knight >= 1) ||
+              (pieces.rook >= 1 && pieces.bishop >= 1) ||
+              (pieces.knight >= 1 && pieces.bishop >= 1) ||
+              (pieces.rook >= 1 && pieces.pawn >= 1) ||
+              (pieces.knight >= 1 && pieces.pawn >= 1) ||
+              (pieces.bishop >= 1 && pieces.pawn >= 1) ||
+              (hasBishopPair(opposite(color)) && pieces.pawn >= 1)) &&
+            (piecesB('dark') >= 2 ? piecesOfRoleNot(piecesB('dark')) >= 3 : true) &&
+            (piecesB('light') >= 2 ? piecesOfRoleNot(piecesB('light')) >= 3 : true)
+          )
+        );
+      }
+
+      // By this point, we only need to deal with white's minor pieces.
+    } else if (hordeNum === 2) {
+      if (piecesNum === 1) {
+        // Two minor pieces cannot mate a lone king.
+        return true;
+      } else if (horde.knight === 2) {
+        // A king on A1 is mated by two knights, if it is obstructed by a
+        // pawn/bishop/knight on B2. On the other hand, if black only has
+        // major pieces it is a draw.
+        return pieces.pawn + pieces.bishop + pieces.knight < 1;
+      } else if (hasBishopPair(color)) {
+        return !(
+          // A king on A1 obstructed by a pawn/bishop on A2 is mated
+          // by the bishop pair.
+          (
+            pieces.pawn >= 1 ||
+            pieces.bishop >= 1 ||
+            // A pawn/bishop/knight on B4, a pawn/bishop/rook/queen on
+            // A4 and the king on A3 enable Boden's mate by the bishop
+            // pair. In every other case white cannot win.
+            (pieces.knight >= 1 && pieces.rook + pieces.queen >= 1)
+          )
+        );
+      } else if (horde.bishop >= 1 && horde.knight >= 1) {
+        // The horde has a bishop and a knight.
+        return !(
+          // A king on A1 obstructed by a pawn/opposite-color-bishop on
+          // A2 is mated by a knight on D2 and a bishop on C3.
+          (
+            pieces.pawn >= 1 ||
+            piecesB(oppositeSquareColor(hordeBishopCo)) >= 1 ||
+            // A king on A1 bounded by two friendly pieces on A2 and B1 is
+            // mated when the knight moves from D4 to C2 so that both the
+            // knight and the bishop deliver check.
+            piecesOfRoleNot(piecesB(hordeBishopCo)) >= 3
+          )
+        );
+      } else {
+        // The horde has two or more bishops on the same color.
+        // White can only win if black has enough material to obstruct
+        // the squares of the opposite color around the king.
+        return !(
+          // A king on A1 obstructed by a pawn/opposite-bishop/knight
+          // on A2 and a opposite-bishop/knight on B1 is mated by two
+          // bishops on B2 and C3. This position is theoretically
+          // achievable even when black has two pawns or when they
+          // have a pawn and an opposite color bishop.
+          (
+            (pieces.pawn >= 1 && piecesB(oppositeSquareColor(hordeBishopCo)) >= 1) ||
+            (pieces.pawn >= 1 && pieces.knight >= 1) ||
+            (piecesB(oppositeSquareColor(hordeBishopCo)) >= 1 && pieces.knight >= 1) ||
+            piecesB(oppositeSquareColor(hordeBishopCo)) >= 2 ||
+            pieces.knight >= 2 ||
+            pieces.pawn >= 2
+          )
+          // In every other case, white can only draw.
+        );
+      }
+    } else if (hordeNum === 3) {
+      // A king in the corner is mated by two knights and a bishop or three
+      // knights or the bishop pair and a knight/bishop.
+      if ((horde.knight === 2 && horde.bishop === 1) || horde.knight === 3 || hasBishopPair(color)) {
+        return false;
+      } else {
+        // White has two same color bishops and a knight.
+        // A king on A1 is mated by a bishop on B2, a bishop on C1 and a
+        // knight on C3, as long as there is another black piece to waste
+        // a tempo.
+        return piecesNum === 1;
+      }
+    }
+
+    return true;
   }
 
   isVariantEnd(): boolean {
