@@ -1,4 +1,4 @@
-import { Square, Color, SquareColor } from './types.js';
+import { Square, Color } from './types.js';
 
 const popcnt32 = (n: number): number => {
   n = n - ((n >>> 1) & 0x5555_5555);
@@ -72,10 +72,6 @@ export class SquareSet implements Iterable<Square> {
 
   static darkSquares(): SquareSet {
     return new SquareSet(0xaa55_aa55, 0xaa55_aa55);
-  }
-
-  static coloredSquares(squareColor: SquareColor): SquareSet {
-    return squareColor === 'light' ? SquareSet.lightSquares() : SquareSet.darkSquares();
   }
 
   complement(): SquareSet {

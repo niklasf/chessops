@@ -37,10 +37,6 @@ export type ByRole<T> = {
   [role in Role]: T;
 };
 
-export const SQUARE_COLORS = ['light', 'dark'] as const;
-
-export type SquareColor = (typeof SQUARE_COLORS)[number];
-
 export const CASTLING_SIDES = ['a', 'h'] as const;
 
 export type CastlingSide = (typeof CASTLING_SIDES)[number];

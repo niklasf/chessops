@@ -1,6 +1,6 @@
 import { Result } from '@badrap/result';
-import { Square, Outcome, Color, Piece, COLORS, SquareColor, Rules } from './types.js';
-import { defined, opposite, oppositeSquareColor } from './util.js';
+import { Square, Outcome, Color, Piece, COLORS, Rules } from './types.js';
+import { defined, opposite } from './util.js';
 import { between, pawnAttacks, kingAttacks } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
@@ -611,26 +611,36 @@ export class Horde extends Position {
     // The side with the king can always win by capturing the horde.
     if (this.board.pieces(color, 'king').nonEmpty()) return false;
 
+    type SquareColor = 'light' | 'dark';
+    const oppositeSquareColor = (squareColor: SquareColor): SquareColor => (squareColor === 'light' ? 'dark' : 'light');
+    const coloredSquares = (squareColor: SquareColor): SquareSet =>
+      squareColor === 'light' ? SquareSet.lightSquares() : SquareSet.darkSquares();
+
+    const hasBishopPair = (side: Color) => {
+      const bishops = this.board.pieces(side, 'bishop');
+      return bishops.intersects(SquareSet.darkSquares()) && bishops.intersects(SquareSet.lightSquares());
+    };
+
     // By this point: color is the horde.
     const horde = MaterialSide.fromBoard(this.board, color);
-    const hordeDarkB = SquareSet.darkSquares().intersect(this.board.pieces(color, 'bishop')).size();
-    const hordeLightB = SquareSet.lightSquares().intersect(this.board.pieces(color, 'bishop')).size();
-    const hordeBishopCo: SquareColor = hordeLightB >= 1 ? 'light' : 'dark';
-
-    // Two same color bishops suffice to cover all the light and dark squares
-    // around the enemy king.
+    const hordeBishops = (squareColor: SquareColor) =>
+      coloredSquares(squareColor).intersect(this.board.pieces(color, 'bishop')).size();
+    const hordeBishopColor: SquareColor = hordeBishops('light') >= 1 ? 'light' : 'dark';
     const hordeNum =
-      horde.pawn + horde.knight + horde.rook + horde.queen + Math.min(hordeDarkB, 2) + Math.min(hordeLightB, 2);
+      horde.pawn +
+      horde.knight +
+      horde.rook +
+      horde.queen +
+      Math.min(hordeBishops('dark'), 2) +
+      Math.min(hordeBishops('light'), 2);
 
     const pieces = MaterialSide.fromBoard(this.board, opposite(color));
-    const piecesB = (squareColor: SquareColor) =>
-      SquareSet.coloredSquares(squareColor)
+    const piecesBishops = (squareColor: SquareColor) =>
+      coloredSquares(squareColor)
         .intersect(this.board.pieces(opposite(color), 'bishop'))
         .size();
     const piecesNum = pieces.size();
     const piecesOfRoleNot = (piece: number) => piecesNum - piece;
-    const hasBishopPair = (side: Color) =>
-      side === color ? hordeLightB >= 1 && hordeDarkB >= 1 : piecesB('light') >= 1 && piecesB('dark') >= 1;
 
     if (hordeNum === 0) return true;
     if (hordeNum >= 4) {
@@ -649,7 +659,14 @@ export class Horde extends Position {
       // friendly pawn/opposite-color-bishop/rook/queen on C2.
       // A rook on B8 and a bishop C3 mate a king on A1 when there is a friendly
       // knight on A2.
-      if (!(hordeNum === 2 && horde.rook === 1 && horde.bishop === 1 && piecesOfRoleNot(piecesB(hordeBishopCo)) === 1))
+      if (
+        !(
+          hordeNum === 2 &&
+          horde.rook === 1 &&
+          horde.bishop === 1 &&
+          piecesOfRoleNot(piecesBishops(hordeBishopColor)) === 1
+        )
+      )
         return false;
     }
 
@@ -665,7 +682,7 @@ export class Horde extends Position {
         // We ignore every other mating case, since it can be reduced to
         // the two previous cases (e.g. a black pawn on A2 and a black
         // bishop on B1).
-        return !(pieces.pawn >= 1 || pieces.rook >= 1 || piecesB('light') >= 2 || piecesB('dark') >= 2);
+        return !(pieces.pawn >= 1 || pieces.rook >= 1 || piecesBishops('light') >= 2 || piecesBishops('dark') >= 2);
       } else if (horde.pawn === 1) {
         // Promote the pawn to a queen or a knight and check whether white
         // can mate.
@@ -701,8 +718,8 @@ export class Horde extends Position {
           // a pawn/opposite-color-bishop on A4, a pawn/opposite-color-bishop on
           // B3, a pawn/bishop/rook/queen on A2 and any other piece on B2.
           (
-            piecesB(oppositeSquareColor(hordeBishopCo)) >= 2 ||
-            (piecesB(oppositeSquareColor(hordeBishopCo)) >= 1 && pieces.pawn >= 1) ||
+            piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 2 ||
+            (piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 && pieces.pawn >= 1) ||
             pieces.pawn >= 2
           )
         );
@@ -725,8 +742,8 @@ export class Horde extends Position {
               (pieces.knight >= 1 && pieces.pawn >= 1) ||
               (pieces.bishop >= 1 && pieces.pawn >= 1) ||
               (hasBishopPair(opposite(color)) && pieces.pawn >= 1)) &&
-            (piecesB('dark') >= 2 ? piecesOfRoleNot(piecesB('dark')) >= 3 : true) &&
-            (piecesB('light') >= 2 ? piecesOfRoleNot(piecesB('light')) >= 3 : true)
+            (piecesBishops('dark') < 2 || piecesOfRoleNot(piecesBishops('dark')) >= 3) &&
+            (piecesBishops('light') < 2 || piecesOfRoleNot(piecesBishops('light')) >= 3)
           )
         );
       }
@@ -761,11 +778,11 @@ export class Horde extends Position {
           // A2 is mated by a knight on D2 and a bishop on C3.
           (
             pieces.pawn >= 1 ||
-            piecesB(oppositeSquareColor(hordeBishopCo)) >= 1 ||
+            piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 ||
             // A king on A1 bounded by two friendly pieces on A2 and B1 is
             // mated when the knight moves from D4 to C2 so that both the
             // knight and the bishop deliver check.
-            piecesOfRoleNot(piecesB(hordeBishopCo)) >= 3
+            piecesOfRoleNot(piecesBishops(hordeBishopColor)) >= 3
           )
         );
       } else {
@@ -779,10 +796,10 @@ export class Horde extends Position {
           // achievable even when black has two pawns or when they
           // have a pawn and an opposite color bishop.
           (
-            (pieces.pawn >= 1 && piecesB(oppositeSquareColor(hordeBishopCo)) >= 1) ||
+            (pieces.pawn >= 1 && piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1) ||
             (pieces.pawn >= 1 && pieces.knight >= 1) ||
-            (piecesB(oppositeSquareColor(hordeBishopCo)) >= 1 && pieces.knight >= 1) ||
-            piecesB(oppositeSquareColor(hordeBishopCo)) >= 2 ||
+            (piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 && pieces.knight >= 1) ||
+            piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 2 ||
             pieces.knight >= 2 ||
             pieces.pawn >= 2
           )
