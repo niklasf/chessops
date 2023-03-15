@@ -622,6 +622,8 @@ export class Horde extends Position {
     };
 
     // By this point: color is the horde.
+    // Based on
+    // https://github.com/stevepapazis/horde-insufficient-material-tests.
     const horde = MaterialSide.fromBoard(this.board, color);
     const hordeBishops = (squareColor: SquareColor) =>
       coloredSquares(squareColor).intersect(this.board.pieces(color, 'bishop')).size();
