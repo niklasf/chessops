@@ -91,6 +91,7 @@ const insufficientMaterial: [Rules, string, boolean, boolean][] = [
   ['horde', '8/8/1N6/rb6/kr6/qn6/8/8 b - - 0 1', false, false],
   ['horde', '8/8/1N6/qq6/kq6/nq6/8/8 b - - 0 1', true, false],
   ['horde', '8/P1P5/8/8/8/8/brqqn3/k7 b - - 0 1', false, false],
+  ['horde', '8/1b5r/1P6/1Pk3q1/1PP5/r1P5/P1P5/2P5 b - - 0 52', false, false],
 ];
 
 test.each(insufficientMaterial)('%s insufficient material: %s', (rules, fen, white, black) => {
