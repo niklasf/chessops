@@ -1,5 +1,9 @@
 # Changelog for chessops
 
+## v0.12.7
+
+- Implement insufficient material detection for `Horde`.
+
 ## v0.12.6
 
 - Added `rookCastlesTo` to `chessops/util`.
