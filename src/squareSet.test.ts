@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { SquareSet } from './squareSet.js';
 
 test('full set has all', () => {

@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { SquareSet } from './squareSet.js';
 import { parseUci } from './util.js';
 import { parseFen, makeFen, INITIAL_FEN } from './fen.js';

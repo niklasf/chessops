@@ -1,3 +1,4 @@
+import { expect, jest, test } from '@jest/globals';
 import {
   makePgn,
   Node,
@@ -17,7 +18,6 @@ import {
 import { parseSan } from './san.js';
 import { Position } from './chess.js';
 import { makeFen } from './fen.js';
-import { jest } from '@jest/globals';
 import { createReadStream } from 'fs';
 
 interface GameCallback {

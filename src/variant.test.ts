@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { Rules, RULES } from './types.js';
 import { perft } from './debug.js';
 import { defaultPosition, setupPosition, isStandardMaterial } from './variant.js';

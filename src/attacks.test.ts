@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { rookAttacks, ray, between } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 

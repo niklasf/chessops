@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { parseFen, makeFen, makeBoardFen, INITIAL_FEN, INITIAL_BOARD_FEN, EMPTY_BOARD_FEN } from './fen.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';

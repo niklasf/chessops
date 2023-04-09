@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { Piece } from './types.js';
 import { Board, boardEquals } from './board.js';
 

@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { SquareSet } from './squareSet.js';
 import { flipVertical, flipHorizontal, flipDiagonal, rotate180 } from './transform.js';
 

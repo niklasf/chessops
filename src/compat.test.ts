@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { parseUci } from './util.js';
 import { parseFen } from './fen.js';
 import { Chess } from './chess.js';

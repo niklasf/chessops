@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 import { parseUci, makeUci } from './util.js';
 
 test('parse uci', () => {
