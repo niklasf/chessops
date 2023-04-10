@@ -32,7 +32,7 @@ Chess and chess variant rules and operations in TypeScript.
   - Setup validation
 - Supports Chess960
 - [Attacks and rays](https://niklasf.github.io/chessops/modules/attacks.html)
-  using hyperbola quintessence (faster to initialize than magic bitboards)
+  using Hyperbola Quintessence (faster to initialize than Magic Bitboards)
 - Read and write UCI move notation
 - [Read and write SAN](https://niklasf.github.io/chessops/modules/san.html)
 - [Read and write PGN](https://niklasf.github.io/chessops/modules/pgn.html)
