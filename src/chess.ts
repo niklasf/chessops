@@ -15,8 +15,8 @@ import {
   Outcome,
 } from './types.js';
 import { SquareSet } from './squareSet.js';
-import { Board, boardEquals } from './board.js';
-import { Setup, Material, RemainingChecks } from './setup.js';
+import { ReadonlyBoard, Board, boardEquals } from './board.js';
+import { ReadonlySetup, Setup, Material, RemainingChecks, ReadonlyRemainingChecks, ReadonlyMaterial } from './setup.js';
 import {
   attacks,
   bishopAttacks,
@@ -55,7 +55,15 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
       .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn))
   );
 
-export class Castles {
+export interface ReadonlyCastles {
+  readonly unmovedRooks: SquareSet;
+  rook: Readonly<ByColor<Readonly<ByCastlingSide<Square | undefined>>>>;
+  path: Readonly<ByColor<Readonly<ByCastlingSide<SquareSet>>>>;
+
+  clone(): Castles;
+}
+
+export class Castles implements ReadonlyCastles {
   unmovedRooks: SquareSet;
   rook: ByColor<ByCastlingSide<Square | undefined>>;
   path: ByColor<ByCastlingSide<SquareSet>>;
@@ -116,7 +124,7 @@ export class Castles {
       .without(rook);
   }
 
-  static fromSetup(setup: Setup): Castles {
+  static fromSetup(setup: ReadonlySetup): Castles {
     const castles = Castles.empty();
     const rooks = setup.unmovedRooks.intersect(setup.board.rook);
     for (const color of COLORS) {
@@ -158,7 +166,38 @@ export interface Context {
   mustCapture: boolean;
 }
 
-export abstract class Position {
+export interface ReadonlyPosition {
+  readonly rules: Rules;
+  readonly board: ReadonlyBoard;
+  readonly pockets: ReadonlyMaterial | undefined;
+  readonly turn: Color;
+  readonly castles: ReadonlyCastles;
+  readonly epSquare: Square | undefined;
+  readonly remainingChecks: ReadonlyRemainingChecks | undefined;
+  readonly halfmoves: number;
+  readonly fullmoves: number;
+
+  kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet;
+  ctx(): Context;
+  clone(): Position;
+  dropDests(ctx?: Context): SquareSet;
+  dests(square: Square, ctx?: Context): SquareSet;
+  isVariantEnd(): boolean;
+  variantOutcome(ctx?: Context): Outcome | undefined;
+  hasInsufficientMaterial(color: Color): boolean;
+  toSetup(): Setup;
+  isInsufficientMaterial(): boolean;
+  hasDests(ctx?: Context): boolean;
+  isLegal(move: Move, ctx?: Context): boolean;
+  isCheck(): boolean;
+  isEnd(ctx?: Context): boolean;
+  isCheckmate(ctx?: Context): boolean;
+  isStalemate(ctx?: Context): boolean;
+  outcome(ctx?: Context): Outcome | undefined;
+  allDests(ctx?: Context): Map<Square, SquareSet>;
+}
+
+export abstract class Position implements ReadonlyPosition {
   board: Board;
   pockets: Material | undefined;
   turn: Color;
@@ -181,7 +220,7 @@ export abstract class Position {
     this.fullmoves = 1;
   }
 
-  protected setupUnchecked(setup: Setup) {
+  protected setupUnchecked(setup: ReadonlySetup) {
     this.board = setup.board.clone();
     this.board.promoted = SquareSet.empty();
     this.pockets = undefined;
@@ -532,7 +571,7 @@ export class Chess extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Chess, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<Chess, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -543,7 +582,7 @@ export class Chess extends Position {
   }
 }
 
-const validEpSquare = (pos: Position, square: Square | undefined): Square | undefined => {
+const validEpSquare = (pos: ReadonlyPosition, square: Square | undefined): Square | undefined => {
   if (!defined(square)) return;
   const epRank = pos.turn === 'white' ? 5 : 2;
   const forward = pos.turn === 'white' ? 8 : -8;
@@ -554,7 +593,7 @@ const validEpSquare = (pos: Position, square: Square | undefined): Square | unde
   return square;
 };
 
-const legalEpSquare = (pos: Position): Square | undefined => {
+const legalEpSquare = (pos: ReadonlyPosition): Square | undefined => {
   if (!defined(pos.epSquare)) return;
   const ctx = pos.ctx();
   const ourPawns = pos.board.pieces(pos.turn, 'pawn');
@@ -565,7 +604,7 @@ const legalEpSquare = (pos: Position): Square | undefined => {
   return;
 };
 
-const canCaptureEp = (pos: Position, pawn: Square, ctx: Context): boolean => {
+const canCaptureEp = (pos: ReadonlyPosition, pawn: Square, ctx: Context): boolean => {
   if (!defined(pos.epSquare)) return false;
   if (!pawnAttacks(pos.turn, pawn).has(pos.epSquare)) return false;
   if (!defined(ctx.king)) return true;
@@ -574,7 +613,7 @@ const canCaptureEp = (pos: Position, pawn: Square, ctx: Context): boolean => {
   return !pos.kingAttackers(ctx.king, opposite(pos.turn), occupied).intersects(occupied);
 };
 
-const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSet => {
+const castlingDest = (pos: ReadonlyPosition, side: CastlingSide, ctx: Context): SquareSet => {
   if (!defined(ctx.king) || ctx.checkers.nonEmpty()) return SquareSet.empty();
   const rook = pos.castles.rook[pos.turn][side];
   if (!defined(rook)) return SquareSet.empty();
@@ -594,7 +633,7 @@ const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSe
   return SquareSet.fromSquare(rook);
 };
 
-export const pseudoDests = (pos: Position, square: Square, ctx: Context): SquareSet => {
+export const pseudoDests = (pos: ReadonlyPosition, square: Square, ctx: Context): SquareSet => {
   if (ctx.variantEnd) return SquareSet.empty();
   const piece = pos.board.get(square);
   if (!piece || piece.color !== pos.turn) return SquareSet.empty();
@@ -622,7 +661,7 @@ export const pseudoDests = (pos: Position, square: Square, ctx: Context): Square
   else return pseudo;
 };
 
-export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
+export const equalsIgnoreMoves = (left: ReadonlyPosition, right: ReadonlyPosition): boolean =>
   left.rules === right.rules &&
   boardEquals(left.board, right.board) &&
   ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
@@ -632,7 +671,7 @@ export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
   ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
     (!left.remainingChecks && !right.remainingChecks));
 
-export const castlingSide = (pos: Position, move: Move): CastlingSide | undefined => {
+export const castlingSide = (pos: ReadonlyPosition, move: Move): CastlingSide | undefined => {
   if (isDrop(move)) return;
   const delta = move.to - move.from;
   if (Math.abs(delta) !== 2 && !pos.board[pos.turn].has(move.to)) return;
@@ -640,7 +679,7 @@ export const castlingSide = (pos: Position, move: Move): CastlingSide | undefine
   return delta > 0 ? 'h' : 'a';
 };
 
-export const normalizeMove = (pos: Position, move: Move): Move => {
+export const normalizeMove = (pos: ReadonlyPosition, move: Move): Move => {
   const side = castlingSide(pos, move);
   if (!side) return move;
   const rookFrom = pos.castles.rook[pos.turn][side];
@@ -650,7 +689,7 @@ export const normalizeMove = (pos: Position, move: Move): Move => {
   };
 };
 
-export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
+export const isStandardMaterialSide = (board: ReadonlyBoard, color: Color): boolean => {
   const promoted =
     Math.max(board.pieces(color, 'queen').size() - 1, 0) +
     Math.max(board.pieces(color, 'rook').size() - 2, 0) +

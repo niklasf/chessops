@@ -103,11 +103,17 @@
 import { defined, makeSquare, parseSquare } from './util.js';
 import { Rules, Outcome, Square } from './types.js';
 import { parseFen, FenError, makeFen } from './fen.js';
-import { Position, PositionError, FromSetupOpts, IllegalSetup } from './chess.js';
+import { Position, ReadonlyPosition, PositionError, FromSetupOpts, IllegalSetup } from './chess.js';
 import { defaultPosition, setupPosition } from './variant.js';
 import { Result } from '@badrap/result';
 
-export interface Game<T> {
+export interface ReadonlyGame<T> {
+  readonly headers: ReadonlyMap<string, string>;
+  readonly comments?: ReadonlyArray<string>;
+  readonly moves: Readonly<Node<T>>;
+}
+
+export interface Game<T> extends ReadonlyGame<T> {
   headers: Map<string, string>;
   comments?: string[];
   moves: Node<T>;
@@ -117,6 +123,11 @@ export const defaultGame = <T>(initHeaders: () => Map<string, string> = defaultH
   headers: initHeaders(),
   moves: new Node(),
 });
+
+export interface ReadonlyNode<T> {
+  readonly children: ReadonlyArray<ReadonlyChildNode<T>>;
+  mainline(): Iterable<T>;
+}
 
 export class Node<T> {
   children: ChildNode<T>[] = [];
@@ -131,7 +142,11 @@ export class Node<T> {
   }
 }
 
-export class ChildNode<T> extends Node<T> {
+export interface ReadonlyChildNode<T> extends ReadonlyNode<T> {
+  readonly data: T;
+}
+
+export class ChildNode<T> extends Node<T> implements ReadonlyChildNode<T> {
   constructor(public data: T) {
     super();
   }
@@ -139,7 +154,12 @@ export class ChildNode<T> extends Node<T> {
 
 export const isChildNode = <T>(node: Node<T>): node is ChildNode<T> => node instanceof ChildNode<T>;
 
-export class Box<T> {
+export interface ReadonlyBox<T> {
+  readonly value: T;
+  clone(): Box<T>;
+}
+
+export class Box<T> implements ReadonlyBox<T> {
   constructor(public value: T) {}
 
   clone(): Box<T> {
@@ -148,7 +168,7 @@ export class Box<T> {
 }
 
 export const transform = <T, U, C extends { clone(): C }>(
-  node: Node<T>,
+  node: ReadonlyNode<T>,
   ctx: C,
   f: (ctx: C, data: T, childIndex: number) => U | undefined
 ): Node<U> => {
@@ -181,7 +201,7 @@ export const transform = <T, U, C extends { clone(): C }>(
 };
 
 export const walk = <T, C extends { clone(): C }>(
-  node: Node<T>,
+  node: ReadonlyNode<T>,
   ctx: C,
   f: (ctx: C, data: T, childIndex: number) => boolean | void
 ) => {
@@ -196,7 +216,14 @@ export const walk = <T, C extends { clone(): C }>(
   }
 };
 
-export interface PgnNodeData {
+export interface ReadonlyPgnNodeData {
+  readonly san: string;
+  readonly startingComments?: ReadonlyArray<string>;
+  readonly comments?: ReadonlyArray<string>;
+  readonly nags?: ReadonlyArray<number>;
+}
+
+export interface PgnNodeData extends ReadonlyPgnNodeData {
   san: string;
   startingComments?: string[];
   comments?: string[];
@@ -230,13 +257,13 @@ const enum MakePgnState {
 interface MakePgnFrame {
   state: MakePgnState;
   ply: number;
-  node: ChildNode<PgnNodeData>;
-  sidelines: Iterator<ChildNode<PgnNodeData>>;
+  node: ChildNode<ReadonlyPgnNodeData>;
+  sidelines: Iterator<ChildNode<ReadonlyPgnNodeData>>;
   startsVariation: boolean;
   inVariation: boolean;
 }
 
-export const makePgn = (game: Game<PgnNodeData>): string => {
+export const makePgn = (game: ReadonlyGame<ReadonlyPgnNodeData>): string => {
   const builder = [],
     tokens = [];
 
@@ -664,7 +691,7 @@ export const makeVariant = (rules: Rules): string | undefined => {
 };
 
 export const startingPosition = (
-  headers: Map<string, string>,
+  headers: ReadonlyMap<string, string>,
   opts?: FromSetupOpts
 ): Result<Position, FenError | PositionError> => {
   const rules = parseVariant(headers.get('Variant'));
@@ -674,7 +701,7 @@ export const startingPosition = (
   else return Result.ok(defaultPosition(rules));
 };
 
-export const setStartingPosition = (headers: Map<string, string>, pos: Position) => {
+export const setStartingPosition = (headers: Map<string, string>, pos: ReadonlyPosition) => {
   const variant = makeVariant(pos.rules);
   if (variant) headers.set('Variant', variant);
   else headers.delete('Variant');

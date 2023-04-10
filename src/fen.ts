@@ -1,8 +1,16 @@
 import { Result } from '@badrap/result';
 import { Piece, Square, Color, COLORS, ROLES, FILE_NAMES } from './types.js';
 import { SquareSet } from './squareSet.js';
-import { Board } from './board.js';
-import { Setup, MaterialSide, Material, RemainingChecks } from './setup.js';
+import { ReadonlyBoard, Board } from './board.js';
+import {
+  ReadonlySetup,
+  Setup,
+  ReadonlyMaterialSide,
+  ReadonlyMaterial,
+  Material,
+  ReadonlyRemainingChecks,
+  RemainingChecks,
+} from './setup.js';
 import { defined, squareFile, parseSquare, makeSquare, roleToChar, charToRole } from './util.js';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -83,7 +91,7 @@ export const parsePockets = (pocketPart: string): Result<Material, FenError> => 
   return Result.ok(pockets);
 };
 
-export const parseCastlingFen = (board: Board, castlingPart: string): Result<SquareSet, FenError> => {
+export const parseCastlingFen = (board: ReadonlyBoard, castlingPart: string): Result<SquareSet, FenError> => {
   let unmovedRooks = SquareSet.empty();
   if (castlingPart === '-') return Result.ok(unmovedRooks);
   for (const c of castlingPart) {
@@ -233,7 +241,7 @@ export const makePiece = (piece: Piece): string => {
   return r;
 };
 
-export const makeBoardFen = (board: Board): string => {
+export const makeBoardFen = (board: ReadonlyBoard): string => {
   let fen = '';
   let empty = 0;
   for (let rank = 7; rank >= 0; rank--) {
@@ -261,13 +269,13 @@ export const makeBoardFen = (board: Board): string => {
   return fen;
 };
 
-export const makePocket = (material: MaterialSide): string =>
+export const makePocket = (material: ReadonlyMaterialSide): string =>
   ROLES.map(role => roleToChar(role).repeat(material[role])).join('');
 
-export const makePockets = (pocket: Material): string =>
+export const makePockets = (pocket: ReadonlyMaterial): string =>
   makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
 
-export const makeCastlingFen = (board: Board, unmovedRooks: SquareSet): string => {
+export const makeCastlingFen = (board: ReadonlyBoard, unmovedRooks: SquareSet): string => {
   let fen = '';
   for (const color of COLORS) {
     const backrank = SquareSet.backrank(color);
@@ -288,9 +296,9 @@ export const makeCastlingFen = (board: Board, unmovedRooks: SquareSet): string =
   return fen || '-';
 };
 
-export const makeRemainingChecks = (checks: RemainingChecks): string => `${checks.white}+${checks.black}`;
+export const makeRemainingChecks = (checks: ReadonlyRemainingChecks): string => `${checks.white}+${checks.black}`;
 
-export const makeFen = (setup: Setup, opts?: FenOpts): string =>
+export const makeFen = (setup: ReadonlySetup, opts?: FenOpts): string =>
   [
     makeBoardFen(setup.board) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
     setup.turn[0],

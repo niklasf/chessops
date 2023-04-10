@@ -1,6 +1,24 @@
 import { Square, Color, Role, Piece, COLORS, ROLES, ByRole, ByColor } from './types.js';
 import { SquareSet } from './squareSet.js';
 
+export interface ReadonlyBoard
+  extends Iterable<[Square, Piece]>,
+    Readonly<ByRole<SquareSet>>,
+    Readonly<ByColor<SquareSet>> {
+  readonly occupied: SquareSet;
+  readonly promoted: SquareSet;
+
+  clone(): Board;
+  getColor(square: Square): Color | undefined;
+  getRole(square: Square): Role | undefined;
+  get(square: Square): Piece | undefined;
+  has(square: Square): boolean;
+  pieces(color: Color, role: Role): SquareSet;
+  rooksAndQueens(): SquareSet;
+  bishopsAndQueens(): SquareSet;
+  kingOf(color: Color): Square | undefined;
+}
+
 /**
  * Piece positions on a board.
  *
@@ -9,7 +27,7 @@ import { SquareSet } from './squareSet.js';
  * for all pieces of that role. When modifying the properties directly, take
  * care to keep them consistent.
  */
-export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByColor<SquareSet> {
+export class Board implements ReadonlyBoard, ByRole<SquareSet>, ByColor<SquareSet> {
   /**
    * All occupied squares.
    */
@@ -154,7 +172,7 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
   }
 }
 
-export const boardEquals = (left: Board, right: Board): boolean =>
+export const boardEquals = (left: ReadonlyBoard, right: ReadonlyBoard): boolean =>
   left.white.equals(right.white) &&
   left.promoted.equals(right.promoted) &&
   ROLES.every(role => left[role].equals(right[role]));

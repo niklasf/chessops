@@ -2,8 +2,8 @@ import { Square, Piece, Role, ROLES } from './types.js';
 import { opposite, squareRank, makeSquare, makeUci } from './util.js';
 import { makePiece } from './fen.js';
 import { SquareSet } from './squareSet.js';
-import { Board } from './board.js';
-import { Position } from './chess.js';
+import { ReadonlyBoard } from './board.js';
+import { ReadonlyPosition } from './chess.js';
 
 export const squareSet = (squares: SquareSet): string => {
   const r = [];
@@ -19,7 +19,7 @@ export const squareSet = (squares: SquareSet): string => {
 
 export const piece = (piece: Piece): string => makePiece(piece);
 
-export const board = (board: Board): string => {
+export const board = (board: ReadonlyBoard): string => {
   const r = [];
   for (let y = 7; y >= 0; y--) {
     for (let x = 0; x < 8; x++) {
@@ -35,7 +35,7 @@ export const board = (board: Board): string => {
 
 export const square = (sq: Square): string => makeSquare(sq);
 
-export const dests = (dests: Map<Square, SquareSet>): string => {
+export const dests = (dests: ReadonlyMap<Square, SquareSet>): string => {
   const lines = [];
   for (const [from, to] of dests) {
     lines.push(`${makeSquare(from)}: ${Array.from(to, square).join(' ')}`);
@@ -43,7 +43,7 @@ export const dests = (dests: Map<Square, SquareSet>): string => {
   return lines.join('\n');
 };
 
-export const perft = (pos: Position, depth: number, log = false): number => {
+export const perft = (pos: ReadonlyPosition, depth: number, log = false): number => {
   if (depth < 1) return 1;
 
   const promotionRoles: Role[] = ['queen', 'knight', 'rook', 'bishop'];

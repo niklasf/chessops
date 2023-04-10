@@ -10,7 +10,7 @@
 
 import { Rules, SquareName, Move, isDrop } from './types.js';
 import { makeSquare, squareFile } from './util.js';
-import { Position } from './chess.js';
+import { ReadonlyPosition } from './chess.js';
 
 export interface ChessgroundDestsOpts {
   chess960?: boolean;
@@ -23,7 +23,7 @@ export interface ChessgroundDestsOpts {
  * `chess960` mode is enabled), so that the `rookCastles` option will work
  * correctly.
  */
-export const chessgroundDests = (pos: Position, opts?: ChessgroundDestsOpts): Map<SquareName, SquareName[]> => {
+export const chessgroundDests = (pos: ReadonlyPosition, opts?: ChessgroundDestsOpts): Map<SquareName, SquareName[]> => {
   const result = new Map();
   const ctx = pos.ctx();
   for (const [from, squares] of pos.allDests(ctx)) {

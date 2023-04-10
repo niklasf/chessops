@@ -4,10 +4,11 @@ import { defined, opposite } from './util.js';
 import { between, pawnAttacks, kingAttacks } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
-import { Setup, RemainingChecks, MaterialSide, Material } from './setup.js';
+import { ReadonlySetup, RemainingChecks, MaterialSide, Material } from './setup.js';
 import {
   PositionError,
   Position,
+  ReadonlyPosition,
   IllegalSetup,
   Context,
   Chess,
@@ -42,7 +43,7 @@ export class Crazyhouse extends Position {
     this.pockets = Material.empty();
   }
 
-  protected setupUnchecked(setup: Setup) {
+  protected setupUnchecked(setup: ReadonlySetup) {
     super.setupUnchecked(setup);
     this.board.promoted = setup.board.promoted
       .intersect(setup.board.occupied)
@@ -57,7 +58,7 @@ export class Crazyhouse extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Crazyhouse, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<Crazyhouse, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -125,7 +126,7 @@ export class Atomic extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Atomic, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<Atomic, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -251,7 +252,7 @@ export class Antichess extends Position {
     this.castles = Castles.empty();
   }
 
-  protected setupUnchecked(setup: Setup) {
+  protected setupUnchecked(setup: ReadonlySetup) {
     super.setupUnchecked(setup);
     this.castles = Castles.empty();
   }
@@ -262,7 +263,7 @@ export class Antichess extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Antichess, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<Antichess, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -359,7 +360,7 @@ export class KingOfTheHill extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<KingOfTheHill, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<KingOfTheHill, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -395,7 +396,7 @@ export class ThreeCheck extends Position {
     this.remainingChecks = RemainingChecks.default();
   }
 
-  protected setupUnchecked(setup: Setup) {
+  protected setupUnchecked(setup: ReadonlySetup) {
     super.setupUnchecked(setup);
     this.remainingChecks = setup.remainingChecks?.clone() || RemainingChecks.default();
   }
@@ -406,7 +407,7 @@ export class ThreeCheck extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<ThreeCheck, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<ThreeCheck, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -465,7 +466,7 @@ export class RacingKings extends Position {
     this.fullmoves = 1;
   }
 
-  setupUnchecked(setup: Setup) {
+  setupUnchecked(setup: ReadonlySetup) {
     super.setupUnchecked(setup);
     this.castles = Castles.empty();
   }
@@ -476,7 +477,7 @@ export class RacingKings extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<RacingKings, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<RacingKings, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -579,7 +580,7 @@ export class Horde extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Horde, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<Horde, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -857,7 +858,11 @@ export const defaultPosition = (rules: Rules): Position => {
   }
 };
 
-export const setupPosition = (rules: Rules, setup: Setup, opts?: FromSetupOpts): Result<Position, PositionError> => {
+export const setupPosition = (
+  rules: Rules,
+  setup: ReadonlySetup,
+  opts?: FromSetupOpts
+): Result<Position, PositionError> => {
   switch (rules) {
     case 'chess':
       return Chess.fromSetup(setup, opts);
@@ -878,7 +883,7 @@ export const setupPosition = (rules: Rules, setup: Setup, opts?: FromSetupOpts):
   }
 };
 
-export const isStandardMaterial = (pos: Position): boolean => {
+export const isStandardMaterial = (pos: ReadonlyPosition): boolean => {
   switch (pos.rules) {
     case 'chess':
     case 'antichess':

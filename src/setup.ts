@@ -1,8 +1,19 @@
-import { Color, Role, ROLES, Square } from './types.js';
+import { ByColor, ByRole, Color, Role, ROLES, Square } from './types.js';
 import { SquareSet } from './squareSet.js';
-import { Board, boardEquals } from './board.js';
+import { ReadonlyBoard, Board, boardEquals } from './board.js';
 
-export class MaterialSide {
+export interface ReadonlyMaterialSide extends Readonly<ByRole<number>> {
+  clone(): MaterialSide;
+  equals(other: ReadonlyMaterialSide): boolean;
+  add(other: ReadonlyMaterialSide): MaterialSide;
+  nonEmpty(): boolean;
+  isEmpty(): boolean;
+  hasPawns(): boolean;
+  hasNonPawns(): boolean;
+  size(): number;
+}
+
+export class MaterialSide implements ReadonlyMaterialSide {
   pawn: number;
   knight: number;
   bishop: number;
@@ -61,7 +72,19 @@ export class MaterialSide {
   }
 }
 
-export class Material {
+export interface ReadonlyMaterial extends Readonly<ByColor<ReadonlyMaterialSide>> {
+  clone(): Material;
+  equals(other: ReadonlyMaterial): boolean;
+  add(other: ReadonlyMaterial): Material;
+  count(role: Role): number;
+  size(): number;
+  isEmpty(): boolean;
+  nonEmpty(): boolean;
+  hasPawns(): boolean;
+  hasNonPawns(): boolean;
+}
+
+export class Material implements ReadonlyMaterial {
   constructor(public white: MaterialSide, public black: MaterialSide) {}
 
   static empty(): Material {
@@ -109,7 +132,12 @@ export class Material {
   }
 }
 
-export class RemainingChecks {
+export interface ReadonlyRemainingChecks extends Readonly<ByColor<number>> {
+  clone(): RemainingChecks;
+  equals(other: ReadonlyRemainingChecks): boolean;
+}
+
+export class RemainingChecks implements ReadonlyRemainingChecks {
   constructor(public white: number, public black: number) {}
 
   static default(): RemainingChecks {
@@ -123,6 +151,17 @@ export class RemainingChecks {
   equals(other: RemainingChecks): boolean {
     return this.white === other.white && this.black === other.black;
   }
+}
+
+export interface ReadonlySetup {
+  readonly board: ReadonlyBoard;
+  readonly pockets: ReadonlyMaterial | undefined;
+  readonly turn: Color;
+  readonly unmovedRooks: SquareSet;
+  readonly epSquare: Square | undefined;
+  readonly remainingChecks: ReadonlyRemainingChecks | undefined;
+  readonly halfmoves: number;
+  readonly fullmoves: number;
 }
 
 /**
@@ -150,7 +189,7 @@ export const defaultSetup = (): Setup => ({
   fullmoves: 1,
 });
 
-export const setupClone = (setup: Setup): Setup => ({
+export const setupClone = (setup: ReadonlySetup): Setup => ({
   board: setup.board.clone(),
   pockets: setup.pockets?.clone(),
   turn: setup.turn,
@@ -161,7 +200,7 @@ export const setupClone = (setup: Setup): Setup => ({
   fullmoves: setup.fullmoves,
 });
 
-export const setupEquals = (left: Setup, right: Setup): boolean =>
+export const setupEquals = (left: ReadonlySetup, right: ReadonlySetup): boolean =>
   boardEquals(left.board, right.board) &&
   ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
   left.turn === right.turn &&
