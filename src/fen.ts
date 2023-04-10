@@ -234,7 +234,7 @@ export const parsePiece = (str: string): Piece | undefined => {
   return piece;
 };
 
-export const makePiece = (piece: Piece): string => {
+export const makePiece = (piece: Readonly<Piece>): string => {
   let r = roleToChar(piece.role);
   if (piece.color === 'white') r = r.toUpperCase();
   if (piece.promoted) r += '~';
@@ -298,7 +298,7 @@ export const makeCastlingFen = (board: ReadonlyBoard, unmovedRooks: SquareSet): 
 
 export const makeRemainingChecks = (checks: ReadonlyRemainingChecks): string => `${checks.white}+${checks.black}`;
 
-export const makeFen = (setup: ReadonlySetup, opts?: FenOpts): string =>
+export const makeFen = (setup: ReadonlySetup, opts?: Readonly<FenOpts>): string =>
   [
     makeBoardFen(setup.board) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
     setup.turn[0],

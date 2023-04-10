@@ -17,7 +17,7 @@ export const squareSet = (squares: SquareSet): string => {
   return r.join('');
 };
 
-export const piece = (piece: Piece): string => makePiece(piece);
+export const piece = (piece: Readonly<Piece>): string => makePiece(piece);
 
 export const board = (board: ReadonlyBoard): string => {
   const r = [];

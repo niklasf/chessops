@@ -88,7 +88,7 @@ export const parseUci = (str: string): Move | undefined => {
   return;
 };
 
-export const moveEquals = (left: Move, right: Move): boolean => {
+export const moveEquals = (left: Readonly<Move>, right: Readonly<Move>): boolean => {
   if (left.to !== right.to) return false;
   if (isDrop(left)) return isDrop(right) && left.role === right.role;
   else return isNormal(right) && left.from === right.from && left.promotion === right.promotion;
@@ -98,7 +98,7 @@ export const moveEquals = (left: Move, right: Move): boolean => {
  * Converts a move to UCI notation, like `g1f3` for a normal move,
  * `a7a8q` for promotion to a queen, and `Q@f7` for a Crazyhouse drop.
  */
-export const makeUci = (move: Move): string =>
+export const makeUci = (move: Readonly<Move>): string =>
   isDrop(move)
     ? `${roleToChar(move.role).toUpperCase()}@${makeSquare(move.to)}`
     : makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? roleToChar(move.promotion) : '');

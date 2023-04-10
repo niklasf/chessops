@@ -118,7 +118,7 @@ export const queenAttacks = (square: Square, occupied: SquareSet): SquareSet =>
  * Gets squares attacked or defended by a `piece` on `square`, given
  * `occupied` squares.
  */
-export const attacks = (piece: Piece, square: Square, occupied: SquareSet): SquareSet => {
+export const attacks = (piece: Readonly<Piece>, square: Square, occupied: SquareSet): SquareSet => {
   switch (piece.role) {
     case 'pawn':
       return pawnAttacks(piece.color, square);

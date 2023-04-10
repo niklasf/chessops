@@ -29,7 +29,7 @@ export class MaterialSide implements ReadonlyMaterialSide {
     return m;
   }
 
-  static fromBoard(board: Board, color: Color): MaterialSide {
+  static fromBoard(board: ReadonlyBoard, color: Color): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = board.pieces(color, role).size();
     return m;
@@ -41,11 +41,11 @@ export class MaterialSide implements ReadonlyMaterialSide {
     return m;
   }
 
-  equals(other: MaterialSide): boolean {
+  equals(other: ReadonlyMaterialSide): boolean {
     return ROLES.every(role => this[role] === other[role]);
   }
 
-  add(other: MaterialSide): MaterialSide {
+  add(other: ReadonlyMaterialSide): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = this[role] + other[role];
     return m;
@@ -91,7 +91,7 @@ export class Material implements ReadonlyMaterial {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
   }
 
-  static fromBoard(board: Board): Material {
+  static fromBoard(board: ReadonlyBoard): Material {
     return new Material(MaterialSide.fromBoard(board, 'white'), MaterialSide.fromBoard(board, 'black'));
   }
 
@@ -99,11 +99,11 @@ export class Material implements ReadonlyMaterial {
     return new Material(this.white.clone(), this.black.clone());
   }
 
-  equals(other: Material): boolean {
+  equals(other: ReadonlyMaterial): boolean {
     return this.white.equals(other.white) && this.black.equals(other.black);
   }
 
-  add(other: Material): Material {
+  add(other: ReadonlyMaterial): Material {
     return new Material(this.white.add(other.white), this.black.add(other.black));
   }
 
@@ -148,7 +148,7 @@ export class RemainingChecks implements ReadonlyRemainingChecks {
     return new RemainingChecks(this.white, this.black);
   }
 
-  equals(other: RemainingChecks): boolean {
+  equals(other: ReadonlyRemainingChecks): boolean {
     return this.white === other.white && this.black === other.black;
   }
 }

@@ -67,9 +67,17 @@ export interface DropMove {
 
 export type Move = NormalMove | DropMove;
 
-export const isDrop = (v: Move): v is DropMove => 'role' in v;
+export function isDrop(v: Readonly<Move>): v is Readonly<DropMove>;
+export function isDrop(v: Move): v is DropMove;
+export function isDrop(v: Readonly<Move>): v is Readonly<DropMove> {
+  return 'role' in v;
+}
 
-export const isNormal = (v: Move): v is NormalMove => 'from' in v;
+export function isNormal(v: Readonly<Move>): v is Readonly<NormalMove>;
+export function isNormal(v: Move): v is NormalMove;
+export function isNormal(v: Readonly<Move>): v is Readonly<NormalMove> {
+  return 'from' in v;
+}
 
 export const RULES = [
   'chess',

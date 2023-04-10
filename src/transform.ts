@@ -1,8 +1,8 @@
 import { ROLES, COLORS } from './types.js';
 import { defined } from './util.js';
 import { SquareSet } from './squareSet.js';
-import { Board } from './board.js';
-import { Setup } from './setup.js';
+import { Board, ReadonlyBoard } from './board.js';
+import { Setup, ReadonlySetup } from './setup.js';
 
 export const flipVertical = (s: SquareSet): SquareSet => s.bswap64();
 
@@ -28,7 +28,7 @@ export const flipDiagonal = (s: SquareSet): SquareSet => {
 
 export const rotate180 = (s: SquareSet): SquareSet => s.rbit64();
 
-export const transformBoard = (board: Board, f: (s: SquareSet) => SquareSet): Board => {
+export const transformBoard = (board: ReadonlyBoard, f: (s: SquareSet) => SquareSet): Board => {
   const b = Board.empty();
   b.occupied = f(board.occupied);
   b.promoted = f(board.promoted);
@@ -37,7 +37,7 @@ export const transformBoard = (board: Board, f: (s: SquareSet) => SquareSet): Bo
   return b;
 };
 
-export const transformSetup = (setup: Setup, f: (s: SquareSet) => SquareSet): Setup => ({
+export const transformSetup = (setup: ReadonlySetup, f: (s: SquareSet) => SquareSet): Setup => ({
   board: transformBoard(setup.board, f),
   pockets: setup.pockets?.clone(),
   turn: setup.turn,

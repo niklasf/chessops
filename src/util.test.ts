@@ -1,5 +1,6 @@
 import { expect, test } from '@jest/globals';
 import { parseUci, makeUci } from './util.js';
+import { Move, isDrop } from './types.js';
 
 test('parse uci', () => {
   expect(parseUci('a1a2')).toEqual({ from: 0, to: 8 });

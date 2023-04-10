@@ -133,7 +133,7 @@ export class Board implements ReadonlyBoard, ByRole<SquareSet>, ByColor<SquareSe
    * Put `piece` onto `square`, potentially replacing an existing piece.
    * Returns the existing piece, if any.
    */
-  set(square: Square, piece: Piece): Piece | undefined {
+  set(square: Square, piece: Readonly<Piece>): Piece | undefined {
     const old = this.take(square);
     this.occupied = this.occupied.with(square);
     this[piece.color] = this[piece.color].with(square);

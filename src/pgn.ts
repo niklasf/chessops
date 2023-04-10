@@ -152,7 +152,11 @@ export class ChildNode<T> extends Node<T> implements ReadonlyChildNode<T> {
   }
 }
 
-export const isChildNode = <T>(node: Node<T>): node is ChildNode<T> => node instanceof ChildNode<T>;
+export function isChildNode<T>(node: ReadonlyNode<T>): node is ReadonlyChildNode<T>;
+export function isChildNode<T>(node: Node<T>): node is ChildNode<T>;
+export function isChildNode<T>(node: ReadonlyNode<T>): node is ReadonlyChildNode<T> {
+  return 'data' in node;
+}
 
 export interface ReadonlyBox<T> {
   readonly value: T;
@@ -230,7 +234,7 @@ export interface PgnNodeData extends ReadonlyPgnNodeData {
   nags?: number[];
 }
 
-export const makeOutcome = (outcome: Outcome | undefined): string => {
+export const makeOutcome = (outcome: Readonly<Outcome> | undefined): string => {
   if (!outcome) return '*';
   else if (outcome.winner === 'white') return '1-0';
   else if (outcome.winner === 'black') return '0-1';
@@ -724,10 +728,27 @@ export type EvaluationPawns = { pawns: number; depth?: number };
 export type EvaluationMate = { mate: number; depth?: number };
 export type Evaluation = EvaluationPawns | EvaluationMate;
 
-export const isPawns = (ev: Evaluation): ev is EvaluationPawns => 'pawns' in ev;
-export const isMate = (ev: Evaluation): ev is EvaluationMate => 'mate' in ev;
+export function isPawns(ev: Readonly<Evaluation>): ev is Readonly<EvaluationPawns>;
+export function isPawns(ev: Evaluation): ev is EvaluationPawns;
+export function isPawns(ev: Readonly<Evaluation>): ev is Readonly<EvaluationPawns> {
+  return 'pawns' in ev;
+}
 
-export interface Comment {
+export function isMate(ev: Readonly<Evaluation>): ev is Readonly<EvaluationMate>;
+export function isMate(ev: Evaluation): ev is EvaluationMate;
+export function isMate(ev: Readonly<Evaluation>): ev is Readonly<EvaluationMate> {
+  return 'mate' in ev;
+}
+
+export interface ReadonlyComment {
+  readonly text: string;
+  readonly shapes: ReadonlyArray<Readonly<CommentShape>>;
+  readonly clock?: number;
+  readonly em?: number;
+  readonly evaluation?: Readonly<Evaluation>;
+}
+
+export interface Comment extends ReadonlyComment {
   text: string;
   shapes: CommentShape[];
   clock?: number;
@@ -776,7 +797,7 @@ function parseCommentShapeColor(str: string): CommentShapeColor | undefined {
   }
 }
 
-const makeCommentShape = (shape: CommentShape): string =>
+const makeCommentShape = (shape: Readonly<CommentShape>): string =>
   shape.to === shape.from
     ? `${makeCommentShapeColor(shape.color)}${makeSquare(shape.to)}`
     : `${makeCommentShapeColor(shape.color)}${makeSquare(shape.from)}${makeSquare(shape.to)}`;
@@ -791,12 +812,12 @@ const parseCommentShape = (str: string): CommentShape | undefined => {
   return;
 };
 
-const makeEval = (ev: Evaluation): string => {
+const makeEval = (ev: Readonly<Evaluation>): string => {
   const str = isMate(ev) ? '#' + ev.mate : ev.pawns.toFixed(2);
   return defined(ev.depth) ? str + ',' + ev.depth : str;
 };
 
-export const makeComment = (comment: Partial<Comment>): string => {
+export const makeComment = (comment: Partial<Readonly<Comment>>): string => {
   const builder = [];
   if (defined(comment.text)) builder.push(comment.text);
   const circles = (comment.shapes || []).filter(shape => shape.to === shape.from).map(makeCommentShape);

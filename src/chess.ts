@@ -188,7 +188,7 @@ export interface ReadonlyPosition {
   toSetup(): Setup;
   isInsufficientMaterial(): boolean;
   hasDests(ctx?: Context): boolean;
-  isLegal(move: Move, ctx?: Context): boolean;
+  isLegal(move: Readonly<Move>, ctx?: Context): boolean;
   isCheck(): boolean;
   isEnd(ctx?: Context): boolean;
   isCheckmate(ctx?: Context): boolean;
@@ -248,7 +248,7 @@ export abstract class Position implements ReadonlyPosition {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
-  protected playCaptureAt(square: Square, captured: Piece): void {
+  protected playCaptureAt(square: Square, captured: Readonly<Piece>): void {
     this.halfmoves = 0;
     if (captured.role === 'rook') this.castles.discardRook(square);
     if (this.pockets) this.pockets[opposite(captured.color)][captured.promoted ? 'pawn' : captured.role]++;
@@ -291,7 +291,7 @@ export abstract class Position implements ReadonlyPosition {
     return pos;
   }
 
-  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+  protected validate(opts: Readonly<FromSetupOpts> | undefined): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -449,7 +449,7 @@ export abstract class Position implements ReadonlyPosition {
     return this.dropDests(ctx).nonEmpty();
   }
 
-  isLegal(move: Move, ctx?: Context): boolean {
+  isLegal(move: Readonly<Move>, ctx?: Context): boolean {
     if (isDrop(move)) {
       if (!this.pockets || this.pockets[this.turn][move.role] <= 0) return false;
       if (move.role === 'pawn' && SquareSet.backranks().has(move.to)) return false;
@@ -502,7 +502,7 @@ export abstract class Position implements ReadonlyPosition {
     return d;
   }
 
-  play(move: Move): void {
+  play(move: Readonly<Move>): void {
     const turn = this.turn;
     const epSquare = this.epSquare;
     const castling = castlingSide(this, move);
@@ -571,7 +571,7 @@ export class Chess extends Position {
     return pos;
   }
 
-  static fromSetup(setup: ReadonlySetup, opts?: FromSetupOpts): Result<Chess, PositionError> {
+  static fromSetup(setup: ReadonlySetup, opts?: Readonly<FromSetupOpts>): Result<Chess, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate(opts).map(_ => pos);
@@ -671,7 +671,7 @@ export const equalsIgnoreMoves = (left: ReadonlyPosition, right: ReadonlyPositio
   ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
     (!left.remainingChecks && !right.remainingChecks));
 
-export const castlingSide = (pos: ReadonlyPosition, move: Move): CastlingSide | undefined => {
+export const castlingSide = (pos: ReadonlyPosition, move: Readonly<Move>): CastlingSide | undefined => {
   if (isDrop(move)) return;
   const delta = move.to - move.from;
   if (Math.abs(delta) !== 2 && !pos.board[pos.turn].has(move.to)) return;
@@ -679,7 +679,7 @@ export const castlingSide = (pos: ReadonlyPosition, move: Move): CastlingSide | 
   return delta > 0 ? 'h' : 'a';
 };
 
-export const normalizeMove = (pos: ReadonlyPosition, move: Move): Move => {
+export const normalizeMove = (pos: ReadonlyPosition, move: Readonly<Move>): Move => {
   const side = castlingSide(pos, move);
   if (!side) return move;
   const rookFrom = pos.castles.rook[pos.turn][side];
