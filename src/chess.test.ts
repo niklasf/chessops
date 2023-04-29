@@ -35,7 +35,7 @@ const tricky: [string, string, number, number, number, number?, number?][] = [
   ],
 
   // Impossible castling rights
-  ['asymmetrical-and-king-on-h', 'r2r3k/p2p4/8/8/8/7P/P7/R3K2R b KQq -', 14, 206, 3643, 64494],
+  ['asymmetrical-and-king-on-h', 'r2r3k/p7/3p4/8/8/P6P/8/R3K2R b KQq -', 14, 206, 3672, 64639, 1320962],
 ];
 
 const random: [string, string, number, number, number, number, number][] = [
