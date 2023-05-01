@@ -59,7 +59,7 @@ test('castles from setup', () => {
   const setup = parseFen(INITIAL_FEN).unwrap();
   const castles = Castles.fromSetup(setup);
 
-  expect(castles.unmovedRooks).toEqual(SquareSet.corners());
+  expect(castles.castlingRights).toEqual(SquareSet.corners());
 
   expect(castles.rook.white.a).toBe(0);
   expect(castles.rook.white.h).toBe(7);

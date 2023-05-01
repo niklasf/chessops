@@ -3,7 +3,7 @@ import { Piece, Square, Color, COLORS, ROLES, FILE_NAMES } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Setup, MaterialSide, Material, RemainingChecks } from './setup.js';
-import { defined, squareFile, parseSquare, makeSquare, roleToChar, charToRole } from './util.js';
+import { defined, squareFile, parseSquare, makeSquare, roleToChar, charToRole, squareFromCoords } from './util.js';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' w KQkq -';
@@ -84,31 +84,28 @@ export const parsePockets = (pocketPart: string): Result<Material, FenError> => 
 };
 
 export const parseCastlingFen = (board: Board, castlingPart: string): Result<SquareSet, FenError> => {
-  let unmovedRooks = SquareSet.empty();
-  if (castlingPart === '-') return Result.ok(unmovedRooks);
+  let castlingRights = SquareSet.empty();
+  if (castlingPart === '-') return Result.ok(castlingRights);
+
   for (const c of castlingPart) {
     const lower = c.toLowerCase();
     const color = c === lower ? 'black' : 'white';
-    const backrank = SquareSet.backrank(color).intersect(board[color]);
-
-    let candidates: Iterable<Square>;
-    if (lower === 'q') candidates = backrank;
-    else if (lower === 'k') candidates = backrank.reversed();
-    else if ('a' <= lower && lower <= 'h')
-      candidates = SquareSet.fromFile(lower.charCodeAt(0) - 'a'.charCodeAt(0)).intersect(backrank);
-    else return Result.err(new FenError(InvalidFen.Castling));
-
-    for (const square of candidates) {
-      if (board.king.has(square)) break;
-      if (board.rook.has(square)) {
-        unmovedRooks = unmovedRooks.with(square);
-        break;
-      }
-    }
+    const rank = color === 'white' ? 0 : 7;
+    if ('a' <= lower && lower <= 'h')
+      castlingRights = castlingRights.with(squareFromCoords(lower.charCodeAt(0) - 'a'.charCodeAt(0), rank)!);
+    else if (lower === 'k' || lower === 'q') {
+      const rooksAndKings = board[color].intersect(board.rook.union(board.king));
+      const candidate = lower === 'k' ? rooksAndKings.last() : rooksAndKings.first();
+      castlingRights = castlingRights.with(
+        defined(candidate) && board.rook.has(candidate) ? candidate : squareFromCoords(lower === 'k' ? 7 : 0, rank)!
+      );
+    } else return Result.err(new FenError(InvalidFen.Castling));
   }
-  if (COLORS.some(color => SquareSet.backrank(color).intersect(unmovedRooks).size() > 2))
+
+  if (COLORS.some(color => SquareSet.backrank(color).intersect(castlingRights).size() > 2))
     return Result.err(new FenError(InvalidFen.Castling));
-  return Result.ok(unmovedRooks);
+
+  return Result.ok(castlingRights);
 };
 
 export const parseRemainingChecks = (part: string): Result<RemainingChecks, FenError> => {
@@ -159,7 +156,7 @@ export const parseFen = (fen: string): Result<Setup, FenError> => {
   return board.chain(board => {
     // Castling
     const castlingPart = parts.shift();
-    const unmovedRooks = defined(castlingPart) ? parseCastlingFen(board, castlingPart) : Result.ok(SquareSet.empty());
+    const castlingRights = defined(castlingPart) ? parseCastlingFen(board, castlingPart) : Result.ok(SquareSet.empty());
 
     // En passant square
     const epPart = parts.shift();
@@ -195,13 +192,13 @@ export const parseFen = (fen: string): Result<Setup, FenError> => {
     if (parts.length > 0) return Result.err(new FenError(InvalidFen.Fen));
 
     return pockets.chain(pockets =>
-      unmovedRooks.chain(unmovedRooks =>
+      castlingRights.chain(castlingRights =>
         remainingChecks.map(remainingChecks => {
           return {
             board,
             pockets,
             turn,
-            unmovedRooks,
+            castlingRights,
             remainingChecks,
             epSquare,
             halfmoves,
@@ -267,14 +264,14 @@ export const makePocket = (material: MaterialSide): string =>
 export const makePockets = (pocket: Material): string =>
   makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
 
-export const makeCastlingFen = (board: Board, unmovedRooks: SquareSet): string => {
+export const makeCastlingFen = (board: Board, castlingRights: SquareSet): string => {
   let fen = '';
   for (const color of COLORS) {
     const backrank = SquareSet.backrank(color);
     let king = board.kingOf(color);
     if (defined(king) && !backrank.has(king)) king = undefined;
     const candidates = board.pieces(color, 'rook').intersect(backrank);
-    for (const rook of unmovedRooks.intersect(candidates).reversed()) {
+    for (const rook of castlingRights.intersect(candidates).reversed()) {
       if (rook === candidates.first() && defined(king) && rook < king) {
         fen += color === 'white' ? 'Q' : 'q';
       } else if (rook === candidates.last() && defined(king) && king < rook) {
@@ -294,7 +291,7 @@ export const makeFen = (setup: Setup, opts?: FenOpts): string =>
   [
     makeBoardFen(setup.board) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
     setup.turn[0],
-    makeCastlingFen(setup.board, setup.unmovedRooks),
+    makeCastlingFen(setup.board, setup.castlingRights),
     defined(setup.epSquare) ? makeSquare(setup.epSquare) : '-',
     ...(setup.remainingChecks ? [makeRemainingChecks(setup.remainingChecks)] : []),
     ...(opts?.epd ? [] : [Math.max(0, Math.min(setup.halfmoves, 9999)), Math.max(1, Math.min(setup.fullmoves, 9999))]),

@@ -132,7 +132,7 @@ export interface Setup {
   board: Board;
   pockets: Material | undefined;
   turn: Color;
-  unmovedRooks: SquareSet;
+  castlingRights: SquareSet;
   epSquare: Square | undefined;
   remainingChecks: RemainingChecks | undefined;
   halfmoves: number;
@@ -143,7 +143,7 @@ export const defaultSetup = (): Setup => ({
   board: Board.default(),
   pockets: undefined,
   turn: 'white',
-  unmovedRooks: SquareSet.corners(),
+  castlingRights: SquareSet.corners(),
   epSquare: undefined,
   remainingChecks: undefined,
   halfmoves: 0,
@@ -154,7 +154,7 @@ export const setupClone = (setup: Setup): Setup => ({
   board: setup.board.clone(),
   pockets: setup.pockets?.clone(),
   turn: setup.turn,
-  unmovedRooks: setup.unmovedRooks,
+  castlingRights: setup.castlingRights,
   epSquare: setup.epSquare,
   remainingChecks: setup.remainingChecks?.clone(),
   halfmoves: setup.halfmoves,
@@ -165,7 +165,7 @@ export const setupEquals = (left: Setup, right: Setup): boolean =>
   boardEquals(left.board, right.board) &&
   ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
   left.turn === right.turn &&
-  left.unmovedRooks.equals(right.unmovedRooks) &&
+  left.castlingRights.equals(right.castlingRights) &&
   left.epSquare === right.epSquare &&
   ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
     (!left.remainingChecks && !right.remainingChecks)) &&

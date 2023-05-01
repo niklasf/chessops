@@ -41,7 +41,7 @@ export const transformSetup = (setup: Setup, f: (s: SquareSet) => SquareSet): Se
   board: transformBoard(setup.board, f),
   pockets: setup.pockets?.clone(),
   turn: setup.turn,
-  unmovedRooks: f(setup.unmovedRooks),
+  castlingRights: f(setup.castlingRights),
   epSquare: defined(setup.epSquare) ? f(SquareSet.fromSquare(setup.epSquare)).first() : undefined,
   remainingChecks: setup.remainingChecks?.clone(),
   halfmoves: setup.halfmoves,

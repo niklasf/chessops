@@ -56,7 +56,7 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
   );
 
 export class Castles {
-  unmovedRooks: SquareSet;
+  castlingRights: SquareSet;
   rook: ByColor<ByCastlingSide<Square | undefined>>;
   path: ByColor<ByCastlingSide<SquareSet>>;
 
@@ -64,7 +64,7 @@ export class Castles {
 
   static default(): Castles {
     const castles = new Castles();
-    castles.unmovedRooks = SquareSet.corners();
+    castles.castlingRights = SquareSet.corners();
     castles.rook = {
       white: { a: 0, h: 7 },
       black: { a: 56, h: 63 },
@@ -78,7 +78,7 @@ export class Castles {
 
   static empty(): Castles {
     const castles = new Castles();
-    castles.unmovedRooks = SquareSet.empty();
+    castles.castlingRights = SquareSet.empty();
     castles.rook = {
       white: { a: undefined, h: undefined },
       black: { a: undefined, h: undefined },
@@ -92,7 +92,7 @@ export class Castles {
 
   clone(): Castles {
     const castles = new Castles();
-    castles.unmovedRooks = this.unmovedRooks;
+    castles.castlingRights = this.castlingRights;
     castles.rook = {
       white: { a: this.rook.white.a, h: this.rook.white.h },
       black: { a: this.rook.black.a, h: this.rook.black.h },
@@ -107,7 +107,7 @@ export class Castles {
   private add(color: Color, side: CastlingSide, king: Square, rook: Square): void {
     const kingTo = kingCastlesTo(color, side);
     const rookTo = rookCastlesTo(color, side);
-    this.unmovedRooks = this.unmovedRooks.with(rook);
+    this.castlingRights = this.castlingRights.with(rook);
     this.rook[color][side] = rook;
     this.path[color][side] = between(rook, rookTo)
       .with(rookTo)
@@ -118,7 +118,7 @@ export class Castles {
 
   static fromSetup(setup: Setup): Castles {
     const castles = Castles.empty();
-    const rooks = setup.unmovedRooks.intersect(setup.board.rook);
+    const rooks = setup.castlingRights.intersect(setup.board.rook);
     for (const color of COLORS) {
       const backrank = SquareSet.backrank(color);
       const king = setup.board.kingOf(color);
@@ -133,8 +133,8 @@ export class Castles {
   }
 
   discardRook(square: Square): void {
-    if (this.unmovedRooks.has(square)) {
-      this.unmovedRooks = this.unmovedRooks.without(square);
+    if (this.castlingRights.has(square)) {
+      this.castlingRights = this.castlingRights.without(square);
       for (const color of COLORS) {
         for (const side of CASTLING_SIDES) {
           if (this.rook[color][side] === square) this.rook[color][side] = undefined;
@@ -144,7 +144,7 @@ export class Castles {
   }
 
   discardColor(color: Color): void {
-    this.unmovedRooks = this.unmovedRooks.diff(SquareSet.backrank(color));
+    this.castlingRights = this.castlingRights.diff(SquareSet.backrank(color));
     this.rook[color].a = undefined;
     this.rook[color].h = undefined;
   }
@@ -390,7 +390,7 @@ export abstract class Position {
       board: this.board.clone(),
       pockets: this.pockets?.clone(),
       turn: this.turn,
-      unmovedRooks: this.castles.unmovedRooks,
+      castlingRights: this.castles.castlingRights,
       epSquare: legalEpSquare(this),
       remainingChecks: this.remainingChecks?.clone(),
       halfmoves: Math.min(this.halfmoves, 150),
@@ -627,7 +627,7 @@ export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
   boardEquals(left.board, right.board) &&
   ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
   left.turn === right.turn &&
-  left.castles.unmovedRooks.equals(right.castles.unmovedRooks) &&
+  left.castles.castlingRights.equals(right.castles.castlingRights) &&
   legalEpSquare(left) === legalEpSquare(right) &&
   ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
     (!left.remainingChecks && !right.remainingChecks));

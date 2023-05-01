@@ -18,7 +18,7 @@ test('parse initial fen', () => {
   expect(setup.board).toEqual(Board.default());
   expect(setup.pockets).toBeUndefined();
   expect(setup.turn).toEqual('white');
-  expect(setup.unmovedRooks).toEqual(SquareSet.corners());
+  expect(setup.castlingRights).toEqual(SquareSet.corners());
   expect(setup.epSquare).toBeUndefined();
   expect(setup.remainingChecks).toBeUndefined();
   expect(setup.halfmoves).toEqual(0);
@@ -30,7 +30,7 @@ test('partial fen', () => {
   expect(setup.board).toEqual(Board.default());
   expect(setup.pockets).toBeUndefined();
   expect(setup.turn).toEqual('white');
-  expect(setup.unmovedRooks).toEqual(SquareSet.empty());
+  expect(setup.castlingRights).toEqual(SquareSet.empty());
   expect(setup.epSquare).toBeUndefined();
   expect(setup.remainingChecks).toBeUndefined();
   expect(setup.halfmoves).toEqual(0);
