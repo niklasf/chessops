@@ -34,6 +34,12 @@ const tricky: [string, string, number, number, number, number?, number?][] = [
     71908,
   ],
 
+  // Impossible checker alignment
+  ['align-diag-1', '3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - -', 4, 125, 2854],
+  ['align-diag-2', '2Nq4/2K5/1b6/8/7R/3k4/7P/8 w - -', 3, 81, 1217],
+  ['align-horizontal', '5R2/2P5/8/4k3/8/3rK2r/8/8 w - -', 2, 56, 1030],
+  ['align-ep', '8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3', 6, 121, 711],
+
   // Impossible castling rights
   ['asymmetrical-and-king-on-h', 'r2r3k/p7/3p4/8/8/P6P/8/R3K2R b KQq -', 14, 206, 3672, 64639, 1320962],
 ];
@@ -164,25 +170,16 @@ test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black)
 
 test('impossible checker alignment', () => {
   // Multiple checkers aligned with king.
-  const r1 = Chess.fromSetup(parseFen('3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - - 0 1').unwrap());
-  expect(
-    r1.unwrap(
-      _ => undefined,
-      err => err.message
-    )
-  ).toEqual(IllegalSetup.ImpossibleCheck);
+  const pos1 = Chess.fromSetup(parseFen('3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - - 0 1').unwrap()).unwrap();
+  expect(isImpossibleCheck(pos1)).toBe(true);
 
   // Checkers aligned with opponent king are fine.
-  Chess.fromSetup(parseFen('8/8/5k2/p1q5/PP1rp1P1/3P1N2/2RK1r2/5nN1 w - - 0 3').unwrap()).unwrap();
+  const pos2 = Chess.fromSetup(parseFen('8/8/5k2/p1q5/PP1rp1P1/3P1N2/2RK1r2/5nN1 w - - 0 3').unwrap()).unwrap();
+  expect(isImpossibleCheck(pos2)).toBe(false);
 
   // En passant square aligned with checker and king.
-  const r2 = Chess.fromSetup(parseFen('8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 0 1').unwrap());
-  expect(
-    r2.unwrap(
-      _ => undefined,
-      err => err.message
-    )
-  ).toEqual(IllegalSetup.ImpossibleCheck);
+  const pos3 = Chess.fromSetup(parseFen('8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 0 1').unwrap()).unwrap();
+  expect(isImpossibleCheck(pos3)).toBe(true);
 });
 
 test('king captures unmoved rook', () => {

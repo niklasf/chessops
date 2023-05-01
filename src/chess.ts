@@ -33,7 +33,6 @@ import { kingCastlesTo, rookCastlesTo, opposite, defined, squareRank } from './u
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
-  ImpossibleCheck = 'ERR_IMPOSSIBLE_CHECK',
   PawnsOnBackrank = 'ERR_PAWNS_ON_BACKRANK',
   Kings = 'ERR_KINGS',
   Variant = 'ERR_VARIANT',
