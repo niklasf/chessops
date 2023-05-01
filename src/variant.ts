@@ -12,11 +12,11 @@ import {
   Context,
   Chess,
   Castles,
-  FromSetupOpts,
   castlingSide,
   equalsIgnoreMoves,
   normalizeMove,
   isStandardMaterialSide,
+  isImpossibleCheck,
   pseudoDests,
 } from './chess.js';
 
@@ -30,6 +30,7 @@ export {
   equalsIgnoreMoves,
   castlingSide,
   normalizeMove,
+  isImpossibleCheck,
 };
 
 export class Crazyhouse extends Position {
@@ -57,18 +58,18 @@ export class Crazyhouse extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Crazyhouse, PositionError> {
+  static fromSetup(setup: Setup): Result<Crazyhouse, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): Crazyhouse {
     return super.clone() as Crazyhouse;
   }
 
-  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
-    return super.validate(opts).chain(_ => {
+  protected validate(): Result<undefined, PositionError> {
+    return super.validate().chain(_ => {
       if (this.pockets?.count('king')) {
         return Result.err(new PositionError(IllegalSetup.Kings));
       }
@@ -125,17 +126,17 @@ export class Atomic extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Atomic, PositionError> {
+  static fromSetup(setup: Setup): Result<Atomic, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): Atomic {
     return super.clone() as Atomic;
   }
 
-  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+  protected validate(): Result<undefined, PositionError> {
     // Like chess, but allow our king to be missing.
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() > 2) return Result.err(new PositionError(IllegalSetup.Kings));
@@ -147,13 +148,7 @@ export class Atomic extends Position {
     if (SquareSet.backranks().intersects(this.board.pawn)) {
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
     }
-    return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
-  }
-
-  protected validateCheckers(): Result<undefined, PositionError> {
-    // Other king moving away can cause many checks to be given at the
-    // same time. Not checking details or even that the king is close enough.
-    return defined(this.epSquare) ? super.validateCheckers() : Result.ok(undefined);
+    return Result.ok(undefined);
   }
 
   kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -262,17 +257,17 @@ export class Antichess extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Antichess, PositionError> {
+  static fromSetup(setup: Setup): Result<Antichess, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): Antichess {
     return super.clone() as Antichess;
   }
 
-  protected validate(_opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+  protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
@@ -359,10 +354,10 @@ export class KingOfTheHill extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<KingOfTheHill, PositionError> {
+  static fromSetup(setup: Setup): Result<KingOfTheHill, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): KingOfTheHill {
@@ -406,10 +401,10 @@ export class ThreeCheck extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<ThreeCheck, PositionError> {
+  static fromSetup(setup: Setup): Result<ThreeCheck, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): ThreeCheck {
@@ -476,19 +471,19 @@ export class RacingKings extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<RacingKings, PositionError> {
+  static fromSetup(setup: Setup): Result<RacingKings, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): RacingKings {
     return super.clone() as RacingKings;
   }
 
-  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+  protected validate(): Result<undefined, PositionError> {
     if (this.isCheck() || this.board.pawn.nonEmpty()) return Result.err(new PositionError(IllegalSetup.Variant));
-    return super.validate(opts);
+    return super.validate();
   }
 
   dests(square: Square, ctx?: Context): SquareSet {
@@ -579,17 +574,17 @@ export class Horde extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Horde, PositionError> {
+  static fromSetup(setup: Setup): Result<Horde, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): Horde {
     return super.clone() as Horde;
   }
 
-  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+  protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 1) return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -604,7 +599,7 @@ export class Horde extends Position {
         return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
       }
     }
-    return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
+    return Result.ok(undefined);
   }
 
   hasInsufficientMaterial(color: Color): boolean {
@@ -857,24 +852,24 @@ export const defaultPosition = (rules: Rules): Position => {
   }
 };
 
-export const setupPosition = (rules: Rules, setup: Setup, opts?: FromSetupOpts): Result<Position, PositionError> => {
+export const setupPosition = (rules: Rules, setup: Setup): Result<Position, PositionError> => {
   switch (rules) {
     case 'chess':
-      return Chess.fromSetup(setup, opts);
+      return Chess.fromSetup(setup);
     case 'antichess':
-      return Antichess.fromSetup(setup, opts);
+      return Antichess.fromSetup(setup);
     case 'atomic':
-      return Atomic.fromSetup(setup, opts);
+      return Atomic.fromSetup(setup);
     case 'horde':
-      return Horde.fromSetup(setup, opts);
+      return Horde.fromSetup(setup);
     case 'racingkings':
-      return RacingKings.fromSetup(setup, opts);
+      return RacingKings.fromSetup(setup);
     case 'kingofthehill':
-      return KingOfTheHill.fromSetup(setup, opts);
+      return KingOfTheHill.fromSetup(setup);
     case '3check':
-      return ThreeCheck.fromSetup(setup, opts);
+      return ThreeCheck.fromSetup(setup);
     case 'crazyhouse':
-      return Crazyhouse.fromSetup(setup, opts);
+      return Crazyhouse.fromSetup(setup);
   }
 };
 

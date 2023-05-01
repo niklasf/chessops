@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals';
 import { SquareSet } from './squareSet.js';
 import { parseUci } from './util.js';
 import { parseFen, makeFen, INITIAL_FEN } from './fen.js';
-import { Castles, Chess, IllegalSetup, castlingSide, normalizeMove } from './chess.js';
+import { Castles, Chess, IllegalSetup, castlingSide, isImpossibleCheck, normalizeMove } from './chess.js';
 import { perft } from './debug.js';
 
 const tricky: [string, string, number, number, number, number?, number?][] = [
@@ -196,13 +196,8 @@ test('king captures unmoved rook', () => {
 
 test('en passant and unrelated check', () => {
   const setup = parseFen('rnbqk1nr/bb3p1p/1q2r3/2pPp3/3P4/7P/1PP1NpPP/R1BQKBNR w KQkq c6').unwrap();
-  expect(
-    Chess.fromSetup(setup).unwrap(
-      _ => undefined,
-      err => err.message
-    )
-  ).toEqual(IllegalSetup.ImpossibleCheck);
-  const pos = Chess.fromSetup(setup, { ignoreImpossibleCheck: true }).unwrap();
+  const pos = Chess.fromSetup(setup).unwrap();
+  expect(isImpossibleCheck(pos)).toBe(true);
   const enPassant = parseUci('d5c6')!;
   expect(pos.isLegal(enPassant)).toBe(false);
 });

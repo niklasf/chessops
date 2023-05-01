@@ -41,10 +41,6 @@ export enum IllegalSetup {
 
 export class PositionError extends Error {}
 
-export interface FromSetupOpts {
-  ignoreImpossibleCheck?: boolean;
-}
-
 const attacksTo = (square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet =>
   board[attacker].intersect(
     rookAttacks(square, occupied)
@@ -252,7 +248,7 @@ export abstract class Position {
     return pos;
   }
 
-  protected validate(opts: FromSetupOpts | undefined): Result<undefined, PositionError> {
+  protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -266,36 +262,6 @@ export abstract class Position {
     if (SquareSet.backranks().intersects(this.board.pawn))
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
 
-    return opts?.ignoreImpossibleCheck ? Result.ok(undefined) : this.validateCheckers();
-  }
-
-  protected validateCheckers(): Result<undefined, PositionError> {
-    const ourKing = this.board.kingOf(this.turn);
-    if (defined(ourKing)) {
-      const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
-      if (checkers.nonEmpty()) {
-        if (defined(this.epSquare)) {
-          // The pushed pawn must be the only checker, or it has uncovered
-          // check by a single sliding piece.
-          const pushedTo = this.epSquare ^ 8;
-          const pushedFrom = this.epSquare ^ 24;
-          if (
-            checkers.moreThanOne() ||
-            (checkers.first()! !== pushedTo &&
-              this.kingAttackers(
-                ourKing,
-                opposite(this.turn),
-                this.board.occupied.without(pushedTo).with(pushedFrom)
-              ).nonEmpty())
-          )
-            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-        } else {
-          // Multiple sliding checkers aligned with king.
-          if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
-            return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-        }
-      }
-    }
     return Result.ok(undefined);
   }
 
@@ -532,10 +498,10 @@ export class Chess extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, opts?: FromSetupOpts): Result<Chess, PositionError> {
+  static fromSetup(setup: Setup): Result<Chess, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
-    return pos.validate(opts).map(_ => pos);
+    return pos.validate().map(_ => pos);
   }
 
   clone(): Chess {
@@ -662,3 +628,30 @@ export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
 
 export const isStandardMaterial = (pos: Chess): boolean =>
   COLORS.every(color => isStandardMaterialSide(pos.board, color));
+
+export const isImpossibleCheck = (pos: Position): boolean => {
+  const ourKing = pos.board.kingOf(pos.turn);
+  if (!defined(ourKing)) return false;
+  const checkers = pos.kingAttackers(ourKing, opposite(pos.turn), pos.board.occupied);
+  if (checkers.isEmpty()) return false;
+  if (defined(pos.epSquare)) {
+    // The pushed pawn must be the only checker, or it has uncovered
+    // check by a single sliding piece.
+    const pushedTo = pos.epSquare ^ 8;
+    const pushedFrom = pos.epSquare ^ 24;
+    return (
+      checkers.moreThanOne() ||
+      (checkers.first()! !== pushedTo &&
+        pos
+          .kingAttackers(ourKing, opposite(pos.turn), pos.board.occupied.without(pushedTo).with(pushedFrom))
+          .nonEmpty())
+    );
+  } else if (pos.rules === 'atomic') {
+    // Other king moving away can cause many checks to be given at the same
+    // time. Not checking details, or even that the king is close enough.
+    return false;
+  } else {
+    // Sliding checkers aligned with king.
+    return checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing));
+  }
+};

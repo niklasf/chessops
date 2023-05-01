@@ -103,7 +103,7 @@
 import { defined, makeSquare, parseSquare } from './util.js';
 import { Rules, Outcome, Square } from './types.js';
 import { parseFen, FenError, makeFen } from './fen.js';
-import { Position, PositionError, FromSetupOpts, IllegalSetup } from './chess.js';
+import { Position, PositionError, IllegalSetup } from './chess.js';
 import { defaultPosition, setupPosition } from './variant.js';
 import { Result } from '@badrap/result';
 
@@ -663,14 +663,11 @@ export const makeVariant = (rules: Rules): string | undefined => {
   }
 };
 
-export const startingPosition = (
-  headers: Map<string, string>,
-  opts?: FromSetupOpts
-): Result<Position, FenError | PositionError> => {
+export const startingPosition = (headers: Map<string, string>): Result<Position, FenError | PositionError> => {
   const rules = parseVariant(headers.get('Variant'));
   if (!rules) return Result.err(new PositionError(IllegalSetup.Variant));
   const fen = headers.get('FEN');
-  if (fen) return parseFen(fen).chain(setup => setupPosition(rules, setup, opts));
+  if (fen) return parseFen(fen).chain(setup => setupPosition(rules, setup));
   else return Result.ok(defaultPosition(rules));
 };
 
