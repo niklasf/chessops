@@ -94,7 +94,7 @@ export const parseCastlingFen = (board: Board, castlingPart: string): Result<Squ
     if ('a' <= lower && lower <= 'h')
       castlingRights = castlingRights.with(squareFromCoords(lower.charCodeAt(0) - 'a'.charCodeAt(0), rank)!);
     else if (lower === 'k' || lower === 'q') {
-      const rooksAndKings = board[color].intersect(board.rook.union(board.king));
+      const rooksAndKings = board[color].intersect(SquareSet.backrank(color)).intersect(board.rook.union(board.king));
       const candidate = lower === 'k' ? rooksAndKings.last() : rooksAndKings.first();
       castlingRights = castlingRights.with(
         defined(candidate) && board.rook.has(candidate) ? candidate : squareFromCoords(lower === 'k' ? 7 : 0, rank)!
@@ -271,7 +271,7 @@ export const makeCastlingFen = (board: Board, castlingRights: SquareSet): string
     let king = board.kingOf(color);
     if (defined(king) && !backrank.has(king)) king = undefined;
     const candidates = board.pieces(color, 'rook').intersect(backrank);
-    for (const rook of castlingRights.intersect(candidates).reversed()) {
+    for (const rook of castlingRights.intersect(backrank).reversed()) {
       if (rook === candidates.first() && defined(king) && rook < king) {
         fen += color === 'white' ? 'Q' : 'q';
       } else if (rook === candidates.last() && defined(king) && king < rook) {
