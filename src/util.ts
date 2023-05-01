@@ -19,6 +19,9 @@ export const squareRank = (square: Square): number => square >> 3;
 
 export const squareFile = (square: Square): number => square & 0x7;
 
+export const squareFromCoords = (file: number, rank: number): Square | undefined =>
+  0 <= file && file < 8 && 0 <= rank && rank < 8 ? file + 8 * rank : undefined;
+
 export const roleToChar = (role: Role): string => {
   switch (role) {
     case 'pawn':
@@ -61,10 +64,7 @@ export function parseSquare(str: SquareName): Square;
 export function parseSquare(str: string): Square | undefined;
 export function parseSquare(str: string): Square | undefined {
   if (str.length !== 2) return;
-  const file = str.charCodeAt(0) - 'a'.charCodeAt(0);
-  const rank = str.charCodeAt(1) - '1'.charCodeAt(0);
-  if (file < 0 || file >= 8 || rank < 0 || rank >= 8) return;
-  return file + 8 * rank;
+  return squareFromCoords(str.charCodeAt(0) - 'a'.charCodeAt(0), str.charCodeAt(1) - '1'.charCodeAt(0));
 }
 
 export const makeSquare = (square: Square): SquareName =>
