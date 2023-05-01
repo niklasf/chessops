@@ -153,7 +153,7 @@ export class Atomic extends Position {
   protected validateCheckers(): Result<undefined, PositionError> {
     // Other king moving away can cause many checks to be given at the
     // same time. Not checking details or even that the king is close enough.
-    return defined(this.epSquare) ? Result.ok(undefined) : super.validateCheckers();
+    return defined(this.epSquare) ? super.validateCheckers() : Result.ok(undefined);
   }
 
   kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
