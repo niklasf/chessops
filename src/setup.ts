@@ -1,8 +1,8 @@
-import { Color, Role, ROLES, Square } from './types.js';
+import { Color, Role, ROLES, Square, ByColor, ByRole } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board, boardEquals } from './board.js';
 
-export class MaterialSide {
+export class MaterialSide implements ByRole<number> {
   pawn: number;
   knight: number;
   bishop: number;
@@ -61,7 +61,7 @@ export class MaterialSide {
   }
 }
 
-export class Material {
+export class Material implements ByColor<MaterialSide> {
   constructor(public white: MaterialSide, public black: MaterialSide) {}
 
   static empty(): Material {
@@ -109,7 +109,7 @@ export class Material {
   }
 }
 
-export class RemainingChecks {
+export class RemainingChecks implements ByColor<number> {
   constructor(public white: number, public black: number) {}
 
   static default(): RemainingChecks {
