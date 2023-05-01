@@ -1,7 +1,10 @@
 data/
 docs/
 coverage/
+fuzz/dist/
+examples/dist/
 
+package-lock.json
 /*.js
 /*.d.ts
 /*.js.map
