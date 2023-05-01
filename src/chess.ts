@@ -288,10 +288,7 @@ export abstract class Position {
         }
       }
       if (defined(this.epSquare) && canCaptureEp(this, square, ctx)) {
-        const pawn = this.epSquare - delta;
-        if (ctx.checkers.isEmpty() || ctx.checkers.singleSquare() === pawn) {
-          legal = SquareSet.fromSquare(this.epSquare);
-        }
+        legal = SquareSet.fromSquare(this.epSquare);
       }
     } else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
     else if (piece.role === 'knight') pseudo = knightAttacks(square);
@@ -530,13 +527,20 @@ const legalEpSquare = (pos: Position): Square | undefined => {
   return;
 };
 
-const canCaptureEp = (pos: Position, pawn: Square, ctx: Context): boolean => {
+const canCaptureEp = (pos: Position, pawnFrom: Square, ctx: Context): boolean => {
   if (!defined(pos.epSquare)) return false;
-  if (!pawnAttacks(pos.turn, pawn).has(pos.epSquare)) return false;
+  if (!pawnAttacks(pos.turn, pawnFrom).has(pos.epSquare)) return false;
   if (!defined(ctx.king)) return true;
-  const captured = pos.epSquare + (pos.turn === 'white' ? -8 : 8);
-  const occupied = pos.board.occupied.toggle(pawn).toggle(pos.epSquare).toggle(captured);
-  return !pos.kingAttackers(ctx.king, opposite(pos.turn), occupied).intersects(occupied);
+  const delta = pos.turn === 'white' ? 8 : -8;
+  const captured = pos.epSquare - delta;
+  return pos
+    .kingAttackers(
+      ctx.king,
+      opposite(pos.turn),
+      pos.board.occupied.toggle(pawnFrom).toggle(captured).with(pos.epSquare)
+    )
+    .without(captured)
+    .isEmpty();
 };
 
 const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSet => {

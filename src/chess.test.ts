@@ -39,6 +39,8 @@ const tricky: [string, string, number, number, number, number?, number?][] = [
   ['align-diag-2', '2Nq4/2K5/1b6/8/7R/3k4/7P/8 w - -', 3, 81, 1217],
   ['align-horizontal', '5R2/2P5/8/4k3/8/3rK2r/8/8 w - -', 2, 56, 1030],
   ['align-ep', '8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3', 6, 121, 711],
+  ['align-ep-pinned', '1b1k4/8/8/1rPpK3/8/8/8/8 w - d6', 5, 100, 555],
+  ['ep-unrelated-check', 'rnbqk1nr/bb3p1p/1q2r3/2pPp3/3P4/7P/1PP1NpPP/R1BQKBNR w KQkq c6', 2, 92, 2528],
 
   // Impossible castling rights
   ['asymmetrical-and-king-on-h', 'r2r3k/p7/3p4/8/8/P6P/8/R3K2R b KQq -', 14, 206, 3672, 64639, 1320962],
