@@ -74,7 +74,7 @@
  * game.moves = transform(game.moves, pos, (pos, node) => {
  *   const move = parseSan(pos, node.san);
  *   if (!move) {
- *     // Illegal move. Returning undefined cuts of the tree here.
+ *     // Illegal move. Returning undefined cuts off the tree here.
  *     return;
  *   }
  *
