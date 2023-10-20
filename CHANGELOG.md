@@ -1,5 +1,9 @@
 # Changelog for chessops
 
+## v0.12.8
+
+- Fix compilation with TypeScript 5.2.2.
+
 ## v0.12.7
 
 - Implement insufficient material detection for `Horde`.
