@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals';
 import { SquareSet } from './squareSet.js';
 import { parseUci } from './util.js';
 import { parseFen, makeFen, INITIAL_FEN } from './fen.js';
-import { Castles, Chess, IllegalSetup, castlingSide, isImpossibleCheck, normalizeMove } from './chess.js';
+import { Castles, Chess, castlingSide, isImpossibleCheck, normalizeMove } from './chess.js';
 import { perft } from './debug.js';
 
 const tricky: [string, string, number, number, number, number?, number?][] = [

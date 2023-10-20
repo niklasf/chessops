@@ -137,7 +137,7 @@ export class ChildNode<T> extends Node<T> {
   }
 }
 
-export const isChildNode = <T>(node: Node<T>): node is ChildNode<T> => node instanceof ChildNode<T>;
+export const isChildNode = <T>(node: Node<T>): node is ChildNode<T> => node instanceof ChildNode;
 
 export class Box<T> {
   constructor(public value: T) {}

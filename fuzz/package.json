@@ -6,10 +6,11 @@
     "chessops": "file:.."
   },
   "devDependencies": {
-    "@gitlab-org/jsfuzz": "^1",
+    "@gitlab-org/jsfuzz": "=1.2.2",
     "@rollup/plugin-node-resolve": "^15",
     "@rollup/plugin-typescript": "^11",
-    "rollup": "^3",
+    "rollup": "^4",
+    "tslib": "^2",
     "typescript": "^5"
   },
   "scripts": {
