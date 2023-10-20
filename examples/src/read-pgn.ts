@@ -40,7 +40,7 @@ for (const arg of process.argv.slice(2)) {
       err => {
         console.error(err, game.headers);
         status.errors++;
-      }
+      },
     );
 
     if (status.games % 1024 == 0) console.log(status);
@@ -53,6 +53,6 @@ for (const arg of process.argv.slice(2)) {
         parser.parse('');
         console.log(status);
         resolve();
-      })
+      }),
   );
 }

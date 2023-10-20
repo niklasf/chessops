@@ -97,7 +97,7 @@ export const parseCastlingFen = (board: Board, castlingPart: string): Result<Squ
       const rooksAndKings = board[color].intersect(SquareSet.backrank(color)).intersect(board.rook.union(board.king));
       const candidate = lower === 'k' ? rooksAndKings.last() : rooksAndKings.first();
       castlingRights = castlingRights.with(
-        defined(candidate) && board.rook.has(candidate) ? candidate : squareFromCoords(lower === 'k' ? 7 : 0, rank)!
+        defined(candidate) && board.rook.has(candidate) ? candidate : squareFromCoords(lower === 'k' ? 7 : 0, rank)!,
       );
     } else return Result.err(new FenError(InvalidFen.Castling));
   }
@@ -204,8 +204,8 @@ export const parseFen = (fen: string): Result<Setup, FenError> => {
             halfmoves,
             fullmoves: Math.max(1, fullmoves),
           };
-        })
-      )
+        }),
+      ),
     );
   });
 };

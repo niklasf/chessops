@@ -47,7 +47,7 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
       .union(bishopAttacks(square, occupied).intersect(board.bishopsAndQueens()))
       .union(knightAttacks(square).intersect(board.knight))
       .union(kingAttacks(square).intersect(board.king))
-      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn))
+      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn)),
   );
 
 export class Castles {
@@ -537,7 +537,7 @@ const canCaptureEp = (pos: Position, pawnFrom: Square, ctx: Context): boolean =>
     .kingAttackers(
       ctx.king,
       opposite(pos.turn),
-      pos.board.occupied.toggle(pawnFrom).toggle(captured).with(pos.epSquare)
+      pos.board.occupied.toggle(pawnFrom).toggle(captured).with(pos.epSquare),
     )
     .without(captured)
     .isEmpty();

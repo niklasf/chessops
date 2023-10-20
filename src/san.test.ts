@@ -28,7 +28,7 @@ test('make stockfish line with many knight moves', () => {
       .split(' ')
       .map(uci => parseUci(uci)!);
   expect(makeSanVariation(pos, variation)).toBe(
-    '16. Nbd2 Nb4 17. Rd1 Re8 18. Nf1 Nd3 19. Ne1 Nxe1 20. Rxe1 Nf8 21. f4 Ne6 22. Be3 h5 23. f5 Ng5 24. Bxg5 Bxg5 25. f6 Qc7'
+    '16. Nbd2 Nb4 17. Rd1 Re8 18. Nf1 Nd3 19. Ne1 Nxe1 20. Rxe1 Nf8 21. f4 Ne6 22. Be3 h5 23. f5 Ng5 24. Bxg5 Bxg5 25. f6 Qc7',
   );
   expect(pos).toEqual(Chess.fromSetup(setup).unwrap());
 });

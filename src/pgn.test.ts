@@ -75,7 +75,7 @@ test('make pgn', () => {
   e5.children.push(c4);
 
   expect(makePgn({ headers: emptyHeaders(), moves: root })).toEqual(
-    '1. e4 $7 ( 1. e3 ) 1... e5 ( 1... e6 2. Nf3 { a comment } ) 2. c4 *\n'
+    '1. e4 $7 ( 1. e3 ) 1... e5 ( 1... e6 2. Nf3 { a comment } ) 2. c4 *\n',
   );
 });
 
@@ -87,7 +87,7 @@ test('parse headers', () => {
       '[Escaped "quote: \\", backslashes: \\\\\\\\, trailing text"]',
       '[Multiple "on"] [the "same line"]',
       '[Incomplete',
-    ].join('\r\n')
+    ].join('\r\n'),
   );
   expect(games).toHaveLength(1);
   expect(games[0].headers.get('Black')).toBe('black player');
@@ -130,7 +130,7 @@ test('transform pgn', () => {
         fen: makeFen(pos.toSetup()),
         ...data,
       };
-    }
+    },
   );
   expect(res.children[0].data.fen).toBe('rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq - 0 1');
   expect(res.children[0].children[0].data.fen).toBe('rnbqkbnr/1ppppppp/8/p7/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 2');
@@ -152,7 +152,7 @@ testPgnFile(
   game => {
     expect(game.headers.get('Variant')).toBe('Antichess');
     expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e3', 'e6', 'b4', 'Bxb4', 'Qg4']);
-  }
+  },
 );
 testPgnFile(
   {
@@ -168,7 +168,7 @@ testPgnFile(
     expect(game.headers.get('E')).toBe('"A]]["');
     expect(game.headers.get('F')).toBe('"A]]["\\');
     expect(game.headers.get('G')).toBe('"]');
-  }
+  },
 );
 
 testPgnFile(
@@ -179,7 +179,7 @@ testPgnFile(
   },
   game => {
     expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e4', 'e5', 'Nf3', 'Nc6', 'Bb5']);
-  }
+  },
 );
 
 test('tricky tokens', () => {
@@ -239,13 +239,13 @@ test('make comment', () => {
         { color: 'red', from: 0, to: 1 },
         { color: 'red', from: 0, to: 2 },
       ],
-    })
+    }),
   ).toBe('text [%csl Ya1] [%cal Ra1b1,Ra1c1] [%eval 10.00] [%emt 1:02:03.4] [%clk 0:00:01]');
 
   expect(
     makeComment({
       evaluation: { mate: -4, depth: 5 },
-    })
+    }),
   ).toBe('[%eval #-4,5]');
 });
 

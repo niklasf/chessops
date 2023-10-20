@@ -104,7 +104,7 @@ test.each(insufficientMaterial)('%s insufficient material: %s', (rules, fen, whi
 test('king of the hill not over', () => {
   const pos = setupPosition(
     'kingofthehill',
-    parseFen('rnbqkbnr/pppppppp/8/1Q6/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1').unwrap()
+    parseFen('rnbqkbnr/pppppppp/8/1Q6/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1').unwrap(),
   ).unwrap();
   expect(pos.isInsufficientMaterial()).toBe(false);
   expect(pos.isCheck()).toBe(false);
@@ -118,7 +118,7 @@ test('racing kings end', () => {
   // Both players reached the backrank.
   const draw = setupPosition(
     'racingkings',
-    parseFen('kr3NK1/1q2R3/8/8/8/5n2/2N5/1rb2B1R w - - 11 14').unwrap()
+    parseFen('kr3NK1/1q2R3/8/8/8/5n2/2N5/1rb2B1R w - - 11 14').unwrap(),
   ).unwrap();
   expect(draw.isEnd()).toBe(true);
   expect(draw.outcome()).toStrictEqual({ winner: undefined });
@@ -142,7 +142,7 @@ test('racing kings end', () => {
 test('atomic king exploded', () => {
   const pos1 = setupPosition(
     'atomic',
-    parseFen('r4b1r/ppp1pppp/7n/8/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 3').unwrap()
+    parseFen('r4b1r/ppp1pppp/7n/8/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 3').unwrap(),
   ).unwrap();
   expect(pos1.isEnd()).toBe(true);
   expect(pos1.isVariantEnd()).toBe(true);
@@ -150,7 +150,7 @@ test('atomic king exploded', () => {
 
   const pos2 = setupPosition(
     'atomic',
-    parseFen('rn5r/pp4pp/2p3Nn/5p2/1b2P1PP/8/PPP2P2/R1B1KB1R b KQ - 0 9').unwrap()
+    parseFen('rn5r/pp4pp/2p3Nn/5p2/1b2P1PP/8/PPP2P2/R1B1KB1R b KQ - 0 9').unwrap(),
   ).unwrap();
   expect(pos2.isEnd()).toBe(true);
   expect(pos2.isVariantEnd()).toBe(true);
@@ -160,7 +160,7 @@ test('atomic king exploded', () => {
 test('3check remaining checks', () => {
   const pos = setupPosition(
     '3check',
-    parseFen('rnbqkbnr/ppp1pppp/3p4/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 3+3 0 2').unwrap()
+    parseFen('rnbqkbnr/ppp1pppp/3p4/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 3+3 0 2').unwrap(),
   ).unwrap();
   pos.play(parseUci('f1b5')!);
   expect(makeFen(pos.toSetup())).toBe('rnbqkbnr/ppp1pppp/3p4/1B6/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 2+3 1 2');
@@ -169,7 +169,7 @@ test('3check remaining checks', () => {
 test('antichess en passant', () => {
   const pos = setupPosition(
     'antichess',
-    parseFen('r1bqkbn1/p1ppp3/2n4p/6p1/1Pp5/4P3/P2P1PP1/R1B1K3 b - b3 0 11').unwrap()
+    parseFen('r1bqkbn1/p1ppp3/2n4p/6p1/1Pp5/4P3/P2P1PP1/R1B1K3 b - b3 0 11').unwrap(),
   ).unwrap();
   const move = parseUci('c4b3')!;
   expect(pos.isLegal(move)).toBe(true);

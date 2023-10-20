@@ -90,7 +90,7 @@ export const parseSan = (pos: Position, san: string): Move | undefined => {
         string | undefined,
         string | undefined,
         SquareName,
-        'n' | 'b' | 'r' | 'q' | 'k' | 'N' | 'B' | 'R' | 'Q' | 'K' | undefined
+        'n' | 'b' | 'r' | 'q' | 'k' | 'N' | 'B' | 'R' | 'Q' | 'K' | undefined,
       ]
     | null;
   if (!match) {
@@ -133,7 +133,7 @@ export const parseSan = (pos: Position, san: string): Move | undefined => {
   // Optimization: Reduce set of candidates
   const pawnAdvance = role === 'pawn' ? SquareSet.fromFile(squareFile(to)) : SquareSet.empty();
   candidates = candidates.intersect(
-    pawnAdvance.union(attacks({ color: opposite(pos.turn), role }, to, pos.board.occupied))
+    pawnAdvance.union(attacks({ color: opposite(pos.turn), role }, to, pos.board.occupied)),
   );
 
   // Check uniqueness and legality

@@ -62,7 +62,10 @@ export class MaterialSide implements ByRole<number> {
 }
 
 export class Material implements ByColor<MaterialSide> {
-  constructor(public white: MaterialSide, public black: MaterialSide) {}
+  constructor(
+    public white: MaterialSide,
+    public black: MaterialSide,
+  ) {}
 
   static empty(): Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
@@ -110,7 +113,10 @@ export class Material implements ByColor<MaterialSide> {
 }
 
 export class RemainingChecks implements ByColor<number> {
-  constructor(public white: number, public black: number) {}
+  constructor(
+    public white: number,
+    public black: number,
+  ) {}
 
   static default(): RemainingChecks {
     return new RemainingChecks(3, 3);

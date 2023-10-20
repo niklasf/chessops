@@ -103,7 +103,7 @@ export class Crazyhouse extends Position {
           ? SquareSet.full()
           : this.pockets?.[this.turn].hasPawns()
           ? SquareSet.backranks().complement()
-          : SquareSet.empty()
+          : SquareSet.empty(),
       );
 
     ctx = ctx || this.ctx();
@@ -306,7 +306,7 @@ export class Antichess extends Position {
         ? defined(this.epSquare) && this.board.getRole(square) === 'pawn'
           ? enemy.with(this.epSquare)
           : enemy
-        : SquareSet.full()
+        : SquareSet.full(),
     );
   }
 
@@ -895,7 +895,7 @@ export const isStandardMaterial = (pos: Position): boolean => {
       return COLORS.every(color =>
         pos.board.pieces(color, 'king').nonEmpty()
           ? isStandardMaterialSide(pos.board, color)
-          : pos.board[color].size() <= 36
+          : pos.board[color].size() <= 36,
       );
     case 'racingkings':
       return COLORS.every(
@@ -903,7 +903,7 @@ export const isStandardMaterial = (pos: Position): boolean => {
           pos.board.pieces(color, 'knight').size() <= 2 &&
           pos.board.pieces(color, 'bishop').size() <= 2 &&
           pos.board.pieces(color, 'rook').size() <= 2 &&
-          pos.board.pieces(color, 'queen').size() <= 1
+          pos.board.pieces(color, 'queen').size() <= 1,
       );
   }
 };

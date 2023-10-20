@@ -150,7 +150,7 @@ export class Box<T> {
 export const transform = <T, U, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
-  f: (ctx: C, data: T, childIndex: number) => U | undefined
+  f: (ctx: C, data: T, childIndex: number) => U | undefined,
 ): Node<U> => {
   const root = new Node<U>();
   const stack = [
@@ -183,7 +183,7 @@ export const transform = <T, U, C extends { clone(): C }>(
 export const walk = <T, C extends { clone(): C }>(
   node: Node<T>,
   ctx: C,
-  f: (ctx: C, data: T, childIndex: number) => boolean | void
+  f: (ctx: C, data: T, childIndex: number) => boolean | void,
 ) => {
   const stack = [{ node, ctx }];
   let frame;
@@ -253,7 +253,7 @@ export const makePgn = (game: Game<PgnNodeData>): string => {
   const initialPly = fen
     ? parseFen(fen).unwrap(
         setup => (setup.fullmoves - 1) * 2 + (setup.turn === 'white' ? 0 : 1),
-        _ => 0
+        _ => 0,
       )
     : 0;
 
@@ -394,7 +394,7 @@ export class PgnParser {
   constructor(
     private emitGame: (game: Game<PgnNodeData>, err: PgnError | undefined) => void,
     private initHeaders: () => Map<string, string> = defaultHeaders,
-    private maxBudget = 1_000_000
+    private maxBudget = 1_000_000,
   ) {
     this.resetGame();
     this.state = ParserState.Bom;
@@ -468,7 +468,7 @@ export class PgnParser {
                 moreHeaders = true;
                 freshLine = false;
                 return '';
-              }
+              },
             );
           }
           if (isWhitespace(line)) return;
@@ -790,7 +790,7 @@ export const parseComment = (comment: string): Comment => {
         if (annotation === 'emt') emt = value;
         else if (annotation === 'clk') clock = value;
         return '  ';
-      }
+      },
     )
     .replace(
       /\s?\[%(?:csl|cal)\s([RGYB][a-h][1-8](?:[a-h][1-8])?(?:,[RGYB][a-h][1-8](?:[a-h][1-8])?)*)\]\s?/g,
@@ -799,7 +799,7 @@ export const parseComment = (comment: string): Comment => {
           shapes.push(parseCommentShape(arrow)!);
         }
         return '  ';
-      }
+      },
     )
     .replace(
       /\s?\[%eval\s(?:#([+-]?\d{1,5})|([+-]?(?:\d{1,5}|\d{0,5}\.\d{1,2})))(?:,(\d{1,5}))?\]\s?/g,
@@ -807,7 +807,7 @@ export const parseComment = (comment: string): Comment => {
         const depth = d && parseInt(d, 10);
         evaluation = mate ? { mate: parseInt(mate, 10), depth } : { pawns: parseFloat(pawns), depth };
         return '  ';
-      }
+      },
     )
     .trim();
   return {
