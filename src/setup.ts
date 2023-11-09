@@ -40,6 +40,12 @@ export class MaterialSide implements ByRole<number> {
     return m;
   }
 
+  subtract(other: MaterialSide): MaterialSide {
+    const m = new MaterialSide();
+    for (const role of ROLES) m[role] = this[role] - other[role];
+    return m;
+  }
+
   nonEmpty(): boolean {
     return ROLES.some(role => this[role] > 0);
   }
@@ -85,6 +91,10 @@ export class Material implements ByColor<MaterialSide> {
 
   add(other: Material): Material {
     return new Material(this.white.add(other.white), this.black.add(other.black));
+  }
+
+  subtract(other: Material): Material {
+    return new Material(this.white.subtract(other.white), this.black.subtract(other.black));
   }
 
   count(role: Role): number {
