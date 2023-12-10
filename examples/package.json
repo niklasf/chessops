@@ -1,6 +1,7 @@
 {
   "name": "chessops-examples",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "type": "module",
   "dependencies": {
     "chessops": "file:.."
