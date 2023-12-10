@@ -4,16 +4,16 @@
 
 - `Position.fromSetup()` now only checks minimum validity requirements.
   Remove `FromSetupOpts`. In particular:
-   - As before, bad `setup.castlingRights` (formerly `setup.unmovedRooks`)
-     are silently dropped. But note changes to FEN parsing.
-   - As before, a bad `setup.epSquare` is silently dropped.
-   - As before, non-standard material is allowed.
-     Use `isStandardMaterial()` if strict validation is needed.
-   - As before, the side to move cannot be giving check.
-   - Unlike before, some other positions involving impossibly many checkers
-     are no longer rejected. Use `isImpossibleCheck()` if strict validation
-     is needed. This is more consistent with the other relaxed choices above,
-     more consistent with Lichess's behavior, and aids tree-shaking.
+  - As before, bad `setup.castlingRights` (formerly `setup.unmovedRooks`)
+    are silently dropped. But note changes to FEN parsing.
+  - As before, a bad `setup.epSquare` is silently dropped.
+  - As before, non-standard material is allowed.
+    Use `isStandardMaterial()` if strict validation is needed.
+  - As before, the side to move cannot be giving check.
+  - Unlike before, some other positions involving impossibly many checkers
+    are no longer rejected. Use `isImpossibleCheck()` if strict validation
+    is needed. This is more consistent with the other relaxed choices above,
+    more consistent with Lichess's behavior, and aids tree-shaking.
 - The FEN parser and writer now preserve syntactically valid castling rights
   even if there is no matching rook or king. Rename `unmovedRooks` to
   `castlingRights`.
