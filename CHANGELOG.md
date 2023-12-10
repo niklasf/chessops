@@ -1,8 +1,30 @@
 # Changelog for chessops
 
+## v0.13.0
+
+- `Position.fromSetup()` now only checks minimum validity requirements.
+  Remove `FromSetupOpts`. In particular:
+   - As before, bad `setup.castlingRights` (formerly `setup.unmovedRooks`)
+     are silently dropped. But note changes to FEN parsing.
+   - As before, a bad `setup.epSquare` is silently dropped.
+   - As before, non-standard material is allowed.
+     Use `isStandardMaterial()` if strict validation is needed.
+   - As before, the side to move cannot be giving check.
+   - Unlike before, some other positions involving impossibly many checkers
+     are no longer rejected. Use `isImpossibleCheck()` if strict validation
+     is needed. This is more consistent with the other relaxed choices above,
+     more consistent with Lichess's behavior, and aids tree-shaking.
+- The FEN parser and writer now preserve syntactically valid castling rights
+  even if there is no matching rook or king. Rename `unmovedRooks` to
+  `castlingRights`.
+- Add `{Material,MaterialSide}.subtract()`.
+- Add `squareFromCoords()` to `chessops/util`.
+- Fix impossible checker validation for `Atomic`.
+- Fix en passant in some impossible check situations.
+
 ## v0.12.8
 
-- Fix compilation with TypeScript 5.2.2.
+Marked as deprecated on npm. Accidentally included semver-breaking changes.
 
 ## v0.12.7
 
@@ -10,7 +32,7 @@
 
 ## v0.12.6
 
-- Added `rookCastlesTo` to `chessops/util`.
+- Add `rookCastlesTo` to `chessops/util`.
 
 ## v0.12.5
 
@@ -31,7 +53,7 @@
 - Improvements for `chessops/pgn`:
   - Add `defaultGame()`.
   - Add `isChildNode()`.
-  - Add `parseComment` and `makeComment`.
+  - Add `parseComment()` and `makeComment()`.
   - Add `Box` for wrapping immutable context in transformations.
 
 ## v0.12.2
@@ -95,13 +117,13 @@
 
 ## v0.10.0
 
-- Renamed `lichessVariantRules` to `lichessRules`, added the inverse function
-  `lichessVariant`.
+- Renamed `lichessVariantRules()` to `lichessRules()`, added the inverse
+  function `lichessVariant()`.
 
 ## v0.9.0
 
 - Now built as ES module (instead of CommonJS).
-- Made `kingCastlesTo` public.
+- Made `kingCastlesTo()` public.
 
 ## v0.8.1
 
@@ -138,10 +160,10 @@
 
 ## v0.7.0
 
-- Added `parseSan`.
-- Added `chessgroundMove` compatibility.
+- Added `parseSan()`.
+- Added `chessgroundMove()` compatibility.
 - Added `FILES` and `RANKS` constants.
-- Fix spelling of export: `transfrom` -> `transform`.
+- Fix spelling of export: `transfrom()` -> `transform()`.
 - Added `{MaterialSide,Material}.{fromBoard,add}()`.
 - Clamp move counters in FEN export for guaranteed reparsability.
 - Reject promotions not on backrank.
@@ -149,10 +171,10 @@
 
 ## v0.6.0
 
-- Updated `chessgroundDests` for chessground 7.8 compatibility.
+- Updated `chessgroundDests()` for chessground 7.8 compatibility.
 - Added `chessgroundDests(pos, {chess960: true})` to generate only
   Chess960-style castling moves.
-- Renamed `scalachessId` to `scalachessCharPair`.
+- Renamed `scalachessId()` to `scalachessCharPair()`.
 
 ## v0.5.0
 
@@ -168,13 +190,13 @@
 
 ## v0.4.1
 
-- Added `lichessVariantRules` compatibility.
+- Added `lichessVariantRules()` compatibility.
 
 ## v0.4.0
 
 - Renamed `Uci` to `Move`, `UciMove` to `NormalMove`, `UciDrop` to `DropMove`,
-  and `isMove` to `isNormal`.
-- Renamed `uciCharPair` to `scalachessId`.
+  and `isMove()` to `isNormal()`.
+- Renamed `uciCharPair()` to `scalachessId()`.
 - All `ctx` parameters are now optional.
 - Added `index` module with re-exports.
 
