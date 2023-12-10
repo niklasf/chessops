@@ -102,8 +102,8 @@ export class Crazyhouse extends Position {
         this.pockets?.[this.turn].hasNonPawns()
           ? SquareSet.full()
           : this.pockets?.[this.turn].hasPawns()
-          ? SquareSet.backranks().complement()
-          : SquareSet.empty(),
+            ? SquareSet.backranks().complement()
+            : SquareSet.empty(),
       );
 
     ctx = ctx || this.ctx();
