@@ -131,6 +131,19 @@ export class Node<T> {
   }
 }
 
+export const extendMainline = <T>(game: Game<T>, data: T[]) => {
+  let node = game.moves;
+  while (node.children.length) {
+    const child = node.children[0];
+    node = child;
+  }
+  data.forEach(d => {
+    const newNode = new ChildNode(d);
+    node.children = [newNode];
+    node = newNode;
+  });
+};
+
 export class ChildNode<T> extends Node<T> {
   constructor(public data: T) {
     super();
