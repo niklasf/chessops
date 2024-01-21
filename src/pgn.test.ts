@@ -42,7 +42,7 @@ function testPgnFile({ fileName = '', numberOfGames = 1, allValid = true } = {},
       .on('close', () => {
         parser.parse('');
         expect(gameCallback).toHaveBeenCalledTimes(numberOfGames);
-        done();
+        done!();
       });
   });
 }
