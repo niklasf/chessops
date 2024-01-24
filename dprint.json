@@ -5,7 +5,12 @@
   },
   "excludes": [
     "**/node_modules",
-    "**/*-lock.json"
+    "**/*-lock.json",
+    "docs/",
+    "coverage/",
+    "*.js.map",
+    "*.d.ts",
+    "*.js"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.88.10.wasm",
