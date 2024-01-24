@@ -48,8 +48,8 @@ Chess and chess variant rules and operations in TypeScript.
 ## Example
 
 ```javascript
-import { parseFen } from 'chessops/fen';
 import { Chess } from 'chessops/chess';
+import { parseFen } from 'chessops/fen';
 
 const setup = parseFen('r1bqkbnr/ppp2Qpp/2np4/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4').unwrap();
 const pos = Chess.fromSetup(setup).unwrap();

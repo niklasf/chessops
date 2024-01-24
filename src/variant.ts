@@ -1,36 +1,36 @@
 import { Result } from '@badrap/result';
-import { Square, Outcome, Color, Piece, COLORS, Rules } from './types.js';
-import { defined, opposite } from './util.js';
-import { between, pawnAttacks, kingAttacks } from './attacks.js';
-import { SquareSet } from './squareSet.js';
+import { between, kingAttacks, pawnAttacks } from './attacks.js';
 import { Board } from './board.js';
-import { Setup, RemainingChecks, MaterialSide, Material } from './setup.js';
 import {
-  PositionError,
-  Position,
-  IllegalSetup,
-  Context,
-  Chess,
   Castles,
   castlingSide,
+  Chess,
+  Context,
   equalsIgnoreMoves,
-  normalizeMove,
-  isStandardMaterialSide,
+  IllegalSetup,
   isImpossibleCheck,
+  isStandardMaterialSide,
+  normalizeMove,
+  Position,
+  PositionError,
   pseudoDests,
 } from './chess.js';
+import { Material, MaterialSide, RemainingChecks, Setup } from './setup.js';
+import { SquareSet } from './squareSet.js';
+import { Color, COLORS, Outcome, Piece, Rules, Square } from './types.js';
+import { defined, opposite } from './util.js';
 
 export {
+  Castles,
+  castlingSide,
+  Chess,
+  Context,
+  equalsIgnoreMoves,
+  IllegalSetup,
+  isImpossibleCheck,
+  normalizeMove,
   Position,
   PositionError,
-  IllegalSetup,
-  Context,
-  Chess,
-  Castles,
-  equalsIgnoreMoves,
-  castlingSide,
-  normalizeMove,
-  isImpossibleCheck,
 };
 
 export class Crazyhouse extends Position {
@@ -85,13 +85,13 @@ export class Crazyhouse extends Position {
     // custom positions.
     if (!this.pockets) return super.hasInsufficientMaterial(color);
     return (
-      this.board.occupied.size() + this.pockets.size() <= 3 &&
-      this.board.pawn.isEmpty() &&
-      this.board.promoted.isEmpty() &&
-      this.board.rooksAndQueens().isEmpty() &&
-      this.pockets.count('pawn') <= 0 &&
-      this.pockets.count('rook') <= 0 &&
-      this.pockets.count('queen') <= 0
+      this.board.occupied.size() + this.pockets.size() <= 3
+      && this.board.pawn.isEmpty()
+      && this.board.promoted.isEmpty()
+      && this.board.rooksAndQueens().isEmpty()
+      && this.pockets.count('pawn') <= 0
+      && this.pockets.count('rook') <= 0
+      && this.pockets.count('queen') <= 0
     );
   }
 
@@ -102,8 +102,8 @@ export class Crazyhouse extends Position {
         this.pockets?.[this.turn].hasNonPawns()
           ? SquareSet.full()
           : this.pockets?.[this.turn].hasPawns()
-            ? SquareSet.backranks().complement()
-            : SquareSet.empty(),
+          ? SquareSet.backranks().complement()
+          : SquareSet.empty(),
       );
 
     ctx = ctx || this.ctx();
@@ -214,9 +214,9 @@ export class Atomic extends Position {
       after.play({ from: square, to });
       const ourKing = after.board.kingOf(this.turn);
       if (
-        defined(ourKing) &&
-        (!defined(after.board.kingOf(after.turn)) ||
-          after.kingAttackers(ourKing, after.turn, after.board.occupied).isEmpty())
+        defined(ourKing)
+        && (!defined(after.board.kingOf(after.turn))
+          || after.kingAttackers(ourKing, after.turn, after.board.occupied).isEmpty())
       ) {
         dests = dests.with(to);
       }
@@ -269,8 +269,9 @@ export class Antichess extends Position {
 
   protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (SquareSet.backranks().intersects(this.board.pawn))
+    if (SquareSet.backranks().intersects(this.board.pawn)) {
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
+    }
     return Result.ok(undefined);
   }
 
@@ -281,8 +282,8 @@ export class Antichess extends Position {
   ctx(): Context {
     const ctx = super.ctx();
     if (
-      defined(this.epSquare) &&
-      pawnAttacks(opposite(this.turn), this.epSquare).intersects(this.board.pieces(this.turn, 'pawn'))
+      defined(this.epSquare)
+      && pawnAttacks(opposite(this.turn), this.epSquare).intersects(this.board.pieces(this.turn, 'pawn'))
     ) {
       ctx.mustCapture = true;
       return ctx;
@@ -322,9 +323,9 @@ export class Antichess extends Position {
     }
     if (this.board.occupied.equals(this.board.knight) && this.board.occupied.size() === 2) {
       return (
-        (this.board.white.intersects(SquareSet.lightSquares()) !==
-          this.board.black.intersects(SquareSet.darkSquares())) !==
-        (this.turn === color)
+        (this.board.white.intersects(SquareSet.lightSquares())
+          !== this.board.black.intersects(SquareSet.darkSquares()))
+          !== (this.turn === color)
       );
     }
     return false;
@@ -589,8 +590,9 @@ export class Horde extends Position {
     if (this.board.king.size() !== 1) return Result.err(new PositionError(IllegalSetup.Kings));
 
     const otherKing = this.board.kingOf(opposite(this.turn));
-    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
+    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
+    }
     for (const color of COLORS) {
       const backranks = this.board.pieces(color, 'king').isEmpty()
         ? SquareSet.backrank(opposite(color))
@@ -623,13 +625,12 @@ export class Horde extends Position {
     const hordeBishops = (squareColor: SquareColor) =>
       coloredSquares(squareColor).intersect(this.board.pieces(color, 'bishop')).size();
     const hordeBishopColor: SquareColor = hordeBishops('light') >= 1 ? 'light' : 'dark';
-    const hordeNum =
-      horde.pawn +
-      horde.knight +
-      horde.rook +
-      horde.queen +
-      Math.min(hordeBishops('dark'), 2) +
-      Math.min(hordeBishops('light'), 2);
+    const hordeNum = horde.pawn
+      + horde.knight
+      + horde.rook
+      + horde.queen
+      + Math.min(hordeBishops('dark'), 2)
+      + Math.min(hordeBishops('light'), 2);
 
     const pieces = MaterialSide.fromBoard(this.board, opposite(color));
     const piecesBishops = (squareColor: SquareColor) =>
@@ -658,13 +659,14 @@ export class Horde extends Position {
       // knight on A2.
       if (
         !(
-          hordeNum === 2 &&
-          horde.rook === 1 &&
-          horde.bishop === 1 &&
-          piecesOfRoleNot(piecesBishops(hordeBishopColor)) === 1
+          hordeNum === 2
+          && horde.rook === 1
+          && horde.bishop === 1
+          && piecesOfRoleNot(piecesBishops(hordeBishopColor)) === 1
         )
-      )
+      ) {
         return false;
+      }
     }
 
     if (hordeNum === 1) {
@@ -695,10 +697,10 @@ export class Horde extends Position {
         // reduced to the two previous cases.
         // (e.g. three pawns on A7, B7, C7)
         return !(
-          pieces.pawn >= 2 ||
-          (pieces.rook >= 1 && pieces.pawn >= 1) ||
-          (pieces.rook >= 1 && pieces.knight >= 1) ||
-          (pieces.pawn >= 1 && pieces.knight >= 1)
+          pieces.pawn >= 2
+          || (pieces.rook >= 1 && pieces.pawn >= 1)
+          || (pieces.rook >= 1 && pieces.knight >= 1)
+          || (pieces.pawn >= 1 && pieces.knight >= 1)
         );
       } else if (horde.bishop === 1) {
         // The horde has a lone bishop.
@@ -714,11 +716,9 @@ export class Horde extends Position {
           // For example a king on A3 can be mated if there is
           // a pawn/opposite-color-bishop on A4, a pawn/opposite-color-bishop on
           // B3, a pawn/bishop/rook/queen on A2 and any other piece on B2.
-          (
-            piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 2 ||
-            (piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 && pieces.pawn >= 1) ||
-            pieces.pawn >= 2
-          )
+          piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 2
+          || (piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 && pieces.pawn >= 1)
+          || pieces.pawn >= 2
         );
       } else if (horde.knight === 1) {
         // The horde has a lone knight.
@@ -728,20 +728,18 @@ export class Horde extends Position {
           // on A2.
           // Moreover, when black has four or more pieces and two of them are
           // pawns, black can promote their pawns and selfmate theirself.
-          (
-            piecesNum >= 4 &&
-            (pieces.knight >= 2 ||
-              pieces.pawn >= 2 ||
-              (pieces.rook >= 1 && pieces.knight >= 1) ||
-              (pieces.rook >= 1 && pieces.bishop >= 1) ||
-              (pieces.knight >= 1 && pieces.bishop >= 1) ||
-              (pieces.rook >= 1 && pieces.pawn >= 1) ||
-              (pieces.knight >= 1 && pieces.pawn >= 1) ||
-              (pieces.bishop >= 1 && pieces.pawn >= 1) ||
-              (hasBishopPair(opposite(color)) && pieces.pawn >= 1)) &&
-            (piecesBishops('dark') < 2 || piecesOfRoleNot(piecesBishops('dark')) >= 3) &&
-            (piecesBishops('light') < 2 || piecesOfRoleNot(piecesBishops('light')) >= 3)
-          )
+          piecesNum >= 4
+          && (pieces.knight >= 2
+            || pieces.pawn >= 2
+            || (pieces.rook >= 1 && pieces.knight >= 1)
+            || (pieces.rook >= 1 && pieces.bishop >= 1)
+            || (pieces.knight >= 1 && pieces.bishop >= 1)
+            || (pieces.rook >= 1 && pieces.pawn >= 1)
+            || (pieces.knight >= 1 && pieces.pawn >= 1)
+            || (pieces.bishop >= 1 && pieces.pawn >= 1)
+            || (hasBishopPair(opposite(color)) && pieces.pawn >= 1))
+          && (piecesBishops('dark') < 2 || piecesOfRoleNot(piecesBishops('dark')) >= 3)
+          && (piecesBishops('light') < 2 || piecesOfRoleNot(piecesBishops('light')) >= 3)
         );
       }
 
@@ -759,28 +757,24 @@ export class Horde extends Position {
         return !(
           // A king on A1 obstructed by a pawn/bishop on A2 is mated
           // by the bishop pair.
-          (
-            pieces.pawn >= 1 ||
-            pieces.bishop >= 1 ||
-            // A pawn/bishop/knight on B4, a pawn/bishop/rook/queen on
-            // A4 and the king on A3 enable Boden's mate by the bishop
-            // pair. In every other case white cannot win.
-            (pieces.knight >= 1 && pieces.rook + pieces.queen >= 1)
-          )
+          pieces.pawn >= 1
+          || pieces.bishop >= 1
+          // A pawn/bishop/knight on B4, a pawn/bishop/rook/queen on
+          // A4 and the king on A3 enable Boden's mate by the bishop
+          // pair. In every other case white cannot win.
+          || (pieces.knight >= 1 && pieces.rook + pieces.queen >= 1)
         );
       } else if (horde.bishop >= 1 && horde.knight >= 1) {
         // The horde has a bishop and a knight.
         return !(
           // A king on A1 obstructed by a pawn/opposite-color-bishop on
           // A2 is mated by a knight on D2 and a bishop on C3.
-          (
-            pieces.pawn >= 1 ||
-            piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 ||
-            // A king on A1 bounded by two friendly pieces on A2 and B1 is
-            // mated when the knight moves from D4 to C2 so that both the
-            // knight and the bishop deliver check.
-            piecesOfRoleNot(piecesBishops(hordeBishopColor)) >= 3
-          )
+          pieces.pawn >= 1
+          || piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1
+          // A king on A1 bounded by two friendly pieces on A2 and B1 is
+          // mated when the knight moves from D4 to C2 so that both the
+          // knight and the bishop deliver check.
+          || piecesOfRoleNot(piecesBishops(hordeBishopColor)) >= 3
         );
       } else {
         // The horde has two or more bishops on the same color.
@@ -792,14 +786,12 @@ export class Horde extends Position {
           // bishops on B2 and C3. This position is theoretically
           // achievable even when black has two pawns or when they
           // have a pawn and an opposite color bishop.
-          (
-            (pieces.pawn >= 1 && piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1) ||
-            (pieces.pawn >= 1 && pieces.knight >= 1) ||
-            (piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 && pieces.knight >= 1) ||
-            piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 2 ||
-            pieces.knight >= 2 ||
-            pieces.pawn >= 2
-          )
+          (pieces.pawn >= 1 && piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1)
+          || (pieces.pawn >= 1 && pieces.knight >= 1)
+          || (piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 1 && pieces.knight >= 1)
+          || piecesBishops(oppositeSquareColor(hordeBishopColor)) >= 2
+          || pieces.knight >= 2
+          || pieces.pawn >= 2
           // In every other case, white can only draw.
         );
       }
@@ -884,26 +876,26 @@ export const isStandardMaterial = (pos: Position): boolean => {
     case 'crazyhouse': {
       const promoted = pos.board.promoted;
       return (
-        promoted.size() + pos.board.pawn.size() + (pos.pockets?.count('pawn') || 0) <= 16 &&
-        pos.board.knight.diff(promoted).size() + (pos.pockets?.count('knight') || 0) <= 4 &&
-        pos.board.bishop.diff(promoted).size() + (pos.pockets?.count('bishop') || 0) <= 4 &&
-        pos.board.rook.diff(promoted).size() + (pos.pockets?.count('rook') || 0) <= 4 &&
-        pos.board.queen.diff(promoted).size() + (pos.pockets?.count('queen') || 0) <= 2
+        promoted.size() + pos.board.pawn.size() + (pos.pockets?.count('pawn') || 0) <= 16
+        && pos.board.knight.diff(promoted).size() + (pos.pockets?.count('knight') || 0) <= 4
+        && pos.board.bishop.diff(promoted).size() + (pos.pockets?.count('bishop') || 0) <= 4
+        && pos.board.rook.diff(promoted).size() + (pos.pockets?.count('rook') || 0) <= 4
+        && pos.board.queen.diff(promoted).size() + (pos.pockets?.count('queen') || 0) <= 2
       );
     }
     case 'horde':
       return COLORS.every(color =>
         pos.board.pieces(color, 'king').nonEmpty()
           ? isStandardMaterialSide(pos.board, color)
-          : pos.board[color].size() <= 36,
+          : pos.board[color].size() <= 36
       );
     case 'racingkings':
       return COLORS.every(
         color =>
-          pos.board.pieces(color, 'knight').size() <= 2 &&
-          pos.board.pieces(color, 'bishop').size() <= 2 &&
-          pos.board.pieces(color, 'rook').size() <= 2 &&
-          pos.board.pieces(color, 'queen').size() <= 1,
+          pos.board.pieces(color, 'knight').size() <= 2
+          && pos.board.pieces(color, 'bishop').size() <= 2
+          && pos.board.pieces(color, 'rook').size() <= 2
+          && pos.board.pieces(color, 'queen').size() <= 1,
       );
   }
 };

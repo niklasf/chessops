@@ -1,34 +1,34 @@
 import { Result } from '@badrap/result';
 import {
-  Rules,
-  CastlingSide,
+  attacks,
+  between,
+  bishopAttacks,
+  kingAttacks,
+  knightAttacks,
+  pawnAttacks,
+  queenAttacks,
+  ray,
+  rookAttacks,
+} from './attacks.js';
+import { Board, boardEquals } from './board.js';
+import { Material, RemainingChecks, Setup } from './setup.js';
+import { SquareSet } from './squareSet.js';
+import {
+  ByCastlingSide,
+  ByColor,
   CASTLING_SIDES,
+  CastlingSide,
   Color,
   COLORS,
-  Square,
-  ByColor,
-  ByCastlingSide,
+  isDrop,
   Move,
   NormalMove,
-  isDrop,
-  Piece,
   Outcome,
+  Piece,
+  Rules,
+  Square,
 } from './types.js';
-import { SquareSet } from './squareSet.js';
-import { Board, boardEquals } from './board.js';
-import { Setup, Material, RemainingChecks } from './setup.js';
-import {
-  attacks,
-  bishopAttacks,
-  rookAttacks,
-  queenAttacks,
-  knightAttacks,
-  kingAttacks,
-  pawnAttacks,
-  between,
-  ray,
-} from './attacks.js';
-import { kingCastlesTo, rookCastlesTo, opposite, defined, squareRank } from './util.js';
+import { defined, kingCastlesTo, opposite, rookCastlesTo, squareRank } from './util.js';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
@@ -213,8 +213,9 @@ export abstract class Position {
   ctx(): Context {
     const variantEnd = this.isVariantEnd();
     const king = this.board.kingOf(this.turn);
-    if (!defined(king))
+    if (!defined(king)) {
       return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
+    }
     const snipers = rookAttacks(king, SquareSet.empty())
       .intersect(this.board.rooksAndQueens())
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishopsAndQueens()))
@@ -255,11 +256,13 @@ export abstract class Position {
 
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
-    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
+    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()) {
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
+    }
 
-    if (SquareSet.backranks().intersects(this.board.pawn))
+    if (SquareSet.backranks().intersects(this.board.pawn)) {
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
+    }
 
     return Result.ok(undefined);
   }
@@ -332,14 +335,13 @@ export abstract class Position {
     if (this.board[color].intersect(this.board.pawn.union(this.board.rooksAndQueens())).nonEmpty()) return false;
     if (this.board[color].intersects(this.board.knight)) {
       return (
-        this.board[color].size() <= 2 &&
-        this.board[opposite(color)].diff(this.board.king).diff(this.board.queen).isEmpty()
+        this.board[color].size() <= 2
+        && this.board[opposite(color)].diff(this.board.king).diff(this.board.queen).isEmpty()
       );
     }
     if (this.board[color].intersects(this.board.bishop)) {
-      const sameColor =
-        !this.board.bishop.intersects(SquareSet.darkSquares()) ||
-        !this.board.bishop.intersects(SquareSet.lightSquares());
+      const sameColor = !this.board.bishop.intersects(SquareSet.darkSquares())
+        || !this.board.bishop.intersects(SquareSet.lightSquares());
       return sameColor && this.board.pawn.isEmpty() && this.board.knight.isEmpty();
     }
     return true;
@@ -592,14 +594,14 @@ export const pseudoDests = (pos: Position, square: Square, ctx: Context): Square
 };
 
 export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
-  left.rules === right.rules &&
-  boardEquals(left.board, right.board) &&
-  ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
-  left.turn === right.turn &&
-  left.castles.castlingRights.equals(right.castles.castlingRights) &&
-  legalEpSquare(left) === legalEpSquare(right) &&
-  ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
-    (!left.remainingChecks && !right.remainingChecks));
+  left.rules === right.rules
+  && boardEquals(left.board, right.board)
+  && ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets))
+  && left.turn === right.turn
+  && left.castles.castlingRights.equals(right.castles.castlingRights)
+  && legalEpSquare(left) === legalEpSquare(right)
+  && ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks))
+    || (!left.remainingChecks && !right.remainingChecks));
 
 export const castlingSide = (pos: Position, move: Move): CastlingSide | undefined => {
   if (isDrop(move)) return;
@@ -620,12 +622,11 @@ export const normalizeMove = (pos: Position, move: Move): Move => {
 };
 
 export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
-  const promoted =
-    Math.max(board.pieces(color, 'queen').size() - 1, 0) +
-    Math.max(board.pieces(color, 'rook').size() - 2, 0) +
-    Math.max(board.pieces(color, 'knight').size() - 2, 0) +
-    Math.max(board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0) +
-    Math.max(board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
+  const promoted = Math.max(board.pieces(color, 'queen').size() - 1, 0)
+    + Math.max(board.pieces(color, 'rook').size() - 2, 0)
+    + Math.max(board.pieces(color, 'knight').size() - 2, 0)
+    + Math.max(board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0)
+    + Math.max(board.pieces(color, 'bishop').intersect(SquareSet.darkSquares()).size() - 1, 0);
   return board.pieces(color, 'pawn').size() + promoted <= 8;
 };
 
@@ -643,9 +644,9 @@ export const isImpossibleCheck = (pos: Position): boolean => {
     const pushedTo = pos.epSquare ^ 8;
     const pushedFrom = pos.epSquare ^ 24;
     return (
-      checkers.moreThanOne() ||
-      (checkers.first()! !== pushedTo &&
-        pos
+      checkers.moreThanOne()
+      || (checkers.first()! !== pushedTo
+        && pos
           .kingAttackers(ourKing, opposite(pos.turn), pos.board.occupied.without(pushedTo).with(pushedFrom))
           .nonEmpty())
     );

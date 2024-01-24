@@ -8,9 +8,9 @@
  * @packageDocumentation
  */
 
-import { Rules, SquareName, Move, isDrop } from './types.js';
-import { makeSquare, squareFile } from './util.js';
 import { Position } from './chess.js';
+import { isDrop, Move, Rules, SquareName } from './types.js';
+import { makeSquare, squareFile } from './util.js';
 
 export interface ChessgroundDestsOpts {
   chess960?: boolean;
@@ -49,15 +49,15 @@ export const chessgroundMove = (move: Move): SquareName[] =>
 export const scalachessCharPair = (move: Move): string =>
   isDrop(move)
     ? String.fromCharCode(
-        35 + move.to,
-        35 + 64 + 8 * 5 + ['queen', 'rook', 'bishop', 'knight', 'pawn'].indexOf(move.role),
-      )
+      35 + move.to,
+      35 + 64 + 8 * 5 + ['queen', 'rook', 'bishop', 'knight', 'pawn'].indexOf(move.role),
+    )
     : String.fromCharCode(
-        35 + move.from,
-        move.promotion
-          ? 35 + 64 + 8 * ['queen', 'rook', 'bishop', 'knight', 'king'].indexOf(move.promotion) + squareFile(move.to)
-          : 35 + move.to,
-      );
+      35 + move.from,
+      move.promotion
+        ? 35 + 64 + 8 * ['queen', 'rook', 'bishop', 'knight', 'king'].indexOf(move.promotion) + squareFile(move.to)
+        : 35 + move.to,
+    );
 
 export const lichessRules = (
   variant:

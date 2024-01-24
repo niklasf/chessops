@@ -1,24 +1,24 @@
 import { expect, jest, test } from '@jest/globals';
-import {
-  makePgn,
-  Node,
-  ChildNode,
-  PgnNodeData,
-  PgnParser,
-  PgnError,
-  Game,
-  parsePgn,
-  transform,
-  startingPosition,
-  emptyHeaders,
-  parseComment,
-  makeComment,
-  isChildNode,
-} from './pgn.js';
-import { parseSan } from './san.js';
+import { createReadStream } from 'fs';
 import { Position } from './chess.js';
 import { makeFen } from './fen.js';
-import { createReadStream } from 'fs';
+import {
+  ChildNode,
+  emptyHeaders,
+  Game,
+  isChildNode,
+  makeComment,
+  makePgn,
+  Node,
+  parseComment,
+  parsePgn,
+  PgnError,
+  PgnNodeData,
+  PgnParser,
+  startingPosition,
+  transform,
+} from './pgn.js';
+import { parseSan } from './san.js';
 
 interface GameCallback {
   (game: Game<PgnNodeData>, err: PgnError | undefined): Error | void;

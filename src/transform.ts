@@ -1,8 +1,8 @@
-import { ROLES, COLORS } from './types.js';
-import { defined } from './util.js';
-import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Setup } from './setup.js';
+import { SquareSet } from './squareSet.js';
+import { COLORS, ROLES } from './types.js';
+import { defined } from './util.js';
 
 export const flipVertical = (s: SquareSet): SquareSet => s.bswap64();
 

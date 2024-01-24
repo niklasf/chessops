@@ -1,5 +1,5 @@
-import { Square, Color, Role, Piece, COLORS, ROLES, ByRole, ByColor } from './types.js';
 import { SquareSet } from './squareSet.js';
+import { ByColor, ByRole, Color, COLORS, Piece, Role, ROLES, Square } from './types.js';
 
 /**
  * Piece positions on a board.
@@ -155,6 +155,6 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
 }
 
 export const boardEquals = (left: Board, right: Board): boolean =>
-  left.white.equals(right.white) &&
-  left.promoted.equals(right.promoted) &&
-  ROLES.every(role => left[role].equals(right[role]));
+  left.white.equals(right.white)
+  && left.promoted.equals(right.promoted)
+  && ROLES.every(role => left[role].equals(right[role]));

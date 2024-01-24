@@ -1,7 +1,7 @@
-import { createReadStream } from 'fs';
-import { parseSan } from 'chessops/san';
 import { makeFen } from 'chessops/fen';
-import { PgnParser, walk, startingPosition } from 'chessops/pgn';
+import { PgnParser, startingPosition, walk } from 'chessops/pgn';
+import { parseSan } from 'chessops/san';
+import { createReadStream } from 'fs';
 
 const status = {
   games: 0,
@@ -53,6 +53,6 @@ for (const arg of process.argv.slice(2)) {
         parser.parse('');
         console.log(status);
         resolve();
-      }),
+      })
   );
 }

@@ -1,13 +1,13 @@
 import {
-  FILE_NAMES,
-  RANK_NAMES,
   CastlingSide,
   Color,
-  Square,
-  Role,
-  Move,
+  FILE_NAMES,
   isDrop,
   isNormal,
+  Move,
+  RANK_NAMES,
+  Role,
+  Square,
   SquareName,
 } from './types.js';
 

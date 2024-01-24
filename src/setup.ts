@@ -1,6 +1,6 @@
-import { Color, Role, ROLES, Square, ByColor, ByRole } from './types.js';
-import { SquareSet } from './squareSet.js';
 import { Board, boardEquals } from './board.js';
+import { SquareSet } from './squareSet.js';
+import { ByColor, ByRole, Color, Role, ROLES, Square } from './types.js';
 
 export class MaterialSide implements ByRole<number> {
   pawn: number;
@@ -178,12 +178,12 @@ export const setupClone = (setup: Setup): Setup => ({
 });
 
 export const setupEquals = (left: Setup, right: Setup): boolean =>
-  boardEquals(left.board, right.board) &&
-  ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets)) &&
-  left.turn === right.turn &&
-  left.castlingRights.equals(right.castlingRights) &&
-  left.epSquare === right.epSquare &&
-  ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks)) ||
-    (!left.remainingChecks && !right.remainingChecks)) &&
-  left.halfmoves === right.halfmoves &&
-  left.fullmoves === right.fullmoves;
+  boardEquals(left.board, right.board)
+  && ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets))
+  && left.turn === right.turn
+  && left.castlingRights.equals(right.castlingRights)
+  && left.epSquare === right.epSquare
+  && ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks))
+    || (!left.remainingChecks && !right.remainingChecks))
+  && left.halfmoves === right.halfmoves
+  && left.fullmoves === right.fullmoves;

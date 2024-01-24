@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals';
-import { Piece } from './types.js';
 import { Board, boardEquals } from './board.js';
+import { Piece } from './types.js';
 
 test('set and get', () => {
   const emptyBoard = Board.empty();

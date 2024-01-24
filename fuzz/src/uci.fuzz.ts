@@ -1,4 +1,4 @@
-import { parseUci, makeUci, moveEquals } from 'chessops/util';
+import { makeUci, moveEquals, parseUci } from 'chessops/util';
 
 export const fuzz = (data: Buffer): void => {
   const move = parseUci(data.toString());

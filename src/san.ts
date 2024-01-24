@@ -1,8 +1,8 @@
-import { FILE_NAMES, RANK_NAMES, isDrop, Move, CastlingSide, SquareName } from './types.js';
-import { charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util.js';
-import { SquareSet } from './squareSet.js';
+import { attacks, bishopAttacks, kingAttacks, knightAttacks, queenAttacks, rookAttacks } from './attacks.js';
 import { Position } from './chess.js';
-import { attacks, kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks.js';
+import { SquareSet } from './squareSet.js';
+import { CastlingSide, FILE_NAMES, isDrop, Move, RANK_NAMES, SquareName } from './types.js';
+import { charToRole, defined, makeSquare, opposite, parseSquare, roleToChar, squareFile, squareRank } from './util.js';
 
 const makeSanWithoutSuffix = (pos: Position, move: Move): string => {
   let san = '';
@@ -15,8 +15,8 @@ const makeSanWithoutSuffix = (pos: Position, move: Move): string => {
     if (role === 'king' && (pos.board[pos.turn].has(move.to) || Math.abs(move.to - move.from) === 2)) {
       san = move.to > move.from ? 'O-O' : 'O-O-O';
     } else {
-      const capture =
-        pos.board.occupied.has(move.to) || (role === 'pawn' && squareFile(move.from) !== squareFile(move.to));
+      const capture = pos.board.occupied.has(move.to)
+        || (role === 'pawn' && squareFile(move.from) !== squareFile(move.to));
       if (role !== 'pawn') {
         san = roleToChar(role).toUpperCase();
 
@@ -85,13 +85,13 @@ export const parseSan = (pos: Position, san: string): Move | undefined => {
   // Normal move
   const match = san.match(/^([NBRQK])?([a-h])?([1-8])?[-x]?([a-h][1-8])(?:=?([nbrqkNBRQK]))?[+#]?$/) as
     | [
-        string,
-        'N' | 'B' | 'R' | 'Q' | 'K' | undefined,
-        string | undefined,
-        string | undefined,
-        SquareName,
-        'n' | 'b' | 'r' | 'q' | 'k' | 'N' | 'B' | 'R' | 'Q' | 'K' | undefined,
-      ]
+      string,
+      'N' | 'B' | 'R' | 'Q' | 'K' | undefined,
+      string | undefined,
+      string | undefined,
+      SquareName,
+      'n' | 'b' | 'r' | 'q' | 'k' | 'N' | 'B' | 'R' | 'Q' | 'K' | undefined,
+    ]
     | null;
   if (!match) {
     // Castling

@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals';
-import { rookAttacks, ray, between } from './attacks.js';
+import { between, ray, rookAttacks } from './attacks.js';
 import { SquareSet } from './squareSet.js';
 
 test('rook attacks', () => {

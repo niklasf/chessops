@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals';
 import { SquareSet } from './squareSet.js';
-import { flipVertical, flipHorizontal, flipDiagonal, rotate180 } from './transform.js';
+import { flipDiagonal, flipHorizontal, flipVertical, rotate180 } from './transform.js';
 
 const r = new SquareSet(0x0e0a1222, 0x1e222212);
 

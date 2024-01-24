@@ -1,9 +1,9 @@
-import { Square, Piece, Role, ROLES } from './types.js';
-import { opposite, squareRank, makeSquare, makeUci } from './util.js';
-import { makePiece } from './fen.js';
-import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Position } from './chess.js';
+import { makePiece } from './fen.js';
+import { SquareSet } from './squareSet.js';
+import { Piece, Role, ROLES, Square } from './types.js';
+import { makeSquare, makeUci, opposite, squareRank } from './util.js';
 
 export const squareSet = (squares: SquareSet): string => {
   const r = [];

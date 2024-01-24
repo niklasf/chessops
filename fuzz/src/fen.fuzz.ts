@@ -1,4 +1,4 @@
-import { parseFen, makeFen } from 'chessops/fen';
+import { makeFen, parseFen } from 'chessops/fen';
 import { setupEquals } from 'chessops/setup';
 
 export const fuzz = (data: Buffer): void => {

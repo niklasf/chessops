@@ -100,12 +100,12 @@
  *
  * @packageDocumentation
  */
-import { defined, makeSquare, parseSquare } from './util.js';
-import { Rules, Outcome, Square } from './types.js';
-import { parseFen, FenError, makeFen } from './fen.js';
-import { Position, PositionError, IllegalSetup } from './chess.js';
-import { defaultPosition, setupPosition } from './variant.js';
 import { Result } from '@badrap/result';
+import { IllegalSetup, Position, PositionError } from './chess.js';
+import { FenError, makeFen, parseFen } from './fen.js';
+import { Outcome, Rules, Square } from './types.js';
+import { defined, makeSquare, parseSquare } from './util.js';
+import { defaultPosition, setupPosition } from './variant.js';
 
 export interface Game<T> {
   headers: Map<string, string>;
@@ -252,9 +252,9 @@ export const makePgn = (game: Game<PgnNodeData>): string => {
   const fen = game.headers.get('FEN');
   const initialPly = fen
     ? parseFen(fen).unwrap(
-        setup => (setup.fullmoves - 1) * 2 + (setup.turn === 'white' ? 0 : 1),
-        _ => 0,
-      )
+      setup => (setup.fullmoves - 1) * 2 + (setup.turn === 'white' ? 0 : 1),
+      _ => 0,
+    )
     : 0;
 
   const stack: MakePgnFrame[] = [];
@@ -710,10 +710,12 @@ const makeClk = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   seconds = (seconds % 3600) % 60;
-  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toLocaleString('en', {
-    minimumIntegerDigits: 2,
-    maximumFractionDigits: 3,
-  })}`;
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${
+    seconds.toLocaleString('en', {
+      minimumIntegerDigits: 2,
+      maximumFractionDigits: 3,
+    })
+  }`;
 };
 
 const makeCommentShapeColor = (color: CommentShapeColor): 'G' | 'R' | 'Y' | 'B' => {

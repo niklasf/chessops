@@ -1,8 +1,8 @@
 import { expect, test } from '@jest/globals';
-import { parseUci } from './util.js';
-import { makeSan, makeSanVariation, parseSan } from './san.js';
 import { Chess } from './chess.js';
-import { parseFen, makeFen } from './fen.js';
+import { makeFen, parseFen } from './fen.js';
+import { makeSan, makeSanVariation, parseSan } from './san.js';
+import { parseUci } from './util.js';
 import { Antichess, Crazyhouse } from './variant.js';
 
 test('make variation with king move', () => {

@@ -1,9 +1,9 @@
 import { Result } from '@badrap/result';
-import { Piece, Square, Color, COLORS, ROLES, FILE_NAMES } from './types.js';
-import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
-import { Setup, MaterialSide, Material, RemainingChecks } from './setup.js';
-import { defined, squareFile, parseSquare, makeSquare, roleToChar, charToRole, squareFromCoords } from './util.js';
+import { Material, MaterialSide, RemainingChecks, Setup } from './setup.js';
+import { SquareSet } from './squareSet.js';
+import { Color, COLORS, FILE_NAMES, Piece, ROLES, Square } from './types.js';
+import { charToRole, defined, makeSquare, parseSquare, roleToChar, squareFile, squareFromCoords } from './util.js';
 
 export const INITIAL_BOARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' w KQkq -';
@@ -91,9 +91,9 @@ export const parseCastlingFen = (board: Board, castlingPart: string): Result<Squ
     const lower = c.toLowerCase();
     const color = c === lower ? 'black' : 'white';
     const rank = color === 'white' ? 0 : 7;
-    if ('a' <= lower && lower <= 'h')
+    if ('a' <= lower && lower <= 'h') {
       castlingRights = castlingRights.with(squareFromCoords(lower.charCodeAt(0) - 'a'.charCodeAt(0), rank)!);
-    else if (lower === 'k' || lower === 'q') {
+    } else if (lower === 'k' || lower === 'q') {
       const rooksAndKings = board[color].intersect(SquareSet.backrank(color)).intersect(board.rook.union(board.king));
       const candidate = lower === 'k' ? rooksAndKings.last() : rooksAndKings.first();
       castlingRights = castlingRights.with(
@@ -102,8 +102,9 @@ export const parseCastlingFen = (board: Board, castlingPart: string): Result<Squ
     } else return Result.err(new FenError(InvalidFen.Castling));
   }
 
-  if (COLORS.some(color => SquareSet.backrank(color).intersect(castlingRights).size() > 2))
+  if (COLORS.some(color => SquareSet.backrank(color).intersect(castlingRights).size() > 2)) {
     return Result.err(new FenError(InvalidFen.Castling));
+  }
 
   return Result.ok(castlingRights);
 };
@@ -113,14 +114,16 @@ export const parseRemainingChecks = (part: string): Result<RemainingChecks, FenE
   if (parts.length === 3 && parts[0] === '') {
     const white = parseSmallUint(parts[1]);
     const black = parseSmallUint(parts[2]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3)
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) {
       return Result.err(new FenError(InvalidFen.RemainingChecks));
+    }
     return Result.ok(new RemainingChecks(3 - white, 3 - black));
   } else if (parts.length === 2) {
     const white = parseSmallUint(parts[0]);
     const black = parseSmallUint(parts[1]);
-    if (!defined(white) || white > 3 || !defined(black) || black > 3)
+    if (!defined(white) || white > 3 || !defined(black) || black > 3) {
       return Result.err(new FenError(InvalidFen.RemainingChecks));
+    }
     return Result.ok(new RemainingChecks(white, black));
   } else return Result.err(new FenError(InvalidFen.RemainingChecks));
 };
@@ -204,8 +207,8 @@ export const parseFen = (fen: string): Result<Setup, FenError> => {
             halfmoves,
             fullmoves: Math.max(1, fullmoves),
           };
-        }),
-      ),
+        })
+      )
     );
   });
 };

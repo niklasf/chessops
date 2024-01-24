@@ -12,9 +12,9 @@
  * @packageDocumentation
  */
 
-import { squareFile, squareRank } from './util.js';
-import { Square, Piece, Color, BySquare } from './types.js';
 import { SquareSet } from './squareSet.js';
+import { BySquare, Color, Piece, Square } from './types.js';
+import { squareFile, squareRank } from './util.js';
 
 const computeRange = (square: Square, deltas: number[]): SquareSet => {
   let range = SquareSet.empty();

@@ -1,8 +1,8 @@
 import { expect, test } from '@jest/globals';
-import { parseFen, makeFen, makeBoardFen, INITIAL_FEN, INITIAL_BOARD_FEN, EMPTY_BOARD_FEN } from './fen.js';
-import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
+import { EMPTY_BOARD_FEN, INITIAL_BOARD_FEN, INITIAL_FEN, makeBoardFen, makeFen, parseFen } from './fen.js';
 import { defaultSetup } from './setup.js';
+import { SquareSet } from './squareSet.js';
 
 test('make board fen', () => {
   expect(makeBoardFen(Board.default())).toEqual(INITIAL_BOARD_FEN);

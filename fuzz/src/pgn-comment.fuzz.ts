@@ -1,4 +1,4 @@
-import { Comment, parseComment, makeComment, isMate, isPawns, CommentShape } from 'chessops/pgn';
+import { Comment, CommentShape, isMate, isPawns, makeComment, parseComment } from 'chessops/pgn';
 
 const mate = (comment: Comment): number | undefined =>
   comment.evaluation && isMate(comment.evaluation) ? comment.evaluation.mate : undefined;
