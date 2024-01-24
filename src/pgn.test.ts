@@ -4,7 +4,9 @@ import { Position } from './chess.js';
 import { makeFen } from './fen.js';
 import {
   ChildNode,
+  defaultGame,
   emptyHeaders,
+  extendMainline,
   Game,
   isChildNode,
   makeComment,
@@ -40,7 +42,7 @@ function testPgnFile({ fileName = '', numberOfGames = 1, allValid = true } = {},
       .on('close', () => {
         parser.parse('');
         expect(gameCallback).toHaveBeenCalledTimes(numberOfGames);
-        done();
+        done!();
       });
   });
 }
@@ -77,6 +79,17 @@ test('make pgn', () => {
   expect(makePgn({ headers: emptyHeaders(), moves: root })).toEqual(
     '1. e4 $7 ( 1. e3 ) 1... e5 ( 1... e6 2. Nf3 { a comment } ) 2. c4 *\n',
   );
+});
+
+test('extend mainline', () => {
+  let game: Game<PgnNodeData> = defaultGame(emptyHeaders);
+  const mainline = 'e4 d5 a3 h6 Bg5'.split(' ').map(san => {
+    return {
+      san: san,
+    };
+  });
+  extendMainline(game, mainline);
+  expect(makePgn(game)).toEqual('1. e4 d5 2. a3 h6 3. Bg5 *\n');
 });
 
 test('parse headers', () => {
