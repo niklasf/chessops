@@ -25,9 +25,9 @@
     "@jest/globals": "^29",
     "@typescript-eslint/eslint-plugin": "^6",
     "@typescript-eslint/parser": "^6",
+    "dprint": "^0.45",
     "eslint": "^8",
     "jest": "^29",
-    "prettier": "^3",
     "ts-jest": "^29",
     "typedoc": "^0.25",
     "typescript": "^5"
@@ -37,8 +37,8 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/san.ts src/transform.ts src/variant.ts src/pgn.ts",
     "lint": "eslint src/*.ts",
-    "format": "prettier --write .",
-    "check-format": "prettier --check ."
+    "format": "dprint fmt",
+    "check-format": "dprint check"
   },
   "files": [
     "attacks.js",
