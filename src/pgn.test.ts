@@ -82,12 +82,8 @@ test('make pgn', () => {
 });
 
 test('extend mainline', () => {
-  let game: Game<PgnNodeData> = defaultGame(emptyHeaders);
-  const mainline = 'e4 d5 a3 h6 Bg5'.split(' ').map(san => {
-    return {
-      san: san,
-    };
-  });
+  const game: Game<PgnNodeData> = defaultGame(emptyHeaders);
+  const mainline = 'e4 d5 a3 h6 Bg5'.split(' ').map(san => ({ san }));
   extendMainline(game, mainline);
   expect(makePgn(game)).toEqual('1. e4 d5 2. a3 h6 3. Bg5 *\n');
 });
