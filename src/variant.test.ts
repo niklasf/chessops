@@ -1,10 +1,10 @@
 import { expect, test } from '@jest/globals';
 import { Rules, RULES } from './types.js';
 import { perft } from './debug.js';
-import { defaultPosition, setupPosition, isStandardMaterial } from './variant.js';
+import { defaultPosition, setupPosition, isStandardMaterial, Atomic } from './variant.js';
 import { parseFen, makeFen } from './fen.js';
 import { parseUci } from './util.js';
-import { parseSan } from './san.js';
+import { makeSanAndPlay, parseSan } from './san.js';
 
 const skip = 0;
 
@@ -175,6 +175,15 @@ test('antichess en passant', () => {
   expect(pos.isLegal(move)).toBe(true);
   const san = parseSan(pos, 'cxb3');
   expect(move).toEqual(san);
+});
+
+test('atomic rooks after explosion', () => {
+  const pos = Atomic.default();
+  for (const san of 'e4 d5 d4 e6 Nc3 b5 Bg5 f6 Bh6 Ba3 Bxg7 h5 bxa3 c5 Qc1 Qe7 Qh6 Qg7 Qh8+ Qxh8 Rb1 cxd4 Bxb5 Nd7 Rb7 Kf8 Rxd7 Rb8 Ne2 Rb1+ Nc1 d4 O-O'.split(
+    ' ',
+  )) {
+    expect(makeSanAndPlay(pos, parseSan(pos, san)!)).toEqual(san);
+  }
 });
 
 test.each(RULES)('%s standard material', rules => {
