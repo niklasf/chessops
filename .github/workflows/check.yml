@@ -1,4 +1,4 @@
-name: Test
+name: Check
 on: [push, pull_request]
 jobs:
   build:
@@ -10,3 +10,5 @@ jobs:
       - run: npm test
       - run: cd examples && npm ci
       - run: cd fuzz && npm ci && npm run compile
+      - run: npm run lint
+      - run: npm run check-format
