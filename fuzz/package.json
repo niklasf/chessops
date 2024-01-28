@@ -8,14 +8,11 @@
   },
   "devDependencies": {
     "@gitlab-org/jsfuzz": "=1.2.2",
-    "@rollup/plugin-node-resolve": "^15",
-    "@rollup/plugin-typescript": "^11",
-    "rollup": "^4",
-    "tslib": "^2",
+    "esbuild": "^0.20.0",
     "typescript": "^5"
   },
   "scripts": {
-    "compile": "rollup --config",
+    "compile": "find src -name '*.ts' -exec esbuild {} --bundle --outdir=dist --platform=node \\;",
     "fuzz-uci": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/uci.fuzz.js corpus/uci",
     "fuzz-san": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/san.fuzz.js corpus/san",
     "fuzz-fen": "$npm_execpath run compile && node node_modules/@gitlab-org/jsfuzz dist/fen.fuzz.js corpus/fen",
