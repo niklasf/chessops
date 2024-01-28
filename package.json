@@ -52,8 +52,7 @@
     "typescript": "^5"
   },
   "scripts": {
-    "prepare": "tsc --declarationDir dist/types",
-    "build": "tsc --declarationDir dist/types && tsc --outDir dist/cjs --module commonjs -d false",
+    "prepare": "tsc --declarationDir dist/types && tsc --outDir dist/cjs --module commonjs -d false",
     "prepublishOnly": "pnpm build && find dist -name '*.test.*' -exec rm {} +",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/san.ts src/transform.ts src/variant.ts src/pgn.ts",
