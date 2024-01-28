@@ -7,15 +7,11 @@
     "chessops": "file:.."
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15",
-    "@rollup/plugin-terser": "^0.4",
-    "@rollup/plugin-typescript": "^11",
-    "rollup": "^4",
-    "tslib": "^2",
+    "esbuild": "^0.20.0",
     "typescript": "^5"
   },
   "scripts": {
-    "prepare": "rollup --config && du --bytes dist/*",
+    "prepare": "esbuild src/read-pgn.ts --bundle --outdir=dist --platform=node --format=esm && du --bytes dist/*",
     "read-pgn": "time node --experimental-vm-modules dist/read-pgn.js"
   }
 }
