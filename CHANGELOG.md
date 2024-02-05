@@ -1,5 +1,13 @@
 # Changelog for chessops
 
+## v0.14.0
+
+- Change package layout to hybrid cjs/esm with subpath exports.
+- `chessops/pgn`:
+  - Add `Node.mainlineNodes()`.
+  - Add `node.end()`.
+  - Add `extend()`.
+
 ## v0.13.0
 
 - `Position.fromSetup()` now only checks minimum validity requirements.

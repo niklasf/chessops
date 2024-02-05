@@ -120,6 +120,25 @@ export const defaultGame = <T>(initHeaders: () => Map<string, string> = defaultH
 
 export class Node<T> {
   children: ChildNode<T>[] = [];
+
+  *mainlineNodes(): Iterable<ChildNode<T>> {
+    let node: Node<T> = this;
+    while (node.children.length) {
+      const child = node.children[0];
+      yield child;
+      node = child;
+    }
+  }
+
+  *mainline(): Iterable<T> {
+    for (const child of this.mainlineNodes()) yield child.data;
+  }
+
+  end(): Node<T> {
+    let node: Node<T> = this;
+    while (node.children.length) node = node.children[0];
+    return node;
+  }
 }
 
 export class ChildNode<T> extends Node<T> {
@@ -129,23 +148,6 @@ export class ChildNode<T> extends Node<T> {
 }
 
 export const isChildNode = <T>(node: Node<T>): node is ChildNode<T> => node instanceof ChildNode;
-
-export function* mainlineNodes<T>(node: Node<T>): Iterable<ChildNode<T>> {
-  while (node.children.length) {
-    const child = node.children[0];
-    yield child;
-    node = child;
-  }
-}
-
-export function* mainline<T>(node: Node<T>): Iterable<T> {
-  for (const child of mainlineNodes(node)) yield child.data;
-}
-
-export function mainlineEnd<T>(node: Node<T>): Node<T> {
-  while (node.children.length) node = node.children[0];
-  return node;
-}
 
 export const extend = <T>(node: Node<T>, data: T[]): Node<T> => {
   for (const d of data) {
