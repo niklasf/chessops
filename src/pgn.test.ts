@@ -6,9 +6,11 @@ import {
   ChildNode,
   defaultGame,
   emptyHeaders,
-  extendMainline,
+  extend,
   Game,
   isChildNode,
+  mainline,
+  mainlineEnd,
   makeComment,
   makePgn,
   Node,
@@ -83,8 +85,7 @@ test('make pgn', () => {
 
 test('extend mainline', () => {
   const game: Game<PgnNodeData> = defaultGame(emptyHeaders);
-  const mainline = 'e4 d5 a3 h6 Bg5'.split(' ').map(san => ({ san }));
-  extendMainline(game, mainline);
+  extend(mainlineEnd(game.moves), 'e4 d5 a3 h6 Bg5'.split(' ').map(san => ({ san })));
   expect(makePgn(game)).toEqual('1. e4 d5 2. a3 h6 3. Bg5 *\n');
 });
 
@@ -160,7 +161,7 @@ testPgnFile(
   },
   game => {
     expect(game.headers.get('Variant')).toBe('Antichess');
-    expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e3', 'e6', 'b4', 'Bxb4', 'Qg4']);
+    expect(Array.from(mainline(game.moves)).map(move => move.san)).toStrictEqual(['e3', 'e6', 'b4', 'Bxb4', 'Qg4']);
   },
 );
 testPgnFile(
@@ -187,12 +188,12 @@ testPgnFile(
     allValid: true,
   },
   game => {
-    expect(Array.from(game.moves.mainline()).map(move => move.san)).toStrictEqual(['e4', 'e5', 'Nf3', 'Nc6', 'Bb5']);
+    expect(Array.from(mainline(game.moves)).map(move => move.san)).toStrictEqual(['e4', 'e5', 'Nf3', 'Nc6', 'Bb5']);
   },
 );
 
 test('tricky tokens', () => {
-  const steps = Array.from(parsePgn('O-O-O !! 0-0-0# ??')[0].moves.mainline());
+  const steps = Array.from(mainline(parsePgn('O-O-O !! 0-0-0# ??')[0].moves));
   expect(steps[0].san).toBe('O-O-O');
   expect(steps[0].nags).toEqual([3]);
   expect(steps[1].san).toBe('O-O-O#');

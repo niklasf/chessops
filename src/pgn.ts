@@ -120,29 +120,7 @@ export const defaultGame = <T>(initHeaders: () => Map<string, string> = defaultH
 
 export class Node<T> {
   children: ChildNode<T>[] = [];
-
-  *mainline(): Iterable<T> {
-    let node: Node<T> = this;
-    while (node.children.length) {
-      const child = node.children[0];
-      yield child.data;
-      node = child;
-    }
-  }
 }
-
-export const extendMainline = <T>(game: Game<T>, data: T[]) => {
-  let node = game.moves;
-  while (node.children.length) {
-    const child = node.children[0];
-    node = child;
-  }
-  data.forEach(d => {
-    const newNode = new ChildNode(d);
-    node.children = [newNode];
-    node = newNode;
-  });
-};
 
 export class ChildNode<T> extends Node<T> {
   constructor(public data: T) {
@@ -151,6 +129,32 @@ export class ChildNode<T> extends Node<T> {
 }
 
 export const isChildNode = <T>(node: Node<T>): node is ChildNode<T> => node instanceof ChildNode;
+
+export function* mainlineNodes<T>(node: Node<T>): Iterable<ChildNode<T>> {
+  while (node.children.length) {
+    const child = node.children[0];
+    yield child;
+    node = child;
+  }
+}
+
+export function* mainline<T>(node: Node<T>): Iterable<T> {
+  for (const child of mainlineNodes(node)) yield child.data;
+}
+
+export function mainlineEnd<T>(node: Node<T>): Node<T> {
+  while (node.children.length) node = node.children[0];
+  return node;
+}
+
+export const extend = <T>(node: Node<T>, data: T[]): Node<T> => {
+  for (const d of data) {
+    const child = new ChildNode(d);
+    node.children.push(child);
+    node = child;
+  }
+  return node;
+};
 
 export class Box<T> {
   constructor(public value: T) {}
