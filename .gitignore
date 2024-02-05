@@ -1,7 +1,4 @@
 node_modules/
 docs/
 coverage/
-
-*.js.map
-*.d.ts
-*.js
+dist/
