@@ -834,9 +834,9 @@ export const parseComment = (comment: string): Comment => {
       /\s?(?:([+-]?M\d{1,5})|([+-]?(?:\d{1,5}|\d{0,5}\.\d{1,2})))(?:\/(\d{1,5}))?,?(?:\s(\d{1,5}\.\d{1,3})s),?\s?/g,
       (_, mate, pawns, d, e) => {
         const depth = d && parseInt(d, 10);
-        evaluation = mate ? { mate: parseInt(mate.replace("M", ""), 10), depth } : { pawns: parseFloat(pawns), depth };
+        evaluation = mate ? { mate: parseInt(mate.replace('M', ''), 10), depth } : { pawns: parseFloat(pawns), depth };
         if (e) {
-          emt = parseFloat(e)
+          emt = parseFloat(e);
         }
         return '  ';
       },

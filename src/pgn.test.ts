@@ -237,7 +237,7 @@ test('parse comment', () => {
     text: '',
     emt: 4.3,
     evaluation: { mate: 35, depth: 33 },
-    shapes: []
+    shapes: [],
   });
   expect(parseComment('-0.32/24 1.0s, White loses on time')).toEqual({
     emt: 1.0,
@@ -249,7 +249,7 @@ test('parse comment', () => {
     emt: 0.003,
     evaluation: { mate: 1, depth: 245 },
     text: 'nodes,9071, seldepth, 2, nps, 2267750, Komodo got checkmated',
-    shapes: []
+    shapes: [],
   });
 });
 
