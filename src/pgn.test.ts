@@ -233,6 +233,24 @@ test('parse comment', () => {
     shapes: [{ from: 0, to: 0, color: 'green' }],
   });
   expect(parseComment('foo [%bar] [%csl Ga1] [%cal Ra1h1,Gb1b8] [%clk 3:25:45]').text).toBe('foo [%bar]');
+  expect(parseComment('+M35/33 4.3s')).toEqual({
+    text: '',
+    emt: 4.3,
+    evaluation: { mate: 35, depth: 33 },
+    shapes: [],
+  });
+  expect(parseComment('-0.32/24 1.0s, White loses on time')).toEqual({
+    emt: 1.0,
+    evaluation: { pawns: -0.32, depth: 24 },
+    text: 'White loses on time',
+    shapes: [],
+  });
+  expect(parseComment('+M1/245, 0.003s, nodes,9071, seldepth, 2, nps, 2267750, Komodo got checkmated')).toEqual({
+    emt: 0.003,
+    evaluation: { mate: 1, depth: 245 },
+    text: 'nodes,9071, seldepth, 2, nps, 2267750, Komodo got checkmated',
+    shapes: [],
+  });
 });
 
 test('make comment', () => {
