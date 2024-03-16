@@ -1,5 +1,9 @@
 # Changelog for chessops
 
+## v0.14.1
+
+- Set `"type": "module"` in `package.json`.
+
 ## v0.14.0
 
 - Change package layout to hybrid cjs/esm with subpath exports.
