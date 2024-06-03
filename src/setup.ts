@@ -13,20 +13,37 @@ import { ByColor, ByRole, Color, Role, ROLES, Square } from './types.js';
  * @property {number} king The number of kings on the side.
  */
 export class MaterialSide implements ByRole<number> {
-  /** @type {number} */
+  /** 
+  * The number of pawns.
+  */
   pawn: number;
-  /** @type {number} */
+
+  /**
+   * The number of knights.
+   */
   knight: number;
-  /** @type {number} */
+
+  /**
+   * The number of bishops.
+   */
   bishop: number;
-  /** @type {number} */
+
+  /**
+   * The number of rooks.
+   */
   rook: number;
-  /** @type {number} */
+
+  /**
+   * The number of queens.
+   */
   queen: number;
-  /** @type {number} */
+
+  /**
+   * The number of kings.
+   */
   king: number;
 
-  private constructor() {}
+  private constructor() { }
 
   /**
    * Creates an empty MaterialSide instance.
@@ -63,7 +80,7 @@ export class MaterialSide implements ByRole<number> {
   /**
    * Checks if the MaterialSide instance is equal to another MaterialSide instance.
    * @param {MaterialSide} other The other MaterialSide instance to compare.
-   * @returns {boolean} True if the MaterialSide instances are equal, false otherwise.
+   * @returns {boolean} `true` if the MaterialSide instances are equal, `false` otherwise.
    */
   equals(other: MaterialSide): boolean {
     return ROLES.every(role => this[role] === other[role]);
@@ -93,7 +110,7 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Checks if the MaterialSide is not empty (has pieces).
-   * @returns {boolean} True if the MaterialSide is not empty, false otherwise.
+   * @returns {boolean} `true` if the MaterialSide is not empty, `false` otherwise.
    */
   nonEmpty(): boolean {
     return ROLES.some(role => this[role] > 0);
@@ -101,7 +118,7 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Checks if the MaterialSide is empty (no pieces).
-   * @returns {boolean} True if the MaterialSide is empty, false otherwise.
+   * @returns {boolean} `true` if the MaterialSide is empty, `false` otherwise.
    */
   isEmpty(): boolean {
     return !this.nonEmpty();
@@ -109,7 +126,7 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Checks if the MaterialSide has pawns.
-   * @returns {boolean} True if the MaterialSide has pawns, false otherwise.
+   * @returns {boolean} `true` if the MaterialSide has pawns, `false` otherwise.
    */
   hasPawns(): boolean {
     return this.pawn > 0;
@@ -117,7 +134,7 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Checks if the MaterialSide has non-pawn pieces.
-   * @returns {boolean} True if the MaterialSide has non-pawn pieces, false otherwise.
+   * @returns {boolean} `true` if the MaterialSide has non-pawn pieces, `false` otherwise.
    */
   hasNonPawns(): boolean {
     return this.knight > 0 || this.bishop > 0 || this.rook > 0 || this.queen > 0 || this.king > 0;
@@ -147,7 +164,7 @@ export class Material implements ByColor<MaterialSide> {
   constructor(
     public white: MaterialSide,
     public black: MaterialSide,
-  ) {}
+  ) { }
 
   /**
    * Creates an empty Material instance.
@@ -177,7 +194,7 @@ export class Material implements ByColor<MaterialSide> {
   /**
    * Checks if the Material instance is equal to another Material instance.
    * @param {Material} other The other Material instance to compare.
-   * @returns {boolean} True if the Material instances are equal, false otherwise.
+   * @returns {boolean} `true` if the Material instances are equal, `false` otherwise.
    */
   equals(other: Material): boolean {
     return this.white.equals(other.white) && this.black.equals(other.black);
@@ -220,7 +237,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Checks if the Material is empty (no pieces).
-   * @returns {boolean} True if the Material is empty, false otherwise.
+   * @returns {boolean} `true` if the Material is empty, `false` otherwise.
    */
   isEmpty(): boolean {
     return this.white.isEmpty() && this.black.isEmpty();
@@ -228,7 +245,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Checks if the Material is not empty (has pieces).
-   * @returns {boolean} True if the Material is not empty, false otherwise.
+   * @returns {boolean} `true` if the Material is not empty, `false` otherwise.
    */
   nonEmpty(): boolean {
     return !this.isEmpty();
@@ -236,7 +253,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Checks if the Material has pawns.
-   * @returns {boolean} True if the Material has pawns, false otherwise.
+   * @returns {boolean} `true` if the Material has pawns, `false` otherwise.
    */
   hasPawns(): boolean {
     return this.white.hasPawns() || this.black.hasPawns();
@@ -244,27 +261,49 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Checks if the Material has non-pawn pieces.
-   * @returns {boolean} True if the Material has non-pawn pieces, false otherwise.
+   * @returns {boolean} `true` if the Material has non-pawn pieces, `false` otherwise.
    */
   hasNonPawns(): boolean {
     return this.white.hasNonPawns() || this.black.hasNonPawns();
   }
 }
 
+/**
+ * Represents the remaining checks count for each color.
+ * @implements {ByColor<number>}
+ */
 export class RemainingChecks implements ByColor<number> {
+  /**
+   * Creates a new instance of the RemainingChecks class.
+   * @param {number} white The remaining checks count for the white player.
+   * @param {number} black The remaining checks count for the black player.
+   */
   constructor(
     public white: number,
     public black: number,
-  ) {}
+  ) { }
 
+  /**
+   * Returns the default remaining checks count for each color.
+   * @returns {RemainingChecks} The default remaining checks count.
+   */
   static default(): RemainingChecks {
     return new RemainingChecks(3, 3);
   }
 
+  /**
+   * Creates a clone of the RemainingChecks instance.
+   * @returns {RemainingChecks} A new instance with the same remaining checks count.
+   */
   clone(): RemainingChecks {
     return new RemainingChecks(this.white, this.black);
   }
 
+  /**
+   * Checks if the RemainingChecks instance is equal to another instance.
+   * @param {RemainingChecks} other The other RemainingChecks instance to compare.
+   * @returns {boolean} `true` if the instances are equal, `false` otherwise.
+   */
   equals(other: RemainingChecks): boolean {
     return this.white === other.white && this.black === other.black;
   }
@@ -328,7 +367,7 @@ export const setupClone = (setup: Setup): Setup => ({
  * Checks if two setups are equal.
  * @param {Setup} left The first setup.
  * @param {Setup} right The second setup.
- * @returns {boolean} True if the setups are equal, false otherwise.
+ * @returns {boolean} `true` if the setups are equal, `false` otherwise.
  */
 export const setupEquals = (left: Setup, right: Setup): boolean =>
   boardEquals(left.board, right.board)
