@@ -155,7 +155,7 @@ export const parseUci = (str: string): Move | undefined => {
  * @function moveEquals
  * @param {Move} left The first move to compare.
  * @param {Move} right The second move to compare.
- * @returns {boolean} True if the moves are equal, false otherwise.
+ * @returns {boolean} `true` if the moves are equal, `false` otherwise.
  */
 export const moveEquals = (left: Move, right: Move): boolean => {
   if (left.to !== right.to) return false;

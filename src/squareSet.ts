@@ -193,7 +193,7 @@ export class SquareSet implements Iterable<Square> {
    * Two SquareSets are considered to intersect if they have at least one square in common.
    *
    * @param {SquareSet} other The SquareSet to check for intersection.
-   * @returns {boolean} True if the current set intersects with the other set, false otherwise.
+   * @returns {boolean} `true`  if the current set intersects with the other set, `false` otherwise.
    */
   intersects(other: SquareSet): boolean {
     return this.intersect(other).nonEmpty();
@@ -205,7 +205,7 @@ export class SquareSet implements Iterable<Square> {
    * Two SquareSets are considered to be disjoint if they have no squares in common.
    *
    * @param {SquareSet} other The SquareSet to check for disjointness.
-   * @returns {boolean} True if the current set is disjoint with the other set, false otherwise.
+   * @returns {boolean} `true`  if the current set is disjoint with the other set, `false` otherwise.
    */
   isDisjoint(other: SquareSet): boolean {
     return this.intersect(other).isEmpty();
@@ -217,7 +217,7 @@ export class SquareSet implements Iterable<Square> {
    * A SquareSet is a superset of another SquareSet if every square in the other set is also present in the current set.
    *
    * @param {SquareSet} other The SquareSet to check for supersetness.
-   * @returns {boolean} True if the current set is a superset of the other set, false otherwise.
+   * @returns {boolean} `true`  if the current set is a superset of the other set, `false` otherwise.
    */
   supersetOf(other: SquareSet): boolean {
     return other.diff(this).isEmpty();
@@ -229,7 +229,7 @@ export class SquareSet implements Iterable<Square> {
    * A SquareSet is a subset of another SquareSet if every square in the current set is also present in the other set.
    *
    * @param {SquareSet} other The SquareSet to check for subsetness.
-   * @returns {boolean} True if the current set is a subset of the other set, false otherwise.
+   * @returns {boolean} `true`  if the current set is a subset of the other set, `false` otherwise.
    */
   subsetOf(other: SquareSet): boolean {
     return this.diff(other).isEmpty();
@@ -301,7 +301,7 @@ export class SquareSet implements Iterable<Square> {
   * Checks if the current SquareSet is equal to another SquareSet.
   *
   * @param {SquareSet} other The SquareSet to compare with.
-  * @returns {boolean} True if the SquareSets are equal, false otherwise.
+  * @returns {boolean} `true`  if the SquareSets are equal, `false` otherwise.
   */
   equals(other: SquareSet): boolean {
     return this.lo === other.lo && this.hi === other.hi;
@@ -319,7 +319,7 @@ export class SquareSet implements Iterable<Square> {
   /**
   * Checks if the SquareSet is empty.
   *
-  * @returns {boolean} True if the SquareSet is empty, false otherwise.
+  * @returns {boolean} `true`  if the SquareSet is empty, `false` otherwise.
   */
   isEmpty(): boolean {
     return this.lo === 0 && this.hi === 0;
@@ -328,7 +328,7 @@ export class SquareSet implements Iterable<Square> {
   /**
   * Checks if the SquareSet is not empty.
   *
-  * @returns {boolean} True if the SquareSet is not empty, false otherwise.
+  * @returns {boolean} `true`  if the SquareSet is not empty, `false` otherwise.
   */
   nonEmpty(): boolean {
     return this.lo !== 0 || this.hi !== 0;
@@ -338,7 +338,7 @@ export class SquareSet implements Iterable<Square> {
   * Checks if the SquareSet contains a specific square.
   *
   * @param {Square} square The square to check for presence.
-  * @returns {boolean} True if the SquareSet contains the square, false otherwise.
+  * @returns {boolean} `true`  if the SquareSet contains the square, `false` otherwise.
   */
   has(square: Square): boolean {
     return (square >= 32 ? this.hi & (1 << (square - 32)) : this.lo & (1 << square)) !== 0;
@@ -348,7 +348,7 @@ export class SquareSet implements Iterable<Square> {
   * Sets or unsets a square in the SquareSet.
   *
   * @param {Square} square The square to set or unset.
-  * @param {boolean} on True to set the square, false to unset it.
+  * @param {boolean} on `true`  to set the square, `false` to unset it.
   * @returns {SquareSet} A new SquareSet with the square set or unset.
   */
   set(square: Square, on: boolean): SquareSet {
@@ -426,7 +426,7 @@ export class SquareSet implements Iterable<Square> {
   /**
    * Checks if the SquareSet contains more than one square.
    *
-   * @returns {boolean} True if the SquareSet contains more than one square, false otherwise.
+   * @returns {boolean} `true`  if the SquareSet contains more than one square, `false` otherwise.
    */
   moreThanOne(): boolean {
     return (this.hi !== 0 && this.lo !== 0) || (this.lo & (this.lo - 1)) !== 0 || (this.hi & (this.hi - 1)) !== 0;

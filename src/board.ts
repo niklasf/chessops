@@ -172,7 +172,7 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
   /**
    * Checks if the given square is occupied by a piece.
    * @param {Square} square The square to check.
-   * @returns {boolean} True if the square is occupied, false otherwise.
+   * @returns {boolean} `true` if the square is occupied, `false` otherwise.
    */
   has(square: Square): boolean {
     return this.occupied.has(square);
@@ -228,7 +228,7 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
  * Checks if two boards are equal.
  * @param {Board} left The first board.
  * @param {Board} right The second board.
- * @returns {boolean} True if the boards are equal, false otherwise.
+ * @returns {boolean} `true` if the boards are equal, `false` otherwise.
  */
 export const boardEquals = (left: Board, right: Board): boolean =>
   left.white.equals(right.white)

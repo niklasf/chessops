@@ -313,22 +313,53 @@ export class RemainingChecks implements ByColor<number> {
  * Represents the setup of a chess position.
  * @interface Setup
  * @property {Board} board The chess board.
- * @property {Material | undefined} pockets The material in the pockets (optional).
+ * @property {Material | undefined} pockets The material in the pockets.
  * @property {Color} turn The color of the side to move.
  * @property {SquareSet} castlingRights The castling rights.
- * @property {Square | undefined} epSquare The en passant square (optional).
- * @property {RemainingChecks | undefined} remainingChecks The remaining checks (optional).
+ * @property {Square | undefined} epSquare A square where en passant is possible.
+ * @property {RemainingChecks | undefined} remainingChecks The remaining checks.
  * @property {number} halfmoves The number of halfmoves since the last pawn advance or capture.
  * @property {number} fullmoves The number of fullmoves.
  */
 export interface Setup {
+  /**
+   * The chess board.
+   */
   board: Board;
+  /**
+   * The material in the pockets.
+   */
   pockets: Material | undefined;
+  /**
+   * The color of the side to move.
+   */
   turn: Color;
+  /**
+   * The castling rights.
+   */
   castlingRights: SquareSet;
+  /**
+   * A square where en passant is possible.
+   */
   epSquare: Square | undefined;
+
+  /**
+   * The remaining checks. Used in multi-check variants.
+   */
   remainingChecks: RemainingChecks | undefined;
+
+  /**
+   * The number of halfmoves since the last pawn advance or capture.
+   * 
+   * A halfmove is when a side makes a move.
+   */
   halfmoves: number;
+
+  /**
+   * The number of fullmoves.
+   * 
+   * A fullmove is when both sides make a move.
+   */
   fullmoves: number;
 }
 
