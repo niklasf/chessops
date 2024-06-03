@@ -67,22 +67,38 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
       .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn)),
   );
 
+
 /**
-* TODO: Not sure what this is
+* Represents the castling rights and related information for a chess position.
 */
 export class Castles {
-  /** @type {SquareSet} */
+  /**
+   * The castling rights as a set of squares.
+   * @type {SquareSet}
+   */
   castlingRights: SquareSet;
-  /** @type {ByColor<ByCastlingSide<Square | undefined>>} */
+
+  /**
+   * The rook positions for each color and castling side.
+   * @type {ByColor<ByCastlingSide<Square | undefined>>}
+   */
   rook: ByColor<ByCastlingSide<Square | undefined>>;
-  /** @type {ByColor<ByCastlingSide<SquareSet>>} */
+
+  /**
+   * The castling paths for each color and castling side.
+   * @type {ByColor<ByCastlingSide<SquareSet>>}
+   */
   path: ByColor<ByCastlingSide<SquareSet>>;
 
+  /**
+   * Creates a new instance of the Castles class.
+   * @private
+   */
   private constructor() { }
 
   /**
-   * Creates a new Castles instance with default castling rights.
-   * @returns {Castles} The default Castles instance.
+   * Returns the default castling rights and setup.
+   * @returns {Castles} The default castling rights and setup.
    */
   static default(): Castles {
     const castles = new Castles();
@@ -99,8 +115,8 @@ export class Castles {
   }
 
   /**
-   * Creates a new empty Castles instance.
-   * @returns {Castles} The empty Castles instance.
+   * Returns an empty castling rights setup.
+   * @returns {Castles} The empty castling rights setup.
    */
   static empty(): Castles {
     const castles = new Castles();
@@ -117,8 +133,8 @@ export class Castles {
   }
 
   /**
-   * Creates a clone of the current Castles instance.
-   * @returns {Castles} The cloned Castles instance.
+   * Creates a clone of the Castles instance.
+   * @returns {Castles} A new instance with the same castling rights and setup.
    */
   clone(): Castles {
     const castles = new Castles();
@@ -135,11 +151,12 @@ export class Castles {
   }
 
   /**
-   * Adds castling rights for the given color and side.
-   * @param {Color} color The color.
-   * @param {CastlingSide} side The castling side.
-   * @param {Square} king The king's square.
-   * @param {Square} rook The rook's square.
+   * Adds a castling right for the given color, side, king, and rook positions.
+   * @param {Color} color The color of the castling side.
+   * @param {CastlingSide} side The castling side ('a' for queenside, 'h' for kingside).
+   * @param {Square} king The position of the king.
+   * @param {Square} rook The position of the rook.
+   * @private
    */
   private add(color: Color, side: CastlingSide, king: Square, rook: Square): void {
     const kingTo = kingCastlesTo(color, side);
@@ -154,10 +171,10 @@ export class Castles {
   }
 
   /**
-  * Creates a Castles instance from the given setup.
-  * @param {Setup} setup The chess setup.
-  * @returns {Castles} The Castles instance derived from the setup.
-  */
+   * Creates a Castles instance from the given setup.
+   * @param {Setup} setup The chess position setup.
+   * @returns {Castles} The Castles instance created from the setup.
+   */
   static fromSetup(setup: Setup): Castles {
     const castles = Castles.empty();
     const rooks = setup.castlingRights.intersect(setup.board.rook);
@@ -175,8 +192,8 @@ export class Castles {
   }
 
   /**
-   * Discards castling rights for the rook on the given square.
-   * @param {Square} square The square of the rook.
+   * Discards the castling rights for the given rook square.
+   * @param {Square} square The square of the rook to discard.
    */
   discardRook(square: Square): void {
     if (this.castlingRights.has(square)) {
@@ -190,8 +207,8 @@ export class Castles {
   }
 
   /**
-   * Discards castling rights for the given color.
-   * @param {Color} color The color to discard castling rights for.
+   * Discards the castling rights for the given color.
+   * @param {Color} color The color to discard the castling rights for.
    */
   discardColor(color: Color): void {
     this.castlingRights = this.castlingRights.diff(SquareSet.backrank(color));
@@ -201,20 +218,38 @@ export class Castles {
 }
 
 /**
- * TODO: Not sure what this is
  * Represents the context of a chess position.
- * @interface
- * @property {Square | undefined} king The square of the king.
- * @property {SquareSet} blockers The set of blocking squares.
- * @property {SquareSet} checkers The set of checking squares.
- * @property {boolean} variantEnd Whether the variant has ended.
- * @property {boolean} mustCapture Whether a capture is required.
+ * @interface Context
  */
 export interface Context {
+  /**
+   * The position of the king.
+   * @type {Square | undefined}
+   */
   king: Square | undefined;
+
+  /**
+   * The set of blocking squares.
+   * @type {SquareSet}
+   */
   blockers: SquareSet;
+
+  /**
+   * The set of checking squares.
+   * @type {SquareSet}
+   */
   checkers: SquareSet;
+
+  /**
+   * Indicates if the variant has ended.
+   * @type {boolean}
+   */
   variantEnd: boolean;
+
+  /**
+   * Indicates if a capture is required.
+   * @type {boolean}
+   */
   mustCapture: boolean;
 }
 
@@ -477,18 +512,18 @@ export abstract class Position {
   }
 
   /**
-   * TODO: Not sure what this is
-   * @returns {boolean} Whether the position is a variant end.
+   * Checks if the variant has ended.
+   * @returns {boolean} `false` by default. Subclasses can override this method.
    */
   isVariantEnd(): boolean {
     return false;
   }
 
   /**
-   * TODO: Not sure what this is
-   * @param _ctx 
-   * @returns 
-   */
+  * Determines the outcome of the variant.
+  * @param {Context} [_ctx] The optional context for the position.
+  * @returns {Outcome | undefined} `undefined` by default. Subclasses can override this method.
+  */
   variantOutcome(_ctx?: Context): Outcome | undefined {
     return;
   }
@@ -720,10 +755,9 @@ export class Chess extends Position {
   }
 
   /**
-   * Create a new, unchecked chess game from a setup.
-   * TODO: There is validation, but I'm not sure what it is.
-   * @param {Setup} setup The chess setup.
-   * @returns Chess or an error.
+   * Creates a new chess position from the given setup.
+   * @param {Setup} setup The chess position setup.
+   * @returns {Result<Chess, PositionError>} The result containing the chess position or an error.
    */
   static fromSetup(setup: Setup): Result<Chess, PositionError> {
     const pos = new this();
@@ -774,11 +808,11 @@ const legalEpSquare = (pos: Position): Square | undefined => {
 };
 
 /**
- * TODO: Not sure what this does
- * @param {Position} pos 
- * @param {Square} pawnFrom
- * @param {Context} ctx
- * @returns {boolean} `true` if can capture, `false` otherwise
+ * Checks if an en passant capture is possible from the given pawn square.
+ * @param {Position} pos The chess position.
+ * @param {Square} pawnFrom The square of the capturing pawn.
+ * @param {Context} ctx The context for the position.
+ * @returns {boolean} `true` if an en passant capture is possible, `false` otherwise.
  */
 const canCaptureEp = (pos: Position, pawnFrom: Square, ctx: Context): boolean => {
   if (!defined(pos.epSquare)) return false;
@@ -834,6 +868,19 @@ const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSe
   return SquareSet.fromSquare(rook);
 };
 
+/**
+ * Calculates the pseudo-legal destination squares for a given piece on a square.
+ * 
+ * Pseudo-legal destinations refer to the set of squares that a piece can potentially move to, without 
+ * considering the legality of the move in the context of the current position. They include moves that 
+ * may be illegal, such as leaving the king in check. Pseudo-legal moves need to be further filtered to 
+ * determine the actual legal moves in the given position.
+ * 
+ * @param {Position} pos The chess position.
+ * @param {Square} square The square of the piece.
+ * @param {Context} ctx The context for the position.
+ * @returns {SquareSet} The set of pseudo-legal destination squares.
+ */
 export const pseudoDests = (pos: Position, square: Square, ctx: Context): SquareSet => {
   if (ctx.variantEnd) return SquareSet.empty();
   const piece = pos.board.get(square);
@@ -862,6 +909,12 @@ export const pseudoDests = (pos: Position, square: Square, ctx: Context): Square
   else return pseudo;
 };
 
+/**
+ * Checks if two positions are equal, ignoring the move history.
+ * @param {Position} left The first position.
+ * @param {Position} right The second position.
+ * @returns {boolean} `true` if the positions are equal (ignoring move history), `false` otherwise.
+ */
 export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
   left.rules === right.rules
   && boardEquals(left.board, right.board)
@@ -873,12 +926,10 @@ export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
     || (!left.remainingChecks && !right.remainingChecks));
 
 /**
- * TODO: unsure
- * 
- * I believe this takes in a move and a position, and from that determines what side is being castled to?
- * @param pos 
- * @param move 
- * @returns {CastlingSide | undefined}
+ * Determines the castling side for a given move in a chess position.
+ * @param {Position} pos The chess position.
+ * @param {Move} move The move to determine the castling side for.
+ * @returns {CastlingSide | undefined} The castling side ('a' for queenside, 'h' for kingside) or `undefined` if the move is not a castling move.
  */
 export const castlingSide = (pos: Position, move: Move): CastlingSide | undefined => {
   if (isDrop(move)) return;
@@ -889,10 +940,10 @@ export const castlingSide = (pos: Position, move: Move): CastlingSide | undefine
 };
 
 /**
- * TODO: unsure
- * @param pos 
- * @param move 
- * @returns 
+ * Normalizes a move by converting castling moves to their corresponding rook moves.
+ * @param {Position} pos The chess position.
+ * @param {Move} move The move to normalize.
+ * @returns {Move} The normalized move.
  */
 export const normalizeMove = (pos: Position, move: Move): Move => {
   const side = castlingSide(pos, move);
@@ -905,12 +956,10 @@ export const normalizeMove = (pos: Position, move: Move): Move => {
 };
 
 /**
- * TODO: unsure
- * 
- * I think this determines whether a given side has more pieces than normal?
- * @param board 
- * @param color 
- * @returns 
+ * Checks if the material on a given side is in a standard configuration.
+ * @param {Board} board The chessboard.
+ * @param {Color} color The color of the side to check.
+ * @returns {boolean} `true` if the material on the side is in a standard configuration, `false` otherwise.
  */
 export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
   const promoted = Math.max(board.pieces(color, 'queen').size() - 1, 0)
@@ -922,20 +971,17 @@ export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
 };
 
 /**
- * TODO: unsure
- * 
- * I think this returns whether the total amount of material on the board is within the bounds
- * of what is expected in standard chess.
- * @param pos 
- * @returns 
+ * Checks if the material on both sides is in a standard configuration.
+ * @param {Chess} pos The chess position.
+ * @returns {boolean} `true` if the material on both sides is in a standard configuration, `false` otherwise.
  */
 export const isStandardMaterial = (pos: Chess): boolean =>
   COLORS.every(color => isStandardMaterialSide(pos.board, color));
 
 /**
- * TODO: no clue here
- * @param pos 
- * @returns 
+ * Checks if the current position has an impossible check configuration.
+ * @param {Position} pos The chess position.
+ * @returns {boolean} `true` if the position has an impossible check configuration, `false` otherwise.
  */
 export const isImpossibleCheck = (pos: Position): boolean => {
   const ourKing = pos.board.kingOf(pos.turn);
