@@ -22,7 +22,7 @@ export type RankName = (typeof RANK_NAMES)[number];
 
 /**
  * The type representing a square on the chess board.
- * 
+ *
  * A number between 0 and 63, inclusive.
  */
 export type Square = number;

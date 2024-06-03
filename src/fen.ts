@@ -27,7 +27,7 @@ export enum InvalidFen {
   Fullmoves = 'ERR_FULLMOVES',
 }
 
-export class FenError extends Error { }
+export class FenError extends Error {}
 
 const nthIndexOf = (haystack: string, needle: string, n: number): number => {
   let index = haystack.indexOf(needle);
@@ -48,7 +48,7 @@ const charToPiece = (ch: string): Piece | undefined => {
 /**
  * TODO: what is a "boardPart"?
  * Takes a FEN and produces a Board object representing it
- * @param boardPart 
+ * @param boardPart
  * @returns {Result<Board, FenError>}
  */
 export const parseBoardFen = (boardPart: string): Result<Board, FenError> => {
@@ -149,7 +149,7 @@ export const parseCastlingFen = (board: Board, castlingPart: string): Result<Squ
 
 /**
  * Useful for three-check, four-check, n-check variants.
- * 
+ *
  * Parses the remaining checks part of a FEN string and returns the corresponding RemainingChecks object.
  *
  * @param {string} part The remaining checks part of the FEN string.
@@ -378,7 +378,6 @@ export const makeBoardFen = (board: Board): string => {
   return fen;
 };
 
-
 /**
  * Converts a MaterialSide object to its string representation.
  *
@@ -432,7 +431,6 @@ export const makeCastlingFen = (board: Board, castlingRights: SquareSet): string
  * @returns {string} The string representation of the remaining checks.
  */
 export const makeRemainingChecks = (checks: RemainingChecks): string => `${checks.white}+${checks.black}`;
-
 
 /**
  * Converts a Setup object to its FEN string representation.

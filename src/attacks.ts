@@ -59,9 +59,12 @@ const KNIGHT_ATTACKS: BySquare<SquareSet> = tabulate(sq => computeRange(sq, [-17
 
 /**
  * A pre-computed table of pawn attacks for each square on the chessboard, separated by color.
- * @type {{ white: BySquare<SquareSet>, black: BySquare<SquareSet> }}
+ * @type {{ white: BySquare<SquareSet>; black: BySquare<SquareSet> }}
  */
-const PAWN_ATTACKS: { white: BySquare<SquareSet>, black: BySquare<SquareSet> } = {
+const PAWN_ATTACKS: {
+  white: BySquare<SquareSet>;
+  black: BySquare<SquareSet>;
+} = {
   white: tabulate(sq => computeRange(sq, [7, 9])),
   black: tabulate(sq => computeRange(sq, [-7, -9])),
 };
@@ -87,7 +90,6 @@ export const knightAttacks = (square: Square): SquareSet => KNIGHT_ATTACKS[squar
  * @returns {SquareSet} The set of squares attacked by the pawn.
  */
 export const pawnAttacks = (color: Color, square: Square): SquareSet => PAWN_ATTACKS[color][square];
-
 
 /**
  * A pre-computed table of file ranges for each square on the chessboard.

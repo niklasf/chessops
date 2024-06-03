@@ -41,7 +41,7 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
   /** @type {SquareSet} */
   king: SquareSet;
 
-  private constructor() { }
+  private constructor() {}
 
   /**
    * Creates a new board with the default starting position for standard chess.

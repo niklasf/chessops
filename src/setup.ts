@@ -13,9 +13,9 @@ import { ByColor, ByRole, Color, Role, ROLES, Square } from './types.js';
  * @property {number} king The number of kings on the side.
  */
 export class MaterialSide implements ByRole<number> {
-  /** 
-  * The number of pawns.
-  */
+  /**
+   * The number of pawns.
+   */
   pawn: number;
 
   /**
@@ -43,7 +43,7 @@ export class MaterialSide implements ByRole<number> {
    */
   king: number;
 
-  private constructor() { }
+  private constructor() {}
 
   /**
    * Creates an empty MaterialSide instance.
@@ -164,7 +164,7 @@ export class Material implements ByColor<MaterialSide> {
   constructor(
     public white: MaterialSide,
     public black: MaterialSide,
-  ) { }
+  ) {}
 
   /**
    * Creates an empty Material instance.
@@ -281,7 +281,7 @@ export class RemainingChecks implements ByColor<number> {
   constructor(
     public white: number,
     public black: number,
-  ) { }
+  ) {}
 
   /**
    * Returns the default remaining checks count for each color.
@@ -350,14 +350,14 @@ export interface Setup {
 
   /**
    * The number of halfmoves since the last pawn advance or capture.
-   * 
+   *
    * A halfmove is when a side makes a move.
    */
   halfmoves: number;
 
   /**
    * The number of fullmoves.
-   * 
+   *
    * A fullmove is when both sides make a move.
    */
   fullmoves: number;

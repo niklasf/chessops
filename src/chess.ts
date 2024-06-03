@@ -47,7 +47,7 @@ export enum IllegalSetup {
  * Custom error class for position errors.
  * @extends Error
  */
-export class PositionError extends Error { }
+export class PositionError extends Error {}
 
 /**
  * Calculates the attacking squares for a given square and attacker color.
@@ -67,10 +67,9 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
       .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn)),
   );
 
-
 /**
-* Represents the castling rights and related information for a chess position.
-*/
+ * Represents the castling rights and related information for a chess position.
+ */
 export class Castles {
   /**
    * The castling rights as a set of squares.
@@ -94,7 +93,7 @@ export class Castles {
    * Creates a new instance of the Castles class.
    * @private
    */
-  private constructor() { }
+  private constructor() {}
 
   /**
    * Returns the default castling rights and setup.
@@ -306,7 +305,7 @@ export abstract class Position {
    */
   fullmoves: number;
 
-  protected constructor(readonly rules: Rules) { }
+  protected constructor(readonly rules: Rules) {}
 
   /**
    * Resets the position to the starting position.
@@ -445,20 +444,20 @@ export abstract class Position {
   }
 
   /**
-  * Calculates the possible destination squares for a drop move.
-  * @param {Context} [_ctx] The optional context for the move generation.
-  * @returns {SquareSet} The set of possible destination squares for a drop move.
-  */
+   * Calculates the possible destination squares for a drop move.
+   * @param {Context} [_ctx] The optional context for the move generation.
+   * @returns {SquareSet} The set of possible destination squares for a drop move.
+   */
   dropDests(_ctx?: Context): SquareSet {
     return SquareSet.empty();
   }
 
   /**
-  * Calculates the possible destination squares for a piece on a given square.
-  * @param {Square} square The square of the piece.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {SquareSet} The set of possible destination squares.
-  */
+   * Calculates the possible destination squares for a piece on a given square.
+   * @param {Square} square The square of the piece.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {SquareSet} The set of possible destination squares.
+   */
   dests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
     if (ctx.variantEnd) return SquareSet.empty();
@@ -520,10 +519,10 @@ export abstract class Position {
   }
 
   /**
-  * Determines the outcome of the variant.
-  * @param {Context} [_ctx] The optional context for the position.
-  * @returns {Outcome | undefined} `undefined` by default. Subclasses can override this method.
-  */
+   * Determines the outcome of the variant.
+   * @param {Context} [_ctx] The optional context for the position.
+   * @returns {Outcome | undefined} `undefined` by default. Subclasses can override this method.
+   */
   variantOutcome(_ctx?: Context): Outcome | undefined {
     return;
   }
@@ -577,10 +576,10 @@ export abstract class Position {
   }
 
   /**
-  * Checks if there are any possible destination squares for the current player's moves.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {boolean} `true` if there are possible destination squares, `false` otherwise.
-  */
+   * Checks if there are any possible destination squares for the current player's moves.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if there are possible destination squares, `false` otherwise.
+   */
   hasDests(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     for (const square of this.board[this.turn]) {
@@ -589,11 +588,11 @@ export abstract class Position {
     return this.dropDests(ctx).nonEmpty();
   }
   /**
-  * Checks if a given move is legal in the current position.
-  * @param {Move} move The move to check for legality.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {boolean} `true` if the move is legal, `false` otherwise.
-  */
+   * Checks if a given move is legal in the current position.
+   * @param {Move} move The move to check for legality.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the move is legal, `false` otherwise.
+   */
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
       if (!this.pockets || this.pockets[this.turn][move.role] <= 0) return false;
@@ -609,49 +608,49 @@ export abstract class Position {
   }
 
   /**
-  * Checks if the current position is a check.
-  * @returns {boolean} `true` if the current position is a check, `false` otherwise.
-  */
+   * Checks if the current position is a check.
+   * @returns {boolean} `true` if the current position is a check, `false` otherwise.
+   */
   isCheck(): boolean {
     const king = this.board.kingOf(this.turn);
     return defined(king) && this.kingAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
   }
 
   /**
-  * Checks if the current position is an end position.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {boolean} `true` if the current position is an end position, `false` otherwise.
-  */
+   * Checks if the current position is an end position.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the current position is an end position, `false` otherwise.
+   */
   isEnd(ctx?: Context): boolean {
     if (ctx ? ctx.variantEnd : this.isVariantEnd()) return true;
     return this.isInsufficientMaterial() || !this.hasDests(ctx);
   }
 
   /**
-  * Checks if the current position is a checkmate.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {boolean} `true` if the current position is a checkmate, `false` otherwise.
-  */
+   * Checks if the current position is a checkmate.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the current position is a checkmate, `false` otherwise.
+   */
   isCheckmate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     return !ctx.variantEnd && ctx.checkers.nonEmpty() && !this.hasDests(ctx);
   }
 
   /**
-  * Checks if the current position is a stalemate.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {boolean} `true` if the current position is a stalemate, `false` otherwise.
-  */
+   * Checks if the current position is a stalemate.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the current position is a stalemate, `false` otherwise.
+   */
   isStalemate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     return !ctx.variantEnd && ctx.checkers.isEmpty() && !this.hasDests(ctx);
   }
 
   /**
-  * Determines the outcome of the current position.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {Outcome | undefined} The outcome of the current position, or undefined if the position is not an end position.
-  */
+   * Determines the outcome of the current position.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {Outcome | undefined} The outcome of the current position, or undefined if the position is not an end position.
+   */
   outcome(ctx?: Context): Outcome | undefined {
     const variantOutcome = this.variantOutcome(ctx);
     if (variantOutcome) return variantOutcome;
@@ -662,10 +661,10 @@ export abstract class Position {
   }
 
   /**
-  * Calculates all possible destination squares for each piece of the current player.
-  * @param {Context} [ctx] The optional context for the move generation.
-  * @returns {Map<Square, SquareSet>} A map of source squares to their corresponding sets of possible destination squares.
-  */
+   * Calculates all possible destination squares for each piece of the current player.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {Map<Square, SquareSet>} A map of source squares to their corresponding sets of possible destination squares.
+   */
   allDests(ctx?: Context): Map<Square, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
@@ -793,7 +792,7 @@ const validEpSquare = (pos: Position, square: Square | undefined): Square | unde
 
 /**
  * Finds and returns all legal en passant squares in the position.
- * @param {Position} pos 
+ * @param {Position} pos
  * @returns {Square | undefined}
  */
 const legalEpSquare = (pos: Position): Square | undefined => {
@@ -830,12 +829,11 @@ const canCaptureEp = (pos: Position, pawnFrom: Square, ctx: Context): boolean =>
     .isEmpty();
 };
 
-
 /**
  * Checks various castling conditions and returns a set of squares that can be castled to.
- * @param {Position} pos 
- * @param {CastlingSide} side 
- * @param {Context} ctx 
+ * @param {Position} pos
+ * @param {CastlingSide} side
+ * @param {Context} ctx
  * @returns {SquareSet} A set of squares that can be castled to. Can be empty.
  */
 const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSet => {
@@ -855,11 +853,9 @@ const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSe
   // Remove the king position
   const occ = pos.board.occupied.without(ctx.king);
 
-
   for (const sq of kingPath) {
     if (pos.kingAttackers(sq, opposite(pos.turn), occ).nonEmpty()) return SquareSet.empty();
   }
-
 
   const rookTo = rookCastlesTo(pos.turn, side);
   const after = pos.board.occupied.toggle(ctx.king).toggle(rook).toggle(rookTo);
@@ -870,12 +866,12 @@ const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSe
 
 /**
  * Calculates the pseudo-legal destination squares for a given piece on a square.
- * 
- * Pseudo-legal destinations refer to the set of squares that a piece can potentially move to, without 
- * considering the legality of the move in the context of the current position. They include moves that 
- * may be illegal, such as leaving the king in check. Pseudo-legal moves need to be further filtered to 
+ *
+ * Pseudo-legal destinations refer to the set of squares that a piece can potentially move to, without
+ * considering the legality of the move in the context of the current position. They include moves that
+ * may be illegal, such as leaving the king in check. Pseudo-legal moves need to be further filtered to
  * determine the actual legal moves in the given position.
- * 
+ *
  * @param {Position} pos The chess position.
  * @param {Square} square The square of the piece.
  * @param {Context} ctx The context for the position.

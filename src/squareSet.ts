@@ -32,8 +32,8 @@ export class SquareSet implements Iterable<Square> {
 
   /**
    * Returns a square set containing the given square.
-   * @param square 
-   * @returns 
+   * @param square
+   * @returns
    */
   static fromSquare(square: Square): SquareSet {
     return square >= 32 ? new SquareSet(0, 1 << (square - 32)) : new SquareSet(1 << square, 0);
@@ -124,26 +124,26 @@ export class SquareSet implements Iterable<Square> {
   }
 
   /**
- * Returns the complement of the current SquareSet.
- *
- * The complement of a SquareSet is a new SquareSet that contains all the squares
- * that are not present in the original set.
- *
- * @returns {SquareSet} A new SquareSet representing the complement of the current set.
- */
+   * Returns the complement of the current SquareSet.
+   *
+   * The complement of a SquareSet is a new SquareSet that contains all the squares
+   * that are not present in the original set.
+   *
+   * @returns {SquareSet} A new SquareSet representing the complement of the current set.
+   */
   complement(): SquareSet {
     return new SquareSet(~this.lo, ~this.hi);
   }
 
   /**
-  * Performs a bitwise XOR operation between the current SquareSet and another SquareSet.
-  *
-  * The XOR operation returns a new SquareSet that contains the squares that are present
-  * in either the current set or the other set, but not both.
-  *
-  * @param {SquareSet} other The SquareSet to perform the XOR operation with.
-  * @returns {SquareSet} A new SquareSet representing the result of the XOR operation.
-  */
+   * Performs a bitwise XOR operation between the current SquareSet and another SquareSet.
+   *
+   * The XOR operation returns a new SquareSet that contains the squares that are present
+   * in either the current set or the other set, but not both.
+   *
+   * @param {SquareSet} other The SquareSet to perform the XOR operation with.
+   * @returns {SquareSet} A new SquareSet representing the result of the XOR operation.
+   */
   xor(other: SquareSet): SquareSet {
     return new SquareSet(this.lo ^ other.lo, this.hi ^ other.hi);
   }
@@ -213,7 +213,7 @@ export class SquareSet implements Iterable<Square> {
 
   /**
    * Checks if the current SquareSet is a superset of another SquareSet.
-   * 
+   *
    * A SquareSet is a superset of another SquareSet if every square in the other set is also present in the current set.
    *
    * @param {SquareSet} other The SquareSet to check for supersetness.
@@ -268,29 +268,29 @@ export class SquareSet implements Iterable<Square> {
   }
 
   /**
-  * Swaps the bytes of the SquareSet in a 64-bit manner.
-  *
-  * @returns {SquareSet} A new SquareSet with the bytes swapped.
-  */
+   * Swaps the bytes of the SquareSet in a 64-bit manner.
+   *
+   * @returns {SquareSet} A new SquareSet with the bytes swapped.
+   */
   bswap64(): SquareSet {
     return new SquareSet(bswap32(this.hi), bswap32(this.lo));
   }
 
   /**
-  * Reverses the bits of the SquareSet in a 64-bit manner.
-  *
-  * @returns {SquareSet} A new SquareSet with the bits reversed.
-  */
+   * Reverses the bits of the SquareSet in a 64-bit manner.
+   *
+   * @returns {SquareSet} A new SquareSet with the bits reversed.
+   */
   rbit64(): SquareSet {
     return new SquareSet(rbit32(this.hi), rbit32(this.lo));
   }
 
   /**
-  * Subtracts another SquareSet from the current SquareSet in a 64-bit manner.
-  *
-  * @param {SquareSet} other The SquareSet to subtract.
-  * @returns {SquareSet} A new SquareSet representing the result of the subtraction.
-  */
+   * Subtracts another SquareSet from the current SquareSet in a 64-bit manner.
+   *
+   * @param {SquareSet} other The SquareSet to subtract.
+   * @returns {SquareSet} A new SquareSet representing the result of the subtraction.
+   */
   minus64(other: SquareSet): SquareSet {
     const lo = this.lo - other.lo;
     const c = ((lo & other.lo & 1) + (other.lo >>> 1) + (lo >>> 1)) >>> 31;
@@ -298,59 +298,59 @@ export class SquareSet implements Iterable<Square> {
   }
 
   /**
-  * Checks if the current SquareSet is equal to another SquareSet.
-  *
-  * @param {SquareSet} other The SquareSet to compare with.
-  * @returns {boolean} `true`  if the SquareSets are equal, `false` otherwise.
-  */
+   * Checks if the current SquareSet is equal to another SquareSet.
+   *
+   * @param {SquareSet} other The SquareSet to compare with.
+   * @returns {boolean} `true`  if the SquareSets are equal, `false` otherwise.
+   */
   equals(other: SquareSet): boolean {
     return this.lo === other.lo && this.hi === other.hi;
   }
 
   /**
-  * Returns the number of squares in the SquareSet.
-  *
-  * @returns {number} The count of squares in the SquareSet.
-  */
+   * Returns the number of squares in the SquareSet.
+   *
+   * @returns {number} The count of squares in the SquareSet.
+   */
   size(): number {
     return popcnt32(this.lo) + popcnt32(this.hi);
   }
 
   /**
-  * Checks if the SquareSet is empty.
-  *
-  * @returns {boolean} `true`  if the SquareSet is empty, `false` otherwise.
-  */
+   * Checks if the SquareSet is empty.
+   *
+   * @returns {boolean} `true`  if the SquareSet is empty, `false` otherwise.
+   */
   isEmpty(): boolean {
     return this.lo === 0 && this.hi === 0;
   }
 
   /**
-  * Checks if the SquareSet is not empty.
-  *
-  * @returns {boolean} `true`  if the SquareSet is not empty, `false` otherwise.
-  */
+   * Checks if the SquareSet is not empty.
+   *
+   * @returns {boolean} `true`  if the SquareSet is not empty, `false` otherwise.
+   */
   nonEmpty(): boolean {
     return this.lo !== 0 || this.hi !== 0;
   }
 
   /**
-  * Checks if the SquareSet contains a specific square.
-  *
-  * @param {Square} square The square to check for presence.
-  * @returns {boolean} `true`  if the SquareSet contains the square, `false` otherwise.
-  */
+   * Checks if the SquareSet contains a specific square.
+   *
+   * @param {Square} square The square to check for presence.
+   * @returns {boolean} `true`  if the SquareSet contains the square, `false` otherwise.
+   */
   has(square: Square): boolean {
     return (square >= 32 ? this.hi & (1 << (square - 32)) : this.lo & (1 << square)) !== 0;
   }
 
   /**
-  * Sets or unsets a square in the SquareSet.
-  *
-  * @param {Square} square The square to set or unset.
-  * @param {boolean} on `true`  to set the square, `false` to unset it.
-  * @returns {SquareSet} A new SquareSet with the square set or unset.
-  */
+   * Sets or unsets a square in the SquareSet.
+   *
+   * @param {Square} square The square to set or unset.
+   * @param {boolean} on `true`  to set the square, `false` to unset it.
+   * @returns {SquareSet} A new SquareSet with the square set or unset.
+   */
   set(square: Square, on: boolean): SquareSet {
     return on ? this.with(square) : this.without(square);
   }
