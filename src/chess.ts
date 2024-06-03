@@ -51,10 +51,10 @@ export class PositionError extends Error { }
 
 /**
  * Calculates the attacking squares for a given square and attacker color.
- * @param {Square} square - The target square.
- * @param {Color} attacker - The attacking color.
- * @param {Board} board - The chess board.
- * @param {SquareSet} occupied - The occupied squares on the board.
+ * @param {Square} square The target square.
+ * @param {Color} attacker The attacking color.
+ * @param {Board} board The chess board.
+ * @param {SquareSet} occupied The occupied squares on the board.
  * @returns {SquareSet} The squares from which the target square is attacked.
  */
 const attacksTo = (square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet =>
@@ -136,10 +136,10 @@ export class Castles {
 
   /**
    * Adds castling rights for the given color and side.
-   * @param {Color} color - The color.
-   * @param {CastlingSide} side - The castling side.
-   * @param {Square} king - The king's square.
-   * @param {Square} rook - The rook's square.
+   * @param {Color} color The color.
+   * @param {CastlingSide} side The castling side.
+   * @param {Square} king The king's square.
+   * @param {Square} rook The rook's square.
    */
   private add(color: Color, side: CastlingSide, king: Square, rook: Square): void {
     const kingTo = kingCastlesTo(color, side);
@@ -155,7 +155,7 @@ export class Castles {
 
   /**
   * Creates a Castles instance from the given setup.
-  * @param {Setup} setup - The chess setup.
+  * @param {Setup} setup The chess setup.
   * @returns {Castles} The Castles instance derived from the setup.
   */
   static fromSetup(setup: Setup): Castles {
@@ -176,7 +176,7 @@ export class Castles {
 
   /**
    * Discards castling rights for the rook on the given square.
-   * @param {Square} square - The square of the rook.
+   * @param {Square} square The square of the rook.
    */
   discardRook(square: Square): void {
     if (this.castlingRights.has(square)) {
@@ -191,7 +191,7 @@ export class Castles {
 
   /**
    * Discards castling rights for the given color.
-   * @param {Color} color - The color to discard castling rights for.
+   * @param {Color} color The color to discard castling rights for.
    */
   discardColor(color: Color): void {
     this.castlingRights = this.castlingRights.diff(SquareSet.backrank(color));
@@ -204,11 +204,11 @@ export class Castles {
  * TODO: Not sure what this is
  * Represents the context of a chess position.
  * @interface
- * @property {Square | undefined} king - The square of the king.
- * @property {SquareSet} blockers - The set of blocking squares.
- * @property {SquareSet} checkers - The set of checking squares.
- * @property {boolean} variantEnd - Whether the variant has ended.
- * @property {boolean} mustCapture - Whether a capture is required.
+ * @property {Square | undefined} king The square of the king.
+ * @property {SquareSet} blockers The set of blocking squares.
+ * @property {SquareSet} checkers The set of checking squares.
+ * @property {boolean} variantEnd Whether the variant has ended.
+ * @property {boolean} mustCapture Whether a capture is required.
  */
 export interface Context {
   king: Square | undefined;
@@ -224,49 +224,53 @@ export interface Context {
  */
 export abstract class Position {
   /**
-   * The current Board.
+   * The board state of the position.
+   * @type {Board}
    */
   board: Board;
 
   /**
-   * Represents the taken pieces.
+   * The pocket pieces (captured pieces) of the position, if any.
+   * @type {Material | undefined}
    */
   pockets: Material | undefined;
 
   /**
-   * The current turn.
+   * The color of the side to move in the position.
+   * @type {Color}
    */
   turn: Color;
 
   /**
-   * TODO: Not sure what this is
+   * The castling rights of the position.
+   * @type {Castles}
    */
   castles: Castles;
 
   /**
-   * TODO: Not sure what this is
+   * The en passant square of the position, if any.
+   * @type {Square | undefined}
    */
   epSquare: Square | undefined;
 
   /**
-   * TODO: Not sure what this is
+   * The remaining checks count of the position, if applicable.
+   * @type {RemainingChecks | undefined}
    */
   remainingChecks: RemainingChecks | undefined;
+
   /**
-   * Number of times pieces have been moved.
-   * For example: 1.e4 is a halfmove, but 1.e4 e5 is a fullmove.
+   * The number of halfmoves since the last pawn advance or capture.
+   * @type {number}
    */
   halfmoves: number;
+
   /**
-   * Number of times both sides have played a move.
-   * For example: 1.e4 e5 1.e5 is a fullmove, but 1.e4 e5 1.e5 e6 is two fullmoves.
+   * The number of fullmoves (each player's turn counts as one fullmove).
+   * @type {number}
    */
   fullmoves: number;
 
-  /**
-   * Creates a new Position instance.
-   * @param {Rules} rules - The chess rules.
-   */
   protected constructor(readonly rules: Rules) { }
 
   /**
@@ -285,7 +289,7 @@ export abstract class Position {
 
   /**
    * Sets up the position from the given setup without validation.
-   * @param {Setup} setup - The chess setup.
+   * @param {Setup} setup The chess setup.
    * @protected
    */
   protected setupUnchecked(setup: Setup) {
@@ -314,9 +318,9 @@ export abstract class Position {
 
   /**
    * Calculates the attacking squares for the king on the given square by the given color.
-   * @param {Square} square - The square of the king.
-   * @param {Color} attacker - The attacking color.
-   * @param {SquareSet} occupied - The occupied squares on the board.
+   * @param {Square} square The square of the king.
+   * @param {Color} attacker The attacking color.
+   * @param {SquareSet} occupied The occupied squares on the board.
    * @returns {SquareSet} The squares from which the king is attacked.
    */
   kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -325,8 +329,8 @@ export abstract class Position {
 
   /**
    * Executes a capture at the given square.
-   * @param {Square} square - The square where the capture occurs.
-   * @param {Piece} captured - The captured piece.
+   * @param {Square} square The square where the capture occurs.
+   * @param {Piece} captured The captured piece.
    * @protected
    */
   protected playCaptureAt(square: Square, captured: Piece): void {
@@ -718,7 +722,7 @@ export class Chess extends Position {
   /**
    * Create a new, unchecked chess game from a setup.
    * TODO: There is validation, but I'm not sure what it is.
-   * @param {Setup} setup - The chess setup.
+   * @param {Setup} setup The chess setup.
    * @returns Chess or an error.
    */
   static fromSetup(setup: Setup): Result<Chess, PositionError> {

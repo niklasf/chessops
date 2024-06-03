@@ -5,12 +5,12 @@ import { ByColor, ByRole, Color, Role, ROLES, Square } from './types.js';
 /**
  * Represents the material configuration for one side (color) in a chess position.
  * @implements {ByRole<number>}
- * @property {number} pawn - The number of pawns on the side.
- * @property {number} knight - The number of knights on the side.
- * @property {number} bishop - The number of bishops on the side.
- * @property {number} rook - The number of rooks on the side.
- * @property {number} queen - The number of queens on the side.
- * @property {number} king - The number of kings on the side.
+ * @property {number} pawn The number of pawns on the side.
+ * @property {number} knight The number of knights on the side.
+ * @property {number} bishop The number of bishops on the side.
+ * @property {number} rook The number of rooks on the side.
+ * @property {number} queen The number of queens on the side.
+ * @property {number} king The number of kings on the side.
  */
 export class MaterialSide implements ByRole<number> {
   /** @type {number} */
@@ -40,8 +40,8 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Creates a MaterialSide instance from a Board for a specific color.
-   * @param {Board} board - The Board to create the MaterialSide from.
-   * @param {Color} color - The color to create the MaterialSide for.
+   * @param {Board} board The Board to create the MaterialSide from.
+   * @param {Color} color The color to create the MaterialSide for.
    * @returns {MaterialSide} The MaterialSide instance derived from the Board.
    */
   static fromBoard(board: Board, color: Color): MaterialSide {
@@ -62,7 +62,7 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Checks if the MaterialSide instance is equal to another MaterialSide instance.
-   * @param {MaterialSide} other - The other MaterialSide instance to compare.
+   * @param {MaterialSide} other The other MaterialSide instance to compare.
    * @returns {boolean} True if the MaterialSide instances are equal, false otherwise.
    */
   equals(other: MaterialSide): boolean {
@@ -71,7 +71,7 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Adds another MaterialSide instance to the current MaterialSide instance.
-   * @param {MaterialSide} other - The MaterialSide instance to add.
+   * @param {MaterialSide} other The MaterialSide instance to add.
    * @returns {MaterialSide} A new MaterialSide instance representing the sum.
    */
   add(other: MaterialSide): MaterialSide {
@@ -82,7 +82,7 @@ export class MaterialSide implements ByRole<number> {
 
   /**
    * Subtracts another MaterialSide instance from the current MaterialSide instance.
-   * @param {MaterialSide} other - The MaterialSide instance to subtract.
+   * @param {MaterialSide} other The MaterialSide instance to subtract.
    * @returns {MaterialSide} A new MaterialSide instance representing the difference.
    */
   subtract(other: MaterialSide): MaterialSide {
@@ -135,14 +135,14 @@ export class MaterialSide implements ByRole<number> {
 /**
  * Represents the material configuration of a chess position.
  * @implements {ByColor<MaterialSide>}
- * @property {MaterialSide} white - The material configuration for white.
- * @property {MaterialSide} black - The material configuration for black.
+ * @property {MaterialSide} white The material configuration for white.
+ * @property {MaterialSide} black The material configuration for black.
  */
 export class Material implements ByColor<MaterialSide> {
   /**
    * Creates a new Material instance.
-   * @param {MaterialSide} white - The material configuration for white.
-   * @param {MaterialSide} black - The material configuration for black.
+   * @param {MaterialSide} white The material configuration for white.
+   * @param {MaterialSide} black The material configuration for black.
    */
   constructor(
     public white: MaterialSide,
@@ -159,7 +159,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Creates a Material instance from a Board.
-   * @param {Board} board - The Board to create the Material from.
+   * @param {Board} board The Board to create the Material from.
    * @returns {Material} The Material instance derived from the Board.
    */
   static fromBoard(board: Board): Material {
@@ -176,7 +176,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Checks if the Material instance is equal to another Material instance.
-   * @param {Material} other - The other Material instance to compare.
+   * @param {Material} other The other Material instance to compare.
    * @returns {boolean} True if the Material instances are equal, false otherwise.
    */
   equals(other: Material): boolean {
@@ -185,7 +185,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Adds another Material instance to the current Material instance.
-   * @param {Material} other - The Material instance to add.
+   * @param {Material} other The Material instance to add.
    * @returns {Material} A new Material instance representing the sum.
    */
   add(other: Material): Material {
@@ -194,7 +194,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Subtracts another Material instance from the current Material instance.
-   * @param {Material} other - The Material instance to subtract.
+   * @param {Material} other The Material instance to subtract.
    * @returns {Material} A new Material instance representing the difference.
    */
   subtract(other: Material): Material {
@@ -203,7 +203,7 @@ export class Material implements ByColor<MaterialSide> {
 
   /**
    * Counts the number of pieces of a specific role.
-   * @param {Role} role - The role to count.
+   * @param {Role} role The role to count.
    * @returns {number} The count of pieces with the specified role.
    */
   count(role: Role): number {
@@ -273,14 +273,14 @@ export class RemainingChecks implements ByColor<number> {
 /**
  * Represents the setup of a chess position.
  * @interface Setup
- * @property {Board} board - The chess board.
- * @property {Material | undefined} pockets - The material in the pockets (optional).
- * @property {Color} turn - The color of the side to move.
- * @property {SquareSet} castlingRights - The castling rights.
- * @property {Square | undefined} epSquare - The en passant square (optional).
- * @property {RemainingChecks | undefined} remainingChecks - The remaining checks (optional).
- * @property {number} halfmoves - The number of halfmoves since the last pawn advance or capture.
- * @property {number} fullmoves - The number of fullmoves.
+ * @property {Board} board The chess board.
+ * @property {Material | undefined} pockets The material in the pockets (optional).
+ * @property {Color} turn The color of the side to move.
+ * @property {SquareSet} castlingRights The castling rights.
+ * @property {Square | undefined} epSquare The en passant square (optional).
+ * @property {RemainingChecks | undefined} remainingChecks The remaining checks (optional).
+ * @property {number} halfmoves The number of halfmoves since the last pawn advance or capture.
+ * @property {number} fullmoves The number of fullmoves.
  */
 export interface Setup {
   board: Board;
@@ -310,7 +310,7 @@ export const defaultSetup = (): Setup => ({
 
 /**
  * Creates a clone of a given setup.
- * @param {Setup} setup - The setup to clone.
+ * @param {Setup} setup The setup to clone.
  * @returns {Setup} The cloned setup.
  */
 export const setupClone = (setup: Setup): Setup => ({
@@ -326,8 +326,8 @@ export const setupClone = (setup: Setup): Setup => ({
 
 /**
  * Checks if two setups are equal.
- * @param {Setup} left - The first setup.
- * @param {Setup} right - The second setup.
+ * @param {Setup} left The first setup.
+ * @param {Setup} right The second setup.
  * @returns {boolean} True if the setups are equal, false otherwise.
  */
 export const setupEquals = (left: Setup, right: Setup): boolean =>

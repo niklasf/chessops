@@ -7,7 +7,7 @@ import { defined } from './util.js';
 /**
 * Flips a SquareSet vertically.
 *
-* @param {SquareSet} s - The SquareSet to flip.
+* @param {SquareSet} s The SquareSet to flip.
 * @returns {SquareSet} The flipped SquareSet.
 */
 export const flipVertical = (s: SquareSet): SquareSet => s.bswap64();
@@ -15,7 +15,7 @@ export const flipVertical = (s: SquareSet): SquareSet => s.bswap64();
 /**
 * Flips a SquareSet horizontally.
 *
-* @param {SquareSet} s - The SquareSet to flip.
+* @param {SquareSet} s The SquareSet to flip.
 * @returns {SquareSet} The flipped SquareSet.
 */
 export const flipHorizontal = (s: SquareSet): SquareSet => {
@@ -31,7 +31,7 @@ export const flipHorizontal = (s: SquareSet): SquareSet => {
 /**
 * Flips a SquareSet diagonally.
 *
-* @param {SquareSet} s - The SquareSet to flip.
+* @param {SquareSet} s The SquareSet to flip.
 * @returns {SquareSet} The flipped SquareSet.
 */
 export const flipDiagonal = (s: SquareSet): SquareSet => {
@@ -47,7 +47,7 @@ export const flipDiagonal = (s: SquareSet): SquareSet => {
 /**
 * Rotates a SquareSet by 180 degrees.
 *
-* @param {SquareSet} s - The SquareSet to rotate.
+* @param {SquareSet} s The SquareSet to rotate.
 * @returns {SquareSet} The rotated SquareSet.
 */
 export const rotate180 = (s: SquareSet): SquareSet => s.rbit64();
@@ -55,8 +55,8 @@ export const rotate180 = (s: SquareSet): SquareSet => s.rbit64();
 /**
 * Transforms a Board by applying a transformation function to each SquareSet.
 *
-* @param {Board} board - The Board to transform.
-* @param {function(SquareSet): SquareSet} f - The transformation function.
+* @param {Board} board The Board to transform.
+* @param {function(SquareSet): SquareSet} f The transformation function.
 * @returns {Board} The transformed Board.
 */
 export const transformBoard = (board: Board, f: (s: SquareSet) => SquareSet): Board => {
@@ -71,8 +71,8 @@ export const transformBoard = (board: Board, f: (s: SquareSet) => SquareSet): Bo
 /**
 * Transforms a Setup by applying a transformation function to each SquareSet.
 *
-* @param {Setup} setup - The Setup to transform.
-* @param {function(SquareSet): SquareSet} f - The transformation function.
+* @param {Setup} setup The Setup to transform.
+* @param {function(SquareSet): SquareSet} f The transformation function.
 * @returns {Setup} The transformed Setup.
 */
 export const transformSetup = (setup: Setup, f: (s: SquareSet) => SquareSet): Setup => ({

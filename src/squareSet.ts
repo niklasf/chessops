@@ -141,7 +141,7 @@ export class SquareSet implements Iterable<Square> {
   * The XOR operation returns a new SquareSet that contains the squares that are present
   * in either the current set or the other set, but not both.
   *
-  * @param {SquareSet} other - The SquareSet to perform the XOR operation with.
+  * @param {SquareSet} other The SquareSet to perform the XOR operation with.
   * @returns {SquareSet} A new SquareSet representing the result of the XOR operation.
   */
   xor(other: SquareSet): SquareSet {
@@ -154,7 +154,7 @@ export class SquareSet implements Iterable<Square> {
    * The OR operation returns a new SquareSet that contains the squares that are present
    * in either the current set or the other set, or both.
    *
-   * @param {SquareSet} other - The SquareSet to perform the OR operation with.
+   * @param {SquareSet} other The SquareSet to perform the OR operation with.
    * @returns {SquareSet} A new SquareSet representing the result of the OR operation.
    */
   union(other: SquareSet): SquareSet {
@@ -167,7 +167,7 @@ export class SquareSet implements Iterable<Square> {
    * The AND operation returns a new SquareSet that contains the squares that are present
    * in both the current set and the other set.
    *
-   * @param {SquareSet} other - The SquareSet to perform the AND operation with.
+   * @param {SquareSet} other The SquareSet to perform the AND operation with.
    * @returns {SquareSet} A new SquareSet representing the result of the AND operation.
    */
   intersect(other: SquareSet): SquareSet {
@@ -180,7 +180,7 @@ export class SquareSet implements Iterable<Square> {
    * The AND NOT operation returns a new SquareSet that contains the squares that are present
    * in the current set, but not in the other set.
    *
-   * @param {SquareSet} other - The SquareSet to perform the AND NOT operation with.
+   * @param {SquareSet} other The SquareSet to perform the AND NOT operation with.
    * @returns {SquareSet} A new SquareSet representing the result of the AND NOT operation.
    */
   diff(other: SquareSet): SquareSet {
@@ -192,7 +192,7 @@ export class SquareSet implements Iterable<Square> {
    *
    * Two SquareSets are considered to intersect if they have at least one square in common.
    *
-   * @param {SquareSet} other - The SquareSet to check for intersection.
+   * @param {SquareSet} other The SquareSet to check for intersection.
    * @returns {boolean} True if the current set intersects with the other set, false otherwise.
    */
   intersects(other: SquareSet): boolean {
@@ -204,7 +204,7 @@ export class SquareSet implements Iterable<Square> {
    *
    * Two SquareSets are considered to be disjoint if they have no squares in common.
    *
-   * @param {SquareSet} other - The SquareSet to check for disjointness.
+   * @param {SquareSet} other The SquareSet to check for disjointness.
    * @returns {boolean} True if the current set is disjoint with the other set, false otherwise.
    */
   isDisjoint(other: SquareSet): boolean {
@@ -216,7 +216,7 @@ export class SquareSet implements Iterable<Square> {
    * 
    * A SquareSet is a superset of another SquareSet if every square in the other set is also present in the current set.
    *
-   * @param {SquareSet} other - The SquareSet to check for supersetness.
+   * @param {SquareSet} other The SquareSet to check for supersetness.
    * @returns {boolean} True if the current set is a superset of the other set, false otherwise.
    */
   supersetOf(other: SquareSet): boolean {
@@ -228,7 +228,7 @@ export class SquareSet implements Iterable<Square> {
    *
    * A SquareSet is a subset of another SquareSet if every square in the current set is also present in the other set.
    *
-   * @param {SquareSet} other - The SquareSet to check for subsetness.
+   * @param {SquareSet} other The SquareSet to check for subsetness.
    * @returns {boolean} True if the current set is a subset of the other set, false otherwise.
    */
   subsetOf(other: SquareSet): boolean {
@@ -241,7 +241,7 @@ export class SquareSet implements Iterable<Square> {
    * The right shift operation shifts the bits of the SquareSet towards the right by the given
    * number of positions. The vacated bits on the left side are filled with zeros.
    *
-   * @param {number} shift - The number of positions to shift the bits to the right.
+   * @param {number} shift The number of positions to shift the bits to the right.
    * @returns {SquareSet} A new SquareSet representing the result of the right shift operation.
    */
   shr64(shift: number): SquareSet {
@@ -257,7 +257,7 @@ export class SquareSet implements Iterable<Square> {
    * The left shift operation shifts the bits of the SquareSet towards the left by the given
    * number of positions. The vacated bits on the right side are filled with zeros.
    *
-   * @param {number} shift - The number of positions to shift the bits to the left.
+   * @param {number} shift The number of positions to shift the bits to the left.
    * @returns {SquareSet} A new SquareSet representing the result of the left shift operation.
    */
   shl64(shift: number): SquareSet {
@@ -288,7 +288,7 @@ export class SquareSet implements Iterable<Square> {
   /**
   * Subtracts another SquareSet from the current SquareSet in a 64-bit manner.
   *
-  * @param {SquareSet} other - The SquareSet to subtract.
+  * @param {SquareSet} other The SquareSet to subtract.
   * @returns {SquareSet} A new SquareSet representing the result of the subtraction.
   */
   minus64(other: SquareSet): SquareSet {
@@ -300,7 +300,7 @@ export class SquareSet implements Iterable<Square> {
   /**
   * Checks if the current SquareSet is equal to another SquareSet.
   *
-  * @param {SquareSet} other - The SquareSet to compare with.
+  * @param {SquareSet} other The SquareSet to compare with.
   * @returns {boolean} True if the SquareSets are equal, false otherwise.
   */
   equals(other: SquareSet): boolean {
@@ -337,7 +337,7 @@ export class SquareSet implements Iterable<Square> {
   /**
   * Checks if the SquareSet contains a specific square.
   *
-  * @param {Square} square - The square to check for presence.
+  * @param {Square} square The square to check for presence.
   * @returns {boolean} True if the SquareSet contains the square, false otherwise.
   */
   has(square: Square): boolean {
@@ -347,8 +347,8 @@ export class SquareSet implements Iterable<Square> {
   /**
   * Sets or unsets a square in the SquareSet.
   *
-  * @param {Square} square - The square to set or unset.
-  * @param {boolean} on - True to set the square, false to unset it.
+  * @param {Square} square The square to set or unset.
+  * @param {boolean} on True to set the square, false to unset it.
   * @returns {SquareSet} A new SquareSet with the square set or unset.
   */
   set(square: Square, on: boolean): SquareSet {
@@ -358,7 +358,7 @@ export class SquareSet implements Iterable<Square> {
   /**
    * Adds a square to the SquareSet.
    *
-   * @param {Square} square - The square to add.
+   * @param {Square} square The square to add.
    * @returns {SquareSet} A new SquareSet with the square added.
    */
   with(square: Square): SquareSet {
@@ -370,7 +370,7 @@ export class SquareSet implements Iterable<Square> {
   /**
    * Removes a square from the SquareSet.
    *
-   * @param {Square} square - The square to remove.
+   * @param {Square} square The square to remove.
    * @returns {SquareSet} A new SquareSet with the square removed.
    */
   without(square: Square): SquareSet {
@@ -382,7 +382,7 @@ export class SquareSet implements Iterable<Square> {
   /**
    * Toggles the presence of a square in the SquareSet.
    *
-   * @param {Square} square - The square to toggle.
+   * @param {Square} square The square to toggle.
    * @returns {SquareSet} A new SquareSet with the square toggled.
    */
   toggle(square: Square): SquareSet {

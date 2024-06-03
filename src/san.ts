@@ -8,8 +8,8 @@ import { charToRole, defined, makeSquare, opposite, parseSquare, roleToChar, squ
  * Generates the SAN (Standard Algebraic Notation) representation of a move
  * in the given position without the move suffix (#, +).
  *
- * @param {Position} pos - The chess position.
- * @param {Move} move - The move to generate the SAN for.
+ * @param {Position} pos The chess position.
+ * @param {Move} move The move to generate the SAN for.
  * @returns {string} The SAN representation of the move.
  */
 const makeSanWithoutSuffix = (pos: Position, move: Move): string => {
@@ -64,8 +64,8 @@ const makeSanWithoutSuffix = (pos: Position, move: Move): string => {
  * Generates the SAN (Standard Algebraic Notation) representation of a move
  * in the given position and plays the move on the position.
  *
- * @param {Position} pos - The chess position.
- * @param {Move} move - The move to generate the SAN for and play.
+ * @param {Position} pos The chess position.
+ * @param {Move} move The move to generate the SAN for and play.
  * @returns {string} The SAN representation of the move with the move suffix.
  */
 export const makeSanAndPlay = (pos: Position, move: Move): string => {
@@ -80,8 +80,8 @@ export const makeSanAndPlay = (pos: Position, move: Move): string => {
  * Generates the SAN (Standard Algebraic Notation) representation of a variation
  * (sequence of moves) in the given position.
  *
- * @param {Position} pos - The starting position of the variation.
- * @param {Move[]} variation - The sequence of moves in the variation.
+ * @param {Position} pos The starting position of the variation.
+ * @param {Move[]} variation The sequence of moves in the variation.
  * @returns {string} The SAN representation of the variation.
  */
 export const makeSanVariation = (pos: Position, variation: Move[]): string => {
@@ -105,8 +105,8 @@ export const makeSanVariation = (pos: Position, variation: Move[]): string => {
  * Generates the SAN (Standard Algebraic Notation) representation of a move
  * in the given position without modifying the position.
  *
- * @param {Position} pos - The chess position.
- * @param {Move} move - The move to generate the SAN for.
+ * @param {Position} pos The chess position.
+ * @param {Move} move The move to generate the SAN for.
  * @returns {string} The SAN representation of the move.
  */
 export const makeSan = (pos: Position, move: Move): string => makeSanAndPlay(pos.clone(), move);
@@ -115,8 +115,8 @@ export const makeSan = (pos: Position, move: Move): string => makeSanAndPlay(pos
  * Parses a SAN (Standard Algebraic Notation) string and returns the corresponding move
  * in the given position.
  *
- * @param {Position} pos - The chess position.
- * @param {string} san - The SAN string to parse.
+ * @param {Position} pos The chess position.
+ * @param {string} san The SAN string to parse.
  * @returns {Move | undefined} The parsed move, or undefined if the SAN is invalid or ambiguous.
  */
 export const parseSan = (pos: Position, san: string): Move | undefined => {

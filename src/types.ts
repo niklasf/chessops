@@ -98,9 +98,9 @@ export type ByCastlingSide<T> = {
 /**
  * An interface representing a chess piece.
  * @interface Piece
- * @property {Role} role - The role of the piece.
- * @property {Color} color - The color of the piece.
- * @property {boolean} [promoted] - Whether the piece is promoted (optional).
+ * @property {Role} role The role of the piece.
+ * @property {Color} color The color of the piece.
+ * @property {boolean} [promoted] Whether the piece is promoted (optional).
  */
 export interface Piece {
   role: Role;
@@ -111,9 +111,9 @@ export interface Piece {
 /**
  * An interface representing a normal chess move.
  * @interface NormalMove
- * @property {Square} from - The starting square of the move.
- * @property {Square} to - The destination square of the move.
- * @property {Role} [promotion] - The role to promote the pawn to (optional).
+ * @property {Square} from The starting square of the move.
+ * @property {Square} to The destination square of the move.
+ * @property {Role} [promotion] The role to promote the pawn to (optional).
  */
 export interface NormalMove {
   from: Square;
@@ -124,8 +124,8 @@ export interface NormalMove {
 /**
  * An interface representing a drop move in chess variants.
  * @interface DropMove
- * @property {Role} role - The role of the piece being dropped.
- * @property {Square} to - The square where the piece is dropped.
+ * @property {Role} role The role of the piece being dropped.
+ * @property {Square} to The square where the piece is dropped.
  */
 export interface DropMove {
   role: Role;
@@ -140,7 +140,7 @@ export type Move = NormalMove | DropMove;
 /**
  * A type guard function to check if a move is a drop move.
  * @function isDrop
- * @param {Move} v - The move to check.
+ * @param {Move} v The move to check.
  * @returns {v is DropMove} - Returns true if the move is a drop move.
  */
 export const isDrop = (v: Move): v is DropMove => 'role' in v;
@@ -148,7 +148,7 @@ export const isDrop = (v: Move): v is DropMove => 'role' in v;
 /**
  * A type guard function to check if a move is a normal move.
  * @function isNormal
- * @param {Move} v - The move to check.
+ * @param {Move} v The move to check.
  * @returns {v is NormalMove} - Returns true if the move is a normal move.
  */
 export const isNormal = (v: Move): v is NormalMove => 'from' in v;
@@ -176,7 +176,7 @@ export type Rules = (typeof RULES)[number];
 /**
  * An interface representing the outcome of a chess game.
  * @interface Outcome
- * @property {Color | undefined} winner - The color of the winning side, or undefined if the game is a draw.
+ * @property {Color | undefined} winner The color of the winning side, or undefined if the game is a draw.
  */
 export interface Outcome {
   winner: Color | undefined;

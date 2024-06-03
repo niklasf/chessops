@@ -57,8 +57,8 @@ export const squareFromCoords = (file: number, rank: number): Square | undefined
 /**
  * A function to convert a chess piece role to its corresponding character representation.
  * @function roleToChar
- * @param {Role} role - The chess piece role.
- * @returns {string} - The character representation of the role.
+ * @param {Role} role The chess piece role.
+ * @returns {string} The character representation of the role.
  */
 export const roleToChar = (role: Role): string => {
   switch (role) {
@@ -80,8 +80,8 @@ export const roleToChar = (role: Role): string => {
 /**
  * A function to convert a character to its corresponding chess piece role.
  * @function charToRole
- * @param {string} ch - The character to convert.
- * @returns {Role | undefined} - The corresponding chess piece role, or undefined if the character is not valid.
+ * @param {string} ch The character to convert.
+ * @returns {Role | undefined} The corresponding chess piece role, or undefined if the character is not valid.
  */
 export function charToRole(ch: 'p' | 'n' | 'b' | 'r' | 'q' | 'k' | 'P' | 'N' | 'B' | 'R' | 'Q' | 'K'): Role;
 export function charToRole(ch: string): Role | undefined;
@@ -107,8 +107,8 @@ export function charToRole(ch: string): Role | undefined {
 /**
  * A function to parse a square name and return the corresponding square.
  * @function parseSquare
- * @param {string} str - The square name to parse.
- * @returns {Square | undefined} - The corresponding square, or undefined if the square name is not valid.
+ * @param {string} str The square name to parse.
+ * @returns {Square | undefined} The corresponding square, or undefined if the square name is not valid.
  */
 export function parseSquare(str: SquareName): Square;
 export function parseSquare(str: string): Square | undefined;
@@ -120,8 +120,8 @@ export function parseSquare(str: string): Square | undefined {
 /**
  * A function to convert a square to its corresponding square name.
  * @function makeSquare
- * @param {Square} square - The square to convert.
- * @returns {SquareName} - The corresponding square name.
+ * @param {Square} square The square to convert.
+ * @returns {SquareName} The corresponding square name.
  */
 export const makeSquare = (square: Square): SquareName =>
   (FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)]) as SquareName;
@@ -129,8 +129,8 @@ export const makeSquare = (square: Square): SquareName =>
 /**
  * A function to parse a UCI (Universal Chess Interface) string and return the corresponding move.
  * @function parseUci
- * @param {string} str - The UCI string to parse.
- * @returns {Move | undefined} - The corresponding move, or undefined if the UCI string is not valid.
+ * @param {string} str The UCI string to parse.
+ * @returns {Move | undefined} The corresponding move, or undefined if the UCI string is not valid.
  */
 export const parseUci = (str: string): Move | undefined => {
   if (str[1] === '@' && str.length === 4) {
@@ -153,9 +153,9 @@ export const parseUci = (str: string): Move | undefined => {
 /**
  * A function to check if two moves are equal.
  * @function moveEquals
- * @param {Move} left - The first move to compare.
- * @param {Move} right - The second move to compare.
- * @returns {boolean} - True if the moves are equal, false otherwise.
+ * @param {Move} left The first move to compare.
+ * @param {Move} right The second move to compare.
+ * @returns {boolean} True if the moves are equal, false otherwise.
  */
 export const moveEquals = (left: Move, right: Move): boolean => {
   if (left.to !== right.to) return false;
@@ -166,8 +166,8 @@ export const moveEquals = (left: Move, right: Move): boolean => {
 /**
  * A function to convert a move to its corresponding UCI string representation.
  * @function makeUci
- * @param {Move} move - The move to convert.
- * @returns {string} - The corresponding UCI string representation of the move.
+ * @param {Move} move The move to convert.
+ * @returns {string} The corresponding UCI string representation of the move.
  */
 export const makeUci = (move: Move): string =>
   isDrop(move)
@@ -177,9 +177,9 @@ export const makeUci = (move: Move): string =>
 /**
  * A function to get the square where the king castles to for a given color and castling side.
  * @function kingCastlesTo
- * @param {Color} color - The color of the king.
- * @param {CastlingSide} side - The castling side ('a' for queenside, 'h' for kingside).
- * @returns {Square} - The square where the king castles to.
+ * @param {Color} color The color of the king.
+ * @param {CastlingSide} side The castling side ('a' for queenside, 'h' for kingside).
+ * @returns {Square} The square where the king castles to.
  */
 export const kingCastlesTo = (color: Color, side: CastlingSide): Square =>
   color === 'white' ? (side === 'a' ? 2 : 6) : side === 'a' ? 58 : 62;
@@ -187,9 +187,9 @@ export const kingCastlesTo = (color: Color, side: CastlingSide): Square =>
 /**
  * A function to get the square where the rook castles to for a given color and castling side.
  * @function rookCastlesTo
- * @param {Color} color - The color of the rook.
- * @param {CastlingSide} side - The castling side ('a' for queenside, 'h' for kingside).
- * @returns {Square} - The square where the rook castles to.
+ * @param {Color} color The color of the rook.
+ * @param {CastlingSide} side The castling side ('a' for queenside, 'h' for kingside).
+ * @returns {Square} The square where the rook castles to.
  */
 export const rookCastlesTo = (color: Color, side: CastlingSide): Square =>
   color === 'white' ? (side === 'a' ? 3 : 5) : side === 'a' ? 59 : 61;
