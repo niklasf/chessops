@@ -22,6 +22,8 @@ export interface ChessgroundDestsOpts {
  * Includes both possible representations of castling moves (unless
  * `chess960` mode is enabled), so that the `rookCastles` option will work
  * correctly.
+ * @param {Position} pos 
+ * @param {ChessgroundDestsOpts} [opts]
  */
 export const chessgroundDests = (pos: Position, opts?: ChessgroundDestsOpts): Map<SquareName, SquareName[]> => {
   const result = new Map();
@@ -43,6 +45,11 @@ export const chessgroundDests = (pos: Position, opts?: ChessgroundDestsOpts): Ma
   return result;
 };
 
+/**
+ * Converts a move to Chessground format.
+ * @param {Move} move
+ * @returns {SquareName[]}
+ */
 export const chessgroundMove = (move: Move): SquareName[] =>
   isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
 
@@ -59,6 +66,11 @@ export const scalachessCharPair = (move: Move): string =>
         : 35 + move.to,
     );
 
+/**
+ * Converts chessops chess variant names to lichess chess rule names
+ * @param variant 
+ * @returns {Rules}
+ */
 export const lichessRules = (
   variant:
     | 'standard'
@@ -88,6 +100,11 @@ export const lichessRules = (
   }
 };
 
+/**
+ * Conversts chessops rule name to lichess variant name.
+ * @param rules 
+ * @returns 
+ */
 export const lichessVariant = (
   rules: Rules,
 ): 'standard' | 'antichess' | 'kingOfTheHill' | 'threeCheck' | 'atomic' | 'horde' | 'racingKings' | 'crazyhouse' => {

@@ -4,6 +4,14 @@ import { SquareSet } from './squareSet.js';
 import { CastlingSide, FILE_NAMES, isDrop, Move, RANK_NAMES, SquareName } from './types.js';
 import { charToRole, defined, makeSquare, opposite, parseSquare, roleToChar, squareFile, squareRank } from './util.js';
 
+/**
+ * Generates the SAN (Standard Algebraic Notation) representation of a move
+ * in the given position without the move suffix (#, +).
+ *
+ * @param {Position} pos - The chess position.
+ * @param {Move} move - The move to generate the SAN for.
+ * @returns {string} The SAN representation of the move.
+ */
 const makeSanWithoutSuffix = (pos: Position, move: Move): string => {
   let san = '';
   if (isDrop(move)) {
@@ -52,6 +60,14 @@ const makeSanWithoutSuffix = (pos: Position, move: Move): string => {
   return san;
 };
 
+/**
+ * Generates the SAN (Standard Algebraic Notation) representation of a move
+ * in the given position and plays the move on the position.
+ *
+ * @param {Position} pos - The chess position.
+ * @param {Move} move - The move to generate the SAN for and play.
+ * @returns {string} The SAN representation of the move with the move suffix.
+ */
 export const makeSanAndPlay = (pos: Position, move: Move): string => {
   const san = makeSanWithoutSuffix(pos, move);
   pos.play(move);
@@ -60,6 +76,14 @@ export const makeSanAndPlay = (pos: Position, move: Move): string => {
   return san;
 };
 
+/**
+ * Generates the SAN (Standard Algebraic Notation) representation of a variation
+ * (sequence of moves) in the given position.
+ *
+ * @param {Position} pos - The starting position of the variation.
+ * @param {Move[]} variation - The sequence of moves in the variation.
+ * @returns {string} The SAN representation of the variation.
+ */
 export const makeSanVariation = (pos: Position, variation: Move[]): string => {
   pos = pos.clone();
   const line = [];
@@ -77,8 +101,24 @@ export const makeSanVariation = (pos: Position, variation: Move[]): string => {
   return line.join('');
 };
 
+/**
+ * Generates the SAN (Standard Algebraic Notation) representation of a move
+ * in the given position without modifying the position.
+ *
+ * @param {Position} pos - The chess position.
+ * @param {Move} move - The move to generate the SAN for.
+ * @returns {string} The SAN representation of the move.
+ */
 export const makeSan = (pos: Position, move: Move): string => makeSanAndPlay(pos.clone(), move);
 
+/**
+ * Parses a SAN (Standard Algebraic Notation) string and returns the corresponding move
+ * in the given position.
+ *
+ * @param {Position} pos - The chess position.
+ * @param {string} san - The SAN string to parse.
+ * @returns {Move | undefined} The parsed move, or undefined if the SAN is invalid or ambiguous.
+ */
 export const parseSan = (pos: Position, san: string): Move | undefined => {
   const ctx = pos.ctx();
 

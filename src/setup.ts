@@ -2,121 +2,250 @@ import { Board, boardEquals } from './board.js';
 import { SquareSet } from './squareSet.js';
 import { ByColor, ByRole, Color, Role, ROLES, Square } from './types.js';
 
+/**
+ * Represents the material configuration for one side (color) in a chess position.
+ * @implements {ByRole<number>}
+ * @property {number} pawn - The number of pawns on the side.
+ * @property {number} knight - The number of knights on the side.
+ * @property {number} bishop - The number of bishops on the side.
+ * @property {number} rook - The number of rooks on the side.
+ * @property {number} queen - The number of queens on the side.
+ * @property {number} king - The number of kings on the side.
+ */
 export class MaterialSide implements ByRole<number> {
+  /** @type {number} */
   pawn: number;
+  /** @type {number} */
   knight: number;
+  /** @type {number} */
   bishop: number;
+  /** @type {number} */
   rook: number;
+  /** @type {number} */
   queen: number;
+  /** @type {number} */
   king: number;
 
   private constructor() {}
 
+  /**
+   * Creates an empty MaterialSide instance.
+   * @returns {MaterialSide} The empty MaterialSide instance.
+   */
   static empty(): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = 0;
     return m;
   }
 
+  /**
+   * Creates a MaterialSide instance from a Board for a specific color.
+   * @param {Board} board - The Board to create the MaterialSide from.
+   * @param {Color} color - The color to create the MaterialSide for.
+   * @returns {MaterialSide} The MaterialSide instance derived from the Board.
+   */
   static fromBoard(board: Board, color: Color): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = board.pieces(color, role).size();
     return m;
   }
 
+  /**
+   * Creates a clone of the MaterialSide instance.
+   * @returns {MaterialSide} The cloned MaterialSide instance.
+   */
   clone(): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = this[role];
     return m;
   }
 
+  /**
+   * Checks if the MaterialSide instance is equal to another MaterialSide instance.
+   * @param {MaterialSide} other - The other MaterialSide instance to compare.
+   * @returns {boolean} True if the MaterialSide instances are equal, false otherwise.
+   */
   equals(other: MaterialSide): boolean {
     return ROLES.every(role => this[role] === other[role]);
   }
 
+  /**
+   * Adds another MaterialSide instance to the current MaterialSide instance.
+   * @param {MaterialSide} other - The MaterialSide instance to add.
+   * @returns {MaterialSide} A new MaterialSide instance representing the sum.
+   */
   add(other: MaterialSide): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = this[role] + other[role];
     return m;
   }
 
+  /**
+   * Subtracts another MaterialSide instance from the current MaterialSide instance.
+   * @param {MaterialSide} other - The MaterialSide instance to subtract.
+   * @returns {MaterialSide} A new MaterialSide instance representing the difference.
+   */
   subtract(other: MaterialSide): MaterialSide {
     const m = new MaterialSide();
     for (const role of ROLES) m[role] = this[role] - other[role];
     return m;
   }
 
+  /**
+   * Checks if the MaterialSide is not empty (has pieces).
+   * @returns {boolean} True if the MaterialSide is not empty, false otherwise.
+   */
   nonEmpty(): boolean {
     return ROLES.some(role => this[role] > 0);
   }
 
+  /**
+   * Checks if the MaterialSide is empty (no pieces).
+   * @returns {boolean} True if the MaterialSide is empty, false otherwise.
+   */
   isEmpty(): boolean {
     return !this.nonEmpty();
   }
 
+  /**
+   * Checks if the MaterialSide has pawns.
+   * @returns {boolean} True if the MaterialSide has pawns, false otherwise.
+   */
   hasPawns(): boolean {
     return this.pawn > 0;
   }
 
+  /**
+   * Checks if the MaterialSide has non-pawn pieces.
+   * @returns {boolean} True if the MaterialSide has non-pawn pieces, false otherwise.
+   */
   hasNonPawns(): boolean {
     return this.knight > 0 || this.bishop > 0 || this.rook > 0 || this.queen > 0 || this.king > 0;
   }
 
+  /**
+   * Calculates the total size of the MaterialSide (number of pieces).
+   * @returns {number} The total size of the MaterialSide.
+   */
   size(): number {
     return this.pawn + this.knight + this.bishop + this.rook + this.queen + this.king;
   }
 }
 
+/**
+ * Represents the material configuration of a chess position.
+ * @implements {ByColor<MaterialSide>}
+ * @property {MaterialSide} white - The material configuration for white.
+ * @property {MaterialSide} black - The material configuration for black.
+ */
 export class Material implements ByColor<MaterialSide> {
+  /**
+   * Creates a new Material instance.
+   * @param {MaterialSide} white - The material configuration for white.
+   * @param {MaterialSide} black - The material configuration for black.
+   */
   constructor(
     public white: MaterialSide,
     public black: MaterialSide,
   ) {}
 
+  /**
+   * Creates an empty Material instance.
+   * @returns {Material} The empty Material instance.
+   */
   static empty(): Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
   }
 
+  /**
+   * Creates a Material instance from a Board.
+   * @param {Board} board - The Board to create the Material from.
+   * @returns {Material} The Material instance derived from the Board.
+   */
   static fromBoard(board: Board): Material {
     return new Material(MaterialSide.fromBoard(board, 'white'), MaterialSide.fromBoard(board, 'black'));
   }
 
+  /**
+   * Creates a clone of the Material instance.
+   * @returns {Material} The cloned Material instance.
+   */
   clone(): Material {
     return new Material(this.white.clone(), this.black.clone());
   }
 
+  /**
+   * Checks if the Material instance is equal to another Material instance.
+   * @param {Material} other - The other Material instance to compare.
+   * @returns {boolean} True if the Material instances are equal, false otherwise.
+   */
   equals(other: Material): boolean {
     return this.white.equals(other.white) && this.black.equals(other.black);
   }
 
+  /**
+   * Adds another Material instance to the current Material instance.
+   * @param {Material} other - The Material instance to add.
+   * @returns {Material} A new Material instance representing the sum.
+   */
   add(other: Material): Material {
     return new Material(this.white.add(other.white), this.black.add(other.black));
   }
 
+  /**
+   * Subtracts another Material instance from the current Material instance.
+   * @param {Material} other - The Material instance to subtract.
+   * @returns {Material} A new Material instance representing the difference.
+   */
   subtract(other: Material): Material {
     return new Material(this.white.subtract(other.white), this.black.subtract(other.black));
   }
 
+  /**
+   * Counts the number of pieces of a specific role.
+   * @param {Role} role - The role to count.
+   * @returns {number} The count of pieces with the specified role.
+   */
   count(role: Role): number {
     return this.white[role] + this.black[role];
   }
 
+  /**
+   * Calculates the total size of the Material (number of pieces).
+   * @returns {number} The total size of the Material.
+   */
   size(): number {
     return this.white.size() + this.black.size();
   }
 
+  /**
+   * Checks if the Material is empty (no pieces).
+   * @returns {boolean} True if the Material is empty, false otherwise.
+   */
   isEmpty(): boolean {
     return this.white.isEmpty() && this.black.isEmpty();
   }
 
+  /**
+   * Checks if the Material is not empty (has pieces).
+   * @returns {boolean} True if the Material is not empty, false otherwise.
+   */
   nonEmpty(): boolean {
     return !this.isEmpty();
   }
 
+  /**
+   * Checks if the Material has pawns.
+   * @returns {boolean} True if the Material has pawns, false otherwise.
+   */
   hasPawns(): boolean {
     return this.white.hasPawns() || this.black.hasPawns();
   }
 
+  /**
+   * Checks if the Material has non-pawn pieces.
+   * @returns {boolean} True if the Material has non-pawn pieces, false otherwise.
+   */
   hasNonPawns(): boolean {
     return this.white.hasNonPawns() || this.black.hasNonPawns();
   }
@@ -142,7 +271,16 @@ export class RemainingChecks implements ByColor<number> {
 }
 
 /**
- * A not necessarily legal chess or chess variant position.
+ * Represents the setup of a chess position.
+ * @interface Setup
+ * @property {Board} board - The chess board.
+ * @property {Material | undefined} pockets - The material in the pockets (optional).
+ * @property {Color} turn - The color of the side to move.
+ * @property {SquareSet} castlingRights - The castling rights.
+ * @property {Square | undefined} epSquare - The en passant square (optional).
+ * @property {RemainingChecks | undefined} remainingChecks - The remaining checks (optional).
+ * @property {number} halfmoves - The number of halfmoves since the last pawn advance or capture.
+ * @property {number} fullmoves - The number of fullmoves.
  */
 export interface Setup {
   board: Board;
@@ -155,6 +293,10 @@ export interface Setup {
   fullmoves: number;
 }
 
+/**
+ * Creates a default setup for a standard chess position.
+ * @returns {Setup} The default setup.
+ */
 export const defaultSetup = (): Setup => ({
   board: Board.default(),
   pockets: undefined,
@@ -166,6 +308,11 @@ export const defaultSetup = (): Setup => ({
   fullmoves: 1,
 });
 
+/**
+ * Creates a clone of a given setup.
+ * @param {Setup} setup - The setup to clone.
+ * @returns {Setup} The cloned setup.
+ */
 export const setupClone = (setup: Setup): Setup => ({
   board: setup.board.clone(),
   pockets: setup.pockets?.clone(),
@@ -177,6 +324,12 @@ export const setupClone = (setup: Setup): Setup => ({
   fullmoves: setup.fullmoves,
 });
 
+/**
+ * Checks if two setups are equal.
+ * @param {Setup} left - The first setup.
+ * @param {Setup} right - The second setup.
+ * @returns {boolean} True if the setups are equal, false otherwise.
+ */
 export const setupEquals = (left: Setup, right: Setup): boolean =>
   boardEquals(left.board, right.board)
   && ((right.pockets && left.pockets?.equals(right.pockets)) || (!left.pockets && !right.pockets))

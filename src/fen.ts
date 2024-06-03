@@ -12,6 +12,9 @@ export const EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8';
 export const EMPTY_EPD = EMPTY_BOARD_FEN + ' w - -';
 export const EMPTY_FEN = EMPTY_EPD + ' 0 1';
 
+/**
+ * ENUM representing the possible FEN errors
+ */
 export enum InvalidFen {
   Fen = 'ERR_FEN',
   Board = 'ERR_BOARD',
@@ -24,7 +27,7 @@ export enum InvalidFen {
   Fullmoves = 'ERR_FULLMOVES',
 }
 
-export class FenError extends Error {}
+export class FenError extends Error { }
 
 const nthIndexOf = (haystack: string, needle: string, n: number): number => {
   let index = haystack.indexOf(needle);
@@ -42,6 +45,12 @@ const charToPiece = (ch: string): Piece | undefined => {
   return role && { role, color: ch.toLowerCase() === ch ? 'black' : 'white' };
 };
 
+/**
+ * TODO: what is a "boardPart"?
+ * Takes a FEN and produces a Board object representing it
+ * @param boardPart 
+ * @returns {Result<Board, FenError>}
+ */
 export const parseBoardFen = (boardPart: string): Result<Board, FenError> => {
   const board = Board.empty();
   let rank = 7;
@@ -72,6 +81,28 @@ export const parseBoardFen = (boardPart: string): Result<Board, FenError> => {
   return Result.ok(board);
 };
 
+/**
+ * Parses the pockets part of a FEN (Forsyth-Edwards Notation) string and returns a Material object.
+ *
+ * @param {string} pocketPart - The pockets part of the FEN string.
+ * @returns {Result<Material, FenError>} The parsed Material object if successful, or a FenError if parsing fails.
+ *
+ * @throws {FenError} Throws a FenError if the pockets part is invalid.
+ *
+ * @example
+ * const pocketPart = "RNBQKBNRPPPPPPPP";
+ * const result = parsePockets(pocketPart);
+ * if (result.isOk()) {
+ *   const pockets = result.value;
+ *   // Access pockets properties
+ *   const whitePawns = pockets.white.pawn;
+ *   const blackRooks = pockets.black.rook;
+ *   // ...
+ * } else {
+ *   const error = result.error;
+ *   console.error("Pockets parsing error:", error);
+ * }
+ */
 export const parsePockets = (pocketPart: string): Result<Material, FenError> => {
   if (pocketPart.length > 64) return Result.err(new FenError(InvalidFen.Pockets));
   const pockets = Material.empty();
@@ -83,6 +114,13 @@ export const parsePockets = (pocketPart: string): Result<Material, FenError> => 
   return Result.ok(pockets);
 };
 
+/**
+ * Parses the castling part of a FEN string and returns the corresponding castling rights as a SquareSet.
+ *
+ * @param {Board} board - The chess board.
+ * @param {string} castlingPart - The castling part of the FEN string.
+ * @returns {Result<SquareSet, FenError>} The castling rights as a SquareSet if parsing is successful, or a FenError if parsing fails.
+ */
 export const parseCastlingFen = (board: Board, castlingPart: string): Result<SquareSet, FenError> => {
   let castlingRights = SquareSet.empty();
   if (castlingPart === '-') return Result.ok(castlingRights);
@@ -109,6 +147,32 @@ export const parseCastlingFen = (board: Board, castlingPart: string): Result<Squ
   return Result.ok(castlingRights);
 };
 
+/**
+ * Useful for three-check, four-check, n-check variants.
+ * 
+ * Parses the remaining checks part of a FEN string and returns the corresponding RemainingChecks object.
+ *
+ * @param {string} part - The remaining checks part of the FEN string.
+ * @returns {Result<RemainingChecks, FenError>} The RemainingChecks object if parsing is successful, or a FenError if parsing fails.
+ *
+ * @example
+ * // Provided some arbitrary FEN containing a check
+ * // Parsing remaining checks in the format "+2+3"
+ * const result1 = parseRemainingChecks("+2+3");
+ * if (result1.isOk()) {
+ *   const remainingChecks = result1.value; // RemainingChecks object with white: 1, black: 0
+ * }
+ *
+ * @example
+ * // Provided some arbitrary FEN containing a check
+ * // Parsing remaining checks in the format "2+3"
+ * const result2 = parseRemainingChecks("2+3");
+ * if (result2.isOk()) {
+ *   const remainingChecks = result2.value; // RemainingChecks object with white: 2, black: 3
+ * }
+ *
+ * @throws {FenError} Throws a FenError if the remaining checks part is invalid.
+ */
 export const parseRemainingChecks = (part: string): Result<RemainingChecks, FenError> => {
   const parts = part.split('+');
   if (parts.length === 3 && parts[0] === '') {
@@ -128,6 +192,28 @@ export const parseRemainingChecks = (part: string): Result<RemainingChecks, FenE
   } else return Result.err(new FenError(InvalidFen.RemainingChecks));
 };
 
+/**
+ * Parses a FEN (Forsyth-Edwards Notation) string and returns a Setup object.
+ *
+ * @param {string} fen - The FEN string to parse.
+ * @returns {Result<Setup, FenError>} The parsed Setup object if successful, or a FenError if parsing fails.
+ *
+ * @throws {FenError} Throws a FenError if the FEN string is invalid.
+ *
+ * @example
+ * const fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+ * const result = parseFen(fen);
+ * if (result.isOk()) {
+ *   const setup = result.value;
+ *   // Access setup properties
+ *   const board = setup.board;
+ *   const pockets = setup.pockets;
+ *   // ...
+ * } else {
+ *   const error = result.error;
+ *   console.error("FEN parsing error:", error);
+ * }
+ */
 export const parseFen = (fen: string): Result<Setup, FenError> => {
   const parts = fen.split(/[\s_]+/);
   const boardPart = parts.shift()!;
@@ -217,6 +303,18 @@ export interface FenOpts {
   epd?: boolean;
 }
 
+/**
+ * Parses a string representation of a chess piece and returns the corresponding Piece object.
+ *
+ * @param {string} str - The string representation of the piece.
+ * @returns {Piece | undefined} The parsed Piece object, or undefined if the string is invalid.
+ *
+ * @example
+ * const piece1 = parsePiece('R'); // { color: 'white', role: 'rook', promoted: false }
+ * const piece2 = parsePiece('n~'); // { color: 'black', role: 'knight', promoted: true }
+ * const piece3 = parsePiece(''); // undefined
+ * const piece4 = parsePiece('Qx'); // undefined
+ */
 export const parsePiece = (str: string): Piece | undefined => {
   if (!str) return;
   const piece = charToPiece(str[0]);
@@ -226,6 +324,19 @@ export const parsePiece = (str: string): Piece | undefined => {
   return piece;
 };
 
+/**
+ * Converts a Piece object to its string representation.
+ *
+ * @param {Piece} piece - The Piece object to convert.
+ * @returns {string} The string representation of the piece.
+ *
+ * @example
+ * const piece1 = { color: 'white', role: 'rook', promoted: false };
+ * const str1 = makePiece(piece1); // 'R'
+ *
+ * const piece2 = { color: 'black', role: 'knight', promoted: true };
+ * const str2 = makePiece(piece2); // 'n~'
+ */
 export const makePiece = (piece: Piece): string => {
   let r = roleToChar(piece.role);
   if (piece.color === 'white') r = r.toUpperCase();
@@ -233,6 +344,12 @@ export const makePiece = (piece: Piece): string => {
   return r;
 };
 
+/**
+ * Converts a Board object to its FEN (Forsyth-Edwards Notation) string representation.
+ *
+ * @param {Board} board - The Board object to convert.
+ * @returns {string} The FEN string representation of the board.
+ */
 export const makeBoardFen = (board: Board): string => {
   let fen = '';
   let empty = 0;
@@ -261,12 +378,32 @@ export const makeBoardFen = (board: Board): string => {
   return fen;
 };
 
+
+/**
+ * Converts a MaterialSide object to its string representation.
+ *
+ * @param {MaterialSide} material - The MaterialSide object to convert.
+ * @returns {string} The string representation of the material.
+ */
 export const makePocket = (material: MaterialSide): string =>
   ROLES.map(role => roleToChar(role).repeat(material[role])).join('');
 
+/**
+ * Converts a Material object to its string representation.
+ *
+ * @param {Material} pocket - The Material object to convert.
+ * @returns {string} The string representation of the pocket.
+ */
 export const makePockets = (pocket: Material): string =>
   makePocket(pocket.white).toUpperCase() + makePocket(pocket.black);
 
+/**
+ * Converts the castling rights of a board to its FEN string representation.
+ *
+ * @param {Board} board - The Board object.
+ * @param {SquareSet} castlingRights - The castling rights as a SquareSet.
+ * @returns {string} The FEN string representation of the castling rights.
+ */
 export const makeCastlingFen = (board: Board, castlingRights: SquareSet): string => {
   let fen = '';
   for (const color of COLORS) {
@@ -288,8 +425,22 @@ export const makeCastlingFen = (board: Board, castlingRights: SquareSet): string
   return fen || '-';
 };
 
+/**
+ * Converts a RemainingChecks object to its string representation.
+ *
+ * @param {RemainingChecks} checks - The RemainingChecks object to convert.
+ * @returns {string} The string representation of the remaining checks.
+ */
 export const makeRemainingChecks = (checks: RemainingChecks): string => `${checks.white}+${checks.black}`;
 
+
+/**
+ * Converts a Setup object to its FEN string representation.
+ *
+ * @param {Setup} setup - The Setup object to convert.
+ * @param {FenOpts} [opts] - Optional FEN formatting options.
+ * @returns {string} The FEN string representation of the setup.
+ */
 export const makeFen = (setup: Setup, opts?: FenOpts): string =>
   [
     makeBoardFen(setup.board) + (setup.pockets ? `[${makePockets(setup.pockets)}]` : ''),
