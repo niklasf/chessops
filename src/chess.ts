@@ -30,6 +30,11 @@ import {
 } from './types.js';
 import { defined, kingCastlesTo, opposite, rookCastlesTo, squareRank } from './util.js';
 
+/**
+ * Enum representing illegal setup states.
+ * @readonly
+ * @enum {string}
+ */
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
@@ -38,8 +43,20 @@ export enum IllegalSetup {
   Variant = 'ERR_VARIANT',
 }
 
+/**
+ * Custom error class for position errors.
+ * @extends Error
+ */
 export class PositionError extends Error {}
 
+/**
+ * Calculates the attacking squares for a given square and attacker color.
+ * @param {Square} square The target square.
+ * @param {Color} attacker The attacking color.
+ * @param {Board} board The chess board.
+ * @param {SquareSet} occupied The occupied squares on the board.
+ * @returns {SquareSet} The squares from which the target square is attacked.
+ */
 const attacksTo = (square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet =>
   board[attacker].intersect(
     rookAttacks(square, occupied)
@@ -50,13 +67,38 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
       .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn)),
   );
 
+/**
+ * Represents the castling rights and related information for a chess position.
+ */
 export class Castles {
+  /**
+   * The castling rights as a set of squares.
+   * @type {SquareSet}
+   */
   castlingRights: SquareSet;
+
+  /**
+   * The rook positions for each color and castling side.
+   * @type {ByColor<ByCastlingSide<Square | undefined>>}
+   */
   rook: ByColor<ByCastlingSide<Square | undefined>>;
+
+  /**
+   * The castling paths for each color and castling side.
+   * @type {ByColor<ByCastlingSide<SquareSet>>}
+   */
   path: ByColor<ByCastlingSide<SquareSet>>;
 
+  /**
+   * Creates a new instance of the Castles class.
+   * @private
+   */
   private constructor() {}
 
+  /**
+   * Returns the default castling rights and setup.
+   * @returns {Castles} The default castling rights and setup.
+   */
   static default(): Castles {
     const castles = new Castles();
     castles.castlingRights = SquareSet.corners();
@@ -71,6 +113,10 @@ export class Castles {
     return castles;
   }
 
+  /**
+   * Returns an empty castling rights setup.
+   * @returns {Castles} The empty castling rights setup.
+   */
   static empty(): Castles {
     const castles = new Castles();
     castles.castlingRights = SquareSet.empty();
@@ -85,6 +131,10 @@ export class Castles {
     return castles;
   }
 
+  /**
+   * Creates a clone of the Castles instance.
+   * @returns {Castles} A new instance with the same castling rights and setup.
+   */
   clone(): Castles {
     const castles = new Castles();
     castles.castlingRights = this.castlingRights;
@@ -99,6 +149,14 @@ export class Castles {
     return castles;
   }
 
+  /**
+   * Adds a castling right for the given color, side, king, and rook positions.
+   * @param {Color} color The color of the castling side.
+   * @param {CastlingSide} side The castling side ('a' for queenside, 'h' for kingside).
+   * @param {Square} king The position of the king.
+   * @param {Square} rook The position of the rook.
+   * @private
+   */
   private add(color: Color, side: CastlingSide, king: Square, rook: Square): void {
     const kingTo = kingCastlesTo(color, side);
     const rookTo = rookCastlesTo(color, side);
@@ -111,6 +169,11 @@ export class Castles {
       .without(rook);
   }
 
+  /**
+   * Creates a Castles instance from the given setup.
+   * @param {Setup} setup The chess position setup.
+   * @returns {Castles} The Castles instance created from the setup.
+   */
   static fromSetup(setup: Setup): Castles {
     const castles = Castles.empty();
     const rooks = setup.castlingRights.intersect(setup.board.rook);
@@ -127,6 +190,10 @@ export class Castles {
     return castles;
   }
 
+  /**
+   * Discards the castling rights for the given rook square.
+   * @param {Square} square The square of the rook to discard.
+   */
   discardRook(square: Square): void {
     if (this.castlingRights.has(square)) {
       this.castlingRights = this.castlingRights.without(square);
@@ -138,6 +205,10 @@ export class Castles {
     }
   }
 
+  /**
+   * Discards the castling rights for the given color.
+   * @param {Color} color The color to discard the castling rights for.
+   */
   discardColor(color: Color): void {
     this.castlingRights = this.castlingRights.diff(SquareSet.backrank(color));
     this.rook[color].a = undefined;
@@ -145,26 +216,100 @@ export class Castles {
   }
 }
 
+/**
+ * Represents the context of a chess position.
+ * @interface Context
+ */
 export interface Context {
+  /**
+   * The position of the king.
+   * @type {Square | undefined}
+   */
   king: Square | undefined;
+
+  /**
+   * The set of blocking squares.
+   * @type {SquareSet}
+   */
   blockers: SquareSet;
+
+  /**
+   * The set of checking squares.
+   * @type {SquareSet}
+   */
   checkers: SquareSet;
+
+  /**
+   * Indicates if the variant has ended.
+   * @type {boolean}
+   */
   variantEnd: boolean;
+
+  /**
+   * Indicates if a capture is required.
+   * @type {boolean}
+   */
   mustCapture: boolean;
 }
 
+/**
+ * Abstract base class for chess positions.
+ * @abstract
+ */
 export abstract class Position {
+  /**
+   * The board state of the position.
+   * @type {Board}
+   */
   board: Board;
+
+  /**
+   * The pocket pieces (captured pieces) of the position, if any.
+   * @type {Material | undefined}
+   */
   pockets: Material | undefined;
+
+  /**
+   * The color of the side to move in the position.
+   * @type {Color}
+   */
   turn: Color;
+
+  /**
+   * The castling rights of the position.
+   * @type {Castles}
+   */
   castles: Castles;
+
+  /**
+   * The en passant square of the position, if any.
+   * @type {Square | undefined}
+   */
   epSquare: Square | undefined;
+
+  /**
+   * The remaining checks count of the position, if applicable.
+   * @type {RemainingChecks | undefined}
+   */
   remainingChecks: RemainingChecks | undefined;
+
+  /**
+   * The number of halfmoves since the last pawn advance or capture.
+   * @type {number}
+   */
   halfmoves: number;
+
+  /**
+   * The number of fullmoves (each player's turn counts as one fullmove).
+   * @type {number}
+   */
   fullmoves: number;
 
   protected constructor(readonly rules: Rules) {}
 
+  /**
+   * Resets the position to the starting position.
+   */
   reset() {
     this.board = Board.default();
     this.pockets = undefined;
@@ -176,6 +321,11 @@ export abstract class Position {
     this.fullmoves = 1;
   }
 
+  /**
+   * Sets up the position from the given setup without validation.
+   * @param {Setup} setup The chess setup.
+   * @protected
+   */
   protected setupUnchecked(setup: Setup) {
     this.board = setup.board.clone();
     this.board.promoted = SquareSet.empty();
@@ -200,16 +350,33 @@ export abstract class Position {
   // - hasInsufficientMaterial()
   // - isStandardMaterial()
 
+  /**
+   * Calculates the attacking squares for the king on the given square by the given color.
+   * @param {Square} square The square of the king.
+   * @param {Color} attacker The attacking color.
+   * @param {SquareSet} occupied The occupied squares on the board.
+   * @returns {SquareSet} The squares from which the king is attacked.
+   */
   kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
+  /**
+   * Executes a capture at the given square.
+   * @param {Square} square The square where the capture occurs.
+   * @param {Piece} captured The captured piece.
+   * @protected
+   */
   protected playCaptureAt(square: Square, captured: Piece): void {
     this.halfmoves = 0;
     if (captured.role === 'rook') this.castles.discardRook(square);
     if (this.pockets) this.pockets[opposite(captured.color)][captured.promoted ? 'pawn' : captured.role]++;
   }
 
+  /**
+   * Returns the context of the current position.
+   * @returns {Context} The position context.
+   */
   ctx(): Context {
     const variantEnd = this.isVariantEnd();
     const king = this.board.kingOf(this.turn);
@@ -235,6 +402,10 @@ export abstract class Position {
     };
   }
 
+  /**
+   * Creates a clone of the current position.
+   * @returns {Position} The cloned position.
+   */
   clone(): Position {
     const pos = new (this as any).constructor();
     pos.board = this.board.clone();
@@ -248,6 +419,11 @@ export abstract class Position {
     return pos;
   }
 
+  /**
+   * Validates the current position.
+   * @returns {Result<undefined, PositionError>} The validation result.
+   * @protected
+   */
   protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
@@ -267,10 +443,21 @@ export abstract class Position {
     return Result.ok(undefined);
   }
 
+  /**
+   * Calculates the possible destination squares for a drop move.
+   * @param {Context} [_ctx] The optional context for the move generation.
+   * @returns {SquareSet} The set of possible destination squares for a drop move.
+   */
   dropDests(_ctx?: Context): SquareSet {
     return SquareSet.empty();
   }
 
+  /**
+   * Calculates the possible destination squares for a piece on a given square.
+   * @param {Square} square The square of the piece.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {SquareSet} The set of possible destination squares.
+   */
   dests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
     if (ctx.variantEnd) return SquareSet.empty();
@@ -323,14 +510,28 @@ export abstract class Position {
     return pseudo;
   }
 
+  /**
+   * Checks if the variant has ended.
+   * @returns {boolean} `false` by default. Subclasses can override this method.
+   */
   isVariantEnd(): boolean {
     return false;
   }
 
+  /**
+   * Determines the outcome of the variant.
+   * @param {Context} [_ctx] The optional context for the position.
+   * @returns {Outcome | undefined} `undefined` by default. Subclasses can override this method.
+   */
   variantOutcome(_ctx?: Context): Outcome | undefined {
     return;
   }
 
+  /**
+   * Returns whether the given side has insufficient material to continue the game.
+   * @param {Color} color the side to check
+   * @returns {boolean} `true` if the side has insufficient material, `false` otherwise.
+   */
   hasInsufficientMaterial(color: Color): boolean {
     if (this.board[color].intersect(this.board.pawn.union(this.board.rooksAndQueens())).nonEmpty()) return false;
     if (this.board[color].intersects(this.board.knight)) {
@@ -349,6 +550,10 @@ export abstract class Position {
 
   // The following should be identical in all subclasses
 
+  /**
+   * Returns a `Setup` instance representing the current position.
+   * @returns {Setup} The setup instance.
+   */
   toSetup(): Setup {
     return {
       board: this.board.clone(),
@@ -362,10 +567,19 @@ export abstract class Position {
     };
   }
 
+  /**
+   * Returns whether both sides have insufficient material to continue the game.
+   * @returns {boolean} `true` if both sides have insufficient material to continue the game, `false` otherwise.
+   */
   isInsufficientMaterial(): boolean {
     return COLORS.every(color => this.hasInsufficientMaterial(color));
   }
 
+  /**
+   * Checks if there are any possible destination squares for the current player's moves.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if there are possible destination squares, `false` otherwise.
+   */
   hasDests(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     for (const square of this.board[this.turn]) {
@@ -373,7 +587,12 @@ export abstract class Position {
     }
     return this.dropDests(ctx).nonEmpty();
   }
-
+  /**
+   * Checks if a given move is legal in the current position.
+   * @param {Move} move The move to check for legality.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the move is legal, `false` otherwise.
+   */
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
       if (!this.pockets || this.pockets[this.turn][move.role] <= 0) return false;
@@ -388,26 +607,50 @@ export abstract class Position {
     }
   }
 
+  /**
+   * Checks if the current position is a check.
+   * @returns {boolean} `true` if the current position is a check, `false` otherwise.
+   */
   isCheck(): boolean {
     const king = this.board.kingOf(this.turn);
     return defined(king) && this.kingAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
   }
 
+  /**
+   * Checks if the current position is an end position.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the current position is an end position, `false` otherwise.
+   */
   isEnd(ctx?: Context): boolean {
     if (ctx ? ctx.variantEnd : this.isVariantEnd()) return true;
     return this.isInsufficientMaterial() || !this.hasDests(ctx);
   }
 
+  /**
+   * Checks if the current position is a checkmate.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the current position is a checkmate, `false` otherwise.
+   */
   isCheckmate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     return !ctx.variantEnd && ctx.checkers.nonEmpty() && !this.hasDests(ctx);
   }
 
+  /**
+   * Checks if the current position is a stalemate.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {boolean} `true` if the current position is a stalemate, `false` otherwise.
+   */
   isStalemate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     return !ctx.variantEnd && ctx.checkers.isEmpty() && !this.hasDests(ctx);
   }
 
+  /**
+   * Determines the outcome of the current position.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {Outcome | undefined} The outcome of the current position, or undefined if the position is not an end position.
+   */
   outcome(ctx?: Context): Outcome | undefined {
     const variantOutcome = this.variantOutcome(ctx);
     if (variantOutcome) return variantOutcome;
@@ -417,6 +660,11 @@ export abstract class Position {
     else return;
   }
 
+  /**
+   * Calculates all possible destination squares for each piece of the current player.
+   * @param {Context} [ctx] The optional context for the move generation.
+   * @returns {Map<Square, SquareSet>} A map of source squares to their corresponding sets of possible destination squares.
+   */
   allDests(ctx?: Context): Map<Square, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
@@ -427,6 +675,11 @@ export abstract class Position {
     return d;
   }
 
+  /**
+   * Plays the given move to the board.
+   * @param {Move} move A move to be played.
+   * @returns {void}
+   */
   play(move: Move): void {
     const turn = this.turn;
     const epSquare = this.epSquare;
@@ -490,23 +743,42 @@ export class Chess extends Position {
     super('chess');
   }
 
+  /**
+   * Create a new chess game with a default setup.
+   * @returns {Chess}
+   */
   static default(): Chess {
     const pos = new this();
     pos.reset();
     return pos;
   }
 
+  /**
+   * Creates a new chess position from the given setup.
+   * @param {Setup} setup The chess position setup.
+   * @returns {Result<Chess, PositionError>} The result containing the chess position or an error.
+   */
   static fromSetup(setup: Setup): Result<Chess, PositionError> {
     const pos = new this();
     pos.setupUnchecked(setup);
     return pos.validate().map(_ => pos);
   }
 
+  /**
+   * Clone the current chess game.
+   * @returns {Chess} The cloned chess game.
+   */
   clone(): Chess {
     return super.clone() as Chess;
   }
 }
 
+/**
+ * Returns the square the en passant can be played to from given position and square.
+ * @param pos {Position}
+ * @param square {Square}
+ * @returns {Square | undefined} Any square the en passant can be played to.
+ */
 const validEpSquare = (pos: Position, square: Square | undefined): Square | undefined => {
   if (!defined(square)) return;
   const epRank = pos.turn === 'white' ? 5 : 2;
@@ -518,6 +790,11 @@ const validEpSquare = (pos: Position, square: Square | undefined): Square | unde
   return square;
 };
 
+/**
+ * Finds and returns all legal en passant squares in the position.
+ * @param {Position} pos
+ * @returns {Square | undefined}
+ */
 const legalEpSquare = (pos: Position): Square | undefined => {
   if (!defined(pos.epSquare)) return;
   const ctx = pos.ctx();
@@ -529,6 +806,13 @@ const legalEpSquare = (pos: Position): Square | undefined => {
   return;
 };
 
+/**
+ * Checks if an en passant capture is possible from the given pawn square.
+ * @param {Position} pos The chess position.
+ * @param {Square} pawnFrom The square of the capturing pawn.
+ * @param {Context} ctx The context for the position.
+ * @returns {boolean} `true` if an en passant capture is possible, `false` otherwise.
+ */
 const canCaptureEp = (pos: Position, pawnFrom: Square, ctx: Context): boolean => {
   if (!defined(pos.epSquare)) return false;
   if (!pawnAttacks(pos.turn, pawnFrom).has(pos.epSquare)) return false;
@@ -545,15 +829,30 @@ const canCaptureEp = (pos: Position, pawnFrom: Square, ctx: Context): boolean =>
     .isEmpty();
 };
 
+/**
+ * Checks various castling conditions and returns a set of squares that can be castled to.
+ * @param {Position} pos
+ * @param {CastlingSide} side
+ * @param {Context} ctx
+ * @returns {SquareSet} A set of squares that can be castled to. Can be empty.
+ */
 const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSet => {
   if (!defined(ctx.king) || ctx.checkers.nonEmpty()) return SquareSet.empty();
   const rook = pos.castles.rook[pos.turn][side];
   if (!defined(rook)) return SquareSet.empty();
+
+  // If any square in the castilng path is occupied, return an empty set
   if (pos.castles.path[pos.turn][side].intersects(pos.board.occupied)) return SquareSet.empty();
 
+  // Find the castling square
   const kingTo = kingCastlesTo(pos.turn, side);
+
+  // Find the path of the king to the castling square
   const kingPath = between(ctx.king, kingTo);
+
+  // Remove the king position
   const occ = pos.board.occupied.without(ctx.king);
+
   for (const sq of kingPath) {
     if (pos.kingAttackers(sq, opposite(pos.turn), occ).nonEmpty()) return SquareSet.empty();
   }
@@ -565,6 +864,19 @@ const castlingDest = (pos: Position, side: CastlingSide, ctx: Context): SquareSe
   return SquareSet.fromSquare(rook);
 };
 
+/**
+ * Calculates the pseudo-legal destination squares for a given piece on a square.
+ *
+ * Pseudo-legal destinations refer to the set of squares that a piece can potentially move to, without
+ * considering the legality of the move in the context of the current position. They include moves that
+ * may be illegal, such as leaving the king in check. Pseudo-legal moves need to be further filtered to
+ * determine the actual legal moves in the given position.
+ *
+ * @param {Position} pos The chess position.
+ * @param {Square} square The square of the piece.
+ * @param {Context} ctx The context for the position.
+ * @returns {SquareSet} The set of pseudo-legal destination squares.
+ */
 export const pseudoDests = (pos: Position, square: Square, ctx: Context): SquareSet => {
   if (ctx.variantEnd) return SquareSet.empty();
   const piece = pos.board.get(square);
@@ -593,6 +905,12 @@ export const pseudoDests = (pos: Position, square: Square, ctx: Context): Square
   else return pseudo;
 };
 
+/**
+ * Checks if two positions are equal, ignoring the move history.
+ * @param {Position} left The first position.
+ * @param {Position} right The second position.
+ * @returns {boolean} `true` if the positions are equal (ignoring move history), `false` otherwise.
+ */
 export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
   left.rules === right.rules
   && boardEquals(left.board, right.board)
@@ -603,6 +921,12 @@ export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
   && ((right.remainingChecks && left.remainingChecks?.equals(right.remainingChecks))
     || (!left.remainingChecks && !right.remainingChecks));
 
+/**
+ * Determines the castling side for a given move in a chess position.
+ * @param {Position} pos The chess position.
+ * @param {Move} move The move to determine the castling side for.
+ * @returns {CastlingSide | undefined} The castling side ('a' for queenside, 'h' for kingside) or `undefined` if the move is not a castling move.
+ */
 export const castlingSide = (pos: Position, move: Move): CastlingSide | undefined => {
   if (isDrop(move)) return;
   const delta = move.to - move.from;
@@ -611,6 +935,12 @@ export const castlingSide = (pos: Position, move: Move): CastlingSide | undefine
   return delta > 0 ? 'h' : 'a';
 };
 
+/**
+ * Normalizes a move by converting castling moves to their corresponding rook moves.
+ * @param {Position} pos The chess position.
+ * @param {Move} move The move to normalize.
+ * @returns {Move} The normalized move.
+ */
 export const normalizeMove = (pos: Position, move: Move): Move => {
   const side = castlingSide(pos, move);
   if (!side) return move;
@@ -621,6 +951,12 @@ export const normalizeMove = (pos: Position, move: Move): Move => {
   };
 };
 
+/**
+ * Checks if the material on a given side is in a standard configuration.
+ * @param {Board} board The chessboard.
+ * @param {Color} color The color of the side to check.
+ * @returns {boolean} `true` if the material on the side is in a standard configuration, `false` otherwise.
+ */
 export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
   const promoted = Math.max(board.pieces(color, 'queen').size() - 1, 0)
     + Math.max(board.pieces(color, 'rook').size() - 2, 0)
@@ -630,9 +966,19 @@ export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
   return board.pieces(color, 'pawn').size() + promoted <= 8;
 };
 
+/**
+ * Checks if the material on both sides is in a standard configuration.
+ * @param {Chess} pos The chess position.
+ * @returns {boolean} `true` if the material on both sides is in a standard configuration, `false` otherwise.
+ */
 export const isStandardMaterial = (pos: Chess): boolean =>
   COLORS.every(color => isStandardMaterialSide(pos.board, color));
 
+/**
+ * Checks if the current position has an impossible check configuration.
+ * @param {Position} pos The chess position.
+ * @returns {boolean} `true` if the position has an impossible check configuration, `false` otherwise.
+ */
 export const isImpossibleCheck = (pos: Position): boolean => {
   const ourKing = pos.board.kingOf(pos.turn);
   if (!defined(ourKing)) return false;
