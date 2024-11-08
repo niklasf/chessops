@@ -278,12 +278,13 @@ export const makePgn = (game: Game<PgnNodeData>): string => {
 
   const stack: MakePgnFrame[] = [];
 
-  if (game.moves.children.length) {
-    const variations = game.moves.children[Symbol.iterator]();
+  const variations = game.moves.children[Symbol.iterator]();
+  const firstVariation = variations.next();
+  if (!firstVariation.done) {
     stack.push({
       state: MakePgnState.Pre,
       ply: initialPly,
-      node: variations.next().value,
+      node: firstVariation.value,
       sidelines: variations,
       startsVariation: false,
       inVariation: false,
@@ -322,12 +323,13 @@ export const makePgn = (game: Game<PgnNodeData>): string => {
       case MakePgnState.Sidelines: {
         const child = frame.sidelines.next();
         if (child.done) {
-          if (frame.node.children.length) {
-            const variations = frame.node.children[Symbol.iterator]();
+          const variations = frame.node.children[Symbol.iterator]();
+          const firstVariation = variations.next();
+          if (!firstVariation.done) {
             stack.push({
               state: MakePgnState.Pre,
               ply: frame.ply + 1,
-              node: variations.next().value,
+              node: firstVariation.value,
               sidelines: variations,
               startsVariation: false,
               inVariation: false,
@@ -532,8 +534,9 @@ export class PgnParser {
               continue continuedLine;
             } else {
               this.consumeBudget(100);
-              if (token.startsWith('O') || token.startsWith('0') || token.startsWith('o')) token = token.replace(/[0o]/g, 'O').replace(/[–—]/g, '-');
-              else if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
+              if (token.startsWith('O') || token.startsWith('0') || token.startsWith('o')) {
+                token = token.replace(/[0o]/g, 'O').replace(/[–—]/g, '-');
+              } else if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
 
               if (frame.node) frame.parent = frame.node;
               frame.node = new ChildNode({
