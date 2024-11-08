@@ -56,7 +56,7 @@
     "prepare": "tsc --declarationDir dist/types && tsc --outDir dist/cjs --module commonjs --declaration false",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/san.ts src/transform.ts src/variant.ts src/pgn.ts",
-    "lint": "eslint src/*.ts",
+    "lint": "eslint",
     "format": "dprint fmt",
     "check-format": "dprint check"
   },

@@ -43,7 +43,7 @@ for (const arg of process.argv.slice(2)) {
       },
     );
 
-    if (status.games % 1024 == 0) console.log(status);
+    if (status.games % 1024 === 0) console.log(status);
   });
 
   await new Promise<void>(resolve =>
