@@ -512,9 +512,10 @@ export class PgnParser {
             else if (token === '??') this.handleNag(4);
             else if (token === '!?') this.handleNag(5);
             else if (token === '?!') this.handleNag(6);
-            else if (token === '1-0' || token === '0-1' || token === '1/2-1/2' || token === '*') {
-              if (this.stack.length === 1 && token !== '*') this.game.headers.set('Result', token);
-            } else if (token === '(') {
+            else if (token === '1-0' || token === '1–0' || token === '1—0') this.handleResult('1-0');
+            else if (token === '0-1' || token === '0–1' || token === '0—1') this.handleResult('0-1');
+            else if (token === '1/2-1/2' || token === '1/2–1/2' || token === '1/2—1/2') this.handleResult('1/2-1/2');
+            else if (token === '(') {
               this.consumeBudget(100);
               this.stack.push({ parent: frame.parent, root: false });
             } else if (token === ')') {
@@ -558,6 +559,10 @@ export class PgnParser {
         }
       }
     }
+  }
+
+  private handleResult(token: string) {
+    if (this.stack.length === 1 && token !== '*') this.game.headers.set('Result', token);
   }
 
   private handleNag(nag: number) {
