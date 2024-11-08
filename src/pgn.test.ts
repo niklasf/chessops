@@ -202,8 +202,8 @@ test('en/em dash', () => {
   const game = parsePgn('14...0–0–0 15. O—O 1—0')[0];
   const steps = Array.from(game.moves.mainline());
   expect(game.headers.get('Result')).toBe('1-0');
-  // expect(steps[0].san).toBe('O-O-O');
-  // expect(steps[1].san).toBe('O-O');
+  expect(steps[0].san).toBe('O-O-O');
+  expect(steps[1].san).toBe('O-O');
 });
 
 test('parse comment', () => {

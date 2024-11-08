@@ -499,7 +499,7 @@ export class PgnParser {
             if (isWhitespace(line)) return this.emit(undefined);
           }
           const tokenRegex =
-            /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O-O|0-0-0|O-O|0-0)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[?!]{1,2}|\(|\)|\*|1[-–—]0|0[-–—]1|1\/2[-–—]1\/2/g;
+            /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O(?:-O)?|0-0(?:-0)?|O–O(?:–O)?|0–0(?:–0)?|O—O(?:—O)?|0—0(?:—0)?)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[?!]{1,2}|\(|\)|\*|1[-–—]0|0[-–—]1|1\/2[-–—]1\/2/g;
           let match;
           while ((match = tokenRegex.exec(line))) {
             const frame = this.stack[this.stack.length - 1];
@@ -532,8 +532,8 @@ export class PgnParser {
               continue continuedLine;
             } else {
               this.consumeBudget(100);
-              if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
-              else if (token.startsWith('0')) token = token.replace(/0/g, 'O');
+              if (token.startsWith('O') || token.startsWith('0')) token = token.replace(/0/g, 'O').replace(/[–—]/g, '-');
+              else if (token === 'Z0' || token === '0000' || token === '@@@@') token = '--';
 
               if (frame.node) frame.parent = frame.node;
               frame.node = new ChildNode({
