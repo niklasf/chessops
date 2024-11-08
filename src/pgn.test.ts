@@ -198,6 +198,12 @@ test('tricky tokens', () => {
   expect(steps[1].nags).toEqual([4]);
 });
 
+test('en/em dash', () => {
+  const steps = Array.from(parsePgn('14...0–0–0 15. O—O')[0].moves.mainline());
+  expect(steps[0].san).toBe('O-O-O');
+  expect(steps[1].san).toBe('O-O');
+});
+
 test('parse comment', () => {
   expect(parseComment('prefix [%emt 1:02:03.4]')).toEqual({
     text: 'prefix',
