@@ -230,9 +230,9 @@ export const makeOutcome = (outcome: Outcome | undefined): string => {
 };
 
 export const parseOutcome = (s: string | undefined): Outcome | undefined => {
-  if (s === '1-0') return { winner: 'white' };
-  else if (s === '0-1') return { winner: 'black' };
-  else if (s === '1/2-1/2') return { winner: undefined };
+  if (s === '1-0' || s === '1–0' || s === '1—0') return { winner: 'white' };
+  else if (s === '0-1' || s === '0–1' || s === '0—1') return { winner: 'black' };
+  else if (s === '1/2-1/2' || s === '1/2–1/2' || s === '1/2—1/2') return { winner: undefined };
   else return;
 };
 
@@ -483,7 +483,7 @@ export class PgnParser {
               /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\"|\\\\)*)"\]/,
               (_match, headerName, headerValue) => {
                 this.consumeBudget(200);
-                this.game.headers.set(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+                this.handleHeader(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
                 moreHeaders = true;
                 freshLine = false;
                 return '';
@@ -499,7 +499,7 @@ export class PgnParser {
             if (isWhitespace(line)) return this.emit(undefined);
           }
           const tokenRegex =
-            /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O-O|0-0-0|O-O|0-0)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[?!]{1,2}|\(|\)|\*|1-0|0-1|1\/2-1\/2/g;
+            /(?:[NBKRQ]?[a-h]?[1-8]?[-x]?[a-h][1-8](?:=?[nbrqkNBRQK])?|[pnbrqkPNBRQK]?@[a-h][1-8]|O-O-O|0-0-0|O-O|0-0)[+#]?|--|Z0|0000|@@@@|{|;|\$\d{1,4}|[?!]{1,2}|\(|\)|\*|1[-–—]0|0[-–—]1|1\/2[-–—]1\/2/g;
           let match;
           while ((match = tokenRegex.exec(line))) {
             const frame = this.stack[this.stack.length - 1];
@@ -512,10 +512,14 @@ export class PgnParser {
             else if (token === '??') this.handleNag(4);
             else if (token === '!?') this.handleNag(5);
             else if (token === '?!') this.handleNag(6);
-            else if (token === '1-0' || token === '1–0' || token === '1—0') this.handleResult('1-0');
-            else if (token === '0-1' || token === '0–1' || token === '0—1') this.handleResult('0-1');
-            else if (token === '1/2-1/2' || token === '1/2–1/2' || token === '1/2—1/2') this.handleResult('1/2-1/2');
-            else if (token === '(') {
+            else if (
+              token === '1-0' || token === '1–0' || token === '1—0'
+              || token === '0-1' || token === '0–1' || token === '0—1'
+              || token === '1/2-1/2' || token === '1/2–1/2' || token === '1/2—1/2'
+              || token === '*'
+            ) {
+              if (this.stack.length === 1 && token !== '*') this.handleHeader('Result', token);
+            } else if (token === '(') {
               this.consumeBudget(100);
               this.stack.push({ parent: frame.parent, root: false });
             } else if (token === ')') {
@@ -561,8 +565,8 @@ export class PgnParser {
     }
   }
 
-  private handleResult(token: string) {
-    if (this.stack.length === 1 && token !== '*') this.game.headers.set('Result', token);
+  private handleHeader(name: string, value: string) {
+    this.game.headers.set(name, name === 'Result' ? makeOutcome(parseOutcome(value)) : value);
   }
 
   private handleNag(nag: number) {
