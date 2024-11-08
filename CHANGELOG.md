@@ -1,5 +1,10 @@
 # Changelog for chessops
 
+## v0.14.2
+
+- `chessops/pgn`: Allow and normalize en-dash and em-dash in `Result` header,
+  result marker, and castling notation.
+
 ## v0.14.1
 
 - Set `"type": "module"` in `package.json`.
