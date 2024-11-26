@@ -39,6 +39,8 @@ export const roleToChar = (role: Role): string => {
   }
 };
 
+export const plyToTurn = (ply: number): number => Math.floor((ply - 1) / 2) + 1;
+
 export function charToRole(ch: 'p' | 'n' | 'b' | 'r' | 'q' | 'k' | 'P' | 'N' | 'B' | 'R' | 'Q' | 'K'): Role;
 export function charToRole(ch: string): Role | undefined;
 export function charToRole(ch: string): Role | undefined {
