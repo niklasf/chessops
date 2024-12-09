@@ -10,6 +10,12 @@ export type Square = number;
 
 export type SquareName = `${FileName}${RankName}`;
 
+export const ROLE_CHARS = ['q', 'n', 'r', 'b', 'p', 'k'] as const;
+
+export type LowerCaseRoleChar = (typeof ROLE_CHARS)[number];
+
+export type RoleChar = LowerCaseRoleChar | Uppercase<LowerCaseRoleChar>;
+
 /**
  * Indexable by square indices.
  */

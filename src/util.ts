@@ -4,9 +4,11 @@ import {
   FILE_NAMES,
   isDrop,
   isNormal,
+  type LowerCaseRoleChar,
   Move,
   RANK_NAMES,
   Role,
+  type RoleChar,
   Square,
   SquareName,
 } from './types.js';
@@ -22,7 +24,7 @@ export const squareFile = (square: Square): number => square & 0x7;
 export const squareFromCoords = (file: number, rank: number): Square | undefined =>
   0 <= file && file < 8 && 0 <= rank && rank < 8 ? file + 8 * rank : undefined;
 
-export const roleToChar = (role: Role): string => {
+export const roleToChar = (role: Role): LowerCaseRoleChar => {
   switch (role) {
     case 'pawn':
       return 'p';
@@ -39,7 +41,7 @@ export const roleToChar = (role: Role): string => {
   }
 };
 
-export function charToRole(ch: 'p' | 'n' | 'b' | 'r' | 'q' | 'k' | 'P' | 'N' | 'B' | 'R' | 'Q' | 'K'): Role;
+export function charToRole(ch: RoleChar): Role;
 export function charToRole(ch: string): Role | undefined;
 export function charToRole(ch: string): Role | undefined {
   switch (ch.toLowerCase()) {

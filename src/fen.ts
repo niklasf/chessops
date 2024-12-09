@@ -227,7 +227,7 @@ export const parsePiece = (str: string): Piece | undefined => {
 };
 
 export const makePiece = (piece: Piece): string => {
-  let r = roleToChar(piece.role);
+  let r: string = roleToChar(piece.role);
   if (piece.color === 'white') r = r.toUpperCase();
   if (piece.promoted) r += '~';
   return r;
