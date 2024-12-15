@@ -106,7 +106,7 @@ import { FenError, makeFen, parseFen } from './fen.js';
 import { Outcome, Rules, Square } from './types.js';
 import { defined, makeSquare, parseSquare } from './util.js';
 import { defaultPosition, setupPosition } from './variant.js';
-import { NAG_INTERPRETATIONS, NAG_VALUES } from './constants/nag.js';
+import { NAG_INTERPRETATION_MAP, NAG_INTERPRETATIONS } from './constants/nag.js';
 
 export interface Game<T> {
   headers: Map<string, string>;
@@ -509,12 +509,9 @@ export class PgnParser {
             let token = match[0];
             if (token === ';') return;
             else if (token.startsWith('$')) this.handleNag(parseInt(token.slice(1), 10));
-            else if (token === NAG_INTERPRETATIONS.GOOD_MOVE) this.handleNag(NAG_VALUES.ONE);
-            else if (token === NAG_INTERPRETATIONS.POOR_MOVE) this.handleNag(NAG_VALUES.TWO);
-            else if (token === NAG_INTERPRETATIONS.BRILLIANT_MOVE) this.handleNag(NAG_VALUES.THREE);
-            else if (token === NAG_INTERPRETATIONS.BLUNDER_MOVE) this.handleNag(NAG_VALUES.FOUR);
-            else if (token === NAG_INTERPRETATIONS.SPECULATIVE_MOVE) this.handleNag(NAG_VALUES.FIVE);
-            else if (token === NAG_INTERPRETATIONS.DUBIOUS_MOVE) this.handleNag(NAG_VALUES.SIX);
+            else if (NAG_INTERPRETATION_MAP.has(token as NAG_INTERPRETATIONS)) {
+              this.handleNag(NAG_INTERPRETATION_MAP.get(token as NAG_INTERPRETATIONS)!);
+            }
             else if (
               token === '1-0' || token === '1–0' || token === '1—0'
               || token === '0-1' || token === '0–1' || token === '0—1'
