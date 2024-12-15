@@ -106,6 +106,7 @@ import { FenError, makeFen, parseFen } from './fen.js';
 import { Outcome, Rules, Square } from './types.js';
 import { defined, makeSquare, parseSquare } from './util.js';
 import { defaultPosition, setupPosition } from './variant.js';
+import { NAG_INTERPRETATION_MAP, NAG_INTERPRETATIONS } from './constants/nag.js';
 
 export interface Game<T> {
   headers: Map<string, string>;
@@ -508,12 +509,9 @@ export class PgnParser {
             let token = match[0];
             if (token === ';') return;
             else if (token.startsWith('$')) this.handleNag(parseInt(token.slice(1), 10));
-            else if (token === '!') this.handleNag(1);
-            else if (token === '?') this.handleNag(2);
-            else if (token === '!!') this.handleNag(3);
-            else if (token === '??') this.handleNag(4);
-            else if (token === '!?') this.handleNag(5);
-            else if (token === '?!') this.handleNag(6);
+            else if (NAG_INTERPRETATION_MAP.has(token as NAG_INTERPRETATIONS)) {
+              this.handleNag(NAG_INTERPRETATION_MAP.get(token as NAG_INTERPRETATIONS)!);
+            }
             else if (
               token === '1-0' || token === '1–0' || token === '1—0'
               || token === '0-1' || token === '0–1' || token === '0—1'
