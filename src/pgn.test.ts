@@ -38,7 +38,7 @@ function testPgnFile({ fileName = '', numberOfGames = 1, allValid = true } = {},
     });
     const parser = new PgnParser(gameCallback, emptyHeaders);
     stream
-      .on('data', (chunk: string) => parser.parse(chunk, { stream: true }))
+      .on('data', (chunk) => parser.parse(chunk as string, { stream: true }))
       .on('close', () => {
         parser.parse('');
         expect(gameCallback).toHaveBeenCalledTimes(numberOfGames);
