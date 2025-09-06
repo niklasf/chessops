@@ -5,7 +5,7 @@
 - Update `@badrap/result` from `^0.2` to `^0.3`.
 - `isImpossibleCheck()` now also detects multiple checks from
   stepping pieces.
-- Add `ROLE_CHARS`, and types `RoleChar`, `LowerCaseRoleChar`.
+- Add `ROLE_CHARS` and type `RoleChar`.
 
 ## v0.14.2
 

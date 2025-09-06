@@ -12,7 +12,6 @@ export {
   FileName,
   isDrop,
   isNormal,
-  LowerCaseRoleChar,
   Move,
   NormalMove,
   Outcome,
