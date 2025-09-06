@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@gitlab-org/jsfuzz": "=1.2.2",
-    "esbuild": "^0.20",
+    "esbuild": "^0.25",
     "typescript": "^5"
   },
   "scripts": {

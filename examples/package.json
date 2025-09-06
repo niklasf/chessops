@@ -7,7 +7,7 @@
     "chessops": "file:.."
   },
   "devDependencies": {
-    "esbuild": "^0.20",
+    "esbuild": "^0.25",
     "typescript": "^5"
   },
   "scripts": {
