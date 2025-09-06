@@ -170,7 +170,7 @@ test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black)
   expect(pos.hasInsufficientMaterial('black')).toBe(black);
 });
 
-test('impossible checker alignment', () => {
+test('impossible check', () => {
   // Multiple checkers aligned with king.
   const pos1 = Chess.fromSetup(parseFen('3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - - 0 1').unwrap()).unwrap();
   expect(isImpossibleCheck(pos1)).toBe(true);
@@ -182,6 +182,10 @@ test('impossible checker alignment', () => {
   // En passant square aligned with checker and king.
   const pos3 = Chess.fromSetup(parseFen('8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 0 1').unwrap()).unwrap();
   expect(isImpossibleCheck(pos3)).toBe(true);
+
+  // Multiple steppers.
+  const pos4 = Chess.fromSetup(parseFen('2b5/1nbn4/n3n3/1kn5/n3n3/1n1n4/5RQ1/2KQ1R2 w K - 0 1').unwrap()).unwrap();
+  expect(isImpossibleCheck(pos4)).toBe(true);
 });
 
 test('king captures unmoved rook', () => {

@@ -656,6 +656,8 @@ export const isImpossibleCheck = (pos: Position): boolean => {
     return false;
   } else {
     // Sliding checkers aligned with king.
-    return checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing));
+    return checkers.size() > 2
+      || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)) // Sliding checkers aligned with king
+      || checkers.intersect(pos.board.steppers()).moreThanOne();
   }
 };

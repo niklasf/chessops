@@ -146,6 +146,14 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
     return this.bishop.union(this.queen);
   }
 
+  steppers(): SquareSet {
+    return this.knight.union(this.pawn).union(this.king);
+  }
+
+  sliders(): SquareSet {
+    return this.bishop.union(this.rook).union(this.queen);
+  }
+
   /**
    * Finds the unique king of the given `color`, if any.
    */
