@@ -1,8 +1,8 @@
 # Changelog for chessops
 
-## Upcoming
+## v0.15.0
 
-- Update `@badrap/result` from `^0.2` to `^0.3`.
+- Update `@badrap/result` from `0.2` to `0.3`.
 - `isImpossibleCheck()` now also detects multiple checks from
   stepping pieces.
 - Add `ROLE_CHARS` and type `RoleChar`.
