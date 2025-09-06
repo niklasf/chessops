@@ -1,5 +1,12 @@
 # Changelog for chessops
 
+## Upcoming
+
+- Update `@badrap/result` from `^0.2` to `^0.3`.
+- `isImpossibleCheck()` now also detects multiple checks from
+  stepping pieces.
+- Add `ROLE_CHARS`, and types `RoleChar`, `LowerCaseRoleChar`.
+
 ## v0.14.2
 
 - `chessops/pgn`: Allow and normalize en-dash and em-dash in `Result` header,
