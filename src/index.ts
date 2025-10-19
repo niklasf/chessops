@@ -55,9 +55,18 @@ export {
   rookAttacks,
 } from './attacks.js';
 
-export { Board } from './board.js';
+export { Board, boardEquals } from './board.js';
 
-export { defaultSetup, Material, MaterialSide, RemainingChecks, Setup } from './setup.js';
+export {
+  defaultSetup,
+  emptySetup,
+  Material,
+  MaterialSide,
+  RemainingChecks,
+  Setup,
+  setupClone,
+  setupEquals,
+} from './setup.js';
 
 export { Castles, Chess, Context, IllegalSetup, Position, PositionError } from './chess.js';
 

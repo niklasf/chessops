@@ -166,6 +166,17 @@ export const defaultSetup = (): Setup => ({
   fullmoves: 1,
 });
 
+export const emptySetup = (): Setup => ({
+  board: Board.empty(),
+  pockets: undefined,
+  turn: 'white',
+  castlingRights: SquareSet.empty(),
+  epSquare: undefined,
+  remainingChecks: undefined,
+  halfmoves: 0,
+  fullmoves: 1,
+});
+
 export const setupClone = (setup: Setup): Setup => ({
   board: setup.board.clone(),
   pockets: setup.pockets?.clone(),
