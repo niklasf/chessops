@@ -28,7 +28,34 @@ export const flipDiagonal = (s: SquareSet): SquareSet => {
 
 export const rotate180 = (s: SquareSet): SquareSet => s.rbit64();
 
-export const transformBoard = (board: Board, f: (s: SquareSet) => SquareSet): Board => {
+export const shiftLeft = (squares: SquareSet): SquareSet =>
+  squares
+    .diff(SquareSet.fromFile(0))
+    .shr64(1)
+    .union(squares.intersect(SquareSet.fromFile(0)).shl64(7));
+
+export const shiftRight = (squares: SquareSet): SquareSet =>
+  squares
+    .diff(SquareSet.fromFile(7))
+    .shl64(1)
+    .union(squares.intersect(SquareSet.fromFile(7)).shr64(7));
+
+export const shiftDown = (squares: SquareSet): SquareSet =>
+  squares
+    .diff(SquareSet.fromRank(0))
+    .shr64(8)
+    .union(squares.intersect(SquareSet.fromRank(0)).shl64(7 * 8));
+
+export const shiftUp = (squares: SquareSet): SquareSet =>
+  squares
+    .diff(SquareSet.fromRank(7))
+    .shl64(8)
+    .union(squares.intersect(SquareSet.fromRank(7)).shr64(7 * 8));
+
+export const transformBoard = (
+  board: Board,
+  f: (s: SquareSet) => SquareSet,
+): Board => {
   const b = Board.empty();
   b.occupied = f(board.occupied);
   b.promoted = f(board.promoted);
@@ -37,12 +64,17 @@ export const transformBoard = (board: Board, f: (s: SquareSet) => SquareSet): Bo
   return b;
 };
 
-export const transformSetup = (setup: Setup, f: (s: SquareSet) => SquareSet): Setup => ({
+export const transformSetup = (
+  setup: Setup,
+  f: (s: SquareSet) => SquareSet,
+): Setup => ({
   board: transformBoard(setup.board, f),
   pockets: setup.pockets?.clone(),
   turn: setup.turn,
   castlingRights: f(setup.castlingRights),
-  epSquare: defined(setup.epSquare) ? f(SquareSet.fromSquare(setup.epSquare)).first() : undefined,
+  epSquare: defined(setup.epSquare)
+    ? f(SquareSet.fromSquare(setup.epSquare)).first()
+    : undefined,
   remainingChecks: setup.remainingChecks?.clone(),
   halfmoves: setup.halfmoves,
   fullmoves: setup.fullmoves,
