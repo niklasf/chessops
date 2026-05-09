@@ -71,24 +71,19 @@ const ANTI_DIAG_RANGE = tabulate(sq => {
   return (shift >= 0 ? diag.shl64(shift) : diag.shr64(-shift)).without(sq);
 });
 
-const hyperbola = (bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet => {
-  let forward = occupied.intersect(range);
-  let reverse = forward.bswap64(); // Assumes no more than 1 bit per rank
-  forward = forward.minus64(bit);
-  reverse = reverse.minus64(bit.bswap64());
-  return forward.xor(reverse.bswap64()).intersect(range);
+const hyperbola = (sq: Square, range: SquareSet, occupied: SquareSet): SquareSet => {
+  const o = range.intersect(occupied);
+  const fwd = o.minus64(SquareSet.fromSquare(sq));
+  const rev = o.bswap64().minus64(SquareSet.fromSquare(56 ^ sq));
+  return fwd.xor(rev.bswap64()).intersect(range);
 };
 
-const fileAttacks = (square: Square, occupied: SquareSet): SquareSet =>
-  hyperbola(SquareSet.fromSquare(square), FILE_RANGE[square], occupied);
-
-const rankAttacks = (square: Square, occupied: SquareSet): SquareSet => {
-  const range = RANK_RANGE[square];
-  let forward = occupied.intersect(range);
-  let reverse = forward.rbit64();
-  forward = forward.minus64(SquareSet.fromSquare(square));
-  reverse = reverse.minus64(SquareSet.fromSquare(63 - square));
-  return forward.xor(reverse.rbit64()).intersect(range);
+const rankAttacks = (sq: Square, occupied: SquareSet): SquareSet => {
+  const range = RANK_RANGE[sq];
+  const o = range.intersect(occupied);
+  const fwd = o.minus64(SquareSet.fromSquare(sq));
+  const rev = o.rbit64().minus64(SquareSet.fromSquare(63 - sq));
+  return fwd.xor(rev.rbit64()).intersect(range);
 };
 
 /**
@@ -96,8 +91,7 @@ const rankAttacks = (square: Square, occupied: SquareSet): SquareSet => {
  * squares.
  */
 export const bishopAttacks = (square: Square, occupied: SquareSet): SquareSet => {
-  const bit = SquareSet.fromSquare(square);
-  return hyperbola(bit, DIAG_RANGE[square], occupied).xor(hyperbola(bit, ANTI_DIAG_RANGE[square], occupied));
+  return hyperbola(square, DIAG_RANGE[square], occupied).xor(hyperbola(square, ANTI_DIAG_RANGE[square], occupied));
 };
 
 /**
@@ -105,7 +99,7 @@ export const bishopAttacks = (square: Square, occupied: SquareSet): SquareSet =>
  * squares.
  */
 export const rookAttacks = (square: Square, occupied: SquareSet): SquareSet =>
-  fileAttacks(square, occupied).xor(rankAttacks(square, occupied));
+  hyperbola(square, FILE_RANGE[square], occupied).xor(rankAttacks(square, occupied));
 
 /**
  * Gets squares attacked or defended by a queen on `square`, given `occupied`
