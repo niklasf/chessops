@@ -3,12 +3,12 @@ import { SquareSet } from './squareSet.js';
 import { ByColor, ByRole, Color, Role, ROLES, Square } from './types.js';
 
 export class MaterialSide implements ByRole<number> {
-  pawn: number;
-  knight: number;
-  bishop: number;
-  rook: number;
-  queen: number;
-  king: number;
+  pawn!: number;
+  knight!: number;
+  bishop!: number;
+  rook!: number;
+  queen!: number;
+  king!: number;
 
   private constructor() {}
 

@@ -13,22 +13,22 @@ export class Board implements Iterable<[Square, Piece]>, ByRole<SquareSet>, ByCo
   /**
    * All occupied squares.
    */
-  occupied: SquareSet;
+  occupied!: SquareSet;
   /**
    * All squares occupied by pieces known to be promoted. This information is
    * relevant in chess variants like Crazyhouse.
    */
-  promoted: SquareSet;
+  promoted!: SquareSet;
 
-  white: SquareSet;
-  black: SquareSet;
+  white!: SquareSet;
+  black!: SquareSet;
 
-  pawn: SquareSet;
-  knight: SquareSet;
-  bishop: SquareSet;
-  rook: SquareSet;
-  queen: SquareSet;
-  king: SquareSet;
+  pawn!: SquareSet;
+  knight!: SquareSet;
+  bishop!: SquareSet;
+  rook!: SquareSet;
+  queen!: SquareSet;
+  king!: SquareSet;
 
   private constructor() {}
 

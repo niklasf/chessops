@@ -51,9 +51,9 @@ const attacksTo = (square: Square, attacker: Color, board: Board, occupied: Squa
   );
 
 export class Castles {
-  castlingRights: SquareSet;
-  rook: ByColor<ByCastlingSide<Square | undefined>>;
-  path: ByColor<ByCastlingSide<SquareSet>>;
+  castlingRights!: SquareSet;
+  rook!: ByColor<ByCastlingSide<Square | undefined>>;
+  path!: ByColor<ByCastlingSide<SquareSet>>;
 
   private constructor() {}
 
@@ -154,14 +154,14 @@ export interface Context {
 }
 
 export abstract class Position {
-  board: Board;
+  board!: Board;
   pockets: Material | undefined;
-  turn: Color;
-  castles: Castles;
+  turn!: Color;
+  castles!: Castles;
   epSquare: Square | undefined;
   remainingChecks: RemainingChecks | undefined;
-  halfmoves: number;
-  fullmoves: number;
+  halfmoves!: number;
+  fullmoves!: number;
 
   protected constructor(readonly rules: Rules) {}
 

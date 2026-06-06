@@ -405,12 +405,12 @@ export class PgnError extends Error {}
 export class PgnParser {
   private lineBuf: string[] = [];
 
-  private budget: number;
-  private found: boolean;
+  private budget!: number;
+  private found!: boolean;
   private state: ParserState;
-  private game: Game<PgnNodeData>;
-  private stack: ParserFrame[];
-  private commentBuf: string[];
+  private game!: Game<PgnNodeData>;
+  private stack!: ParserFrame[];
+  private commentBuf!: string[];
 
   constructor(
     private emitGame: (game: Game<PgnNodeData>, err: PgnError | undefined) => void,
