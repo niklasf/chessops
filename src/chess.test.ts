@@ -1,9 +1,11 @@
-import { expect, test } from '@jest/globals';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { Castles, castlingSide, Chess, isImpossibleCheck, normalizeMove } from './chess.js';
 import { perft } from './debug.js';
 import { INITIAL_FEN, makeFen, parseFen } from './fen.js';
 import { SquareSet } from './squareSet.js';
 import { parseUci } from './util.js';
+import { NormalMove } from './types.js';
 
 const tricky: [string, string, number, number, number, number?, number?][] = [
   ['pos-2', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -', 48, 2039, 97862], // Kiwipete by Peter McKenzie
@@ -67,17 +69,17 @@ test('castles from setup', () => {
   const setup = parseFen(INITIAL_FEN).unwrap();
   const castles = Castles.fromSetup(setup);
 
-  expect(castles.castlingRights).toEqual(SquareSet.corners());
+  assert.deepStrictEqual(castles.castlingRights, SquareSet.corners());
 
-  expect(castles.rook.white.a).toBe(0);
-  expect(castles.rook.white.h).toBe(7);
-  expect(castles.rook.black.a).toBe(56);
-  expect(castles.rook.black.h).toBe(63);
+  assert.strictEqual(castles.rook.white.a, 0);
+  assert.strictEqual(castles.rook.white.h, 7);
+  assert.strictEqual(castles.rook.black.a, 56);
+  assert.strictEqual(castles.rook.black.h, 63);
 
-  expect(Array.from(castles.path.white.a)).toEqual([1, 2, 3]);
-  expect(Array.from(castles.path.white.h)).toEqual([5, 6]);
-  expect(Array.from(castles.path.black.a)).toEqual([57, 58, 59]);
-  expect(Array.from(castles.path.black.h)).toEqual([61, 62]);
+  assert.deepStrictEqual(Array.from(castles.path.white.a), [1, 2, 3]);
+  assert.deepStrictEqual(Array.from(castles.path.white.h), [5, 6]);
+  assert.deepStrictEqual(Array.from(castles.path.black.a), [57, 58, 59]);
+  assert.deepStrictEqual(Array.from(castles.path.black.h), [61, 62]);
 });
 
 test('play move', () => {
@@ -85,71 +87,75 @@ test('play move', () => {
 
   const kd1 = pos.clone();
   kd1.play({ from: 4, to: 3 });
-  expect(makeFen(kd1.toSetup())).toBe('8/8/8/5k2/3p4/8/4P3/3K4 b - - 1 1');
+  assert.strictEqual(makeFen(kd1.toSetup()), '8/8/8/5k2/3p4/8/4P3/3K4 b - - 1 1');
 
   const e4 = pos.clone();
   e4.play({ from: 12, to: 28 });
-  expect(makeFen(e4.toSetup())).toBe('8/8/8/5k2/3pP3/8/8/4K3 b - e3 0 1');
+  assert.strictEqual(makeFen(e4.toSetup()), '8/8/8/5k2/3pP3/8/8/4K3 b - e3 0 1');
 });
 
 test('castling moves', () => {
   let pos = Chess.fromSetup(parseFen('2r5/8/8/8/8/8/6PP/k2KR3 w K -').unwrap()).unwrap();
   let move = { from: 3, to: 4 };
-  expect(pos.isLegal(move)).toBe(true);
+  assert.strictEqual(pos.isLegal(move), true);
   pos.play(move);
-  expect(makeFen(pos.toSetup())).toBe('2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
+  assert.strictEqual(makeFen(pos.toSetup()), '2r5/8/8/8/8/8/6PP/k4RK1 b - - 1 1');
 
   pos = Chess.fromSetup(
     parseFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1').unwrap(),
   ).unwrap();
   move = { from: 4, to: 0 };
-  expect(pos.isLegal(move)).toBe(true);
+  assert.strictEqual(pos.isLegal(move), true);
   pos.play(move);
-  expect(makeFen(pos.toSetup())).toBe('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
+  assert.strictEqual(makeFen(pos.toSetup()), 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/2KR3R b kq - 1 1');
 
   pos = Chess.fromSetup(
     parseFen('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/R3K2R w KQk - 0 20').unwrap(),
   ).unwrap();
   const queenSide = { from: 4, to: 0 };
   const altQueenSide = { from: 4, to: 2 };
-  expect(castlingSide(pos, queenSide)).toBe('a');
-  expect(normalizeMove(pos, queenSide)).toEqual(queenSide);
-  expect(pos.isLegal(queenSide)).toBe(true);
-  expect(castlingSide(pos, altQueenSide)).toBe('a');
-  expect(normalizeMove(pos, altQueenSide)).toEqual(queenSide);
-  expect(pos.isLegal(altQueenSide)).toBe(true);
+  assert.strictEqual(castlingSide(pos, queenSide), 'a');
+  assert.deepStrictEqual(normalizeMove(pos, queenSide), queenSide);
+  assert.strictEqual(pos.isLegal(queenSide), true);
+  assert.strictEqual(castlingSide(pos, altQueenSide), 'a');
+  assert.deepStrictEqual(normalizeMove(pos, altQueenSide), queenSide);
+  assert.strictEqual(pos.isLegal(altQueenSide), true);
   pos.play(altQueenSide);
-  expect(makeFen(pos.toSetup())).toBe('1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/2KR3R b k - 1 20');
+  assert.strictEqual(makeFen(pos.toSetup()), '1r2k2r/p1b1n1pp/1q3p2/1p2pPQ1/4P3/2P4P/1B2B1P1/2KR3R b k - 1 20');
 });
 
 test('test illegal promotion', () => {
   const pos = Chess.default();
-  expect(pos.isLegal({ from: 12, to: 20, promotion: 'queen' })).toBe(false);
+  assert.strictEqual(pos.isLegal({ from: 12, to: 20, promotion: 'queen' }), false);
 });
 
 test('starting perft', () => {
   const pos = Chess.default();
-  expect(perft(pos, 0, false)).toBe(1);
-  expect(perft(pos, 1, false)).toBe(20);
-  expect(perft(pos, 2, false)).toBe(400);
-  expect(perft(pos, 3, false)).toBe(8902);
+  assert.strictEqual(perft(pos, 0, false), 1);
+  assert.strictEqual(perft(pos, 1, false), 20);
+  assert.strictEqual(perft(pos, 2, false), 400);
+  assert.strictEqual(perft(pos, 3, false), 8902);
 });
 
-test.each(tricky)('tricky perft: %s: %s', (_, fen, d1, d2, d3) => {
-  const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
-  expect(perft(pos, 1, false)).toBe(d1);
-  expect(perft(pos, 2, false)).toBe(d2);
-  expect(perft(pos, 3, false)).toBe(d3);
-});
+for (const [name, fen, d1, d2, d3] of tricky) {
+  test(`tricky perft: ${name}: ${fen}`, () => {
+    const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
+    assert.strictEqual(perft(pos, 1, false), d1);
+    assert.strictEqual(perft(pos, 2, false), d2);
+    assert.strictEqual(perft(pos, 3, false), d3);
+  });
+}
 
-test.each(random)('random perft: %s: %s', (_, fen, d1, d2, d3, d4, d5) => {
-  const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
-  expect(perft(pos, 1, false)).toBe(d1);
-  expect(perft(pos, 2, false)).toBe(d2);
-  expect(perft(pos, 3, false)).toBe(d3);
-  expect(perft(pos, 4, false)).toBe(d4);
-  if (d5 < 100000) expect(perft(pos, 5, false)).toBe(d5);
-});
+for (const [name, fen, d1, d2, d3, d4, d5] of random) {
+  test(`random perft: ${name}: ${fen}`, () => {
+    const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
+    assert.strictEqual(perft(pos, 1, false), d1);
+    assert.strictEqual(perft(pos, 2, false), d2);
+    assert.strictEqual(perft(pos, 3, false), d3);
+    assert.strictEqual(perft(pos, 4, false), d4);
+    if (d5 < 100000) assert.strictEqual(perft(pos, 5, false), d5);
+  });
+}
 
 const insufficientMaterial: [string, boolean, boolean][] = [
   ['8/5k2/8/8/8/8/3K4/8 w - - 0 1', true, true],
@@ -164,43 +170,47 @@ const insufficientMaterial: [string, boolean, boolean][] = [
   ['3b4/8/8/6b1/8/8/R7/K1k5 w - - 0 1', false, true],
 ];
 
-test.each(insufficientMaterial)('insufficient material: %s', (fen, white, black) => {
-  const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
-  expect(pos.hasInsufficientMaterial('white')).toBe(white);
-  expect(pos.hasInsufficientMaterial('black')).toBe(black);
-});
+for (const [fen, white, black] of insufficientMaterial) {
+  test(`insufficient material: ${fen}`, () => {
+    const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
+    assert.strictEqual(pos.hasInsufficientMaterial('white'), white);
+    assert.strictEqual(pos.hasInsufficientMaterial('black'), black);
+  });
+}
 
 test('impossible check', () => {
   // Multiple checkers aligned with king.
   const pos1 = Chess.fromSetup(parseFen('3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - - 0 1').unwrap()).unwrap();
-  expect(isImpossibleCheck(pos1)).toBe(true);
+  assert.strictEqual(isImpossibleCheck(pos1), true);
 
   // Checkers aligned with opponent king are fine.
   const pos2 = Chess.fromSetup(parseFen('8/8/5k2/p1q5/PP1rp1P1/3P1N2/2RK1r2/5nN1 w - - 0 3').unwrap()).unwrap();
-  expect(isImpossibleCheck(pos2)).toBe(false);
+  assert.strictEqual(isImpossibleCheck(pos2), false);
 
   // En passant square aligned with checker and king.
   const pos3 = Chess.fromSetup(parseFen('8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 0 1').unwrap()).unwrap();
-  expect(isImpossibleCheck(pos3)).toBe(true);
+  assert.strictEqual(isImpossibleCheck(pos3), true);
 
   // Multiple steppers.
   const pos4 = Chess.fromSetup(parseFen('2b5/1nbn4/n3n3/1kn5/n3n3/1n1n4/5RQ1/2KQ1R2 w K - 0 1').unwrap()).unwrap();
-  expect(isImpossibleCheck(pos4)).toBe(true);
+  assert.strictEqual(isImpossibleCheck(pos4), true);
 });
 
 test('king captures unmoved rook', () => {
   const pos = Chess.fromSetup(parseFen('8/8/8/B2p3Q/2qPp1P1/b7/2P2PkP/4K2R b K - 0 1').unwrap()).unwrap();
-  const move = parseUci('g2h1')!;
-  expect(move).toEqual({ from: 14, to: 7 });
-  expect(pos.isLegal(move)).toBe(true);
+  const move = parseUci('g2h1') as NormalMove;
+  assert.strictEqual(move.from, 14);
+  assert.strictEqual(move.to, 7);
+  assert.strictEqual(move.promotion, undefined);
+  assert.strictEqual(pos.isLegal(move), true);
   pos.play(move);
-  expect(makeFen(pos.toSetup())).toBe('8/8/8/B2p3Q/2qPp1P1/b7/2P2P1P/4K2k w - - 0 2');
+  assert.strictEqual(makeFen(pos.toSetup()), '8/8/8/B2p3Q/2qPp1P1/b7/2P2P1P/4K2k w - - 0 2');
 });
 
 test('en passant and unrelated check', () => {
   const setup = parseFen('rnbqk1nr/bb3p1p/1q2r3/2pPp3/3P4/7P/1PP1NpPP/R1BQKBNR w KQkq c6').unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
-  expect(isImpossibleCheck(pos)).toBe(true);
+  assert.strictEqual(isImpossibleCheck(pos), true);
   const enPassant = parseUci('d5c6')!;
-  expect(pos.isLegal(enPassant)).toBe(false);
+  assert.strictEqual(pos.isLegal(enPassant), false);
 });

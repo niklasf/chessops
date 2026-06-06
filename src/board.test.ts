@@ -1,22 +1,23 @@
-import { expect, test } from '@jest/globals';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { Board, boardEquals } from './board.js';
 import { Piece } from './types.js';
 
 test('set and get', () => {
   const emptyBoard = Board.empty();
-  expect(emptyBoard.getColor(0)).toBeUndefined();
-  expect(emptyBoard.getRole(0)).toBeUndefined();
-  expect(emptyBoard.has(0)).toBe(false);
-  expect(emptyBoard.get(0)).toBeUndefined();
-  expect(boardEquals(emptyBoard, emptyBoard.clone())).toBe(true);
+  assert.strictEqual(emptyBoard.getColor(0), undefined);
+  assert.strictEqual(emptyBoard.getRole(0), undefined);
+  assert.strictEqual(emptyBoard.has(0), false);
+  assert.strictEqual(emptyBoard.get(0), undefined);
+  assert.ok(boardEquals(emptyBoard, emptyBoard.clone()));
 
   const board = emptyBoard.clone();
   const piece: Piece = { role: 'knight', color: 'black', promoted: false };
-  expect(board.set(0, piece)).toBeUndefined();
-  expect(board.getColor(0)).toBe('black');
-  expect(board.getRole(0)).toBe('knight');
-  expect(board.has(0)).toBe(true);
-  expect(board.get(0)).toEqual(piece);
-  expect(boardEquals(board, board.clone())).toBe(true);
-  expect(boardEquals(emptyBoard, board)).toBe(false);
+  assert.strictEqual(board.set(0, piece), undefined);
+  assert.strictEqual(board.getColor(0), 'black');
+  assert.strictEqual(board.getRole(0), 'knight');
+  assert.strictEqual(board.has(0), true);
+  assert.deepStrictEqual(board.get(0), piece);
+  assert.ok(boardEquals(board, board.clone()));
+  assert.strictEqual(boardEquals(emptyBoard, board), false);
 });

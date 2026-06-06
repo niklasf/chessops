@@ -6,7 +6,7 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "target": "ES2018",
     "lib": ["ES2018"],
     "module": "esnext",

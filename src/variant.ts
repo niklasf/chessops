@@ -5,7 +5,7 @@ import {
   Castles,
   castlingSide,
   Chess,
-  Context,
+  type Context,
   equalsIgnoreMoves,
   IllegalSetup,
   isImpossibleCheck,
@@ -20,11 +20,11 @@ import { SquareSet } from './squareSet.js';
 import { Color, COLORS, Outcome, Piece, Rules, Square } from './types.js';
 import { defined, opposite } from './util.js';
 
+export type { Context };
 export {
   Castles,
   castlingSide,
   Chess,
-  Context,
   equalsIgnoreMoves,
   IllegalSetup,
   isImpossibleCheck,

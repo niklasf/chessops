@@ -68,7 +68,8 @@ export {
   setupEquals,
 } from './setup.js';
 
-export { Castles, Chess, Context, IllegalSetup, Position, PositionError } from './chess.js';
+export type { Context } from './chess.js';
+export { Castles, Chess, IllegalSetup, Position, PositionError } from './chess.js';
 
 export * as compat from './compat.js';
 

@@ -1,4 +1,5 @@
-import { expect, test } from '@jest/globals';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { perft } from './debug.js';
 import { makeFen, parseFen } from './fen.js';
 import { makeSanAndPlay, parseSan } from './san.js';
@@ -45,12 +46,14 @@ const variantPerfts: [Rules, string, string, number, number, number][] = [
   ['3check', 'castling', 'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 1+1', 26, 562, 13410],
 ];
 
-test.each(variantPerfts)('variant perft: %s (%s): %s', (rules, name, fen, d1, d2, d3) => {
-  const pos = setupPosition(rules, parseFen(fen).unwrap()).unwrap();
-  expect(perft(pos, 1, false)).toBe(d1);
-  if (d2) expect(perft(pos, 2, false)).toBe(d2);
-  if (d3) expect(perft(pos, 3, false)).toBe(d3);
-});
+for (const [rules, name, fen, d1, d2, d3] of variantPerfts) {
+  test(`variant perft: ${rules} (${name}): ${fen}`, () => {
+    const pos = setupPosition(rules, parseFen(fen).unwrap()).unwrap();
+    assert.strictEqual(perft(pos, 1, false), d1);
+    if (d2) assert.strictEqual(perft(pos, 2, false), d2);
+    if (d3) assert.strictEqual(perft(pos, 3, false), d3);
+  });
+}
 
 const falseNegative = false;
 
@@ -95,23 +98,25 @@ const insufficientMaterial: [Rules, string, boolean, boolean][] = [
   ['horde', '8/1b5r/1P6/1Pk3q1/1PP5/r1P5/P1P5/2P5 b - - 0 52', false, false],
 ];
 
-test.each(insufficientMaterial)('%s insufficient material: %s', (rules, fen, white, black) => {
-  const pos = setupPosition(rules, parseFen(fen).unwrap()).unwrap();
-  expect(pos.hasInsufficientMaterial('white')).toBe(white);
-  expect(pos.hasInsufficientMaterial('black')).toBe(black);
-});
+for (const [rules, fen, white, black] of insufficientMaterial) {
+  test(`${rules} insufficient material: ${fen}`, () => {
+    const pos = setupPosition(rules, parseFen(fen).unwrap()).unwrap();
+    assert.strictEqual(pos.hasInsufficientMaterial('white'), white);
+    assert.strictEqual(pos.hasInsufficientMaterial('black'), black);
+  });
+}
 
 test('king of the hill not over', () => {
   const pos = setupPosition(
     'kingofthehill',
     parseFen('rnbqkbnr/pppppppp/8/1Q6/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1').unwrap(),
   ).unwrap();
-  expect(pos.isInsufficientMaterial()).toBe(false);
-  expect(pos.isCheck()).toBe(false);
-  expect(pos.isVariantEnd()).toBe(false);
-  expect(pos.variantOutcome()).toBeUndefined();
-  expect(pos.outcome()).toBeUndefined();
-  expect(pos.isEnd()).toBe(false);
+  assert.strictEqual(pos.isInsufficientMaterial(), false);
+  assert.strictEqual(pos.isCheck(), false);
+  assert.strictEqual(pos.isVariantEnd(), false);
+  assert.strictEqual(pos.variantOutcome(), undefined);
+  assert.strictEqual(pos.outcome(), undefined);
+  assert.strictEqual(pos.isEnd(), false);
 });
 
 test('racing kings end', () => {
@@ -120,23 +125,23 @@ test('racing kings end', () => {
     'racingkings',
     parseFen('kr3NK1/1q2R3/8/8/8/5n2/2N5/1rb2B1R w - - 11 14').unwrap(),
   ).unwrap();
-  expect(draw.isEnd()).toBe(true);
-  expect(draw.outcome()).toStrictEqual({ winner: undefined });
+  assert.strictEqual(draw.isEnd(), true);
+  assert.deepStrictEqual(draw.outcome(), { winner: undefined });
 
   // White to move is lost because black reached the backrank.
   const black = setupPosition('racingkings', parseFen('1k6/6K1/8/8/8/8/8/8 w - - 0 1').unwrap()).unwrap();
-  expect(black.isEnd()).toBe(true);
-  expect(black.outcome()).toStrictEqual({ winner: 'black' });
+  assert.strictEqual(black.isEnd(), true);
+  assert.deepStrictEqual(black.outcome(), { winner: 'black' });
 
   // Black is given a chance to catch up.
   const pos = setupPosition('racingkings', parseFen('1K6/7k/8/8/8/8/8/8 b - - 0 1').unwrap()).unwrap();
-  expect(pos.isEnd()).toBe(false);
-  expect(pos.outcome()).toBeUndefined();
+  assert.strictEqual(pos.isEnd(), false);
+  assert.strictEqual(pos.outcome(), undefined);
 
   // Black near backrank but cannot move there.
   const white = setupPosition('racingkings', parseFen('2KR4/k7/2Q5/4q3/8/8/8/2N5 b - - 0 1').unwrap()).unwrap();
-  expect(white.isEnd()).toBe(true);
-  expect(white.outcome()).toStrictEqual({ winner: 'white' });
+  assert.strictEqual(white.isEnd(), true);
+  assert.deepStrictEqual(white.outcome(), { winner: 'white' });
 });
 
 test('atomic king exploded', () => {
@@ -144,17 +149,17 @@ test('atomic king exploded', () => {
     'atomic',
     parseFen('r4b1r/ppp1pppp/7n/8/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 3').unwrap(),
   ).unwrap();
-  expect(pos1.isEnd()).toBe(true);
-  expect(pos1.isVariantEnd()).toBe(true);
-  expect(pos1.outcome()).toStrictEqual({ winner: 'white' });
+  assert.strictEqual(pos1.isEnd(), true);
+  assert.strictEqual(pos1.isVariantEnd(), true);
+  assert.deepStrictEqual(pos1.outcome(), { winner: 'white' });
 
   const pos2 = setupPosition(
     'atomic',
     parseFen('rn5r/pp4pp/2p3Nn/5p2/1b2P1PP/8/PPP2P2/R1B1KB1R b KQ - 0 9').unwrap(),
   ).unwrap();
-  expect(pos2.isEnd()).toBe(true);
-  expect(pos2.isVariantEnd()).toBe(true);
-  expect(pos2.outcome()).toStrictEqual({ winner: 'white' });
+  assert.strictEqual(pos2.isEnd(), true);
+  assert.strictEqual(pos2.isVariantEnd(), true);
+  assert.deepStrictEqual(pos2.outcome(), { winner: 'white' });
 });
 
 test('3check remaining checks', () => {
@@ -163,7 +168,7 @@ test('3check remaining checks', () => {
     parseFen('rnbqkbnr/ppp1pppp/3p4/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 3+3 0 2').unwrap(),
   ).unwrap();
   pos.play(parseUci('f1b5')!);
-  expect(makeFen(pos.toSetup())).toBe('rnbqkbnr/ppp1pppp/3p4/1B6/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 2+3 1 2');
+  assert.strictEqual(makeFen(pos.toSetup()), 'rnbqkbnr/ppp1pppp/3p4/1B6/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 2+3 1 2');
 });
 
 test('antichess en passant', () => {
@@ -172,9 +177,9 @@ test('antichess en passant', () => {
     parseFen('r1bqkbn1/p1ppp3/2n4p/6p1/1Pp5/4P3/P2P1PP1/R1B1K3 b - b3 0 11').unwrap(),
   ).unwrap();
   const move = parseUci('c4b3')!;
-  expect(pos.isLegal(move)).toBe(true);
+  assert.strictEqual(pos.isLegal(move), true);
   const san = parseSan(pos, 'cxb3');
-  expect(move).toEqual(san);
+  assert.deepStrictEqual(move, san);
 });
 
 test('atomic rooks after explosion', () => {
@@ -186,10 +191,12 @@ test('atomic rooks after explosion', () => {
           ' ',
         )
   ) {
-    expect(makeSanAndPlay(pos, parseSan(pos, san)!)).toEqual(san);
+    assert.deepStrictEqual(makeSanAndPlay(pos, parseSan(pos, san)!), san);
   }
 });
 
-test.each(RULES)('%s standard material', rules => {
-  expect(isStandardMaterial(defaultPosition(rules))).toBe(true);
-});
+for (const rules of RULES) {
+  test(`${rules} standard material`, () => {
+    assert.strictEqual(isStandardMaterial(defaultPosition(rules)), true);
+  });
+}
