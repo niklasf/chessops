@@ -42,19 +42,18 @@
     "@badrap/result": "^0.3"
   },
   "devDependencies": {
-    "@jest/globals": "^30",
+    "@types/node": "^25",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
     "dprint": "^0.54",
     "eslint": "^10",
-    "jest": "^30",
-    "ts-jest": "^29",
+    "tsx": "^4.22.4",
     "typedoc": "^0.28",
     "typescript": "^5"
   },
   "scripts": {
     "prepare": "tsc --declarationDir dist/types && tsc --outDir dist/cjs --module commonjs --declaration false",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "node --import tsx/esm --test src/*.test.ts",
     "doc": "typedoc src/types.ts src/attacks.ts src/util.ts src/squareSet.ts src/board.ts src/setup.ts src/chess.ts src/compat.ts src/debug.ts src/fen.ts src/san.ts src/transform.ts src/variant.ts src/pgn.ts",
     "lint": "eslint",
     "format": "dprint fmt",
@@ -64,22 +63,5 @@
     "/src",
     "/dist",
     "!/**/*.test.*"
-  ],
-  "jest": {
-    "testRegex": ".*\\.test\\.ts$",
-    "transform": {
-      "\\.ts$": [
-        "ts-jest",
-        {
-          "useESM": true
-        }
-      ]
-    },
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "moduleNameMapper": {
-      "^(.*)\\.js$": "$1"
-    }
-  }
+  ]
 }
