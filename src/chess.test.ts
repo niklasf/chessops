@@ -186,6 +186,8 @@ test('impossible check', () => {
   // Multiple steppers.
   const pos4 = Chess.fromSetup(parseFen('2b5/1nbn4/n3n3/1kn5/n3n3/1n1n4/5RQ1/2KQ1R2 w K - 0 1').unwrap()).unwrap();
   expect(isImpossibleCheck(pos4)).toBe(true);
+  const pos5 = Chess.fromSetup(parseFen('8/8/N7/2k5/N7/8/8/3K4 b - - 0 1').unwrap()).unwrap();
+  expect(isImpossibleCheck(pos5)).toBe(true);
 });
 
 test('king captures unmoved rook', () => {
