@@ -45,10 +45,10 @@
     "@types/node": "^26",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
-    "dprint": "^0.55",
+    "dprint": "^0.56",
     "eslint": "^10",
     "typedoc": "^0.28",
-    "typescript": "^6",
+    "typescript": "^7",
     "vitest": "^4"
   },
   "scripts": {
