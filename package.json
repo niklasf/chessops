@@ -15,27 +15,9 @@
   "funding": "https://github.com/sponsors/niklasf",
   "license": "GPL-3.0-or-later",
   "type": "module",
-  "module": "dist/esm/index.js",
-  "main": "dist/cjs/index.js",
-  "types": "index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "dist/types/*"
-      ]
-    }
-  },
   "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    },
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.js",
-      "require": "./dist/cjs/*.js"
-    }
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js"
   },
   "sideEffects": false,
   "dependencies": {
@@ -52,7 +34,7 @@
     "vitest": "^4"
   },
   "scripts": {
-    "prepare": "tsc --declarationDir dist/types && tsc --outDir dist/cjs --module commonjs --declaration false",
+    "prepare": "tsc",
     "preversion": "npm run prepare && npm test",
     "version": "grep -q \"^## v$npm_package_version$\" CHANGELOG.md || { echo \"CHANGELOG.md has no section for v$npm_package_version\"; exit 1; } && npm --prefix fuzz install --package-lock-only --ignore-scripts && npm --prefix examples install --package-lock-only --ignore-scripts && git add fuzz/package-lock.json examples/package-lock.json",
     "test": "vitest run",

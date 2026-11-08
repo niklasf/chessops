@@ -11,8 +11,7 @@
     "lib": ["ES2018"],
     "module": "esnext",
     "types": ["node"],
-    "esModuleInterop": true,
-    "outDir": "dist/esm",
+    "outDir": "dist",
     "rootDir": "src",
     "declaration": true,
     "sourceMap": true
