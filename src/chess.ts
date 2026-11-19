@@ -622,7 +622,8 @@ export const normalizeMove = (pos: Position, move: Move): Move => {
 };
 
 export const isStandardMaterialSide = (board: Board, color: Color): boolean => {
-  const promoted = Math.max(board.pieces(color, 'queen').size() - 1, 0)
+  const promoted = Math.max(board.pieces(color, 'king').size() - 1, 0)
+    + Math.max(board.pieces(color, 'queen').size() - 1, 0)
     + Math.max(board.pieces(color, 'rook').size() - 2, 0)
     + Math.max(board.pieces(color, 'knight').size() - 2, 0)
     + Math.max(board.pieces(color, 'bishop').intersect(SquareSet.lightSquares()).size() - 1, 0)
