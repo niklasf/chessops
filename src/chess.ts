@@ -606,9 +606,10 @@ export const equalsIgnoreMoves = (left: Position, right: Position): boolean =>
 export const castlingSide = (pos: Position, move: Move): CastlingSide | undefined => {
   if (isDrop(move)) return;
   const delta = move.to - move.from;
-  if (Math.abs(delta) !== 2 && !pos.board[pos.turn].has(move.to)) return;
+  const side: CastlingSide = delta > 0 ? 'h' : 'a';
+  if (Math.abs(delta) !== 2 && pos.castles.rook[pos.turn][side] !== move.to) return;
   if (!pos.board.king.has(move.from)) return;
-  return delta > 0 ? 'h' : 'a';
+  return side;
 };
 
 export const normalizeMove = (pos: Position, move: Move): Move => {
