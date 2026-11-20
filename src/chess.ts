@@ -512,7 +512,7 @@ const validEpSquare = (pos: Position, square: Square | undefined): Square | unde
   const epRank = pos.turn === 'white' ? 5 : 2;
   const forward = pos.turn === 'white' ? 8 : -8;
   if (squareRank(square) !== epRank) return;
-  if (pos.board.occupied.has(square + forward)) return;
+  if (pos.board.occupied.has(square) || pos.board.occupied.has(square + forward)) return;
   const pawn = square - forward;
   if (!pos.board.pawn.has(pawn) || !pos.board[opposite(pos.turn)].has(pawn)) return;
   return square;
