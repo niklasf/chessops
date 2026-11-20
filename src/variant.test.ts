@@ -191,6 +191,17 @@ test('atomic rooks after explosion', () => {
   }
 });
 
+test('antichess with empty side', () => {
+  // the side that just lost all pieces must be to move
+  expect(setupPosition('antichess', parseFen('8/8/8/8/8/8/8/K7 w - - 0 1').unwrap()).isErr).toBe(true);
+  expect(setupPosition('antichess', parseFen('1b6/8/8/8/8/8/8/8 b - - 0 1').unwrap()).isErr).toBe(true);
+
+  const pos = setupPosition('antichess', parseFen('8/8/8/8/8/8/8/k7 w - - 0 1').unwrap()).unwrap();
+  expect(pos.isEnd()).toBe(true);
+  expect(pos.isVariantEnd()).toBe(true);
+  expect(pos.outcome()).toStrictEqual({ winner: 'white' });
+});
+
 test.each(RULES)('%s standard material', rules => {
   expect(isStandardMaterial(defaultPosition(rules))).toBe(true);
 });

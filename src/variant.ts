@@ -269,6 +269,7 @@ export class Antichess extends Position {
 
   protected validate(): Result<undefined, PositionError> {
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (this.board[opposite(this.turn)].isEmpty()) return Result.err(new PositionError(IllegalSetup.Variant));
     if (SquareSet.backranks().intersects(this.board.pawn)) {
       return Result.err(new PositionError(IllegalSetup.PawnsOnBackrank));
     }
