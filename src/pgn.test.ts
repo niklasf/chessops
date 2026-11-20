@@ -89,6 +89,35 @@ test('extend mainline', () => {
   expect(makePgn(game)).toEqual('1. e4 d5 2. a3 h6 3. Bg5 *\n');
 });
 
+test('unescaped quotes in header values', () => {
+  const pgn = [
+    '[WhiteTeam "United States "B" Olympiad"]',
+    '[BlackTeam "United States "A" Olympiad"]',
+    '[Site "a "b" c" ]',
+    '[Annotator "The "Annotator""]',
+    '[Round ""]',
+    '[A "a "b" c"] [B "d"][C "e "f""] [D "g" ]',
+    '[Event "x "y"',
+    '',
+    '1. e4 ',
+  ].join('\n');
+  const games = parsePgn(pgn, emptyHeaders);
+  expect(games).toHaveLength(1);
+  expect([...games[0].headers]).toEqual([
+    ['WhiteTeam', 'United States "B" Olympiad'],
+    ['BlackTeam', 'United States "A" Olympiad'],
+    ['Site', 'a "b" c'],
+    ['Annotator', 'The "Annotator"'],
+    ['Round', ''],
+    ['A', 'a "b" c'],
+    ['B', 'd'],
+    ['C', 'e "f"'],
+    ['D', 'g'],
+    ['Event', 'x "y'],
+  ]);
+  expect([...games[0].moves.mainline()].map(move => move.san)).toEqual(['e4']);
+});
+
 test('parse headers', () => {
   const games = parsePgn(
     [

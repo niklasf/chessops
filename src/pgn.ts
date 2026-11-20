@@ -482,10 +482,12 @@ export class PgnParser {
           while (moreHeaders) {
             moreHeaders = false;
             line = line.replace(
-              /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\"|\\\\)*)"\]/,
+              // Until a quote closes the value, but only if followed by ] or
+              // the end of the line (ignoring whitespace).
+              /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\.|"(?![ \t]*(?:\]|$)))*)"[ \t]*(?:\]|$)/,
               (_match, headerName, headerValue) => {
                 this.consumeBudget(200);
-                this.handleHeader(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+                this.handleHeader(headerName, headerValue.replace(/\\(["\\])/g, '$1'));
                 moreHeaders = true;
                 freshLine = false;
                 return '';
