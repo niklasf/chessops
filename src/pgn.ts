@@ -381,31 +381,6 @@ const isWhitespace = (line: string): boolean => /^\s*$/.test(line);
 
 const isCommentLine = (line: string): boolean => line.startsWith('%');
 
-const escapeInnerQuotesInTeamTag = (tag: string): string => {
-  const first = tag.indexOf('"');
-  const last = tag.lastIndexOf('"');
-  if (first === -1 || last === first) return tag;
-
-  let out = '';
-  for (let i = 0; i < tag.length; i++) {
-    if (tag[i] === '\\' && i + 1 < tag.length) {
-      // already escaped, copy both characters
-      out += tag.slice(i, i += 2);
-      continue;
-    }
-    if (tag[i] === '"' && i !== first && i !== last) {
-      out += '\\"';
-    } else {
-      out += tag[i];
-    }
-  }
-  return out;
-};
-
-const fixTeamHeaderQuotes = (line: string): string => {
-  return line.replace(/\[(WhiteTeam|BlackTeam) [^\]]*\]/g, escapeInnerQuotesInTeamTag);
-};
-
 export interface ParseOptions {
   stream: boolean;
 }
@@ -503,15 +478,16 @@ export class PgnParser {
           this.state = ParserState.Headers; // fall through
         case ParserState.Headers: {
           if (isCommentLine(line)) return;
-          if (/\[(WhiteTeam|BlackTeam) /.test(line)) line = fixTeamHeaderQuotes(line);
           let moreHeaders = true;
           while (moreHeaders) {
             moreHeaders = false;
             line = line.replace(
-              /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\"|\\\\)*)"\]/,
+              // Until a quote closes the value, but only if followed by ] or
+              // the end of the line (ignoring whitespace).
+              /^\s*\[([A-Za-z0-9][A-Za-z0-9_+#=:-]*)\s+"((?:[^"\\]|\\.|"(?![ \t]*(?:\]|$)))*)"[ \t]*(?:\]|$)/,
               (_match, headerName, headerValue) => {
                 this.consumeBudget(200);
-                this.handleHeader(headerName, headerValue.replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+                this.handleHeader(headerName, headerValue.replace(/\\(["\\])/g, '$1'));
                 moreHeaders = true;
                 freshLine = false;
                 return '';

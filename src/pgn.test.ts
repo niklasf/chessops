@@ -89,48 +89,33 @@ test('extend mainline', () => {
   expect(makePgn(game)).toEqual('1. e4 d5 2. a3 h6 3. Bg5 *\n');
 });
 
-test('team tag with nickname in the middle', () => {
-  const game = parsePgn(
-    '[WhiteTeam "United States "Women" Olympiad"]\n\n1. e4 *\n',
-    emptyHeaders,
-  )[0];
-  expect(game.headers.get('WhiteTeam')).toBe('United States "Women" Olympiad');
-});
-
-test('team tag with board letter before bracket', () => {
-  const game = parsePgn('[BlackTeam "Germany "B""]\n\n1. e4 *\n', emptyHeaders)[0];
-  expect(game.headers.get('BlackTeam')).toBe('Germany "B"');
-});
-
-test('team tag with quoted word at end of value', () => {
-  const game = parsePgn('[WhiteTeam "France "A""]\n\n1. e4 *\n', emptyHeaders)[0];
-  expect(game.headers.get('WhiteTeam')).toBe('France "A"');
-});
-
-test('team tag with two quoted segments', () => {
-  const game = parsePgn(
-    '[WhiteTeam "India "A" and China "B""]\n\n1. e4 *\n',
-    emptyHeaders,
-  )[0];
-  expect(game.headers.get('WhiteTeam')).toBe('India "A" and China "B"');
-});
-
-test('two team tags on one header line', () => {
-  const game = parsePgn(
-    '[WhiteTeam "Norway"] [BlackTeam "Spain "C""]\n\n1. e4 *\n',
-    emptyHeaders,
-  )[0];
-  expect(game.headers.get('WhiteTeam')).toBe('Norway');
-  expect(game.headers.get('BlackTeam')).toBe('Spain "C"');
-});
-
-test('plain team names pass through unchanged', () => {
-  const game = parsePgn(
-    ['[WhiteTeam "France"]', '[BlackTeam "Armenia"]', '', '1. e4 *'].join('\n'),
-    emptyHeaders,
-  )[0];
-  expect(game.headers.get('WhiteTeam')).toBe('France');
-  expect(game.headers.get('BlackTeam')).toBe('Armenia');
+test('unescaped quotes in header values', () => {
+  const pgn = [
+    '[WhiteTeam "United States "B" Olympiad"]',
+    '[BlackTeam "United States "A" Olympiad"]',
+    '[Site "a "b" c" ]',
+    '[Annotator "The "Annotator""]',
+    '[Round ""]',
+    '[A "a "b" c"] [B "d"][C "e "f""] [D "g" ]',
+    '[Event "x "y"',
+    '',
+    '1. e4 ',
+  ].join('\n');
+  const games = parsePgn(pgn, emptyHeaders);
+  expect(games).toHaveLength(1);
+  expect([...games[0].headers]).toEqual([
+    ['WhiteTeam', 'United States "B" Olympiad'],
+    ['BlackTeam', 'United States "A" Olympiad'],
+    ['Site', 'a "b" c'],
+    ['Annotator', 'The "Annotator"'],
+    ['Round', ''],
+    ['A', 'a "b" c'],
+    ['B', 'd'],
+    ['C', 'e "f"'],
+    ['D', 'g'],
+    ['Event', 'x "y'],
+  ]);
+  expect([...games[0].moves.mainline()].map(move => move.san)).toEqual(['e4']);
 });
 
 test('parse headers', () => {
